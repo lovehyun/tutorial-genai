@@ -9,7 +9,8 @@ from langchain_community.utilities import GoogleSerperAPIWrapper, WikipediaAPIWr
 from langchain.chains import LLMMathChain
 from langchain.agents.tools import Tool
 
-load_dotenv()
+
+load_dotenv(dotenv_path='../.env')
 
 llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0.1)
 llm_math_chain = LLMMathChain.from_llm(llm=llm, verbose=True)

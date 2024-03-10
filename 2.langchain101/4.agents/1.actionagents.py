@@ -10,7 +10,8 @@ from langchain_openai.llms import OpenAI
 # from langchain.agents import get_all_tool_names
 from langchain.agents import load_tools, initialize_agent, AgentType
 
-load_dotenv()
+
+load_dotenv(dotenv_path='../.env')
 
 # pp = pprint.PrettyPrinter(indent=4)
 # pp.pprint(get_all_tool_names())

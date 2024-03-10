@@ -9,7 +9,8 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 
-load_dotenv()
+
+load_dotenv(dotenv_path='../.env')
 
 # 파일 포멧 인코딩 변경해서 euckr 로 저장해둘것. UTF-8일 경우 cp949로딩 오류 발생.
 loader = TextLoader('./nvme.txt')

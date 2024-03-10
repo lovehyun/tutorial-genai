@@ -5,7 +5,8 @@ from langchain.chains import ConversationChain
 from langchain.memory import ChatMessageHistory, ConversationBufferMemory
 from langchain.schema import messages_from_dict, messages_to_dict
 
-load_dotenv()
+
+load_dotenv(dotenv_path='../.env')
 
 history = ChatMessageHistory()
 history.add_user_message("Hello, Let's talk about giraffes")

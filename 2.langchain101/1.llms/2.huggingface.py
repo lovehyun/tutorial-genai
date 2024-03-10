@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 
 from langchain_community.llms import HuggingFaceEndpoint
 
-load_dotenv()
+
+load_dotenv(dotenv_path='../.env')
 
 repo_id = "mistralai/Mistral-7B-Instruct-v0.2"
 
