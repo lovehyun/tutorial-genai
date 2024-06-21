@@ -6,7 +6,7 @@
 
 # database
 *.db
-vector_db.*
+vector_db*
 
 # data
 *.pdf
