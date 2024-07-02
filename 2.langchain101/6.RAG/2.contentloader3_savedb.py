@@ -18,11 +18,11 @@ import json
 
 load_dotenv(dotenv_path='../.env')
 
-VECTOR_DB_PATH = './vector_db.json'
+VECTOR_DB_PATH = './DATA/vector_db.json'
 
 def create_vector_db():
     # Load documents from a file, ensure encoding is correctly handled
-    loader = TextLoader('./nvme.txt', encoding='euckr')
+    loader = TextLoader('./DATA/nvme.txt', encoding='euckr')
     documents = loader.load()
 
     # Add metadata to the documents if not already present

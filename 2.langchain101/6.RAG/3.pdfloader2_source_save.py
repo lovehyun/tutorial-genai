@@ -17,8 +17,8 @@ import json
 load_dotenv(dotenv_path='../.env')
 
 # 파일 경로 설정
-PDF_FILENAME = './Python_시큐어코딩_가이드(2023년_개정본).pdf'
-VECTOR_DB_PATH = './vector_db_secure_coding.json'
+PDF_FILENAME = './DATA/Python_시큐어코딩_가이드(2023년_개정본).pdf'
+VECTOR_DB_PATH = './DATA/vector_db_secure_coding.json'
 store = None
 
 def create_vector_db(file_path):

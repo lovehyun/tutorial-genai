@@ -11,7 +11,7 @@ from langchain.chains import RetrievalQA
 
 from langchain_community.document_loaders import PyPDFLoader
 
-pdf_filename = './Python_시큐어코딩_가이드(2023년_개정본).pdf'
+pdf_filename = './DATA/Python_시큐어코딩_가이드(2023년_개정본).pdf'
 loader = PyPDFLoader(pdf_filename)
 pages = loader.load()
 
