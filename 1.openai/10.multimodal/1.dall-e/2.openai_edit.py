@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import urllib
 
-load_dotenv(dotenv_path='../.env')
+load_dotenv(dotenv_path='../../.env')
 
 client = OpenAI()
 
