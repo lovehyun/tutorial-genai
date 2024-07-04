@@ -1,4 +1,5 @@
-# pip install yfinance googletrans
+# pip install yfinance googletrans 
+# pip install deep-translator
 import os
 import requests
 import torch
@@ -7,6 +8,8 @@ from datetime import datetime, timedelta
 import yfinance as yf
 from gpt4all import GPT4All
 from googletrans import Translator
+from deep_translator import GoogleTranslator
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -50,9 +53,6 @@ combined_info = f"Stock Data for AAPL over the last 10 trading days:\n{stock_dat
 # Initialize the model
 model = GPT4All("Meta-Llama-3-8B-Instruct.Q4_0.gguf")
 
-# Initialize the translator
-translator = Translator()
-
 # System prompt
 system_prompt = "You are an expert in stock analysis and investment strategies."
 
@@ -71,8 +71,13 @@ with model.chat_session(system_prompt=system_prompt) as session:
     response = session.generate(prompt, max_tokens=500)
     
     # Translate the response to Korean
+    # translator = Translator()
     # translated_response = translator.translate(response, src='en', dest='ko').text
+
+    # Translate the response to Korean using an alternative translation library
+    translator = GoogleTranslator(source='en', target='ko')
+    translated_response = translator.translate(response)
     
     # Print the final summarized result in English and Korean
     print("Generated Investment Strategy (English):\n" + "="*50 + "\n" + response + "\n" + "="*50 + "\n")
-    # print("Generated Investment Strategy (Korean):\n" + "="*50 + "\n" + translated_response + "\n" + "="*50 + "\n")
+    print("Generated Investment Strategy (Korean):\n" + "="*50 + "\n" + translated_response + "\n" + "="*50 + "\n")
