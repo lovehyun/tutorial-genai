@@ -25,8 +25,13 @@ def get_chat_gpt_response(user_input):
             }
         )
 
-        return response.json()
-        # return response.json()['choices'][0]['message']['content']
+        response.raise_for_status()  # Raise an error for bad HTTP status codes
+        response_data = response.json()
+        print('-'*20)
+        print('Response JSON:', response_data)  # Print the entire response for debugging
+        print('-'*20)
+
+        return response.json()['choices'][0]['message']['content']
     except Exception as error:
         print('ChatGPT API 요청 중 오류 발생:', str(error))
         return '챗봇 응답을 가져오는 도중에 오류가 발생했습니다.'
