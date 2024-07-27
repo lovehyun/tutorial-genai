@@ -1,5 +1,6 @@
-# system env
+# project credentials
 .env
+gapi-*.json
 
 # python
 *.pyc
@@ -12,3 +13,4 @@ vector_db*
 *.pdf
 DATA/
 models/
+**/audio/*
