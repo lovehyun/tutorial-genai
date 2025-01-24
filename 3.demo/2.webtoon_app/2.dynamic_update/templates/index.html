@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Webtoon Generator</title>
+    </head>
+    <body>
+        <h1>Webtoon Generator</h1>
+        <form onsubmit="event.preventDefault(); generateImages();">
+            <textarea id="text" name="text" rows="10" cols="100" placeholder="Enter the novel text here..."></textarea
+            ><br />
+            <input type="submit" value="Generate" />
+        </form>
+        <div id="images"></div>
+        <div id="status"></div>
+        <script src="/static/js/script.js"></script>
+    </body>
+</html>

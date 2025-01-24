@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Model</title>
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await fetch('http://localhost:5000/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+        }
+
+        async function askQuestion() {
+            const questionInput = document.getElementById('questionInput');
+            const question = questionInput.value;
+
+            const response = await fetch('http://localhost:5000/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ question: question })
+            });
+
+            const result = await response.json();
+            document.getElementById('answer').innerText = result.answer || result.error;
+        }
+    </script>
+</head>
+<body>
+    <h1>Document Upload and Q&A</h1>
+    <input type="file" id="fileInput">
+    <button onclick="uploadFile()">Upload File</button>
+
+    <h2>Ask a Question</h2>
+    <input type="text" id="questionInput">
+    <button onclick="askQuestion()">Ask</button>
+
+    <h3>Answer</h3>
+    <p id="answer"></p>
+</body>
+</html>

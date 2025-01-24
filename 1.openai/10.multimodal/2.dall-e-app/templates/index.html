@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Masking with OpenAI</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #controls {
+            margin-bottom: 10px;
+        }
+        #canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <h1>Upload or Generate an Image</h1>
+        <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <button type="submit">Upload</button>
+        </form>
+        <form id="generateForm" action="/generate" method="post">
+            <input type="text" name="prompt" placeholder="Enter prompt">
+            <button type="submit">Generate</button>
+        </form>
+        <button id="generateMask">Generate Mask</button>
+        <button id="clearMask">Clear Mask</button>
+        <form id="editForm" action="/edit" method="post">
+            <input type="hidden" id="maskCoordinates" name="maskCoordinates">
+            <input type="text" id="editPrompt" name="prompt" placeholder="Enter edit prompt">
+            <button type="submit">Edit</button>
+        </form>
+    </div>
+    <canvas id="canvas"></canvas>
+    <img id="maskImage" style="display:none;" alt="Generated Mask">
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</body>
+</html>
