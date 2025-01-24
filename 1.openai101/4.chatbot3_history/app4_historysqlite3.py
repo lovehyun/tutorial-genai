@@ -1,21 +1,25 @@
-from flask import Flask, request, send_from_directory, jsonify
-from flask_cors import CORS
-import openai
-from dotenv import load_dotenv
 import os
 import time
 import logging
 import sqlite3
 import json
 
+from flask import Flask, request, send_from_directory, jsonify
+from flask_cors import CORS
+from openai import OpenAI
+from dotenv import load_dotenv
+
 load_dotenv('../.env')
 
 app = Flask(__name__, static_folder='public')  # 정적 파일 폴더 설정
 CORS(app)  # Cross-Origin Resource Sharing 설정
-port = int(os.environ.get("PORT", 5000))
+port = int(os.environ.get('PORT', 5000))
 
 # OpenAI 셋업
-openai.api_key = os.environ.get('OPENAI_API_KEY')
+openai_api_key = os.environ.get('OPENAI_API_KEY')
+
+# Create a client instance
+client = OpenAI(api_key=openai_api_key)
 
 # logging 설정
 logging.basicConfig(level=logging.INFO)
@@ -28,10 +32,37 @@ conn.row_factory = sqlite3.Row
 cursor = conn.cursor()
 
 # 대화 히스토리 테이블 생성
-cursor.execute("CREATE TABLE IF NOT EXISTS conversation (id INTEGER PRIMARY KEY AUTOINCREMENT, role TEXT, content TEXT)")
-conn.commit()
+def init_db():
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS conversation (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            role TEXT NOT NULL,
+            content TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
 
+init_db()
 
+def cleanup_old_conversations():
+    # 30일 이상 된 대화 삭제
+    cursor.execute("DELETE FROM conversation WHERE timestamp < datetime('now', '-30 day')")
+    conn.commit()
+
+@app.route('/api/clear-history', methods=['POST'])
+def clear_history():
+    cursor.execute("DELETE FROM conversation")
+    conn.commit()
+    return jsonify({'status': 'success'})
+
+@app.route('/api/search')
+def search_history():
+    query = request.args.get('q', '')
+    cursor.execute("SELECT * FROM conversation WHERE content LIKE ? ORDER BY id DESC", (f'%{query}%',))
+    rows = cursor.fetchall()
+    return json.dumps({'results': [dict(row) for row in rows]}, ensure_ascii=False)
+                      
 # 최근 10개의 대화 내용 가져오기
 def get_recent_conversation():
     cursor.execute("SELECT * FROM conversation ORDER BY id DESC LIMIT 10")
@@ -99,12 +130,12 @@ def get_chat_gpt_response(conversation_history):
             *conversation_history
         ]
 
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=input_messages
         )
 
-        chatgpt_response = response['choices'][0]['message']['content']
+        chatgpt_response = response.choices[0].message.content
         # logger.info('ChatGPT 응답: %s', chatgpt_response)
         return chatgpt_response
 

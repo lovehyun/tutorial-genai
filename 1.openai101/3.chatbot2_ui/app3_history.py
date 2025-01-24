@@ -1,17 +1,21 @@
-from flask import Flask, request, send_from_directory, jsonify
-import openai
-from dotenv import load_dotenv
 import os
 import time
 import logging
 
-load_dotenv()
+from flask import Flask, request, send_from_directory, jsonify
+from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv('../.env')
 
 app = Flask(__name__, static_folder='public')  # 정적 파일 폴더 설정
-port = int(os.environ.get("PORT", 5000))
+port = int(os.environ.get('PORT', 5000))
 
 # OpenAI 셋업
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+openai_api_key = os.environ.get('OPENAI_API_KEY')
+
+# Create a client instance
+client = OpenAI(api_key=openai_api_key)
 
 # logging 설정
 logging.basicConfig(level=logging.INFO)
@@ -31,18 +35,18 @@ conversation_history = []
 def chat():
     start = time.time() * 1000  # 요청 시작 시간 기록
     user_input = request.json.get('userInput', '')
-    print(f' => 사용자 요청: {user_input}')
+    print(f' => [사용자 요청]: {user_input}')
 
     # 이전 대화 내용 추가
     conversation_history.append({'role': 'user', 'content': user_input})
-    print(f' => 실제(프롬푸트) 요청: {conversation_history}')
+    print(f' => [(프롬푸트) 통합 요청]: {conversation_history}')
 
     # ChatGPT에 대화 내용 전송
     chatgpt_response = get_chatgpt_response(conversation_history)
 
     end = time.time() * 1000  # 응답 완료 시간 기록
-    print(f' <= ChatGPT 응답: {chatgpt_response}')
-    print(f' == 요청 및 응답 시간: {end - start} ms')
+    print(f' <= [ChatGPT 응답]: {chatgpt_response}')
+    print(f'    (요청 및 응답 시간: {end - start} ms)')
 
     # 이전 대화 내용에 ChatGPT 응답 추가
     conversation_history.append({'role': 'assistant', 'content': chatgpt_response})
@@ -58,18 +62,22 @@ def get_chatgpt_response(conversation_history):
     try:
         # 'system' 역할을 사용하여 사용자와 챗봇 간의 대화를 초기화합니다.
         input_messages = [
-            {'role': 'system', 'content': 'You are a helpful assistant.'},
+            # {'role': 'system', 'content': 'You are a helpful assistant.'},
             # {'role': 'system', 'content': 'You are a first-class hotel chef providing culinary recommendations.'},
             # {'role': 'system', 'content': 'You are a travel guide providing assistance and information for travelers.'},
+            {'role': 'system', 'content': '당신은 도움이 되는 AI 어시스턴트입니다.'},
+            # {'role': 'system', 'content': '당신은 최고급 호텔의 요리사로서 요리와 관련된 추천을 제공합니다.'},
+            # {'role': 'system', 'content': '당신은 여행자들에게 도움과 정보를 제공하는 여행 가이드입니다.'},
             *conversation_history,
         ]
 
-        response = openai.ChatCompletion.create(
+        # Use the updated method for chat completions
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=input_messages
         )
 
-        chatgpt_response = response['choices'][0]['message']['content']
+        chatgpt_response = response.choices[0].message.content
         # logger.info('ChatGPT 응답: %s', chatgpt_response)
         return chatgpt_response
 

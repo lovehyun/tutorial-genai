@@ -63,7 +63,7 @@ init_db()
 
 @app.route('/')
 def index():
-    return send_from_directory(app.static_folder, 'index.html')
+    return send_from_directory(app.static_folder, 'index2_delete.html')
 
 # 사용자의 대화를 받아 처리하고 챗봇 응답을 반환
 @app.route('/api/chat', methods=['POST'])
@@ -276,6 +276,18 @@ def get_specific_session(session_id):
         specific_session = cursor.fetchone()
         return specific_session
 
+@app.route('/api/session/<int:sessionId>', methods=['DELETE'])
+def delete_session(sessionId):
+    try:
+        with app.app_context():
+            conn = get_db()
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM conversation WHERE session_id = ?", (sessionId,))
+            cursor.execute("DELETE FROM session WHERE id = ?", (sessionId,))
+            conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port)
