@@ -15,6 +15,7 @@ def chat():
     data = request.get_json()
     user_input = data.get('userInput', '')
     chatgpt_response = get_chatgpt_response(user_input)
+    print(f"Response: {chatgpt_response}")
     return jsonify({'chatGPTResponse': chatgpt_response})
 
 

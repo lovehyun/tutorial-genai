@@ -16,11 +16,17 @@ def get_chat_gpt_response(user_input):
 
         # Use the updated method for chat completions
         response = client.chat.completions.create(
-            model='gpt-3.5-turbo',
+            model='gpt-3.5-turbo', # gpt-3.5-turbo, gpt-3.5-turbo-16k, gpt-4, gpt-4-32k
             messages=[
                 {'role': 'system', 'content': 'You are a helpful assistant.'},
                 {'role': 'user', 'content': user_input},
-            ]
+            ],
+            # 다양한 변수 추가
+            max_tokens=100,          # 응답의 최대 토큰 수
+            temperature=0.7,         # 창의성 제어 (0.0 ~ 2.0: 0.2 정확, 0.7 창의)
+            top_p=0.9,               # 확률 기반 토큰 선택 범위 (0.0 ~ 1.0: 1.0 모든 토큰, 0.1 상위 토큰만 선택)
+            frequency_penalty=0.5,   # 반복 억제 (-2.0 ~ 2.0: 동일한 단어의 반복을 억제, -1.0 반복, 1.0 억제)
+            presence_penalty=0.6     # 새로운 주제 도입 장려 (1.0 장려)
         )
         print('-'*20)
         print('Response JSON:', response)  # Print the entire response for debugging

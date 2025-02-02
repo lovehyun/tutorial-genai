@@ -18,6 +18,12 @@ def get_chat_gpt_response(user_input):
                     {'role': 'system', 'content': 'You are a helpful assistant.'},
                     {'role': 'user', 'content': user_input},
                 ],
+                # 다양한 변수 적용
+                'max_tokens': 100,          # 응답의 최대 토큰 수
+                'temperature': 0.7,         # 창의성 제어
+                'top_p': 0.9,               # 확률 기반 토큰 선택 범위
+                'frequency_penalty': 0.5,   # 반복 억제
+                'presence_penalty': 0.6     # 새로운 주제 장려
             },
             headers={
                 'Content-Type': 'application/json',
