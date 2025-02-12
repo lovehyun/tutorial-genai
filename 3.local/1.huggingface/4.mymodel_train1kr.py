@@ -5,8 +5,10 @@ from datasets import Dataset
 
 # 1️. 데이터 준비 (간단한 감성 분석 데이터셋)
 data = {
-    "text": ["I love this!", "This is terrible!", "I am happy.", "I am sad."],
+    "text": ["이 영화 정말 좋아요!", "완전 최악이에요.", "기분이 너무 좋다.", "정말 슬퍼요."],
+    # "text": ["이 영화 정말 좋아요!", "완전 최악이에요.", "기분이 너무 좋다.", "정말 슬퍼요.", "기분이 안 좋아요."],
     "label": [1, 0, 1, 0]  # 긍정 (1), 부정 (0)
+    # "label": [1, 0, 1, 0, 0]  # 긍정 (1), 부정 (0)
 }
 
 dataset = Dataset.from_dict(data)
@@ -32,8 +34,8 @@ dataset = Dataset.from_dict(data)
 # - Salesforce/codegen-350M-multi (다양한 프로그래밍 언어 지원)
 # - codellama/CodeLlama-7b (Llama 기반 코드 생성)
 
-model_name = "distilbert-base-uncased"
-# model_name = "beomi/KcBERT-base"
+# model_name = "distilbert-base-uncased"
+model_name = "beomi/KcBERT-base"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 # 3️. 데이터셋을 토큰화

@@ -17,3 +17,4 @@ my_model/
 my_local_model/
 quantized_model/
 **/audio/*
+conversation.txt

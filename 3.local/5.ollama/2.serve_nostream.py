@@ -14,7 +14,8 @@ import requests
 url = "http://localhost:11434/api/chat"
 data = {
     "model": "mistral",
-    "messages": [{"role": "user", "content": "안녕?"}]
+    "messages": [{"role": "user", "content": "안녕?"}],
+    "stream": False  # 스트리밍을 비활성화 (기본이 스트림처리)
 }
 
 response = requests.post(url, json=data)
@@ -25,6 +26,7 @@ print("Response Text:", response.text)
 # JSON 변환 테스트
 try:
     json_response = response.json()
-    print("JSON Response:", json_response)
+    # print(json_response)
+    print(json_response["message"]["content"])
 except requests.exceptions.JSONDecodeError:
     print("JSON 디코딩 오류 발생! 응답 내용:", response.text)
