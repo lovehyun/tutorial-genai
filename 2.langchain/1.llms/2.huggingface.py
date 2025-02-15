@@ -1,20 +1,19 @@
 # https://python.langchain.com/docs/integrations/llms/huggingface_endpoint
 
-# pip install huggingface_hub
+# pip install -U huggingface_hub langchain_huggingface
 
 from dotenv import load_dotenv
-
-from langchain_community.llms import HuggingFaceEndpoint
+from huggingface_hub import InferenceClient
 
 
 load_dotenv(dotenv_path='../.env')
 
-repo_id = "mistralai/Mistral-7B-Instruct-v0.2"
+# Hugging Face Inference API 클라이언트 생성
+client = InferenceClient(model="mistralai/Mistral-7B-Instruct-v0.2")
 
-llm = HuggingFaceEndpoint(
-    repo_id=repo_id, max_length=128, temperature=0.5
-)
-
+# 프롬프트 실행
 prompt = "What are good fitness tips?"
+response = client.text_generation(prompt, max_new_tokens=128, temperature=0.5)
 
-print(llm(prompt))
+# 결과 출력
+print(response)

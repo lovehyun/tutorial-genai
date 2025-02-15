@@ -1,45 +1,79 @@
 # pip install transformers pymupdf
 
 import fitz  # PyMuPDF
-from transformers import DistilBertTokenizer, DistilBertForQuestionAnswering, pipeline
+from transformers import AutoTokenizer, AutoModelForQuestionAnswering, pipeline
+from typing import Optional
 
-def extract_text_from_pdf(pdf_path):
-    """Extract text from a PDF document."""
-    doc = fitz.open(pdf_path)
-    text = ""
-    for page_num in range(doc.page_count):
-        page = doc.load_page(page_num)
-        text += page.get_text()
-    return text
+def extract_text_from_pdf(pdf_path: str) -> str:
+   """PDF 문서에서 텍스트를 추출합니다."""
+   try:
+       doc = fitz.open(pdf_path)
+       text_parts = []
+       
+       for page_num in range(doc.page_count):
+           page = doc.load_page(page_num)
+           text_parts.append(page.get_text())
+           
+       doc.close()
+       return "\n\n".join(text_parts)
+   except Exception as e:
+       print(f"PDF 텍스트 추출 중 오류 발생: {str(e)}")
+       return ""
 
-def setup_qa_pipeline():
-    """Set up the QA pipeline using DistilBERT."""
-    model_name = "distilbert-base-uncased-distilled-squad"
-    tokenizer = DistilBertTokenizer.from_pretrained(model_name)
-    model = DistilBertForQuestionAnswering.from_pretrained(model_name)
-    qa_pipeline = pipeline("question-answering", model=model, tokenizer=tokenizer)
-    return qa_pipeline
+def setup_qa_pipeline() -> Optional[pipeline]:
+   """DistilBERT를 사용하여 QA 파이프라인을 설정합니다."""
+   try:
+       model_name = "distilbert-base-uncased-distilled-squad"
+       tokenizer = AutoTokenizer.from_pretrained(model_name)
+       model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+       return pipeline("question-answering", model=model, tokenizer=tokenizer)
+   except Exception as e:
+       print(f"QA 파이프라인 설정 중 오류 발생: {str(e)}")
+       return None
 
-def answer_question(qa_pipeline, question, context):
-    """Answer a question based on the provided context."""
-    result = qa_pipeline(question=question, context=context)
-    return result['answer']
+def answer_question(qa_pipeline: pipeline, question: str, context: str) -> str:
+   """주어진 컨텍스트를 기반으로 질문에 답변합니다."""
+   try:
+       result = qa_pipeline(question=question, context=context)
+       return result['answer']
+   except Exception as e:
+       return f"답변 생성 중 오류 발생: {str(e)}"
 
 def main():
-    # PDF 문서에서 텍스트 추출
-    pdf_path = "./DATA/Python_SecureCoding_Guide.pdf"
-    context = extract_text_from_pdf(pdf_path)
-    print(context)
-    print('-' * 50)
+   # PDF 경로 설정
+   pdf_path = "./DATA/Python_시큐어코딩_가이드(2023년_개정본).pdf"
+   
+   # PDF에서 텍스트 추출
+   print("PDF에서 텍스트를 추출하는 중...")
+   context = extract_text_from_pdf(pdf_path)
+   if not context:
+       print("PDF에서 텍스트를 추출할 수 없습니다.")
+       return
+   
+   print(f"추출된 텍스트 길이: {len(context)} 문자")
+   print("텍스트 샘플:", context[:500], "...")
+   print('-' * 50)
 
-    # QA 파이프라인 설정
-    qa_pipeline = setup_qa_pipeline()
+   # QA 파이프라인 설정
+   print("QA 파이프라인을 설정하는 중...")
+   qa_pipeline = setup_qa_pipeline()
+   if not qa_pipeline:
+       print("QA 파이프라인을 설정할 수 없습니다.")
+       return
 
-    # 예제 질문 수행
-    question = "시큐어 코딩이란?"
-    answer = answer_question(qa_pipeline, question, context)
-    print(f"Question: {question}")
-    print(f"Answer: {answer}")
+   # 질문 목록
+   questions = [
+       "시큐어 코딩이란?",
+       "입력 데이터 검증은 어떻게 해야 하나요?",
+       "주요 보안 취약점은 무엇인가요?"
+   ]
+
+   # 각 질문에 대한 답변 생성
+   print("\n질문 및 답변:")
+   for question in questions:
+       print(f"\n질문: {question}")
+       answer = answer_question(qa_pipeline, question, context)
+       print(f"답변: {answer}")
 
 if __name__ == "__main__":
-    main()
+   main()

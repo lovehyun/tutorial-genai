@@ -1,49 +1,52 @@
-# pip install langchain_experimental
+# 필요한 패키지 설치
+# pip install -U langchain_openai langchain_experimental langchain_community
 
 from dotenv import load_dotenv
-
-from langchain_openai.llms import OpenAI
-from langchain_openai.chat_models import ChatOpenAI
+from langchain_openai import OpenAI, ChatOpenAI
 from langchain_experimental.plan_and_execute import PlanAndExecute, load_agent_executor, load_chat_planner
 from langchain_community.utilities import GoogleSerperAPIWrapper, WikipediaAPIWrapper
 from langchain.chains import LLMMathChain
-from langchain.agents.tools import Tool
+from langchain.tools import Tool
 
+# 환경 변수 로드
+load_dotenv()
 
-load_dotenv(dotenv_path='../.env')
-
+# 1. OpenAI 모델 설정
 llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0.1)
+chat_model = ChatOpenAI(temperature=0.1)  # 메모리 기능을 위해 ChatOpenAI 사용
+
+# 2. 검색 및 계산 도구 설정
 llm_math_chain = LLMMathChain.from_llm(llm=llm, verbose=True)
 search = GoogleSerperAPIWrapper()
 wikipedia = WikipediaAPIWrapper()
 
+# 3. LangChain 도구 설정
 tools = [
     Tool(
         name="Search",
         func=search.run,
-        description = "userful for when you need to answer questions about current events"
+        description="Useful for answering questions about current events."
     ),
     Tool(
         name="Wikipedia",
         func=wikipedia.run,
-        description = "useful for when you need to look up facts and statistics"
+        description="Useful for looking up facts and statistics."
     ),
     Tool(
         name="Calculator",
         func=llm_math_chain.run,
-        description = "useful for when you need to answer questions about math"
+        description="Useful for answering math-related questions."
     ),
 ]
 
-prompt = "Where are the next summer olympics going to be hosted? What is the population of that country divided by 2?"
-
-# 기본적으로 openai 는 memory 기능이 없어 이전 대화 내용을 기억하지 않음.
-# 그래서 chatopenai 기능을 통해 대화 내용을 기억하도록 구성.
-# planner and executor 를 사용해서 최종 답변을 구하기까지 필요한 부분들을 구성.
-model = ChatOpenAI(temperature=0.1)
-
-planner = load_chat_planner(model)
-executor = load_agent_executor(model, tools, verbose=True)
+# 4. LangChain 에이전트 설정
+planner = load_chat_planner(chat_model) 
+executor = load_agent_executor(chat_model, tools, verbose=True)
 agent = PlanAndExecute(planner=planner, executor=executor, verbose=True)
 
-agent.invoke(prompt)
+# 5. 프롬프트 실행
+prompt = "Where are the next summer olympics going to be hosted? What is the population of that country divided by 2?"
+result = agent.invoke(prompt)
+
+# 6. 결과 출력
+print(result)

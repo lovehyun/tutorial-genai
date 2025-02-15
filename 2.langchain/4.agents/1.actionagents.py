@@ -1,30 +1,41 @@
 # https://python.langchain.com/docs/modules/agents/
 
-# pip install wikipedia numexpr
+# 필요한 패키지 설치 (최신 업데이트 적용)
+# pip install langchain_openai wikipedia numexpr
 
 from dotenv import load_dotenv
-
-import pprint
-
-from langchain_openai.llms import OpenAI
-# from langchain.agents import get_all_tool_names
+from langchain_openai import OpenAI
 from langchain.agents import load_tools, initialize_agent, AgentType
 
+# 환경 변수 로드
+load_dotenv()
 
-load_dotenv(dotenv_path='../.env')
-
-# pp = pprint.PrettyPrinter(indent=4)
-# pp.pprint(get_all_tool_names())
-
+# 프롬프트 설정
 prompt = "대한민국의 공휴일 날짜들은? 그리고 이 날짜들의 월과 일의 숫자들의 합산은?"
 
+# OpenAI 모델 초기화
 llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0.9)
-tools = load_tools(['wikipedia', 'llm-math'], llm=llm)
 
-agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
+# 툴 로드
+tools = load_tools(["wikipedia", "llm-math"], llm=llm)
 
-agent.run(prompt)
+# LangChain 에이전트 초기화
+agent = initialize_agent(
+    tools=tools,
+    llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True
+)
 
+# 모델 실행
+result = agent.invoke({"input": prompt})
+print(result)
+
+
+# 사용 가능한 LangChain의 모든 도구 확인
+from langchain.agents import get_all_tool_names
+
+# print(get_all_tool_names())
 
 """
 [   'requests',

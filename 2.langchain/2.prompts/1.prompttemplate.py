@@ -1,35 +1,24 @@
 from dotenv import load_dotenv
+from langchain_core.prompts import PromptTemplate
+from langchain_openai import OpenAI
+from langchain_core.runnables import RunnableLambda
 
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
-from langchain_openai.llms import OpenAI
+# 환경 변수 로드 (경로 없이 실행하면 자동으로 .env 검색)
+load_dotenv()
 
-
-load_dotenv(dotenv_path='../.env')
-
-# 1-1. 템플릿 셋업
-template = "Tell me about {input}"
-prompt = PromptTemplate.from_template(template)
-print(prompt.format(input='Seoul'))
-print(prompt.format(input='Busan'))
-
-# 1-2. 템플릿 셋업
-template = "너는 회사 이름을 짓기 위한 작명가야. {product}를 하기 위해 좋은 회사명은?"
-template = "You are a naming consultant for new companies. What is a good name for a company that makes {product}?"
+# 1. 프롬프트 템플릿 설정
 template = "You are a naming consultant for new companies. What is a good name for a {company} that makes {product}?"
+prompt = PromptTemplate(
+    input_variables=["company", "product"],
+    template=template
+)
 
-prompt = PromptTemplate.from_template(template)
-# print(prompt.format(product="웹게임개발"))
-
-# 2. 모델 생성 및 연동
+# 2. OpenAI 모델 생성 및 연동
 llm = OpenAI(temperature=0.9)
-chain = LLMChain(llm=llm, prompt=prompt)
 
-# 3. 모델 실행
-# print(chain.run("웹게임개발"))
-# print(chain.run({'company':'High Tech Startup', 'product':'Web Game'}))
-# chain.run is deprecated -> use chain.invoke
-# print(chain.invoke('Seoul'))
-# print(chain.invoke({'input':'Busan'}))
-print(chain.invoke({'company':'High Tech Startup', 'product':'Web Game'}))
-print(chain.invoke({'company':'High Tech Startup', 'product':'Web Game'})['text'].strip())
+# 3. 최신 LangChain 방식 적용 (RunnableSequence)
+chain = prompt | llm | RunnableLambda(lambda x: {"response": x.strip()})
+
+# 4. 모델 실행
+result = chain.invoke({"company": "High Tech Startup", "product": "Web Game"})
+print(result["response"])
