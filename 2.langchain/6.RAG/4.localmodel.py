@@ -1,8 +1,8 @@
 # pip install transformers pymupdf
 
 import fitz  # PyMuPDF
-from transformers import AutoTokenizer, AutoModelForQuestionAnswering, pipeline
 from typing import Optional
+from transformers import AutoTokenizer, AutoModelForQuestionAnswering, pipeline
 
 def extract_text_from_pdf(pdf_path: str) -> str:
    """PDF 문서에서 텍스트를 추출합니다."""
