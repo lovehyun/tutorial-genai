@@ -80,7 +80,5 @@ def main():
             with open(CONVO_FILE, "a", encoding="utf-8") as f:
                 f.write(next_question + "\n")
 
-        time.sleep(5)
-
 if __name__ == "__main__":
     main()

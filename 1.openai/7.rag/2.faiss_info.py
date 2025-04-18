@@ -42,7 +42,8 @@ def rag_query(user_query):
     
     # 검색된 문서와 정확도(거리)
     retrieved_doc = documents[indices[0][0]]
-    similarity_score = 1 / (1 + distances[0][0])  # 거리값을 정규화하여 유사도 점수로 변환
+    true_distance = np.sqrt(distances[0][0])  # FAISS는 제곱된 거리값을 반환하므로, 제곱근을 취해야 함
+    similarity_score = 1 / (1 + true_distance)  # 거리값을 정규화하여 유사도 점수로 변환 (가까울수록 유사도가 높음)
 
     print("\n🔍 FAISS 검색 결과:")
     print(f"   📄 검색된 문서: {retrieved_doc}")
@@ -67,7 +68,7 @@ def rag_query(user_query):
     print("\n📝 GPT에게 전달된 프롬프트:")
     print(prompt)
 
-    # 🔹 토큰 수 계산
+    # 토큰 수 계산
     token_count = count_tokens(prompt)
     print(f"\n📏 프롬프트 토큰 수: {token_count} 토큰")
     
