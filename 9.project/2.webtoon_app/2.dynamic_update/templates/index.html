@@ -1,18 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>Webtoon Generator</title>
-    </head>
-    <body>
-        <h1>Webtoon Generator</h1>
-        <form onsubmit="event.preventDefault(); generateImages();">
-            <textarea id="text" name="text" rows="10" cols="100" placeholder="Enter the novel text here..."></textarea
-            ><br />
-            <input type="submit" value="Generate" />
-        </form>
-        <div id="images"></div>
-        <div id="status"></div>
-        <script src="/static/js/script.js"></script>
-    </body>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Webtoon Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .model-selector {
+            margin: 15px 0;
+        }
+        .model-button {
+            padding: 8px 15px;
+            margin-right: 10px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+        .model-button.active {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        #images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        #images img {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            transition: transform 0.3s;
+        }
+        #images img:hover {
+            transform: scale(1.05);
+        }
+        #status {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Webtoon Generator</h1>
+    <form onsubmit="event.preventDefault(); generateImages();">
+        <textarea id="text" rows="10" cols="100" placeholder="Enter novel text..."></textarea><br>
+        
+        <div class="model-selector">
+            <strong>이미지 생성 모델 선택:</strong>
+            <button type="button" id="dalle2-btn" class="model-button active" onclick="selectModel('dalle2')">DALL-E 2</button>
+            <button type="button" id="dalle3-btn" class="model-button" onclick="selectModel('dalle3')">DALL-E 3</button>
+        </div>
+        
+        <input type="submit" value="Generate" />
+    </form>
+
+    <h2>Summary</h2>
+    <ul id="summary"></ul>
+
+    <h2>Images</h2>
+    <div id="images">
+        <img id="image-0" src="/static/placeholder.png" width="200">
+        <img id="image-1" src="/static/placeholder.png" width="200">
+        <img id="image-2" src="/static/placeholder.png" width="200">
+        <img id="image-3" src="/static/placeholder.png" width="200">
+        <img id="image-4" src="/static/placeholder.png" width="200">
+    </div>
+
+    <div id="status"></div>
+
+    <script src="/static/js/script.js"></script>
+</body>
 </html>
