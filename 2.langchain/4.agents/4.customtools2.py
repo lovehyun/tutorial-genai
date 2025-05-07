@@ -1,55 +1,40 @@
 from dotenv import load_dotenv
 from langchain_openai import OpenAI
-from langchain.tools import BaseTool, StructuredTool, tool
 from langchain.agents import initialize_agent, AgentType
+from langchain.tools import tool
 
-# .env 파일에서 환경 변수 로드
+# 환경 변수 로드
 load_dotenv()
 
-# LLM 초기화
+# OpenAI 모델 초기화
 llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0)
 
-# 간단한 도구 만들기
-# @tool 데코레이터의 역할은 함수를 LangChain 에이전트가 사용할 수 있는 도구로 변환하는 것입니다. 에이전트는 이 도구의 기능과 사용 방법을 다음과 같은 방식으로 파악합니다:
-#  - 함수 이름: 에이전트는 함수 이름(예: multiply, add)을 보고 도구의 기본 기능을 파악합니다.
-#  - Docstring(문서 문자열): 함수 아래에 작성된 """두 숫자 a와 b를 곱합니다."""와 같은 문서 문자열은 도구의 설명으로 사용됩니다. 에이전트는 이 설명을 읽고 도구가 무엇을 하는지 이해합니다.
-#  - 파라미터 타입 힌트: 함수 정의에 있는 a: int, b: int와 같은 타입 힌트는 에이전트에게 어떤 타입의 입력이 필요한지 알려줍니다.
-#  - 반환 타입 힌트: -> int와 같은 반환 타입 힌트는 에이전트에게 어떤 결과가 반환될지 알려줍니다.
-# 단일 입력 도구 만들기 - 문자열로 입력 받기
-
-# @tool
-# def multiply(query: str) -> int:
-#     """두 숫자를 곱합니다. 형식: '숫자1 숫자2'"""
-#     a, b = map(int, query.split())
-#     return a * b
-
-# @tool
-# def add(query: str) -> int:
-#     """두 숫자를 더합니다. 형식: '숫자1 숫자2'"""
-#     a, b = map(int, query.split())
-#     return a + b
-
-# 따옴표를 처리하는 간단한 도구
+# 사용자 정의 도구 생성
 @tool
-def multiply(query: str) -> int:
-    """두 숫자를 곱합니다. 형식: '숫자1 숫자2'"""
-    # 따옴표 제거
-    query = query.replace("'", "").replace('"', "").strip()
-    # 숫자 추출 및 곱하기
-    nums = [int(x) for x in query.split()]
-    return nums[0] * nums[1]
+def get_current_weather(location: str) -> str:
+    """특정 위치의 현재 날씨 정보를 가져옵니다."""
+    # 실제로는 날씨 API를 호출해야 하지만, 예시이므로 가상 데이터 반환
+    weather_data = {
+        "서울": "맑음, 기온 22도",
+        "부산": "흐림, 기온 25도",
+        "제주": "비, 기온 20도"
+    }
+    return weather_data.get(location, f"{location}의 날씨 정보가 없습니다.")
 
 @tool
-def add(query: str) -> int:
-    """두 숫자를 더합니다. 형식: '숫자1 숫자2'"""
-    # 따옴표 제거
-    query = query.replace("'", "").replace('"', "").strip()
-    # 숫자 추출 및 더하기
-    nums = [int(x) for x in query.split()]
-    return nums[0] + nums[1]
+def get_population(city: str) -> str:
+    """특정 도시의 인구 정보를 가져옵니다."""
+    # 가상 데이터
+    population_data = {
+        "서울": "약 970만 명",
+        "부산": "약 340만 명",
+        "인천": "약 300만 명",
+        "대구": "약 240만 명"
+    }
+    return population_data.get(city, f"{city}의 인구 정보가 없습니다.")
 
 # 도구 목록 생성
-tools = [multiply, add]
+tools = [get_current_weather, get_population]
 
 # 에이전트 초기화
 agent = initialize_agent(
@@ -60,5 +45,5 @@ agent = initialize_agent(
 )
 
 # 에이전트 실행
-result = agent.invoke({"input": "3과 4를 곱하고, 그 결과에 10을 더해줘."})
-print("\n최종 결과:", result)
+result = agent.invoke({"input": "서울의 날씨는 어때? 그리고 인구는 몇 명이야?"})
+print(result["output"])
