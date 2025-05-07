@@ -7,7 +7,7 @@ from langchain.chains.conversation.memory import ConversationBufferMemory
 load_dotenv()
 
 # OpenAI 채팅 모델 설정
-llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0.1)
+llm = ChatOpenAI(model="gpt-3.5-turbo-instruct", temperature=0.1)
 
 # 프롬프트 템플릿 생성
 prompt = ChatPromptTemplate.from_messages([

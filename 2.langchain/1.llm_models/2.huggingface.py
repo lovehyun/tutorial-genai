@@ -8,8 +8,8 @@ from huggingface_hub import InferenceClient
 
 load_dotenv(dotenv_path='../.env')
 
-# Hugging Face Inference API 클라이언트 생성
-client = InferenceClient(model="mistralai/Mistral-7B-Instruct-v0.2")
+# Hugging Face Inference API 클라이언트 생성 - HF에 API로 연동해서 추론
+client = InferenceClient(model="mistralai/Mistral-7B-Instruct-v0.3")
 
 # 프롬프트 실행
 prompt = "What are good fitness tips?"

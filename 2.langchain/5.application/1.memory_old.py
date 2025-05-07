@@ -6,7 +6,7 @@ from langchain.chains import ConversationChain
 load_dotenv()
 
 # OpenAI 채팅 모델 설정 (대화형 모델이므로 ChatOpenAI 사용)
-llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0.1)
+llm = ChatOpenAI(model="gpt-3.5-turbo-instruct", temperature=0.1)
 
 # 최신 LangChain 실행 방식 적용
 conversation = ConversationChain(llm=llm, verbose=True)

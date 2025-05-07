@@ -3,6 +3,7 @@
 # 이 모델은 다양한 웹 텍스트 데이터로 훈련되었습니다. 여기에는 Wikipedia, Common Crawl, Reddit 및 기타 대규모 데이터셋이 포함됩니다.
 
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+
 from langchain_huggingface import HuggingFacePipeline
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableLambda
