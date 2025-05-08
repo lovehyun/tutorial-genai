@@ -9,36 +9,133 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
         }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
         #controls {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 80%;
+            max-width: 600px;
+        }
+        
+        #canvas {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 100%;
+        }
+        
+        form {
+            margin-bottom: 15px;
+        }
+        
+        input[type="text"], input[type="file"] {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 70%;
+        }
+        
+        button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        #clearMask {
+            background-color: #f44336;
+        }
+        
+        #clearMask:hover {
+            background-color: #d32f2f;
+        }
+        
+        #generateMask {
+            background-color: #2196F3;
+        }
+        
+        #generateMask:hover {
+            background-color: #0b7dda;
+        }
+        
+        .instruction {
+            font-size: 14px;
+            color: #666;
             margin-bottom: 10px;
         }
-        #canvas {
-            border: 1px solid black;
+        
+        #maskImage {
+            margin-top: 20px;
+            max-width: 100%;
+            border: 1px solid #ccc;
+        }
+        
+        .section {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
         }
     </style>
 </head>
 <body>
     <div id="controls">
-        <h1>Upload or Generate an Image</h1>
-        <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="file">
-            <button type="submit">Upload</button>
-        </form>
-        <form id="generateForm" action="/generate" method="post">
-            <input type="text" name="prompt" placeholder="Enter prompt">
-            <button type="submit">Generate</button>
-        </form>
-        <button id="generateMask">Generate Mask</button>
-        <button id="clearMask">Clear Mask</button>
-        <form id="editForm" action="/edit" method="post">
-            <input type="hidden" id="maskCoordinates" name="maskCoordinates">
-            <input type="text" id="editPrompt" name="prompt" placeholder="Enter edit prompt">
-            <button type="submit">Edit</button>
-        </form>
+        <h1>Image Editor with OpenAI</h1>
+        
+        <div class="section">
+            <h3>Step 1: Upload or Generate an Image</h3>
+            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" accept="image/*">
+                <button type="submit">Upload</button>
+            </form>
+            
+            <form id="generateForm" action="/generate" method="post">
+                <input type="text" name="prompt" placeholder="Enter prompt to generate an image">
+                <button type="submit">Generate</button>
+            </form>
+        </div>
+        
+        <div class="section">
+            <h3>Step 2: Select Areas to Edit</h3>
+            <div class="instruction">Draw rectangles on the image to select areas you want to edit</div>
+            <button id="clearMask">Clear Selections</button>
+            <button id="generateMask">Generate Mask from Selections</button>
+        </div>
+        
+        <div class="section">
+            <h3>Step 3: Edit Selected Areas</h3>
+            <form id="editForm" action="/edit" method="post">
+                <input type="hidden" id="maskCoordinates" name="maskCoordinates">
+                <input type="text" id="editPrompt" name="prompt" placeholder="Describe what to replace the selected areas with">
+                <button type="submit">Edit Selected Areas</button>
+            </form>
+        </div>
     </div>
+    
     <canvas id="canvas"></canvas>
     <img id="maskImage" style="display:none;" alt="Generated Mask">
+    
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </body>
 </html>
