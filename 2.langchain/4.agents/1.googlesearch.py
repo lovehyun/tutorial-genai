@@ -55,6 +55,10 @@ agent = initialize_agent(
     agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
     verbose=True
 )
+# ZeroShotAgent + ReAct (Reasoning + Acting) 패턴 기반의 가장 기본적인 Agent입니다.
+# 도구 설명만 보고, 질문에 맞는 툴을 추론하여 한 번에 실행하는 방식입니다.
+# "ZeroShot" = 별도의 학습 없이 툴 설명만 보고 사용
+# "ReAct" = LLM이 생각하고 (Thought), 행동하고 (Action), 관찰(Observation)하는 방식
 
 # 에이전트에게 검색 요청
 result = agent.invoke({"input": "서울의 오늘 날씨는 어때?"})
