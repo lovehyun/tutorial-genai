@@ -1,4 +1,4 @@
-# Hugging Face를 사용하지 않고 오직 로컬 모델만 사용하려면 local_files_only=True 옵션을 추가하면 됩니다.
+# HuggingFace를 사용하지 않고 오직 로컬 모델만 사용하려면 local_files_only=True 옵션을 추가하면 됩니다.
 
 # from transformers import AutoModel, AutoTokenizer
 

@@ -11,4 +11,4 @@ question = "What does Hugging Face develop?"
 result = qa_pipeline(question=question, context=context)
 
 # 결과 출력
-print(f"📢 질문: {question}\n🎯 답변: {result['answer']} (신뢰도: {result['score']:.4f})")
+print(f"질문: {question}\n답변: {result['answer']} (신뢰도: {result['score']:.4f})")

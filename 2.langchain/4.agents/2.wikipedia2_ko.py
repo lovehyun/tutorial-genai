@@ -5,6 +5,9 @@ from langchain_openai import OpenAI
 from langchain_community.agent_toolkits.load_tools import load_tools
 from langchain.agents import initialize_agent, AgentType
 
+from langchain_community.tools.wikipedia.tool import WikipediaQueryRun
+from langchain_community.utilities.wikipedia import WikipediaAPIWrapper
+
 # 환경 변수 로드
 load_dotenv()
 
@@ -12,7 +15,9 @@ load_dotenv()
 llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0)
 
 # 위키피디아 도구 로드 (API 키 필요 없음)
-tools = load_tools(["wikipedia"])
+# tools = load_tools(["wikipedia"])
+wiki = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper(lang="ko"))
+tools = [wiki]
 
 # 에이전트 초기화
 agent = initialize_agent(

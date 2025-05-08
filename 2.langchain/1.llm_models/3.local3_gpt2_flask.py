@@ -1,3 +1,6 @@
+# curl -X POST http://localhost:5000/generate -H "Content-Type: application/json" -d '{"prompt":"Tell me a funny story about a robot."}'
+# curl -X POST http://localhost:5000/generate -H "Content-Type: application/json" -d "{\"prompt\":\"Tell me a funny story about a robot.\"}"
+
 from flask import Flask, request, jsonify
 
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline

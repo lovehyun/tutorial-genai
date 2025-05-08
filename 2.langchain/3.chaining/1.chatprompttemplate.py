@@ -28,7 +28,7 @@ chain1 = chat_prompt1 | llm | RunnableLambda(lambda x: {"response": x.content})
 print(chain1.invoke({"input": "How is Kimchi made"})["response"])
 
 
-# 2-1. 번역 프롬프트 설정 (시스템 메시지 + 사용자 입력)
+# 2-1. 번역 프롬프트 설정, 명시적으로 (시스템 메시지 + 사용자 입력) 설정
 system_template = "You are a professional language translator who translates {input_language} to {output_language}"
 system_message_prompt = SystemMessagePromptTemplate.from_template(system_template)
 human_message_prompt = HumanMessagePromptTemplate.from_template("{text}")

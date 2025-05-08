@@ -21,7 +21,7 @@ Please list each calculation step clearly.
 """
 
 # OpenAI 모델 초기화
-llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0.9)
+llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0.2)
 
 # 툴 로드
 tools = load_tools(["wikipedia", "llm-math"], llm=llm)

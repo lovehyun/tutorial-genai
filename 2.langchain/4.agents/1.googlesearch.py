@@ -31,6 +31,8 @@
 #    - GOOGLE_API_KEY=발급받은_API_키
 #    - GOOGLE_CSE_ID=검색_엔진_ID
 
+# pip install google-api-python-client
+
 from dotenv import load_dotenv
 from langchain_openai import OpenAI
 from langchain_community.agent_toolkits.load_tools import load_tools

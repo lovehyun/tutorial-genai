@@ -11,4 +11,4 @@ results = ner_pipeline(text)
 
 # 결과 출력
 for entity in results:
-    print(f"🔹 엔터티: {entity['word']} → 🎯 타입: {entity['entity']} (신뢰도: {entity['score']:.4f})")
+    print(f"엔터티: {entity['word']} → 타입: {entity['entity']} (신뢰도: {entity['score']:.4f})")

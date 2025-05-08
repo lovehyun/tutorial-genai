@@ -1,3 +1,5 @@
+# pip install langchain_community
+
 # 사용 가능한 LangChain의 모든 도구 확인
 from langchain_community.agent_toolkits.load_tools import get_all_tool_names
 print(get_all_tool_names())

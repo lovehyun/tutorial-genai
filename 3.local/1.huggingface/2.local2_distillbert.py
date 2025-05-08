@@ -30,4 +30,4 @@ predicted_class_id = logits.argmax().item()
 predicted_label = model.config.id2label[predicted_class_id]  # 모델에서 직접 라벨 매핑 가져오기
 
 # 감성 라벨 매핑
-print(f"📢 입력: {text} → 🎯 예측: {predicted_label}")
+print(f"입력: {text} → 예측: {predicted_label}")

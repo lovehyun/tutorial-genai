@@ -2,7 +2,10 @@ from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
 load_dotenv(dotenv_path='../.env')
 
-client = InferenceClient(model="mistralai/Mistral-7B-Instruct-v0.3")
+# model = "gpt2"
+model = "mistralai/Mistral-7B-Instruct-v0.3"
+
+client = InferenceClient(model=model)
 
 # Mistral 형식의 프롬프트 템플릿 사용
 formatted_prompt = """<s>[INST] What are good fitness tips? [/INST]"""

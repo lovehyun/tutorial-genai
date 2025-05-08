@@ -27,8 +27,8 @@ def debug_response(output):
     return {"response": cleaned}
 
 # 4. 체인 구성 (프롬프트 → LLM → 후처리)
-chain = prompt | llm | RunnableLambda(debug_response)
-# chain = prompt | llm | RunnableLambda(lambda x: {"response": x.strip()})
+chain = prompt | llm | RunnableLambda(lambda x: {"response": x.strip()})
+# chain = prompt | llm | RunnableLambda(debug_response)
 
 # 5. 입력 예제
 inputs = {"company": "High Tech Startup", "product": "Web Game"}

@@ -7,8 +7,11 @@ from huggingface_hub import InferenceClient
 
 load_dotenv(dotenv_path='../.env')
 
+model = "gpt2"
+# model = "mistralai/Mistral-7B-Instruct-v0.3"
+
 # Hugging Face Inference API client creation
-client = InferenceClient(model="mistralai/Mistral-7B-Instruct-v0.3")
+client = InferenceClient(model=model)
 
 # Create a conversational prompt with proper formatting for Mistral
 messages = [
