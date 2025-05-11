@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  stable-diffusion-webui:
+    image: universonic/stable-diffusion-webui:minimal
+    container_name: sd-webui
+    command: --api --listen --no-half --no-half-vae --precision full
+    runtime: nvidia
+    ports:
+      - "7860:8080"
+    volumes:
+      - ./data/models:/app/stable-diffusion-webui/models
+      - ./data/outputs:/app/stable-diffusion-webui/outputs
+      - ./data/extensions:/app/stable-diffusion-webui/extensions
+      - ./data/embeddings:/app/stable-diffusion-webui/embeddings
+      - ./data/localizations:/app/stable-diffusion-webui/localizations
+    restart: unless-stopped
