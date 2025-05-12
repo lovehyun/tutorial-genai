@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from langchain_openai import OpenAI
 from langchain.tools import BaseTool, StructuredTool, tool
 from langchain.agents import initialize_agent, AgentType
+import re
 
 # .env 파일에서 환경 변수 로드
 load_dotenv()
@@ -39,14 +40,36 @@ def multiply(query: str) -> int:
     nums = [int(x) for x in query.split()]
     return nums[0] * nums[1]
 
+# @tool
+# def add(query: str) -> int:
+#     """두 숫자를 더합니다. 형식: '숫자1 숫자2'"""
+#     # 따옴표 제거
+#     query = query.replace("'", "").replace('"', "").strip()
+#     # 숫자 추출 및 더하기
+#     nums = [int(x) for x in query.split()] # 음수 처리 못함
+#     return nums[0] + nums[1]
+
 @tool
 def add(query: str) -> int:
     """두 숫자를 더합니다. 형식: '숫자1 숫자2'"""
-    # 따옴표 제거
     query = query.replace("'", "").replace('"', "").strip()
-    # 숫자 추출 및 더하기
-    nums = [int(x) for x in query.split()]
+    nums = list(map(int, re.findall(r"-?\d+", query)))
+    if len(nums) < 2:
+        raise ValueError("두 개의 숫자가 필요합니다.")
     return nums[0] + nums[1]
+
+# @tool
+# def add(query: str) -> int:
+#     """두 숫자를 더합니다. 형식: '숫자1 숫자2'"""
+#     try:
+#         query = query.replace("'", "").replace('"', "").replace("–", "-").strip()
+#         nums = list(map(int, re.findall(r"-?\d+", query)))
+#         if len(nums) < 2:
+#             return "오류: 두 개의 숫자가 필요합니다."
+#         return str(nums[0] * nums[1])
+#     except Exception as e:
+#         return f"오류 발생: {str(e)}"
+
 
 # 도구 목록 생성
 tools = [multiply, add]

@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate, AIMessagePromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_core.runnables import RunnableLambda
 
@@ -9,6 +9,11 @@ load_dotenv()
 chat_prompt = ChatPromptTemplate.from_messages([
     HumanMessagePromptTemplate.from_template("Summarize the following article in 3 sentences:\n\n{article}")
 ])
+
+# chat_prompt = ChatPromptTemplate.from_messages([
+#     SystemMessagePromptTemplate.from_template("You are an expert article summarizer."),
+#     HumanMessagePromptTemplate.from_template("Summarize the following article in 3 sentences:\n\n{article}")
+# ])
 
 # ChatOpenAI로 gpt-4o 모델 설정
 llm = ChatOpenAI(model="gpt-4o", temperature=0.5)
