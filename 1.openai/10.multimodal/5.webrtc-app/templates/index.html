@@ -1,0 +1,26 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <title>WebRTC + Whisper 회의록</title>
+        <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
+        <link rel="stylesheet" href="static/style.css">
+    </head>
+    <body>
+        <div id="video-container">
+            <video id="localVideo" autoplay muted playsinline></video>
+            <video id="remoteVideo" autoplay playsinline></video>
+            <div id="caption">자막 표시 영역</div>
+            <button id="startRecording">음성 전송 시작</button>
+            <button id="summarize">회의 요약</button>
+            <div id="summary-output"></div>
+        </div>
+        <div id="meeting-log">
+            <h3>회의록</h3>
+            <ul id="log"></ul>
+        </div>
+        <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+        <script src="static/script.js"></script>
+    </body>
+</html>
