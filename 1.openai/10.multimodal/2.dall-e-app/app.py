@@ -1,7 +1,7 @@
 # Fixed Python Code (app.py)
 
-import openai
 import requests
+from openai import OpenAI
 from PIL import Image, ImageDraw
 from io import BytesIO
 from flask import Flask, request, render_template, send_from_directory, jsonify
@@ -12,7 +12,7 @@ import os
 load_dotenv(dotenv_path='../../.env')
 
 # Initialize OpenAI client
-client = openai.Client(api_key=os.getenv('OPENAI_API_KEY'))
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 app = Flask(__name__)
 
@@ -25,9 +25,10 @@ def generate():
     prompt = request.form['prompt']
     print(f"Generate prompt: {prompt}")
     response = client.images.generate(
+        model="dall-e-2",  # dall-e-3 최신 모델 명시, 모델 생략시 dall-e-2
         prompt=prompt,
         n=1,
-        size="512x512"
+        size="512x512"   # 512x512, 1024x1024 dall-e-3 사용시
     )
     image_url = response.data[0].url
     image_response = requests.get(image_url)
