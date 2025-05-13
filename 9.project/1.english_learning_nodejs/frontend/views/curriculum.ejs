@@ -1,0 +1,27 @@
+<%- include('partials/header') %>
+
+<div style="display: flex; align-items: center; justify-content: space-between;">
+    <h2><%= grade %>학년 - <%= curriculum_title %></h2>
+    <div id="language_selector">
+        <label for="language_select">음성튜터</label>
+        <select id="language_select">
+            <option value="none">None</option>
+            <option value="en-US">English (US)</option>
+            <option value="ko-KR">한국어 (KR)</option>
+            <option value="auto">Auto (en-US & ko-KR)</option>
+        </select>
+    </div>
+</div>
+<p>여기에 영어 대화 및 학습 내용을 추가하세요.</p>
+
+<div id="chatbox">
+    <div id="chatlog"></div>
+    <form id="chatForm">
+        <input type="text" id="user_input" name="user_input" placeholder="영어로 대화를 시작하세요..." required>
+        <button type="submit">Send</button>
+    </form>
+</div>
+
+<script src="/js/chat.js"></script>
+
+<%- include('partials/footer') %>

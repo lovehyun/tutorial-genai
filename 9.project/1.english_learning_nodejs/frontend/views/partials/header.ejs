@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>ChatGPT와 함께 배우는 영어 클래스</title>
+</head>
+<body>
+    <header>
+        <h1>ChatGPT와 함께 배우는 영어 클래스</h1>
+        <nav>
+            <ul>
+                <% for (const grade of grades) { %>
+                    <li>
+                        <a href="/grade/<%= grade %>" 
+                           style="font-weight: <%= current_grade == grade ? 'bold' : 'normal' %>;">
+                            <%= grade %>학년
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+    </header>
+    <main>

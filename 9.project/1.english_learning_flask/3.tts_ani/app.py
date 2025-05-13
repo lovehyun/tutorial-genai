@@ -1,4 +1,4 @@
-# pip install google-cloud-texttospeech
+# pip install google-cloud-texttospeech google-cloud-speech
 
 from flask import Flask, render_template, request, jsonify, send_file
 from openai import OpenAI
@@ -30,10 +30,21 @@ client = OpenAI(api_key=openai_api_key)
 
 # Google Cloud TTS 설정
 # https://console.cloud.google.com/marketplace/product/google/texttospeech.googleapis.com?q=search
-tts_client = texttospeech.TextToSpeechClient()
 
-# Google Cloud Speech-to-Text 설정
-speech_client = speech.SpeechClient()
+# Google Cloud Text-to-Speech
+try:
+    tts_client = texttospeech.TextToSpeechClient()
+except Exception as e:
+    tts_client = None
+    logging.warning("Google TTS 클라이언트를 초기화하지 못했습니다: %s", e)
+
+# Google Cloud Speech-to-Text
+try:
+    speech_client = speech.SpeechClient()
+except Exception as e:
+    speech_client = None
+    logging.warning("Google STT 클라이언트를 초기화하지 못했습니다: %s", e)
+    
 
 # 각 학년별 커리큘럼 데이터
 curriculums = {
@@ -98,6 +109,9 @@ def get_audio(filename):
 
 @app.route('/speech-to-text', methods=['POST'])
 def speech_to_text():
+    if speech_client is None:
+        return "STT 기능이 활성화되어 있지 않습니다.", 503
+    
     if 'audio_file' not in request.files:
         return "오디오 파일이 필요합니다.", 400
 
@@ -178,6 +192,10 @@ def synthesize_speech2(text):
     return audio_filename
 
 def synthesize_speech3(text):
+    if tts_client is None:
+        logging.warning("TTS 클라이언트가 없어 음성을 생성하지 않습니다.")
+        return None  # 또는 빈 파일 경로 반환
+    
     # --------------------
     # 3. 단어 단위로 분할 - 공백과 쌍따옴표로 문장을 분할하여 언어 선택
     # --------------------

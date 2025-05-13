@@ -1,0 +1,31 @@
+{
+    "name": "english-learning-platform",
+    "version": "1.0.0",
+    "description": "ChatGPT와 함께 배우는 영어 클래스",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js",
+        "dev": "nodemon app.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "english",
+        "learning",
+        "chatgpt",
+        "education"
+    ],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "axios": "^1.4.0",
+        "dotenv": "^16.3.1",
+        "ejs": "^3.1.9",
+        "express": "^4.18.2",
+        "morgan": "^1.10.0",
+        "node-fetch": "^3.3.2"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.1"
+    },
+    "type": "commonjs"
+}

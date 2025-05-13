@@ -9,10 +9,12 @@ gapi-*.json
 *.db
 vector_db*
 
+# node.js
+node_modules/
+
 # data
 *.pdf
 DATA/
-models/
 my_model/
 my_local_model/
 quantized_model/

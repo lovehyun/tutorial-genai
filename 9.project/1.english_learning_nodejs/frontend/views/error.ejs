@@ -1,0 +1,68 @@
+<%- include('partials/header') %>
+
+<div class="error-container">
+    <h2><%- message %></h2>
+    <p>Error: <%= error.status %></p>
+    
+    <% if (error.stack && error.stack.length > 0) { %>
+        <div class="error-details">
+            <h3>기술적 세부사항:</h3>
+            <pre><%= error.stack %></pre>
+        </div>
+    <% } %>
+    
+    <div class="error-actions">
+        <a href="/" class="btn-home">홈으로 돌아가기</a>
+    </div>
+</div>
+
+<style>
+    .error-container {
+        text-align: center;
+        padding: 20px;
+        margin: 20px auto;
+        max-width: 800px;
+        background-color: #f8f8f8;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .error-container h2 {
+        color: #e74c3c;
+    }
+    
+    .error-details {
+        margin-top: 20px;
+        text-align: left;
+        background-color: #f1f1f1;
+        padding: 15px;
+        border-radius: 5px;
+        overflow-x: auto;
+    }
+    
+    .error-details pre {
+        white-space: pre-wrap;
+        margin: 0;
+        font-family: monospace;
+    }
+    
+    .error-actions {
+        margin-top: 30px;
+    }
+    
+    .btn-home {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+    
+    .btn-home:hover {
+        background-color: #45a049;
+    }
+</style>
+
+<%- include('partials/footer') %>
