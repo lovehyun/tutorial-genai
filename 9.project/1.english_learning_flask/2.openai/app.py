@@ -29,7 +29,7 @@ def home():
 def grade(grade):
     if grade in curriculums:
         curriculums_with_index = list(enumerate(curriculums[grade]))
-        return render_template('grade.html', grade=grade, curriculums=curriculums_with_index, grades=curriculums.keys(), current_grade=grade)
+        return render_template('grade.html', grade=grade, curriculums=curriculums_with_index, grades=curriculums.keys())
     return "해당 학년은 존재하지 않습니다.", 404
 
 @app.route('/grade/<int:grade>/curriculum/<int:curriculum_id>', methods=['GET', 'POST'])
@@ -61,7 +61,7 @@ def curriculum(grade, curriculum_id):
             )
             chat_response = response.choices[0].message.content.strip()
             return jsonify({'response': chat_response})
-        return render_template('curriculum.html', grade=grade, curriculum_title=curriculum_title, grades=curriculums.keys(), current_grade=grade)
+        return render_template('curriculum.html', grade=grade, curriculum_title=curriculum_title, grades=curriculums.keys())
     return "해당 커리큘럼은 존재하지 않습니다.", 404
 
 if __name__ == '__main__':

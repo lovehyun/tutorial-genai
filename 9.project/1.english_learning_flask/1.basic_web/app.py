@@ -20,14 +20,14 @@ def home():
 def grade(grade):
     if grade in curriculums:
         curriculums_with_index = list(enumerate(curriculums[grade]))
-        return render_template('grade.html', grade=grade, curriculums=curriculums_with_index)
+        return render_template('grade.html', grade=grade, grades=curriculums.keys(), curriculums=curriculums_with_index)
     return "해당 학년은 존재하지 않습니다.", 404
 
 @app.route('/grade/<int:grade>/curriculum/<int:curriculum_id>')
 def curriculum(grade, curriculum_id):
     if grade in curriculums and 0 <= curriculum_id < len(curriculums[grade]):
         curriculum_title = curriculums[grade][curriculum_id]
-        return render_template('curriculum.html', grade=grade, curriculum_title=curriculum_title)
+        return render_template('curriculum.html', grade=grade, grades=curriculums.keys(), curriculum_title=curriculum_title)
     return "해당 커리큘럼은 존재하지 않습니다.", 404
 
 if __name__ == '__main__':

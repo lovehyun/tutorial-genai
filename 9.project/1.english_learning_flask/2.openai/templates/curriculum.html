@@ -73,6 +73,10 @@
         // 사용자 입력 클리어
         document.getElementById('user_input').value = '';
 
+        // 사용자 메세지를 먼저 화면에 표시
+        const chatLog = document.getElementById('chatlog');
+        chatLog.innerHTML += `<div><strong>학생:</strong> ${userInput}</div>`;
+
         // 백엔드에 요청
         fetch(window.location.href, {
             method: 'POST',
@@ -85,8 +89,7 @@
         })
         .then(response => response.json())
         .then(data => {
-            const chatLog = document.getElementById('chatlog');
-            chatLog.innerHTML += `<div><strong>학생:</strong> ${userInput}</div>`;
+            // 응답을 받은 후에 화면에 표시
             chatLog.innerHTML += `<div><strong>ChatGPT:</strong> ${data.response}</div>`;
 
             // chatlog 자동 스크롤

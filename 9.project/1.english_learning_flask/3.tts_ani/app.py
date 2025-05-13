@@ -28,6 +28,10 @@ logging.basicConfig(level=getattr(logging, log_level))
 openai_api_key = os.environ.get('OPENAI_API_KEY')
 client = OpenAI(api_key=openai_api_key)
 
+# 오디오 디렉토리 생성 (없는 경우)
+AUDIO_DIR = 'audio'
+os.makedirs(AUDIO_DIR, exist_ok=True)
+
 # Google Cloud TTS 설정
 # https://console.cloud.google.com/marketplace/product/google/texttospeech.googleapis.com?q=search
 
@@ -105,7 +109,12 @@ def curriculum(grade, curriculum_id):
 
 @app.route('/audio/<path:filename>')
 def get_audio(filename):
-    return send_file(filename)
+    full_path = os.path.join(AUDIO_DIR, os.path.basename(filename))
+    if os.path.exists(full_path):
+        return send_file(full_path)
+    else:
+        logging.error(f"요청한 오디오 파일이 존재하지 않습니다: {full_path}")
+        return "파일을 찾을 수 없습니다", 404        
 
 @app.route('/speech-to-text', methods=['POST'])
 def speech_to_text():
@@ -139,7 +148,10 @@ def speech_to_text():
         return "오디오 파일에서 텍스트를 인식할 수 없습니다.", 400
 
     transcript = response.results[0].alternatives[0].transcript
-    return jsonify({'transcript': transcript})
+    confidence = response.results[0].alternatives[0].confidence
+
+    logging.info(f"인식된 텍스트: '{transcript}' (신뢰도: {confidence})")
+    return jsonify({'transcript': transcript, 'confidence': confidence})
 
 def synthesize_speech1(text):
     # --------------------
@@ -156,11 +168,12 @@ def synthesize_speech1(text):
     )
 
     audio_content = tts_response.audio_content
-    audio_filename = f"audio/{uuid.uuid4()}.mp3"
-    with open(audio_filename, 'wb') as out:
+    audio_filename = f"{uuid.uuid4()}.mp3"
+    audio_path = os.path.join(AUDIO_DIR, audio_filename)
+    with open(audio_path, 'wb') as out:
         out.write(audio_content)
 
-    return audio_filename
+    return audio_path
 
 def synthesize_speech2(text):
     # --------------------
@@ -185,11 +198,12 @@ def synthesize_speech2(text):
 
         combined_audio_content += tts_response.audio_content
 
-    audio_filename = f"audio/{uuid.uuid4()}.mp3"
-    with open(audio_filename, 'wb') as out:
+    audio_filename = f"{uuid.uuid4()}.mp3"
+    audio_path = os.path.join(AUDIO_DIR, audio_filename)
+    with open(audio_path, 'wb') as out:
         out.write(combined_audio_content)
 
-    return audio_filename
+    return audio_path
 
 def synthesize_speech3(text):
     if tts_client is None:
@@ -244,14 +258,15 @@ def synthesize_speech3(text):
     if buffer:
         combined_audio_content += synthesize_text(buffer.strip(), current_language)
 
-    audio_filename = f"audio/{uuid.uuid4()}.mp3"
-    with open(audio_filename, 'wb') as out:
+    audio_filename = f"{uuid.uuid4()}.mp3"
+    audio_path = os.path.join(AUDIO_DIR, audio_filename)
+    with open(audio_path, 'wb') as out:
         out.write(combined_audio_content)
 
-    return audio_filename
+    return audio_path
 
 def manage_audio_files():
-    audio_files = sorted(glob.glob('audio/*.mp3'), key=os.path.getctime, reverse=True)
+    audio_files = sorted(glob.glob(f'{AUDIO_DIR}/*.mp3'), key=os.path.getctime, reverse=True)
     for file in audio_files[10:]:
         os.remove(file)
 
