@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Gallery</title>
+    <link rel="stylesheet" href="static/style.css">        
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>AI Image Gallery</h1>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="prompt-form">
+            <form id="generateForm">
+                <input type="text" id="promptInput" class="prompt-input" placeholder="Enter a prompt to generate an image" required>
+                <button type="submit" id="generateBtn" class="generate-btn">Generate</button>
+            </form>
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>Generating your image... This may take a moment.</p>
+            </div>
+        </div>
+        
+        <div class="gallery" id="gallery">
+            {% for image in gallery_images %}
+            <div class="gallery-item" data-fullsize="{{ image.fullsize }}" data-prompt="{{ image.prompt }}">
+                <img src="{{ image.thumbnail }}" alt="Generated image" class="gallery-thumbnail">
+                <div class="gallery-info">
+                    <div class="gallery-prompt">{{ image.prompt }}</div>
+                    <div class="gallery-date">{{ image.created_at.split('T')[0] if image.created_at else '' }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImage">
+        <div class="modal-info" id="modalPrompt"></div>
+    </div>
+    
+    <div id="notification" class="notification">Image generated successfully!</div>
+    
+    <script src="static/script.js"></script>
+</body>
+</html>

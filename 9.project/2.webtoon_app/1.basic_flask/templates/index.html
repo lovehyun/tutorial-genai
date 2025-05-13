@@ -1,28 +1,28 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Webtoon Generator</title>
-  </head>
-  <body>
-    <h1>Webtoon Generator</h1>
-    <form method="post">
-      <textarea name="text" rows="10" cols="30" placeholder="Enter the novel text here..."></textarea><br>
-      <input type="submit" value="Generate">
-    </form>
-    {% if prompts %}
-      <h2>Generated Prompts</h2>
-      <ul>
-        {% for prompt in prompts %}
-          <li>{{ prompt }}</li>
-        {% endfor %}
-      </ul>
-      <h2>Generated Images</h2>
-      <div>
-        {% for image in images %}
-          <img src="{{ image }}" width="200">
-        {% endfor %}
-      </div>
-    {% endif %}
-  </body>
+    <head>
+        <meta charset="utf-8" />
+        <title>Webtoon Generator</title>
+    </head>
+    <body>
+        <h1>Webtoon Generator</h1>
+        <form method="post">
+            <textarea name="text" rows="10" cols="30" placeholder="Enter the novel text here..."></textarea><br />
+            <input type="submit" value="Generate" />
+        </form>
+        {% if prompts %}
+            <h2>Generated Prompts</h2>
+            <ul>
+                {% for prompt in prompts %}
+                    <li>{{ prompt }}</li>
+                {% endfor %}
+            </ul>
+            <h2>Generated Images</h2>
+            <div>
+                {% for image in images %}
+                    <img src="{{ image }}" width="200" />
+                {% endfor %}
+            </div>
+        {% endif %}
+    </body>
 </html>

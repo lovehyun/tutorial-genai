@@ -17,6 +17,7 @@ agent = initialize_agent(
     tools=tools,
     llm=llm,
     agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    handle_parsing_errors=True,  # 파싱 에러를 처리하도록 설정
     verbose=True
 )
 
@@ -54,7 +55,15 @@ inputs = [
     {"input": "고양이는 왜 귀엽다고 느껴질까?"}
 ]
 
+# for item in inputs:
+#     print(f"\n[질문] {item['input']}")
+#     result = smart_chain.invoke(item)
+#     print("[응답]", result["output"])
+
 for item in inputs:
     print(f"\n[질문] {item['input']}")
-    result = smart_chain.invoke(item)
-    print("[응답]", result["output"])
+    try:
+        result = smart_chain.invoke(item)
+        print("[응답]", result["output"])
+    except Exception as e:
+        print(f"[오류 발생] {str(e)}")

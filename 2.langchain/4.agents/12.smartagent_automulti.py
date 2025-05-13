@@ -92,9 +92,9 @@ smart_chain = RunnableLambda(smart_router)
 
 # 7. 다양한 테스트 입력
 inputs = [
-    {"input": "2025년 미국 대통령은 누구야?"},              # → google-search
+    {"input": "2025년 미국 대통령은 누구야?"},               # → google-search
     {"input": "고양이는 왜 야옹거려?"},                      # → wikipedia
-    {"input": "153 * (3.2 + 4.8)는 얼마야?"},                # → llm-math
+    {"input": "153 * (3.2 + 4.8)는 얼마야?"},               # → llm-math
     {"input": "너 말고 사람한테 직접 물어보고 싶어"},         # → human
     {"input": "GPT-4와 GPT-3.5의 차이를 알려줘"},            # → llm-only
 ]
