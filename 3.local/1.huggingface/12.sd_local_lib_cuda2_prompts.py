@@ -199,6 +199,6 @@ if __name__ == "__main__":
     # generate_analog_diffusion()          # 빈티지/아날로그 필름 스타일
     
     # 또는 모든 모델을 순차적으로 실행 (시간이 오래 걸릴 수 있음)
-    # run_all_models()
+    run_all_models()
     
     print("\n스크립트가 완료되었습니다.")

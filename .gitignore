@@ -19,3 +19,5 @@ quantized_model/
 **/audio/*
 conversation.txt
 chroma_db
+model_outputs/
+generated.png
