@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
+const morgan = require('morgan');
 
 // 환경 변수 로드
 dotenv.config();
@@ -9,6 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // 미들웨어 설정
+app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -16,12 +18,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 // 템플릿 엔진 설정
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
-// 디버깅을 위한 전역 미들웨어
-app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-    next();
-});
 
 // 라우트 모듈 가져오기
 const indexRouter = require('./routes/index');

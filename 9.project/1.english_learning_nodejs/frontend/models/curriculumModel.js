@@ -45,14 +45,8 @@ function getCurriculumTitle(grade, curriculumId) {
     const gradeNum = parseInt(grade);
     const currId = parseInt(curriculumId);
 
-    console.log(`getCurriculumTitle 호출: grade=${gradeNum}, curriculumId=${currId}`);
-    console.log(`학년 존재 여부: ${curriculums.hasOwnProperty(gradeNum)}`);
-
     if (curriculums.hasOwnProperty(gradeNum)) {
-        console.log(`해당 학년 커리큘럼 개수: ${curriculums[gradeNum].length}`);
-
         if (currId >= 0 && currId < curriculums[gradeNum].length) {
-            console.log(`찾은 커리큘럼 제목: ${curriculums[gradeNum][currId]}`);
             return curriculums[gradeNum][currId];
         }
     }
@@ -71,11 +65,8 @@ function curriculumExists(grade, curriculumId) {
     const gradeNum = parseInt(grade);
     const currId = parseInt(curriculumId);
 
-    console.log(`curriculumExists 호출: grade=${gradeNum}, curriculumId=${currId}`);
-
     const exists = curriculums.hasOwnProperty(gradeNum) && currId >= 0 && currId < curriculums[gradeNum].length;
 
-    console.log(`존재 여부 결과: ${exists}`);
     return exists;
 }
 
