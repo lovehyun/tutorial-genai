@@ -55,7 +55,7 @@ async function translateMessage(text, targetLang) {
 
 // 루트 페이지 요청 시 index.html 제공
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index3.html'));
 });
 
 // Socket.IO 이벤트 처리
@@ -162,7 +162,7 @@ io.on('connection', (socket) => {
 });
 
 // 서버 실행
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
