@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAG Model</title>
+</head>
+<body>
+    <h1>Document Upload and Q&A</h1>
+    <input type="file" id="fileInput">
+    <button onclick="uploadFile()">Upload File</button>
+
+    <h2>Ask a Question</h2>
+    <input type="text" id="questionInput">
+    <button onclick="askQuestion()">Ask</button>
+
+    <h3>Answer</h3>
+    <div id="answer"></div>
+
     <script>
         async function uploadFile() {
             const fileInput = document.getElementById('fileInput');
@@ -36,17 +49,5 @@
             document.getElementById('answer').innerText = result.answer || result.error;
         }
     </script>
-</head>
-<body>
-    <h1>Document Upload and Q&A</h1>
-    <input type="file" id="fileInput">
-    <button onclick="uploadFile()">Upload File</button>
-
-    <h2>Ask a Question</h2>
-    <input type="text" id="questionInput">
-    <button onclick="askQuestion()">Ask</button>
-
-    <h3>Answer</h3>
-    <p id="answer"></p>
 </body>
 </html>

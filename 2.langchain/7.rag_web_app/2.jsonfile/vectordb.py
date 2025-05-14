@@ -1,10 +1,10 @@
 import os
 import json
 from dotenv import load_dotenv
-from langchain_openai import OpenAI
+
+from langchain_openai import OpenAI, OpenAIEmbeddings
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain.docstore.document import Document
 from langchain.chains.qa_with_sources import load_qa_with_sources_chain
@@ -19,7 +19,7 @@ def create_vector_db(file_path):
     loader = TextLoader(file_path, encoding='euckr')
     documents = loader.load()
 
-    # 문서에 메타데이터가 없으면 추가
+    # (옵셔널) 문서에 메타데이터가 없으면 추가
     documents = [Document(page_content=doc.page_content, metadata={"source": file_path}) for doc in documents]
 
     # 문서를 관리 가능한 크기로 나누면서 메타데이터 유지

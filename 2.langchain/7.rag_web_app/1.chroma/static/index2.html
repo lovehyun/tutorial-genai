@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload and QA</title>
+    <style>
+        #overlay {
+            position: fixed;
+            display: none;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 2;
+            cursor: pointer;
+        }
+        #spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            margin: -20px 0 0 -20px;
+            border: 4px solid #fff;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #text {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            font-size: 20px;
+            color: white;
+            transform: translate(-50%,-50%);
+            -ms-transform: translate(-50%,-50%);
+        }
+    </style>
+</head>
+<body>
+    <h1>파일 업로드 및 질문 응답</h1>
+    
+    <form id="upload-form">
+        <input type="file" id="file-input" name="file" required>
+        <button type="submit">업로드</button>
+    </form>
+    
+    <h2>질문하기</h2>
+    <form id="question-form">
+        <input type="text" id="question-input" name="question" placeholder="질문을 입력하세요" required>
+        <button type="submit">질문</button>
+    </form>
+    <div id="answer"></div>
+    
+    <div id="overlay">
+        <div id="spinner"></div>
+        <div id="text"></div>
+    </div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var fileInput = document.getElementById('file-input');
+            if (fileInput.files.length === 0) {
+                alert('파일을 선택하세요.');
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            var overlay = document.getElementById('overlay');
+            overlay.style.display = 'block';
+
+            var spinner = document.getElementById('spinner');
+            spinner.style.display = 'block';
+
+            var text = document.getElementById('text');
+            text.textContent = '파일을 처리하는 중입니다...';
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json())
+            .then(data => {
+                overlay.style.display = 'none';
+                spinner.style.display = 'none';
+                alert(data.message || '업로드가 완료되었습니다.');
+            }).catch(error => {
+                overlay.style.display = 'none';
+                spinner.style.display = 'none';
+                alert('파일 업로드 중 오류가 발생했습니다.');
+            });
+        });
+
+        document.getElementById('question-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var questionInput = document.getElementById('question-input');
+            var question = questionInput.value.trim();
+
+            if (!question) {
+                alert('질문을 입력하세요.');
+                return;
+            }
+
+            var overlay = document.getElementById('overlay');
+            overlay.style.display = 'block';
+
+            var spinner = document.getElementById('spinner');
+            spinner.style.display = 'block';
+
+            var text = document.getElementById('text');
+            text.textContent = '질문을 처리하는 중입니다...';
+
+            fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: question })
+            }).then(response => response.json())
+            .then(data => {
+                overlay.style.display = 'none';
+                spinner.style.display = 'none';
+                // document.getElementById('answer').innerHTML = data.answer || '응답을 받을 수 없습니다.';
+                document.getElementById('answer').innerHTML = 
+                    (data.answer || '응답을 받을 수 없습니다.').replace(/\n/g, '<br>');
+            }).catch(error => {
+                overlay.style.display = 'none';
+                spinner.style.display = 'none';
+                document.getElementById('answer').innerHTML = '질문 처리 중 오류가 발생했습니다.';
+            });
+        });
+    </script>
+</body>
+</html>
