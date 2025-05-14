@@ -1,0 +1,141 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+#chatContainer {
+    width: 400px;
+    height: 90vh;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+#messages {
+    flex: 1;
+    padding: 10px;
+    margin: 0;
+    list-style: none;
+    overflow-y: auto;
+}
+#messages li {
+    margin-bottom: 10px;
+    position: relative;
+}
+#inputContainer {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    position: sticky;
+    bottom: 0;
+    background: white;
+    gap: 5px;
+}
+#usernameInput,
+#messageInput {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    outline: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+#usernameInput:focus,
+#messageInput:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.7);
+}
+#usernameInput {
+    width: 20%;
+}
+#messageInput {
+    flex: 1;
+}
+
+#header {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#header h1 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #333;
+}
+
+#languageSelect {
+    padding: 8px 15px;
+    font-size: 1em;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    outline: none;
+    background: white;
+    cursor: pointer;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    background: #007bff;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+button:hover {
+    background: #0056b3;
+}
+
+.myMessage {
+    text-align: right;
+}
+.myMessage .bubble {
+    background: #007bff;
+    color: white;
+    border-radius: 15px 15px 0 15px;
+    padding: 10px;
+    display: inline-block;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+.otherMessage {
+    text-align: left;
+}
+.otherMessage .bubble {
+    background: #eaeaea;
+    border-radius: 15px 15px 15px 0;
+    padding: 10px;
+    display: inline-block;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+.readCount {
+    font-size: 0.8rem;
+    color: gray;
+    position: absolute;
+    bottom: -15px;
+}
+.myMessage .readCount {
+    right: 0;
+}
+.otherMessage .readCount {
+    left: 0;
+}
+
+.typing {
+    color: gray;
+    font-style: italic;
+    padding: 5px;
+    margin-bottom: 10px;
+}

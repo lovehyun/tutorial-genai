@@ -12,8 +12,10 @@ logging.basicConfig(level=logging.INFO)
 # 환경변수 로드 (.env 파일에서 OPENAI_API_KEY 등을 불러옴)
 load_dotenv()
 
+PUBLIC_DIR='public'
+
 # Flask 앱 초기화, 정적 파일은 별도 설정 없이 'static' 폴더로 간주
-app = Flask(__name__)
+app = Flask(__name__, static_folder=PUBLIC_DIR, static_url_path='')
 # SocketIO 설정 (모든 출처 허용)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -45,7 +47,7 @@ def translate_message(text, target_lang):
 # 루트 페이지 요청 시 index.html 제공
 @app.route('/')
 def index():
-    return send_from_directory('static', 'index.html')
+    return send_from_directory(PUBLIC_DIR, 'index.html')
 
 # 클라이언트가 접속했을 때
 @socketio.on('connect')
