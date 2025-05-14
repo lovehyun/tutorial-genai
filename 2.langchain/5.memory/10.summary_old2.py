@@ -39,6 +39,7 @@ for message in conversation:
 
 # 6. 요약 결과 저장
 print("현재 요약:", repr(memory.moving_summary_buffer))
+
 # if memory.moving_summary_buffer.strip():
 #     with open("final_summary.txt", "w", encoding="utf-8") as f:
 #         f.write(memory.moving_summary_buffer)

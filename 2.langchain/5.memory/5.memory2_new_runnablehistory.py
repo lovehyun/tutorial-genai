@@ -19,7 +19,7 @@ prompt = ChatPromptTemplate.from_messages([
     ("human", "{input}")
 ])
 
-# 체인 구성
+# 체인 구성 (LCEL)
 chain = prompt | llm | StrOutputParser()
 
 # 단일 사용자용 메모리 (세션 없음)
@@ -33,8 +33,17 @@ chain_with_memory = RunnableWithMessageHistory(
     history_messages_key="history"
 )
 
+# print(chain_with_memory.invoke({"input": "안녕하세요"}, config={"configurable": {"session_id": "default"}}))
+# print(chain_with_memory.invoke({"input": "제 이름이 뭐였지요?"}, config={"configurable": {"session_id": "default"}}))
+# print(chain_with_memory.invoke({"input": "저는 프로그래밍을 배우고 싶어요."}, config={"configurable": {"session_id": "default"}}))
+# print(chain_with_memory.invoke({"input": "제가 무엇을 배우고 싶다고 했나요?"}, config={"configurable": {"session_id": "default"}}))
+
+# 채팅 함수
+def chat(message):
+    return chain_with_memory.invoke({"input": message}, config={"configurable": {"session_id": "default"}})
+
 # 대화 시뮬레이션
-print(chain_with_memory.invoke({"input": "안녕하세요"}, config={"configurable": {"session_id": "default"}}))
-print(chain_with_memory.invoke({"input": "제 이름이 뭐였지요?"}, config={"configurable": {"session_id": "default"}}))
-print(chain_with_memory.invoke({"input": "저는 프로그래밍을 배우고 싶어요."}, config={"configurable": {"session_id": "default"}}))
-print(chain_with_memory.invoke({"input": "제가 무엇을 배우고 싶다고 했나요?"}, config={"configurable": {"session_id": "default"}}))
+print(chat("안녕하세요"))
+print(chat("제 이름이 뭐였지요?"))
+print(chat("저는 프로그래밍을 배우고 싶어요."))
+print(chat("제가 무엇을 배우고 싶다고 했나요?"))
