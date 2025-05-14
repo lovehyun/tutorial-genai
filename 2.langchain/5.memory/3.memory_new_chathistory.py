@@ -11,7 +11,7 @@ load_dotenv()
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.1)
 
 # LangChain의 공식 메모리 기능 사용 (ChatMessageHistory)
-message_history = ChatMessageHistory()
+chat_history = ChatMessageHistory()
 
 # 프롬프트 템플릿 생성
 prompt = ChatPromptTemplate.from_messages([
@@ -28,12 +28,12 @@ def chat(message):
     # 체인 실행 (메시지 기록 포함)
     result = chain.invoke({
         "input": message,
-        "history": message_history.messages  # ChatMessageHistory에서 메시지 목록 가져오기
+        "history": chat_history.messages  # ChatMessageHistory에서 메시지 목록 가져오기
     })
     
     # 메시지 기록 업데이트 (LangChain 공식 메모리 기능 사용)
-    message_history.add_user_message(message)
-    message_history.add_ai_message(result.content)
+    chat_history.add_user_message(message)
+    chat_history.add_ai_message(result.content)
     
     return result.content
 

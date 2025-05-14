@@ -34,7 +34,7 @@ chain_with_memory = RunnableWithMessageHistory(
 )
 
 # 대화 시뮬레이션
-print(chain_with_memory.invoke({"input": "안녕하세요, 제 이름은 김철수입니다."}))
-print(chain_with_memory.invoke({"input": "제 이름이 뭐였지요?"}))
-print(chain_with_memory.invoke({"input": "저는 프로그래밍을 배우고 싶어요."}))
-print(chain_with_memory.invoke({"input": "제가 무엇을 배우고 싶다고 했나요?"}))
+print(chain_with_memory.invoke({"input": "안녕하세요"}, config={"configurable": {"session_id": "default"}}))
+print(chain_with_memory.invoke({"input": "제 이름이 뭐였지요?"}, config={"configurable": {"session_id": "default"}}))
+print(chain_with_memory.invoke({"input": "저는 프로그래밍을 배우고 싶어요."}, config={"configurable": {"session_id": "default"}}))
+print(chain_with_memory.invoke({"input": "제가 무엇을 배우고 싶다고 했나요?"}, config={"configurable": {"session_id": "default"}}))
