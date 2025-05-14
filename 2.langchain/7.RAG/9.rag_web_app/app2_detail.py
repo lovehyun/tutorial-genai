@@ -3,21 +3,14 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
-from vectordb import initialize_vector_db, create_vector_db, answer_question, get_store
+from database2 import initialize_vector_db, create_vector_db, answer_question, get_store, DATA_DIR
 
 app = Flask(__name__)
 CORS(app)
 
-VECTOR_DB_PATH = './vector_db.json'
-DATA_DIR = './DATA'
-
-# DATA 디렉토리가 존재하지 않으면 생성
-if not os.path.exists(DATA_DIR):
-    os.makedirs(DATA_DIR)
-
 @app.route('/')
 def index():
-    return send_from_directory('static', 'index.html') 
+    return send_from_directory('static', 'index2.html') 
 
 # 파일 업로드를 처리하는 엔드포인트
 @app.route('/upload', methods=['POST'])

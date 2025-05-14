@@ -4,6 +4,7 @@ gapi-*.json
 
 # python
 *.pyc
+__pycache__/
 
 # database
 *.db

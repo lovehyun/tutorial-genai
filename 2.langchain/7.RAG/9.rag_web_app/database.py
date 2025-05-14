@@ -13,23 +13,28 @@ from langchain_core.output_parsers import StrOutputParser
 
 load_dotenv()
 
-PERSIST_DIR = './chroma_db'
+VECTOR_DB = './chroma_db'
 COLLECTION_NAME = 'my-data'
+DATA_DIR = './DATA'
 store = None
-
+    
 def get_store():
     return store
 
 # 초기 로딩 함수
 def initialize_vector_db():
     global store
-    if os.path.exists(PERSIST_DIR) and os.listdir(PERSIST_DIR):
+    if os.path.exists(VECTOR_DB) and os.listdir(VECTOR_DB):
         store = Chroma(
             collection_name=COLLECTION_NAME,
             embedding_function=OpenAIEmbeddings(),
-            persist_directory=PERSIST_DIR
+            persist_directory=VECTOR_DB
         )
-        
+
+    # DATA 디렉토리가 존재하지 않으면 생성
+    if not os.path.exists(DATA_DIR):
+        os.makedirs(DATA_DIR)
+
 def create_vector_db(file_path):
     global store
     
@@ -45,15 +50,15 @@ def create_vector_db(file_path):
     embeddings = OpenAIEmbeddings()
 
     # 4. 저장 폴더 없으면 생성
-    if not os.path.exists(PERSIST_DIR):
-        os.makedirs(PERSIST_DIR)
+    if not os.path.exists(VECTOR_DB):
+        os.makedirs(VECTOR_DB)
 
     # 5. 기존 DB가 있으면 불러와서 추가
-    if os.path.isdir(PERSIST_DIR) and os.listdir(PERSIST_DIR):
+    if os.path.isdir(VECTOR_DB) and os.listdir(VECTOR_DB):
         store = Chroma(
             collection_name=COLLECTION_NAME,
             embedding_function=embeddings,
-            persist_directory=PERSIST_DIR
+            persist_directory=VECTOR_DB
         )
         store.add_documents(texts)
     else: # 없으면 새로 생성
@@ -61,7 +66,7 @@ def create_vector_db(file_path):
             texts,
             embeddings,
             collection_name=COLLECTION_NAME,
-            persist_directory=PERSIST_DIR
+            persist_directory=VECTOR_DB
         )
 
     return store
