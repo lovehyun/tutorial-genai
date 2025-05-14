@@ -4,12 +4,13 @@ import os
 from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.documents import Document
+
+from langchain_community.document_loaders import TextLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_chroma import Chroma
 
 # 1. .env 파일에서 OpenAI API 키 로드
 load_dotenv(dotenv_path='../.env')
@@ -71,8 +72,6 @@ template2 = """주어진 문서들을 참고하여 질문에 답변해주세요.
 2. 문서에 없는 내용은 "죄송합니다. 주어진 문서에서 해당 정보를 찾을 수 없습니다."라고 답변하세요
 3. 문서의 내용을 바탕으로 명확하고 이해하기 쉽게 설명하세요
 4. 기술적인 용어가 나오면 가능한 풀어서 설명해주세요
-
-마지막에 "SOURCES: "를 추가하고 참고한 문서의 출처를 명시해주세요.
 """
 
 # 6. 프롬프트 + 검색 + LLM + 출력 포맷 체인 구성
@@ -86,26 +85,33 @@ chain = (
     | StrOutputParser()  # 결과를 문자열로 출력
 )
 
-# 7. 질문을 받아 답변 + 출처를 포맷에 맞게 반환하는 함수
+# 7. 질문을 받아 답변 + 출처를 포맷에 맞게 반환하는 함수 (7-1, 7-2는 생략가능. 바로 7-3부터 실행 가능.)
 def answer_question(question):
     try:
-        result = chain.invoke(question)
+        # 7-1. 관련 문서 직접 가져오기
+        docs = retriever.get_relevant_documents(question)
 
-        # 결과에서 "SOURCES:" 기준으로 응답/출처 분리
-        if "SOURCES:" in result:
-            answer, sources = result.split("SOURCES:", 1)
-            answer = answer.strip()
-            sources = sources.strip()
-        else:
-            answer = result.strip()
-            sources = "출처 정보를 찾을 수 없습니다."
+        # 7-2. context 생성: 문서 내용 + 출처 함께 구성
+        context = ""
+        sources = []
+        for i, doc in enumerate(docs, start=1):
+            source = doc.metadata.get("source", "unknown")
+            page = doc.metadata.get("page", "N/A")
+            sources.append(f"{source} (page {page})")
+            context += f"[출처: {source}, 페이지: {page}]\n{doc.page_content.strip()}\n\n"
 
-        # 무의미한 응답 필터링
-        if not answer or answer.lower() == "i don't know.":
-            return f"질문: {question}\n응답: 이 질문에 대한 답변을 제공할 수 없습니다.\n"
-        
-        return f"질문: {question}\n응답: {answer}\n출처: {sources}\n"
-    
+        # 7-3. 체인 실행
+        # result = chain.invoke(question) # 체인을 통해서 context 수행 (get_relevant_documents 가 자동으로 추출)
+        result = chain.invoke({"context": context, "question": question})
+        answer = result.strip()
+
+        # 7-4. 의미 없는 응답 필터링
+        if not answer or answer.lower() in ["i don't know.", "i don’t know."]:
+            return f"질문: {question}\n응답: 죄송합니다. 주어진 문서에서 해당 정보를 찾을 수 없습니다.\n"
+
+        # 7-5. 결과 반환
+        return f"질문: {question}\n응답: {answer}\n출처: {', '.join(sources)}\n"
+
     except Exception as e:
         return f"질문: {question}\n응답: 오류가 발생했습니다: {str(e)}\n"
 

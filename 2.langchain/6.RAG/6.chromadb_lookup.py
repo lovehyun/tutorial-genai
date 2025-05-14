@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 
@@ -42,6 +43,7 @@ docs = store.similarity_search("시큐어 코딩", k=5)
 
 for i, doc in enumerate(docs):
     print(f"[문서]: {i+1}")
+    print(f"[문서ID]: {doc.id}")
     print(f"[내용 (앞 300자)]: {doc.page_content[:300]}")
     print(f"[메타데이터]: {doc.metadata}")
     print("---\n")

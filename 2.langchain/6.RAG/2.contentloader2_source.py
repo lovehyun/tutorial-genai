@@ -3,12 +3,13 @@
 from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter 
-from langchain_community.vectorstores import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.documents import Document
+
+from langchain_community.document_loaders import TextLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter 
+from langchain_community.vectorstores import Chroma
 
 # 1. .env 파일에서 OpenAI API 키 불러오기
 load_dotenv(dotenv_path='../.env')
@@ -51,7 +52,7 @@ chain = (
    {"context": retriever, "question": lambda x: x}  # context는 retriever가 채움, question은 그대로 전달
    | prompt
    | llm
-   | StrOutputParser()  # 응답을 문자열로 처리
+   | StrOutputParser()  # 응답을 문자열로 처리 (최종 result.context 부분을 문자열로 반환)
 )
 
 # 10. 질문을 받아 응답 + 출처를 분리해서 반환하는 함수

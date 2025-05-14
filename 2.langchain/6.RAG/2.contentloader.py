@@ -3,12 +3,12 @@
 from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
+from langchain_community.document_loaders import TextLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import Chroma
 
 # 1. .env 파일에서 OPENAI_API_KEY 등 환경 변수 로드
 load_dotenv(dotenv_path='../.env')
@@ -53,7 +53,16 @@ chain = (
 )
 
 # 10. 실제 질문 실행
-response = chain.invoke("NVME와 SATA의 차이점을 100글자로 요약해줘")
+question = "NVME와 SATA의 차이점을 100글자로 요약해줘"
+
+# 10-1. context(검색된 문서)만 미리 확인
+# context_docs = retriever.invoke(question)
+# print("=== 검색된 문서(Context) ===")
+# for i, doc in enumerate(context_docs):
+#     print(f"[{i+1}] {doc.page_content}\n")
+
+# 10-2. 체인을 통해 질문 실행
+response = chain.invoke(question)
 
 # 11. 응답 출력
 print(response.content)

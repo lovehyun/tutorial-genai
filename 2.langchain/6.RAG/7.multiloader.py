@@ -1,7 +1,10 @@
 from dotenv import load_dotenv
+
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
+
 from langchain.schema import Document
 from langchain_chroma import Chroma
 
@@ -35,8 +38,7 @@ prompt = ChatPromptTemplate.from_template("""
 """)
 
 chain = (
-    {"context": lambda x: x["docs"], "question": lambda x: x["question"]}
-    | prompt
+    prompt
     | llm
     | StrOutputParser()
 )
@@ -58,7 +60,7 @@ def ask(question: str, target_collection: str = None):
     docs = search_documents(question, target=target_collection)
 
     context = "\n\n".join([doc.page_content for doc in docs])
-    response = chain.invoke({"docs": context, "question": question})
+    response = chain.invoke({"context": context, "question": question})
 
     print(f"\n질문: {question}")
     if target_collection:
