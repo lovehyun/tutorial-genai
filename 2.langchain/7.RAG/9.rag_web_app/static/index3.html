@@ -72,29 +72,42 @@
     </div>
 
     <script>
-        const fileListEl = document.getElementById('file-list');
+        const fileListElem = document.getElementById('file-list');
 
         // 1. 파일 목록 가져와서 렌더링
         function loadFileList() {
-        fetch('/files')
-            .then(res => res.json())
-            .then(({ files }) => {
-                fileListEl.innerHTML = files.map(fn => `
-                    <li>
-                        ${fn}
-                        <button data-file="${fn}" class="delete-btn">삭제</button>
-                    </li>
-                `).join('');
-            });
+            fetch('/files')
+                .then(res => res.json())
+                .then(({ files }) => {
+                    // let html = '';
+                    // files.forEach(fn => {
+                    //     html += `
+                    //         <li>
+                    //             ${fn}
+                    //             <button data-file="${fn}" class="delete-btn">삭제</button>
+                    //         </li>
+                    //     `;
+                    // });
+                    // fileListElem.innerHTML = html;
+
+                    // map 이 더 간단하게...
+                    fileListElem.innerHTML = files.map(fn => `
+                        <li>
+                            ${fn}
+                            <button data-file="${fn}" class="delete-btn">삭제</button>
+                        </li>
+                    `).join('');
+
+                });
         }
         loadFileList();
 
         // 2. 삭제 버튼 처리
-        fileListEl.addEventListener('click', e => {
+        fileListElem.addEventListener('click', e => {
             if (!e.target.matches('.delete-btn')) return;
             
             const filename = e.target.dataset.file;
-            if (!confirm(`${filename} 을 정말 삭제하시겠습니까?`)) return;
+            if (!confirm(`'${filename}' 을 정말 삭제하시겠습니까?`)) return;
 
             fetch(`/files/${filename}`, { method: 'DELETE' })
                 .then(res => res.json())
@@ -129,17 +142,17 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                overlay.style.display = 'none';
-                spinner.style.display = 'none';
-                setTimeout(loadFileList, 500); // 기존 어로드 로직 끝난 뒤
-                alert(data.message || '업로드가 완료되었습니다.');
-            }).catch(error => {
-                overlay.style.display = 'none';
-                spinner.style.display = 'none';
-                alert('파일 업로드 중 오류가 발생했습니다.');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    overlay.style.display = 'none';
+                    spinner.style.display = 'none';
+                    setTimeout(loadFileList, 500); // 기존 어로드 로직 끝난 뒤
+                    alert(data.message || '업로드가 완료되었습니다.');
+                }).catch(error => {
+                    overlay.style.display = 'none';
+                    spinner.style.display = 'none';
+                    alert('파일 업로드 중 오류가 발생했습니다.');
+                });
         });
 
         document.getElementById('question-form').addEventListener('submit', function(e) {
@@ -167,18 +180,19 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ question: question })
-            }).then(response => response.json())
-            .then(data => {
-                overlay.style.display = 'none';
-                spinner.style.display = 'none';
-                // document.getElementById('answer').innerHTML = data.answer || '응답을 받을 수 없습니다.';
-                document.getElementById('answer').innerHTML = 
-                    (data.answer || '응답을 받을 수 없습니다.').replace(/\n/g, '<br>');
-            }).catch(error => {
-                overlay.style.display = 'none';
-                spinner.style.display = 'none';
-                document.getElementById('answer').innerHTML = '질문 처리 중 오류가 발생했습니다.';
-            });
+            })
+                .then(response => response.json())
+                .then(data => {
+                    overlay.style.display = 'none';
+                    spinner.style.display = 'none';
+                    // document.getElementById('answer').innerHTML = data.answer || '응답을 받을 수 없습니다.';
+                    document.getElementById('answer').innerHTML = 
+                        (data.answer || '응답을 받을 수 없습니다.').replace(/\n/g, '<br>');
+                }).catch(error => {
+                    overlay.style.display = 'none';
+                    spinner.style.display = 'none';
+                    document.getElementById('answer').innerHTML = '질문 처리 중 오류가 발생했습니다.';
+                });
         });
     </script>
 </body>

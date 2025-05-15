@@ -1,4 +1,8 @@
+# pip install pyyaml
 import os
+import yaml
+import json
+from typing import Dict
 from dotenv import load_dotenv
 
 from langchain_openai import OpenAIEmbeddings
@@ -18,8 +22,45 @@ DATA_DIR = './DATA'
 COLLECTION_NAME = 'my-data'
 store = None
 
+# 전역 선언
+llm = None
+output_parser = None
+prompts = None
+PROMPT_FILE = "prompts.yaml"
+
+# 저장된 store 가져오기
 def get_store():
     return store
+
+# 프롬프트 로딩 함수 - 하나의 KEY 기반 (load_prompt_from_json(PROMPT_FILE, "scored_prompt"))
+def load_prompt_from_json(json_path: str, prompt_name: str) -> ChatPromptTemplate:
+    with open(json_path, "r", encoding="utf-8") as f:
+        prompt_data = json.load(f)
+    template = prompt_data[prompt_name]["template"]
+    return ChatPromptTemplate.from_template(template)
+        
+# 프롬프트 전체 로딩 함수 - YAML
+def load_prompts_from_yaml(yaml_path: str) -> Dict[str, ChatPromptTemplate]:
+    with open(yaml_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+        
+        # 아래와 동일한 list-comprehension 포멧
+        return {
+            name: ChatPromptTemplate.from_template(p["template"])
+            for name, p in data.items()
+        }
+
+# 프롬프트 전체 로딩 함수 -JSON
+def load_prompts_from_json(json_path: str) -> Dict[str, ChatPromptTemplate]:
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+        
+        result = {}
+        for name, p in data.items():
+            template = p["template"]
+            result[name] = ChatPromptTemplate.from_template(template)
+
+        return result
 
 # 초기 로딩 함수
 def initialize_vector_db():
@@ -34,6 +75,20 @@ def initialize_vector_db():
     # DATA 디렉토리가 존재하지 않으면 생성
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR)
+
+def initialize_components():
+    global llm, output_parser, prompts
+    
+    # LLM 준비 (gpt-3.5-turbo 기반)
+    llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+
+    # 출력 파서
+    output_parser = StrOutputParser()
+
+    # 프롬프트 템플릿 정의
+    prompts = load_prompts_from_yaml(PROMPT_FILE)
+    # prompts = load_prompts_from_json(PROMPT_FILE)
+    # prompts = load_prompt_from_json(PROMPT_FILE, "scored_prompt")
 
 def create_vector_db(file_path):
     global store
@@ -64,7 +119,8 @@ def create_vector_db(file_path):
             embedding_function=embeddings,
             persist_directory=VECTOR_DB
         )
-        store.add_documents(texts)
+        
+        store.add_documents(texts) # 내용 추가
     else: # 없으면 새로 생성
         store = Chroma.from_documents(
             texts,
@@ -75,13 +131,35 @@ def create_vector_db(file_path):
 
     return store
 
+def preview_file_entries(file_name: str):
+    """특정 source 메타데이터를 가진 벡터 문서들을 미리 조회하고 출력"""
+    global store
+    if store is None:
+        print("벡터 스토어가 초기화되지 않았습니다.")
+        return
+
+    # 내부 컬렉션에서 조건에 맞는 벡터 가져오기
+    result = store._collection.get(where={"source": file_name})
+
+    ids = result.get("ids", [])
+    documents = result.get("documents", [])
+    metadatas = result.get("metadatas", [])
+
+    print(f"파일명 '{file_name}'에 해당하는 벡터 {len(documents)}개가 존재합니다.")
+    for i, (doc, meta) in enumerate(zip(documents, metadatas), 1):
+        print(f"\n문서 {i}")
+        print(f"내용: {doc[:50]}...")  # 앞 50자만 표시
+        print(f"메타데이터: {meta}")
+        
 def delete_file(file_name: str):
     """지정한 파일명(source)과 매칭되는 벡터를 삭제하고, 실제 PDF/Text 파일도 지움."""
     global store
     
     # 1. 컬렉션 내에서 metadata.source == file_name 인 벡터 삭제
     # 내부 collection 객체를 직접 삭제
+    # preview_file_entries(file_name)
     store._collection.delete(where={"source": file_name})
+    
     # persist 옵션 사용중이면 persist() 호출
     if hasattr(store, "persist"):
         store.persist()
@@ -93,44 +171,9 @@ def delete_file(file_name: str):
 
 def list_files():
     """DATA_DIR에 남아있는 파일 목록 리턴"""
-    return [f for f in os.listdir(DATA_DIR)
+    files = [f for f in os.listdir(DATA_DIR)
             if os.path.isfile(os.path.join(DATA_DIR, f))]
-
-# LLM 준비 (gpt-3.5-turbo 기반)
-llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
-
-# 출력 파서
-output_parser = StrOutputParser()
-
-# 프롬프트 템플릿 정의
-prompt = ChatPromptTemplate.from_template("""
-당신은 문서 기반 질문 응답 시스템입니다.
-다음 문서를 참고하여 사용자의 질문에 답변해 주세요. 
-모르겠다면 절대로 지어내지 말고 "모르겠습니다"라고 답하세요.
-
-문서:
-{context}
-
-질문:
-{question}
-
-답변:
-""")
-
-prompt2 = ChatPromptTemplate.from_template("""
-당신은 문서 기반 질문 응답 시스템입니다.
-다음 문서를 참고하여 사용자의 질문에 답변해 주세요. 
-각 문서에는 번호가 붙어 있습니다. 응답 후 어떤 문서 번호가 가장 관련 있었는지도 알려주세요.
-모르겠다면 절대로 지어내지 말고 "모르겠습니다"라고 답하세요.
-
-문서:
-{context}
-
-질문:
-{question}
-
-답변:
-""")
+    return files
 
 def answer_question(question: str) -> str:
     global store
@@ -149,7 +192,9 @@ def answer_question(question: str) -> str:
     print(context)
     
     # 3. LLM 체인 실행
-    chain = prompt2 | llm | output_parser
+    # chain = prompt | llm | output_parser # 사전에 하나만 로딩한 경우
+    chain = prompts["scored_prompt"] | llm | output_parser # 여러개 프롬프트 중 원하는것 선택
+
     try:
         result = chain.invoke({
             "context": context,

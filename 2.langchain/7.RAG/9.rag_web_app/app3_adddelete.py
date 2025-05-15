@@ -4,7 +4,8 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 from database3 import (
-    initialize_vector_db, 
+    initialize_vector_db,
+    initialize_components,
     create_vector_db, 
     answer_question, 
     get_store, 
@@ -65,4 +66,5 @@ def ask_question():
 
 if __name__ == '__main__':
     initialize_vector_db()
+    initialize_components()
     app.run(debug=True)
