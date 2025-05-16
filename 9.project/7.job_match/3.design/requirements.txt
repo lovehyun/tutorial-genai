@@ -1,0 +1,7 @@
+flask
+scikit-learn
+numpy
+requests
+lxml
+beautifulsoup4
+pymupdf

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app
 from werkzeug.utils import secure_filename
 from bs4 import BeautifulSoup
 import requests
@@ -78,12 +78,6 @@ def extract_text_from_url(url, selector):
     except Exception as e:
         print("[요청 또는 파싱 중 오류]:", e)
         return f"URL 처리 오류: {e}"
-
-
-# 루트 페이지 렌더링
-@routes.route('/')
-def index():
-    return render_template('index.html')
 
 # PDF 업로드 및 텍스트 추출
 @routes.route('/upload_pdf', methods=['POST'])

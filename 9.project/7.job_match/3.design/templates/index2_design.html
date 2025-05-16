@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JobMatch 비교 시스템</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="w-full max-w-screen-xl mx-auto mt-10 p-4 bg-white shadow rounded">
+        <h1 class="text-2xl font-bold text-center mb-6">JobMatch 비교 시스템</h1>
+
+        <!-- 반응형 2단 구성 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- 좌측: PDF 업로드 -->
+            <div>
+                <form id="pdfForm" class="space-y-2 mb-4">
+                    <label class="font-semibold">PDF 업로드</label>
+                    <input type="file" name="pdf" accept=".pdf" required class="w-full border rounded p-2" />
+                    <!-- 오른쪽과 높이 균형 맞춤용 invisible 필드 -->
+                    <input type="text" disabled class="w-full p-2 invisible" />
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        업로드
+                    </button>
+                </form>
+                <div id="pdfPreview" class="h-72 border p-2 overflow-y-auto bg-gray-50 text-sm whitespace-pre-wrap rounded">
+                    PDF 미리보기
+                </div>
+            </div>
+
+            <!-- 우측: URL + XPath 입력 -->
+            <div>
+                <form id="urlForm" class="space-y-2 mb-4">
+                    <label class="font-semibold">채용공고 URL</label>
+                    <input type="text" name="url" required placeholder="https://..." class="w-full border rounded p-2" />
+                    <input type="text" name="xpath" required placeholder="XPath 또는 Selector" class="w-full border rounded p-2" />
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        가져오기
+                    </button>
+                </form>
+                <div id="urlPreview" class="h-72 border p-2 overflow-y-auto bg-gray-50 text-sm whitespace-pre-wrap rounded">
+                    URL 텍스트 미리보기
+                </div>
+            </div>
+        </div>
+
+        <!-- 버튼 영역 -->
+        <div class="mt-6 text-center space-x-4">
+            <button id="compareButton" data-label="조건비교" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
+                조건비교
+            </button>
+            <button id="gptCompareButton" data-label="GPT 분석" class="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700">
+                GPT 분석
+            </button>
+        </div>
+
+        <!-- 결과 출력 -->
+        <div class="mt-6">
+            <h2 class="text-lg font-semibold mb-2">분석 결과</h2>
+            <pre id="finalResult" class="h-64 border p-2 overflow-y-auto text-sm whitespace-pre-wrap bg-gray-100 rounded scroll-smooth"></pre>
+        </div>
+    </div>
+
+    <!-- JS 파일 연결 -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
