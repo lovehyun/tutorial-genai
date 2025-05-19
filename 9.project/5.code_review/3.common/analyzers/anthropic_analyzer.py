@@ -5,17 +5,6 @@ from anthropic import Anthropic
 load_dotenv()
 anthropic = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
-def analyze(code_with_line_numbers):
-    # prompt = build_prompt(code_with_line_numbers)
-    prompt = build_prompt2(code_with_line_numbers)
-    response = anthropic.messages.create(
-        model="claude-3-sonnet-20240229",
-        max_tokens=1024,
-        temperature=0.2,
-        messages=[{"role": "user", "content": prompt}]
-    )
-    return response.content[0].text
-
 def build_prompt(code):
     return (
         "다음 소스코드에서 보안 취약점을 분석해줘.\n"
@@ -48,3 +37,14 @@ def build_prompt2(code):
         f"{code}\n"
         "------------------------------"
     )
+
+def analyze(code_with_line_numbers):
+    # prompt = build_prompt(code_with_line_numbers)
+    prompt = build_prompt2(code_with_line_numbers)
+    response = anthropic.messages.create(
+        model="claude-3-sonnet-20240229",
+        max_tokens=1024,
+        temperature=0.2,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response.content[0].text

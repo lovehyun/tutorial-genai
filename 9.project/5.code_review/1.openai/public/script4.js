@@ -70,8 +70,10 @@ document.addEventListener("DOMContentLoaded", function() {
             
             let match;
             while ((match = regex.exec(data.analysis)) !== null) {
-                const start = parseInt(match[1]);
-                const end = match[2] ? parseInt(match[2]) : start;
+                const range = match[1].split("-").map(s => parseInt(s.trim()));
+                const start = range[0];
+                const end = range.length > 1 ? range[1] : start;
+
                 for (let i = start; i <= end; i++) {
                     const lineElem = document.getElementById("line-" + i);
                     if (lineElem) {

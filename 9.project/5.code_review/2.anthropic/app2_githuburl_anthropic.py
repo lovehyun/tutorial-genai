@@ -18,6 +18,20 @@ def convert_github_url_to_raw(url):
     GitHub 파일 URL (예: https://github.com/user/repo/blob/branch/path/to/file.py)
     을 raw 파일 URL (예: https://raw.githubusercontent.com/user/repo/branch/path/to/file.py)로 변환합니다.
     """
+    # 예: https://github.com/user/repo/blob/branch/path/to/file.py
+    # prefix = "https://github.com/"
+    # if url.startswith(prefix):
+    #     path = url[len(prefix):]  # 'user/repo/blob/branch/path/to/file.py'
+    #     parts = path.split('/')
+    #     if len(parts) >= 5 and parts[2] == "blob":
+    #         user = parts[0]
+    #         repo = parts[1]
+    #         branch = parts[3]
+    #         file_path = "/".join(parts[4:])
+    #         return f"https://raw.githubusercontent.com/{user}/{repo}/{branch}/{file_path}"
+    # return url  # 포맷이 맞지 않으면 원래 URL 반환
+
+    # 정규표현식으로 처리
     pattern = r"https://github.com/(.+)/blob/(.+)"
     match = re.match(pattern, url)
     if match:

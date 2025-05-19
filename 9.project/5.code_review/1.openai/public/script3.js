@@ -34,6 +34,8 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(data => {
             // 먼저 소스코드를 표시합니다.
             const codeLines = data.code.split("\n");
+
+            /*
             codeLines.forEach((line, index) => {
                 const lineDiv = document.createElement("div");
                 lineDiv.className = "code-line";
@@ -48,9 +50,27 @@ document.addEventListener("DOMContentLoaded", function() {
                 lineDiv.appendChild(codeText);
                 codeContainer.appendChild(lineDiv);
             });
+            */
 
             // 분석 결과 영역에 우선 기본 텍스트를 표시 (예: "분석 중입니다..." 혹은 바로 data.analysis)
             analysisElem.innerText = data.analysis;
+
+            // 위에 긴~~ 코드를 아래 간결하게 정리 (그러나 innerHTML 로 하면 태그 이스케이핑 이슈가 있음)
+            // 줄번호 + 코드 조합
+            function escapeHTML(str) {
+                return str
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;");
+            }
+
+            const html = codeLines.map((line, index) => {
+                return `<div class="code-line" id="line-${index + 1}"><span class="line-number">${index + 1}</span> ${escapeHTML(line)}</div>`;
+            }).join("");
+
+            // 한번에 출력
+            codeContainer.innerHTML = html;
 
             // 분석 결과에서 '라인 번호:' 뒤에 나오는 숫자나 범위를 정규표현식으로 추출합니다.
             // 예: "라인 번호: 31" 또는 "라인 번호: 31-36" 또는 "**라인 번호**: 31"
@@ -71,8 +91,10 @@ document.addEventListener("DOMContentLoaded", function() {
             const regex = /라인 번호.*?(\d+(?:\s*-\s*\d+)?)/g;
             let match;
             while ((match = regex.exec(data.analysis)) !== null) {
-                const start = parseInt(match[1]);
-                const end = match[2] ? parseInt(match[2]) : start;
+                const range = match[1].split("-").map(s => parseInt(s.trim()));
+                const start = range[0];
+                const end = range.length > 1 ? range[1] : start;
+
                 for (let i = start; i <= end; i++) {
                     const lineElem = document.getElementById("line-" + i);
                     if (lineElem) {

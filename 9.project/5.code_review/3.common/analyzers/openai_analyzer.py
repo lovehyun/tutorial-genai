@@ -5,20 +5,6 @@ from openai import OpenAI
 load_dotenv()
 openai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def analyze(code_with_line_numbers):
-    # prompt = build_prompt(code_with_line_numbers)
-    prompt = build_prompt2(code_with_line_numbers)
-    messages = [
-        {"role": "system", "content": "당신은 보안 코드 분석 전문가입니다."},
-        {"role": "user", "content": prompt}
-    ]
-    response = openai.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=messages,
-        temperature=0.2
-    )
-    return response.choices[0].message.content
-
 def build_prompt(code):
     return (
         "다음 소스코드에서 보안 취약점을 분석해줘.\n"
@@ -51,3 +37,17 @@ def build_prompt2(code):
         f"{code}\n"
         "------------------------------"
     )
+
+def analyze(code_with_line_numbers):
+    # prompt = build_prompt(code_with_line_numbers)
+    prompt = build_prompt2(code_with_line_numbers)
+    messages = [
+        {"role": "system", "content": "당신은 보안 코드 분석 전문가입니다."},
+        {"role": "user", "content": prompt}
+    ]
+    response = openai.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+        temperature=0.2
+    )
+    return response.choices[0].message.content

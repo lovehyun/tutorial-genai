@@ -18,6 +18,20 @@ def convert_github_url_to_raw(url):
     GitHub 파일 URL (예: https://github.com/user/repo/blob/branch/path/to/file.py)
     을 raw 파일 URL (예: https://raw.githubusercontent.com/user/repo/branch/path/to/file.py)로 변환합니다.
     """
+    # 예: https://github.com/user/repo/blob/branch/path/to/file.py
+    # prefix = "https://github.com/"
+    # if url.startswith(prefix):
+    #     path = url[len(prefix):]  # 'user/repo/blob/branch/path/to/file.py'
+    #     parts = path.split('/')
+    #     if len(parts) >= 5 and parts[2] == "blob":
+    #         user = parts[0]
+    #         repo = parts[1]
+    #         branch = parts[3]
+    #         file_path = "/".join(parts[4:])
+    #         return f"https://raw.githubusercontent.com/{user}/{repo}/{branch}/{file_path}"
+    # return url  # 포맷이 맞지 않으면 원래 URL 반환
+
+    # 정규표현식으로 처리
     pattern = r"https://github.com/(.+)/blob/(.+)"
     match = re.match(pattern, url)
     if match:
@@ -40,8 +54,10 @@ def check_code():
     if not github_url:
         return jsonify({"error": "github_url 필드가 필요합니다."}), 400
 
+    # 1. 주소 변환
     raw_url = convert_github_url_to_raw(github_url)
     
+    # 2. 요청
     try:
         resp = requests.get(raw_url)
         resp.raise_for_status()
@@ -49,6 +65,7 @@ def check_code():
     except Exception as e:
         return jsonify({"error": f"파일을 가져오는 중 에러 발생: {e}"}), 500
 
+    # 3. 분석
     prompt = (
         "다음 소스코드에서 보안 취약점을 분석해줘.\n"
         "각 취약점에 대해 해당 코드의 라인 번호, 코드 스니펫, 취약점 설명과"

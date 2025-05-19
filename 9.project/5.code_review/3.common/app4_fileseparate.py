@@ -13,19 +13,6 @@ load_dotenv()
 app = Flask(__name__, static_folder='public', static_url_path='')
 
 def convert_github_url_to_raw(url):
-    # 예: https://github.com/user/repo/blob/branch/path/to/file.py
-    # prefix = "https://github.com/"
-    # if url.startswith(prefix):
-    #     path = url[len(prefix):]  # 'user/repo/blob/branch/path/to/file.py'
-    #     parts = path.split('/')
-    #     if len(parts) >= 5 and parts[2] == "blob":
-    #         user = parts[0]
-    #         repo = parts[1]
-    #         branch = parts[3]
-    #         file_path = "/".join(parts[4:])
-    #         return f"https://raw.githubusercontent.com/{user}/{repo}/{branch}/{file_path}"
-    # return url  # 포맷이 맞지 않으면 원래 URL 반환
-
     # 정규표현식으로 처리
     pattern = r"https://github.com/(.+)/blob/(.+)"
     match = re.match(pattern, url)
@@ -61,16 +48,20 @@ def check_code():
     except Exception as e:
         return jsonify({"error": f"파일을 가져오는 중 에러 발생: {e}"}), 500
 
-    # 3. 소스코드에 숫자 붙이기
+    # 3. 소스코드에 줄번호 추가
     numbered_code = add_line_numbers(code)
     print(numbered_code)
 
     # 4. 분석
+    print("모델 요청: ", provider)
     try:
-        if provider == "anthropic":
+        if provider == "openai":
+            analysis = openai_analyzer.analyze(numbered_code)
+        elif provider == "anthropic":
             analysis = anthropic_analyzer.analyze(numbered_code)
         else:
-            analysis = openai_analyzer.analyze(numbered_code)
+            analysis = "아직 구현되지 않은 모델입니다."
+            
     except Exception as e:
         return jsonify({"error": f"{provider.upper()} 분석 중 에러 발생: {e}"}), 500
 

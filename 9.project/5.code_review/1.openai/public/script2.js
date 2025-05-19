@@ -50,15 +50,24 @@ document.addEventListener("DOMContentLoaded", function() {
                     // 완성된 라인 div를 codeContainer에 추가
                     codeContainer.appendChild(lineDiv);
                 });
+                */
 
                 // 분석 결과도 innerText를 이용해 추가 (분석 결과는 이미 텍스트로 반환된다고 가정)
                 analysisElem.innerText = data.analysis;
-                */
 
-                // 위에 긴~~ 코드를 아래 간결하게 정리
+                
+                // 위에 긴~~ 코드를 아래 간결하게 정리 (그러나 innerHTML 로 하면 태그 이스케이핑 이슈가 있음)
                 // 줄번호 + 코드 조합
+                function escapeHTML(str) {
+                    return str
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;");
+                }
+
                 const html = codeLines.map((line, index) => {
-                    return `<div class="code-line"><span class="line-number">${index + 1}</span> ${line}</div>`;
+                    return `<div class="code-line"><span class="line-number">${index + 1}</span> ${escapeHTML(line)}</div>`;
                 }).join("");
 
                 // 한번에 출력
