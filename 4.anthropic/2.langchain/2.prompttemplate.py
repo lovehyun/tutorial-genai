@@ -22,6 +22,11 @@ formatted_prompt = template.format(topic="블록체인 기술")
 response = llm.invoke(formatted_prompt)
 print(response.content)
 
+# 새로운 방식 (파이프)
+# chain = template | llm
+# response = chain.invoke({"topic": "블록체인 기술"})
+
+
 # 채팅 프롬프트 템플릿
 chat_template = ChatPromptTemplate.from_messages([
     SystemMessage(content="당신은 {role} 전문가입니다. 질문에 자세히 답변해주세요."),

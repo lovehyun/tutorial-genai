@@ -19,9 +19,10 @@ message = client.messages.create(
     max_tokens=1000,
     temperature=0.7,
     messages=[
-        {"role": "user", "content": "안녕하세요, 저는 Claude AI입니다. 오늘 어떻게 도와드릴까요?"}
+        {"role": "user", "content": "안녕하세요! Python으로 간단한 계산기를 만들고 싶은데 도와주실 수 있나요?"}
     ]
 )
 
 # 응답 출력
-print(message.content)
+# print(message.content)
+print(message.content[0].text)

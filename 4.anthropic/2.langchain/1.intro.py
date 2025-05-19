@@ -1,4 +1,4 @@
-# pip install langchain anthropic python-dotenv
+# pip install langchain-anthropic python-dotenv
 
 import os
 from dotenv import load_dotenv
@@ -10,7 +10,7 @@ load_dotenv()
 # Claude 모델 초기화
 llm = ChatAnthropic(
     model="claude-3-7-sonnet-20250219",  # 최신 모델
-    anthropic_api_key=os.getenv("ANTHROPIC_API_KEY"),
+    # anthropic_api_key=os.getenv("ANTHROPIC_API_KEY"), # 기본키는 자동 인식
     temperature=0.7,
     max_tokens=1000
 )
