@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>시험 자동 채점기</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        async function startGrading() {
+            const button = document.getElementById("grade-button");
+            const status = document.getElementById("status");
+            button.disabled = true;
+            status.innerText = "⏳ 채점 진행 중입니다...";
+
+            const res = await fetch("/grade", { method: "POST" });
+            if (res.ok) {
+                // const results = await fetch("/results");
+                // const data = await results.json();
+                // sessionStorage.setItem("resultsData", JSON.stringify(data));
+                window.location.href = "/render_results";
+            } else {
+                status.innerText = "❌ 채점 실패";
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>📘 시험 자동 채점 시스템</h1>
+        <button id="grade-button" onclick="startGrading()">✅ 채점 실행</button>
+        <p id="status"></p>
+    </div>
+</body>
+</html>

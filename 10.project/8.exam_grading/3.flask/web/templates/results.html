@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>채점 결과</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const response = await fetch("/results");
+            const data = await response.json();
+            if (!data || !data.detailed_results) {
+                alert("채점 결과를 불러오는 데 실패했습니다.");
+                return;
+            }
+
+            document.getElementById("summary").textContent = JSON.stringify(data.summary, null, 2);
+
+            const list = document.getElementById("results");
+            const labels = [];
+            const scores = [];
+
+            data.detailed_results.forEach(r => {
+                const li = document.createElement("li");
+                li.textContent = `${r.filename} - ${r.total_score}점 - ${r.grade}`;
+                list.appendChild(li);
+
+                labels.push(r.filename);
+                scores.push(r.total_score);
+            });
+
+            const ctx = document.getElementById('scoreChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '점수',
+                        data: scores,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 채점 결과 요약</h1>
+        <pre id="summary"></pre>
+
+        <h2>📈 점수 차트</h2>
+        <canvas id="scoreChart" width="600" height="300"></canvas>
+
+        <h2>📄 개별 채점 결과</h2>
+        <ul id="results"></ul>
+
+        <a href="/">⬅ 돌아가기</a>
+    </div>
+</body>
+</html>
