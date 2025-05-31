@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Models - ML Model Serving</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <nav-bar></nav-bar>
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">Models</h1>
+                <button onclick="loadPage('/upload.html')" class="btn btn-primary">Upload Model</button>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Framework</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modelsList" class="bg-white divide-y divide-gray-200">
+                        <!-- Models will be dynamically added here -->
+                    </tbody>
+                </table>
+                <div id="noModelsMessage" class="hidden p-4 text-center text-gray-500">
+                    No models found. Click "Upload Model" to add your first model.
+                </div>
+            </div>
+        </div>
+    </main>
+    <app-footer></app-footer>
+
+    <script type="module">
+        import { Navbar } from '/static/js/components/navbar.js';
+        import { Footer } from '/static/js/components/footer.js';
+        import { auth } from '/static/js/modules/auth.js';
+        import { api } from '/static/js/modules/api.js';
+        import { showToast } from '/static/js/modules/toast.js';
+        import { loadPage } from '/static/js/modules/router.js';
+
+        const modelsList = document.getElementById('modelsList');
+        const noModelsMessage = document.getElementById('noModelsMessage');
+
+        // 인증 상태 확인 및 초기화
+        async function initialize() {
+            console.log('Initializing models page...');
+            console.log('Current token:', auth.getToken());
+            
+            if (!auth.isAuthenticated()) {
+                console.log('Not authenticated, redirecting to login...');
+                loadPage('/login.html');
+                return;
+            }
+
+            try {
+                await loadModels();
+            } catch (error) {
+                console.error('Error loading models:', error);
+                if (error.status === 401) {
+                    console.log('Unauthorized, redirecting to login...');
+                    auth.logout();
+                } else {
+                    showToast('Failed to load models', 'error');
+                }
+            }
+        }
+
+        // 모델 목록 로드
+        async function loadModels() {
+            try {
+                console.log('Loading models...');
+                const models = await api.getModels();
+                console.log('Models loaded:', models);
+                
+                if (!models || models.length === 0) {
+                    modelsList.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                                등록된 모델이 없습니다. 새 모델을 업로드해주세요.
+                            </td>
+                        </tr>
+                    `;
+                    noModelsMessage.classList.remove('hidden');
+                } else {
+                    noModelsMessage.classList.add('hidden');
+                    modelsList.innerHTML = models.map(model => `
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${model.name}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${model.type || '-'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${model.framework || '-'}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">${model.description || '-'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button onclick="testModel(${model.id})" class="text-blue-600 hover:text-blue-900 mr-4">Test</button>
+                                <button onclick="deleteModel(${model.id})" class="text-red-600 hover:text-red-900">Delete</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error in loadModels:', error);
+                throw error;
+            }
+        }
+
+        // 모델 삭제
+        window.deleteModel = async (id) => {
+            if (confirm('Are you sure you want to delete this model?')) {
+                try {
+                    await api.deleteModel(id);
+                    showToast('Model deleted successfully', 'success');
+                    await loadModels();
+                } catch (error) {
+                    console.error('Error deleting model:', error);
+                    showToast('Failed to delete model', 'error');
+                }
+            }
+        };
+
+        // 모델 테스트
+        window.testModel = (id) => {
+            loadPage(`/inference.html?model_id=${id}`);
+        };
+
+        // 페이지 초기화
+        window.initModelsPage = () => {
+            initialize();
+        };
+
+        // 전역 함수로 노출
+        window.loadPage = loadPage;
+
+        // 초기 로드
+        initialize();
+    </script>
+</body>
+</html> 

@@ -1,0 +1,6 @@
+# python
+*.egg-info
+
+# data
+uploads/*
+logs/*

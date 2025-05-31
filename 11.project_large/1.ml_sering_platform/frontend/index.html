@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ML Model Serving</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <nav-bar></nav-bar>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
+
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Total Models</h3>
+                    <p id="totalModels" class="text-3xl font-bold text-blue-600">-</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Active Endpoints</h3>
+                    <p id="activeEndpoints" class="text-3xl font-bold text-green-600">-</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Total API Calls</h3>
+                    <p id="totalApiCalls" class="text-3xl font-bold text-purple-600">-</p>
+                </div>
+            </div>
+
+            <!-- Recent Models -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-900">Recent Models</h2>
+                </div>
+                <div class="p-6">
+                    <div id="recentModels" class="space-y-4">
+                        <!-- Recent models will be added here -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <app-footer></app-footer>
+
+    <script type="module">
+        import { Navbar } from '/static/js/components/navbar.js';
+        import { Footer } from '/static/js/components/footer.js';
+        import { Auth } from '/static/js/modules/auth.js';
+        import { API } from '/static/js/modules/api.js';
+        import { showToast } from '/static/js/modules/toast.js';
+
+        const auth = new Auth();
+        const api = new API();
+
+        // 인증 상태 확인
+        if (!auth.isAuthenticated()) {
+            window.location.href = '/login.html';
+        }
+
+        // 대시보드 데이터 로드
+        async function loadDashboardData() {
+            try {
+                // 모델 통계 로드
+                const models = await api.getModels();
+                document.getElementById('totalModels').textContent = models.length;
+
+                // 엔드포인트 통계 로드
+                const endpoints = await api.getEndpoints();
+                document.getElementById('activeEndpoints').textContent = endpoints.length;
+
+                // 최근 모델 표시
+                const recentModels = models.slice(0, 5);
+                document.getElementById('recentModels').innerHTML = recentModels.map(model => `
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div>
+                            <h4 class="font-medium text-gray-900">${model.name}</h4>
+                            <p class="text-sm text-gray-500">${model.type}</p>
+                        </div>
+                        <a href="/models.html" class="text-blue-600 hover:text-blue-800">View</a>
+                    </div>
+                `).join('');
+
+                // 최근 엔드포인트 표시
+                const recentEndpoints = endpoints.slice(0, 5);
+                document.getElementById('recentEndpoints').innerHTML = recentEndpoints.map(endpoint => `
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div>
+                            <h4 class="font-medium text-gray-900">${endpoint.name}</h4>
+                            <p class="text-sm text-gray-500">${endpoint.model_name}</p>
+                        </div>
+                        <a href="/endpoints.html" class="text-blue-600 hover:text-blue-800">View</a>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                showToast('대시보드 데이터를 불러오는데 실패했습니다.', 'error');
+            }
+        }
+
+        // 초기 로드
+        loadDashboardData();
+    </script>
+</body>
+</html> 

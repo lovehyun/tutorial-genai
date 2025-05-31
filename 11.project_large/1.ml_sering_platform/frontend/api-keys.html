@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 키 관리 - ML 모델 서빙 플랫폼</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <nav-bar></nav-bar>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">API 키 관리</h1>
+                <button id="createKeyBtn" class="btn btn-primary">새 API 키 생성</button>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">설명</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">API 키</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">생성일</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">작업</th>
+                        </tr>
+                    </thead>
+                    <tbody id="apiKeysList" class="bg-white divide-y divide-gray-200">
+                        <!-- API 키 목록이 여기에 동적으로 추가됩니다 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- API 키 생성 모달 -->
+    <div id="createKeyModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">새 API 키 생성</h2>
+                <form id="createKeyForm" class="space-y-4">
+                    <div>
+                        <label for="keyName" class="block text-sm font-medium text-gray-700">키 이름</label>
+                        <input type="text" id="keyName" name="name" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="keyDescription" class="block text-sm font-medium text-gray-700">설명</label>
+                        <textarea id="keyDescription" name="description" rows="3"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            placeholder="API 키에 대한 설명을 입력하세요"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" id="cancelCreateKey" class="btn btn-outline">취소</button>
+                        <button type="submit" class="btn btn-primary">생성</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <app-footer></app-footer>
+
+    <script type="module">
+        import { Navbar } from '/static/js/components/navbar.js';
+        import { Footer } from '/static/js/components/footer.js';
+        import { Auth } from '/static/js/modules/auth.js';
+        import { API } from '/static/js/modules/api.js';
+        import { showToast } from '/static/js/modules/toast.js';
+
+        const auth = new Auth();
+        const api = new API();
+        const apiKeysList = document.getElementById('apiKeysList');
+        const createKeyBtn = document.getElementById('createKeyBtn');
+        const createKeyModal = document.getElementById('createKeyModal');
+        const createKeyForm = document.getElementById('createKeyForm');
+        const cancelCreateKey = document.getElementById('cancelCreateKey');
+
+        // 인증 상태 확인
+        if (!auth.isAuthenticated()) {
+            window.location.href = '/login.html';
+        }
+
+        // API 키 목록 로드
+        async function loadApiKeys() {
+            try {
+                const keys = await api.getApiKeys();
+                if (!keys || keys.length === 0) {
+                    apiKeysList.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                등록된 API 키가 없습니다. 새 API 키를 생성해주세요.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                apiKeysList.innerHTML = keys.map(key => `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${key.name}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">${key.description || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div class="flex items-center space-x-2">
+                                <code class="bg-gray-100 px-2 py-1 rounded">${key.key}</code>
+                                <button onclick="copyApiKey('${key.key}')" class="text-blue-600 hover:text-blue-900">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${new Date(key.created_at).toLocaleDateString()}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${key.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${key.is_active ? '활성' : '비활성'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="toggleApiKey('${key.id}', ${!key.is_active})" class="text-blue-600 hover:text-blue-900 mr-3">
+                                ${key.is_active ? '비활성화' : '활성화'}
+                            </button>
+                            <button onclick="deleteApiKey('${key.id}')" class="text-red-600 hover:text-red-900">삭제</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('API 키 로드 실패:', error);
+                showToast('API 키 목록을 불러오는데 실패했습니다.', 'error');
+            }
+        }
+
+        // API 키 생성 모달 표시
+        createKeyBtn.addEventListener('click', () => {
+            createKeyModal.classList.remove('hidden');
+        });
+
+        // API 키 생성 모달 닫기
+        cancelCreateKey.addEventListener('click', () => {
+            createKeyModal.classList.add('hidden');
+            createKeyForm.reset();
+        });
+
+        // API 키 생성
+        createKeyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('keyName').value;
+            const description = document.getElementById('keyDescription').value;
+
+            try {
+                await api.createApiKey({ name, description });
+                createKeyModal.classList.add('hidden');
+                createKeyForm.reset();
+                loadApiKeys();
+                showToast('API 키가 생성되었습니다.', 'success');
+            } catch (error) {
+                console.error('API 키 생성 실패:', error);
+                showToast('API 키 생성에 실패했습니다.', 'error');
+            }
+        });
+
+        // API 키 복사
+        window.copyApiKey = async (key) => {
+            try {
+                await navigator.clipboard.writeText(key);
+                showToast('API 키가 클립보드에 복사되었습니다.', 'success');
+            } catch (error) {
+                console.error('API 키 복사 실패:', error);
+                showToast('API 키 복사에 실패했습니다.', 'error');
+            }
+        };
+
+        // API 키 활성화/비활성화
+        window.toggleApiKey = async (keyId, isActive) => {
+            try {
+                await api.updateApiKey(keyId, { is_active: isActive });
+                loadApiKeys();
+                showToast(`API 키가 ${isActive ? '활성화' : '비활성화'}되었습니다.`, 'success');
+            } catch (error) {
+                console.error('API 키 상태 변경 실패:', error);
+                showToast('API 키 상태 변경에 실패했습니다.', 'error');
+            }
+        };
+
+        // API 키 삭제
+        window.deleteApiKey = async (keyId) => {
+            if (confirm('정말로 이 API 키를 삭제하시겠습니까?')) {
+                try {
+                    await api.deleteApiKey(keyId);
+                    loadApiKeys();
+                    showToast('API 키가 삭제되었습니다.', 'success');
+                } catch (error) {
+                    console.error('API 키 삭제 실패:', error);
+                    showToast('API 키 삭제에 실패했습니다.', 'error');
+                }
+            }
+        };
+
+        // 초기 로드
+        loadApiKeys();
+    </script>
+</body>
+</html> 
