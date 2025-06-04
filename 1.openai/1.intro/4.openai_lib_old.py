@@ -32,6 +32,8 @@ def get_chat_gpt_response(user_input):
 
 def chat_with_user():
     user_input = '안녕, 챗봇!'
+    # user_input = input("\n당신: ").strip()
+    
     chat_gpt_response = get_chat_gpt_response(user_input)
     print('챗봇 응답:', chat_gpt_response)
 

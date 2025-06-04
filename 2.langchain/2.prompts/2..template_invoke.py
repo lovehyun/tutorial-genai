@@ -26,6 +26,25 @@ test_products = [
     "electric bikes"
 ]
 
+# 3. 프롬프트 확인
 for product in test_products:
     result = prompt.format(product=product)
     print(f"[{product}]\n{result}\n")
+
+print("\n-----\n")
+
+
+# 4. OpenAI LLM 초기화
+from langchain_openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+llm = OpenAI(temperature=0.8)  # gpt-3.5-turbo-instruct 기본 사용됨
+
+# 5. 추론
+for product in test_products:
+    final_prompt = prompt.format(product=product)
+    print(f"[{product}] {final_prompt}\n")
+
+    response = llm.invoke(filled_prompt)
+    print(f"Response: {response.strip()}\n")
