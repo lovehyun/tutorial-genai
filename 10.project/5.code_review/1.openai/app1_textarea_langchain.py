@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 # .env 파일의 환경변수 로드
@@ -20,15 +20,28 @@ llm = ChatOpenAI(
 )
 
 # LangChain 체인 구성
+# prompt = ChatPromptTemplate.from_messages([
+#     ("system", "당신은 보안 코드 분석 전문가입니다."),
+#     ("user", """다음 소스코드에서 보안 취약점을 분석해줘.
+# 각 취약점에 대해 해당 코드의 라인 번호, 코드 스니펫, 취약점 설명과 개선 방안을 간단하게 설명해줘. 주석은 무시해도 돼.
+
+# 소스코드:
+# ------------------------------
+# {code}
+# ------------------------------""")
+# ])
+
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "당신은 보안 코드 분석 전문가입니다."),
-    ("user", """다음 소스코드에서 보안 취약점을 분석해줘.
+    SystemMessagePromptTemplate.from_template("당신은 보안 코드 분석 전문가입니다."),
+    HumanMessagePromptTemplate.from_template(
+        """다음 소스코드에서 보안 취약점을 분석해줘.
 각 취약점에 대해 해당 코드의 라인 번호, 코드 스니펫, 취약점 설명과 개선 방안을 간단하게 설명해줘. 주석은 무시해도 돼.
 
 소스코드:
 ------------------------------
 {code}
-------------------------------""")
+------------------------------"""
+    )
 ])
 
 chain = prompt | llm | StrOutputParser()

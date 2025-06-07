@@ -1,0 +1,34 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+#chat {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 15px;
+    height: 300px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+#userInput {
+    width: calc(100% - 100px);
+    height: 40px;
+    font-size: 16px;
+    padding: 5px 10px;
+    margin-right: 10px;
+}
+
+button {
+    height: 40px;
+    font-size: 16px;
+}
+
+#loading {
+    font-style: italic;
+    color: #888;
+}

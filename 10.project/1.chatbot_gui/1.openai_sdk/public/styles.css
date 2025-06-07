@@ -1,0 +1,59 @@
+body {
+    margin: 0; /* 페이지 기본 여백 제거 */
+    font-family: Arial, sans-serif; /* 전체 폰트 지정 */
+}
+
+#chat-container,
+#user-input-form,
+#loading-indicator {
+    max-width: 600px;       /* 최대 너비 600px로 제한 */
+    margin: 10px auto;      /* 위아래 10px, 좌우는 자동 가운데 정렬 */
+    padding: 10px;          /* 내부 여백 설정 */
+}
+
+.chat-message {
+    margin-bottom: 10px;    /* 메시지 간 간격 */
+    padding: 10px;          /* 메시지 내부 여백 */
+    border-radius: 10px;    /* 모서리 둥글게 */
+    word-break: break-word; /* 단어가 길면 줄바꿈 허용 */
+}
+
+.user {
+    background-color: #5bc0de; /* 사용자 메시지 배경 색 */
+    color: white;              /* 사용자 메시지 글자 색 */
+    text-align: right;           /* 사용자 메시지 오른쪽 정렬 */
+}
+
+.chatbot {
+    background-color: #eee;    /* 챗봇 메시지 배경 색 */
+}
+
+#loading-indicator {
+    display: none;             /* 기본적으로 숨김 상태 */
+    background: #f3f3f3;     /* 로딩 박스 배경 색 */
+    border-radius: 10px;       /* 로딩 박스 모서리 둥글게 */
+    text-align: center;        /* 가운데 정렬 */
+    font-style: italic;        /* 기울임꼴 글씨체 */
+    color: #555;             /* 회색 텍스트 */
+}
+
+#user-input-form {
+    display: flex;             /* 입력창과 버튼을 가로로 배치 */
+    gap: 10px;                 /* 입력창과 버튼 사이 여백 */
+}
+
+#user-input {
+    flex: 1;                   /* 입력창이 가능한 넓게 확장 */
+    padding: 10px;             /* 입력창 내부 여백 */
+    border: 1px solid #ccc;  /* 테두리 색 지정 */
+    border-radius: 5px;        /* 테두리 둥글게 */
+}
+
+#submit-button {
+    padding: 10px 15px;        /* 버튼 상하/좌우 여백 */
+    border: none;              /* 테두리 없음 */
+    background: #5bc0de;     /* 버튼 배경 색 */
+    color: white;            /* 버튼 텍스트 색 */
+    border-radius: 5px;        /* 버튼 둥근 테두리 */
+    cursor: pointer;           /* 마우스 오버 시 포인터 표시 */
+}

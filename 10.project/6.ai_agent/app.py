@@ -21,25 +21,22 @@ def ask():
     if not user_input:
         return jsonify({"error": "질문을 입력하세요."}), 400
 
-    # 세션에서 대화 기록 가져오기 (없으면 초기화)
-    if "messages" not in session:
-        session["messages"] = [{"role": "system", "content": "You are a helpful assistant."}]
+    messages = []
+    messages.append({"role": "system", "content": "You are a helpful assistant."})
 
     # 사용자 입력 추가
-    session["messages"].append({"role": "user", "content": user_input})
+    messages.append({"role": "user", "content": user_input})
+    print(messages)
     
-    print(session["messages"])
-    print('-' * 50)
-
     # GPT API 호출
     response = openai.chat.completions.create(
-        model="gpt-4",  # 사용할 모델
-        messages=session["messages"]
+        model="gpt-4o",  # 사용할 모델
+        messages=messages
     )
 
     # GPT 응답 저장
     bot_reply = response.choices[0].message.content
-    session["messages"].append({"role": "assistant", "content": bot_reply})
+    print(bot_reply)
 
     return jsonify({"response": bot_reply})
 

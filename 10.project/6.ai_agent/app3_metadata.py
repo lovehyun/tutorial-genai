@@ -27,21 +27,23 @@ def ask():
     # 세션에서 대화 기록 가져오기 (없으면 초기화)
     if "messages" not in session:
         session["messages"] = [{"role": "system", "content": "You are a helpful assistant."}]
+        session["conversation_count"] = 0
 
     # 사용자 입력 추가
     session["messages"].append({"role": "user", "content": user_input})
+    session.modified = True
 
     # 대화 길이 제한 (최근 MAX_HISTORY_LENGTH개 유지)
     if len(session["messages"]) > MAX_HISTORY_LENGTH + 1:  # system 메시지 제외
         session["messages"] = [session["messages"][0]] + session["messages"][-MAX_HISTORY_LENGTH:]
 
     # 현재 대화 개수 계산 (시스템 메시지 제외)
-    conversation_count = (len(session["messages"]) - 1) // 2  # 사용자-어시스턴트 쌍 기준
+    session["conversation_count"] = session.get("conversation_count", 0) + 1
 
-    # 시스템 메시지 업데이트 (대화 개수 추가)
+    # 시스템 메시지 업데이트 (대화 개수 추가 - 히스토리에 매번 10개만 남김으로...)
     session["messages"][0] = {
         "role": "system",
-        "content": f"You are a helpful assistant. 현재까지 총 {conversation_count}개의 대화가 오갔습니다."
+        "content": f"You are a helpful assistant. 현재까지 총 {session["conversation_count"]}개의 대화가 오갔습니다."
     }
     
     print(session["messages"])
@@ -49,13 +51,14 @@ def ask():
     
     # GPT API 호출
     response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=session["messages"]
     )
 
     # GPT 응답 저장
     bot_reply = response.choices[0].message.content
     session["messages"].append({"role": "assistant", "content": bot_reply})
+    session.modified = True
 
     return jsonify({"response": bot_reply})
 

@@ -9,6 +9,7 @@ from flask import Flask, request, jsonify, send_from_directory, session
 
 # 환경 변수 로드
 load_dotenv()
+
 openai.api_key = os.getenv("OPENAI_API_KEY")
 WEATHER_API_KEY = os.getenv("OPENWEATHERMAP_API_KEY")
 NEWS_API_KEY = os.getenv("NEWS_API_KEY")
@@ -44,7 +45,7 @@ def get_weather(city):
             weather_desc = data["weather"][0]["description"]
             temp = data["main"]["temp"]
             return f"{city}의 현재 날씨는 '{weather_desc}', 온도는 {temp}°C 입니다."
-        return "날씨 정보를 가져올 수 없습니다."
+        return f"{city} 날씨 정보를 가져올 수 없습니다."
     except Exception as e:
         return f"날씨 API 오류: {str(e)}"
 
@@ -84,7 +85,7 @@ def get_naver_news(query):
             top_news = [f"- {news['title']} ({news['originallink']})" for news in data["items"][:3]]
             return "\n".join(top_news)
         
-        return "뉴스를 가져올 수 없습니다."
+        return f"'{query}' 뉴스를 가져올 수 없습니다."
     
     except Exception as e:
         return f"네이버 뉴스 API 오류: {str(e)}"
@@ -98,7 +99,7 @@ def get_stock_price(symbol):
         if data and isinstance(data, list):
             price = data[0]["price"]
             return f"{symbol} 현재 주가는 {price}원입니다."
-        return "주식 정보를 가져올 수 없습니다."
+        return f"{symbol} 주식 정보를 가져올 수 없습니다."
     except Exception as e:
         return f"주식 API 오류: {str(e)}"
 
@@ -119,7 +120,7 @@ def search_wikipedia(query):
         summary = wikipedia.summary(query, sentences=2)
         return summary
     except wikipedia.exceptions.PageError:
-        return "해당 주제에 대한 위키백과 정보가 없습니다."
+        return f"해당 주제({query})에 대한 위키백과 정보가 없습니다."
     except Exception as e:
         return f"위키백과 검색 오류: {str(e)}"
 
@@ -140,7 +141,7 @@ def ask():
 
     # GPT에게 분류 및 검색 키워드 요청
     gpt_response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": 
                 """사용자의 질문을 분석하여 적절한 태스크 목록을 JSON 배열로 반환하세요.
@@ -181,7 +182,7 @@ def ask():
 
         if task == "수학 연산":
             gpt_math_response = openai.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4o",
                 messages=[{"role": "system", "content": "사용자가 입력한 수식을 Python 코드로 변환하고 'result' 변수에 저장하세요."},
                           {"role": "user", "content": f"다음 수식을 Python 코드로 변환하세요: {keyword}"}]
             )
@@ -227,7 +228,7 @@ def ask():
     print(f"최종 요약 데이터: {summary_prompt}")
     
     gpt_summary = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "당신은 정보를 명확하고 자연스럽게 요약하는 AI입니다."},
             {"role": "user", "content": summary_prompt}
@@ -244,6 +245,8 @@ def ask():
 
     if len(session["messages"]) > MAX_HISTORY_LENGTH + 1:
         session["messages"] = [session["messages"][0]] + session["messages"][-MAX_HISTORY_LENGTH:]
+
+    session.modified = True
 
     return jsonify({"response": final_response})
 

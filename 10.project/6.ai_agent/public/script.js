@@ -1,6 +1,9 @@
 async function sendMessage() {
-    const userInput = document.getElementById("userInput").value;
+    const inputEl = document.getElementById("userInput");
+    const userInput = inputEl.value.trim();
     if (!userInput) return;
+
+    document.getElementById("chat").innerHTML += `<p><strong>사용자:</strong> ${userInput}</p>`;
 
     const response = await fetch("/ask", {
         method: "POST",
@@ -9,10 +12,8 @@ async function sendMessage() {
     });
 
     const data = await response.json();
-    document.getElementById("chat").innerHTML += `<p><strong>사용자:</strong> ${userInput}</p>`;
     document.getElementById("chat").innerHTML += `<p><strong>GPT:</strong> ${data.response}</p>`;
-
-    document.getElementById("userInput").value = "";
+    inputEl.value = "";
 }
 
 async function clearChat() {

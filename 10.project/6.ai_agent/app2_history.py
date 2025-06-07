@@ -30,6 +30,7 @@ def ask():
 
     # 사용자 입력 추가
     session["messages"].append({"role": "user", "content": user_input})
+    session.modified = True
 
     # 대화 길이 제한 (최근 MAX_HISTORY_LENGTH개 유지)
     if len(session["messages"]) > MAX_HISTORY_LENGTH + 1:  # system 메시지 제외
@@ -40,13 +41,14 @@ def ask():
     
     # GPT API 호출
     response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=session["messages"]
     )
 
     # GPT 응답 저장
     bot_reply = response.choices[0].message.content
     session["messages"].append({"role": "assistant", "content": bot_reply})
+    session.modified = True
 
     return jsonify({"response": bot_reply})
 

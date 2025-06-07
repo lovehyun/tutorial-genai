@@ -75,12 +75,20 @@ def ask():
     # 세션에서 대화 기록 가져오기 (없으면 초기화)
     if "messages" not in session:
         session["messages"] = [{"role": "system", "content": "You are a helpful assistant."}]
+        session["conversation_count"] = 0
 
-    # 1️⃣ **수학 연산 감지** (예: "5 + 3", "100 * (2 + 3)")
+    # 대화 길이 제한 (최근 MAX_HISTORY_LENGTH개 유지)
+    if len(session["messages"]) > MAX_HISTORY_LENGTH + 1:  # system 메시지 제외
+        session["messages"] = [session["messages"][0]] + session["messages"][-MAX_HISTORY_LENGTH:]
+
+    # 현재 대화 개수 계산 (시스템 메시지 제외)
+    session["conversation_count"] = session.get("conversation_count", 0) + 1
+
+    # 1️. **수학 연산 감지** (예: "5 + 3", "100 * (2 + 3)")
     if re.match(r"^[0-9+\-*/().\s]+$", user_input.strip()):
         # GPT에게 Python 코드 생성 요청
         gpt_response = openai.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "사용자가 입력한 수식을 Python 코드로 변환하고 'result' 변수에 저장하세요."},
                 {"role": "user", "content": f"다음 수식을 Python 코드로 변환하세요: {user_input}"}
@@ -96,7 +104,7 @@ def ask():
         session["messages"].append({"role": "assistant", "content": bot_reply})
         return jsonify({"response": bot_reply})
 
-    # 2️⃣ **날씨 질문 감지** (예: "서울 날씨 어때?", "부산 날씨 알려줘")
+    # 2️. **날씨 질문 감지** (예: "서울 날씨 어때?", "부산 날씨 알려줘")
     if any(kw in user_input for kw in ["날씨", "기온", "온도"]):
         city_match = re.search(r"([가-힣]+)\s?날씨", user_input)
         city = city_match.group(1) if city_match else "서울"  # 기본값: 서울(Seoul)
@@ -105,24 +113,33 @@ def ask():
 
         bot_reply = f"{weather_info}"
         session["messages"].append({"role": "assistant", "content": bot_reply})
+        session.modified = True
+        
         return jsonify({"response": bot_reply})
 
-    # 3️⃣ **일반적인 질문은 기존 방식 유지**
+    # 3️. **일반적인 질문은 기존 방식 유지**
     session["messages"].append({"role": "user", "content": user_input})
+    session.modified = True
 
-    # 대화 길이 제한
-    if len(session["messages"]) > MAX_HISTORY_LENGTH + 1:
-        session["messages"] = [session["messages"][0]] + session["messages"][-MAX_HISTORY_LENGTH:]
-
+    # 시스템 메시지 업데이트 (대화 개수 추가 - 히스토리에 매번 10개만 남김으로...)
+    session["messages"][0] = {
+        "role": "system",
+        "content": f"You are a helpful assistant. 현재까지 총 {session["conversation_count"]}개의 대화가 오갔습니다."
+    }
+    
+    print(session["messages"])
+    print('-' * 50)
+    
     # GPT API 호출
     response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=session["messages"]
     )
 
     # GPT 응답 저장
-    bot_reply = response["choices"][0]["message"]["content"]
+    bot_reply = response.choices[0].message.content
     session["messages"].append({"role": "assistant", "content": bot_reply})
+    session.modified = True
 
     return jsonify({"response": bot_reply})
 
