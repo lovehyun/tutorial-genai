@@ -24,3 +24,6 @@ conversation.txt
 chroma_db
 model_outputs/
 generated.png
+
+# temp working directory
+TEMP/

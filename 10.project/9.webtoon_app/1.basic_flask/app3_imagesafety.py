@@ -31,15 +31,50 @@ def summarize_text(text):
     print("Summary:", summary)
     return summary[:5]
 
+def rewrite_for_image(text):
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",  # 또는 gpt-3.5-turbo, 속도/비용 고려
+            messages=[
+                {"role": "system", "content": "You are a prompt safety editor for an image generator. Rephrase sentences to be safe and suitable for children's fairy tale illustrations. Avoid words like kill, murder, poison, death, etc."},
+                {"role": "user", "content": f"Rewrite the following sentence to be soft, safe, and appropriate for a children's story illustration:\n\n{text}"}
+            ],
+            max_tokens=100,
+            temperature=0.7
+        )
+        rewritten = response.choices[0].message.content.strip()
+        print(f"\n---\nSentence: {text}\nRewritten: {rewritten}\n---\n")
+        return rewritten
+    except Exception as e:
+        print("Rewrite failed:", repr(e))
+        return text  # 실패 시 원본 그대로 사용
+
+def soften_language(text):
+    replacements = [
+        (r'\b(murder|kill|slay|stab|attack|assassinate)\b', 'harm'),
+        (r'\b(poison|curse|cast a deadly spell)\b', 'cast a spell on'),
+        (r'\b(die|death|dead|passed away|perish)\b', 'disappear from the story'),
+        (r'\b(evil queen|cruel woman|wicked stepmother)\b', 'a jealous queen'),
+        (r'\b(tried to harm|attempted to kill)\b', 'played a dangerous trick on'),
+        (r'\b(executed|hung|punished severely)\b', 'faced the consequences at the end'),
+    ]
+    for pattern, replacement in replacements:
+        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+    return text
+
 # 시각적 이미지 생성에 맞게 프롬프트 변환
 def make_visual_prompts(sentences):
     visual_prompts = []
     for sentence in sentences:
         if sentence.strip():  # 빈 문장 방지
-            # visual_prompts.append(f"An illustration of: {sentence.strip()}")
-            visual_prompts.append(
-                f"A detailed storybook illustration of: {sentence.strip()}. Soft lighting, children's fairy tale style."
-            ) 
+            # softened = soften_language(sentence)
+            # prompt = f"A storybook illustration of: {softened.strip()}. Gentle mood, children's fairy tale style."
+
+            rewritten = rewrite_for_image(sentence)
+            prompt = f"A detailed storybook illustration of: {rewritten}. Soft lighting, children's fairy tale style."
+
+            # 추가 프레이밍
+            visual_prompts.append(prompt)
     print("ImagePrompt: ", visual_prompts)
     return visual_prompts
 
