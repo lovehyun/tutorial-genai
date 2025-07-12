@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Company Name Generator</title>
+</head>
+<body>
+    <h1>회사 이름 생성기</h1>
+
+    <label for="productInput">상품 종류:</label>
+    <input type="text" id="productInput" placeholder="예: educational toys" />
+    <button id="generateBtn">회사 이름 생성</button>
+
+    <h2>결과</h2>
+    <ul id="resultList"></ul>
+
+    <script>
+        document.getElementById('generateBtn').addEventListener('click', () => {
+            const product = document.getElementById('productInput').value;
+
+            fetch('/api/name', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ product: product }),
+            })
+                .then((response) => {
+                    if (!response.ok) throw new Error('서버 응답 오류');
+                    return response.json();
+                })
+                .then((data) => {
+                    const resultList = document.getElementById('resultList');
+                    resultList.innerHTML = ''; // 이전 결과 초기화
+
+                    data.company_names.forEach((name) => {
+                        const li = document.createElement('li');
+                        li.textContent = name;
+                        resultList.appendChild(li);
+                    });
+                })
+                .catch((error) => {
+                    alert('에러 발생: ' + error.message);
+                });
+        });
+    </script>
+</body>
+</html>
