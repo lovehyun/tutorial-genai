@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage
@@ -8,6 +9,7 @@ load_dotenv()
 
 # OpenAI 채팅 모델 설정
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.1)
+# llm = ChatOpenAI(model="gpt-4o", temperature=0.1)
 
 # 프롬프트 템플릿 생성
 prompt_template = ChatPromptTemplate.from_messages([
@@ -66,6 +68,7 @@ def chat_with_system_message_old(message):
     response = llm.invoke([system_msg, human_msg])
     return response.content
 
+
 # 새로운 스타일과 비교를 위한 함수
 def chat_new_style(message):
     """새로운 스타일 (LCEL - LangChain Expression Language)"""
@@ -103,6 +106,7 @@ def main():
     print("새로운 스타일 (LCEL):")
     print(chat_new_style(test_message))
     print()
+
 
 # 실제 대화 테스트 (올드 스타일 사용)
 def test_conversation():

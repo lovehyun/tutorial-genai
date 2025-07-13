@@ -18,7 +18,7 @@
         document.getElementById('generateBtn').addEventListener('click', () => {
             const product = document.getElementById('productInput').value;
 
-            fetch('/api/name', {
+            fetch('/api/names', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

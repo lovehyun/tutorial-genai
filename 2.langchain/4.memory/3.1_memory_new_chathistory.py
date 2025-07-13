@@ -1,9 +1,15 @@
 from dotenv import load_dotenv
 
-from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.prompts import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+    MessagesPlaceholder,
+)
 
+from langchain_openai import ChatOpenAI
+from langchain_community.chat_message_histories import ChatMessageHistory
 # 환경 변수 로드
 load_dotenv()
 
@@ -18,6 +24,12 @@ prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a helpful assistant."),
     MessagesPlaceholder(variable_name="history"),  # 메시지 기록
     ("human", "{input}")
+])
+
+prompt = ChatPromptTemplate.from_messages([
+    SystemMessagePromptTemplate.from_template("You are a helpful assistant."),
+    MessagesPlaceholder(variable_name="history"),
+    HumanMessagePromptTemplate.from_template("{input}")
 ])
 
 # 체인 생성

@@ -9,7 +9,7 @@ from flask_cors import CORS
 from openai import OpenAI
 from dotenv import load_dotenv
 
-load_dotenv('../.env')
+load_dotenv()
 
 app = Flask(__name__, static_folder='public')  # 정적 파일 폴더 설정
 CORS(app)  # Cross-Origin Resource Sharing 설정
@@ -63,7 +63,7 @@ init_db()
 
 @app.route('/')
 def index():
-    return send_from_directory(app.static_folder, 'index2_delete.html')
+    return send_from_directory(app.static_folder, 'index.html')
 
 # 사용자의 대화를 받아 처리하고 챗봇 응답을 반환
 @app.route('/api/chat', methods=['POST'])
@@ -82,14 +82,14 @@ def chat():
             cursor.execute("INSERT INTO conversation (session_id, role, content) VALUES (?, ?, ?)", (session_id, 'user', user_input))
             conn.commit()
 
-            # 위 질문을 포함한, 최근 10개 대화 내용 가져오기
-            recent_conversation = get_recent_conversation(session_id)
+            # 기존: 최근 10개만 가져오던 코드를 전체 대화 기록을 가져오도록 변경
+            # recent_conversation = get_recent_conversation(session_id)
+            # formatted_conversation = [{'role': row['role'], 'content': row['content']} for row in recent_conversation]
+            full_conversation = get_conversation_by_session(session_id)
+            formatted_conversation = [{'role': row['role'], 'content': row['content']} for row in full_conversation]
+            print(f' => 실제(프롬프트) 요청: {formatted_conversation}')
 
-            # 필요한 필드만 선택하고 딕셔너리 리스트로 변환
-            formatted_conversation = [{'role': row['role'], 'content': row['content']} for row in recent_conversation]
-            print(f' => 실제(프롬푸트) 요청: {formatted_conversation}')
-
-            # ChatGPT에 대화 내용 전송
+            # ChatGPT에 대화 내용 전송 (여기서 내부적으로 요약 로직이 동작합니다)
             response = ask_chatgpt(formatted_conversation)
 
             # 응답 결과를 DB에 추가
@@ -106,11 +106,11 @@ def chat():
         return jsonify({'error': 'Internal Server Error'}), 500
 
 
-# 최근 10개의 대화 내용 가져오기
+# 최근 10개의 대화 내용 가져오기 (이전 방식 – 현재는 사용하지 않음)
 def get_recent_conversation(session_id):
     with app.app_context():
         conn = get_db()
-        conn.row_factory = dict_factory # 딕셔너리로 변환
+        conn.row_factory = dict_factory  # 딕셔너리로 변환
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM conversation WHERE session_id = ? ORDER BY id DESC LIMIT 10", [session_id])
@@ -120,18 +120,72 @@ def get_recent_conversation(session_id):
         return rows[::-1]
 
 
+# 현재 세션의 전체 대화 내용 가져오기 (오름차순)
+def get_conversation_by_session(session_id):
+    with app.app_context():
+        conn = get_db()
+        conn.row_factory = dict_factory  # 딕셔너리로 변환
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM conversation WHERE session_id = ? ORDER BY id DESC", (session_id,))
+        conversation_history = cursor.fetchall()
+        return conversation_history[::-1]
+
+
 # ChatGPT에 전송할 대화 내용 구성
 def ask_chatgpt(conversation_history):
     try:
-        input_messages = [
-            # 'system' 역할을 사용하여 사용자와 챗봇 간의 대화를 초기화합니다.
-            {'role': 'system', 'content': 'You are a helpful assistant.'},
-            *conversation_history
-        ]
+        # 기본 시스템 프롬프트
+        system_prompt = {'role': 'system', 'content': 'You are a helpful assistant.'}
+
+        # 개선된 시스템 프롬프트: 대화 내용을 기억하고, 메시지 개수를 추적하라는 지시 포함
+        # system_prompt = {
+        #     'role': 'system',
+        #     'content': (
+        #         "You are a helpful assistant. Remember all the conversation details provided below. "
+        #         "Keep track of the total number of messages as well as the number of user messages, "
+        #         "especially those that are questions. When the user asks about the conversation or "
+        #         "message counts, answer accurately based on the conversation context. "
+        #         "Do not mention that you are using any summarization or truncation of the conversation."
+        #     )
+        # }
+        
+        # 메타정보 계산: 전체 메시지 개수, 사용자 질문 개수 (끝에 '?'가 있으면 질문으로 간주)
+        total_messages = len(conversation_history)
+        user_questions = sum(1 for msg in conversation_history 
+                             if msg['role'] == 'user' and msg['content'].strip().endswith('?'))
+        meta_info = f"현재까지 대화 메시지 개수: {total_messages}개, 사용자 질문 개수: {user_questions}개."
+        meta_prompt = {'role': 'system', 'content': meta_info}
+        
+        # 만약 전체 대화 기록이 10개 이하라면 그대로 사용
+        if len(conversation_history) <= 10:
+            input_messages = [system_prompt, meta_prompt] + conversation_history
+            print(f"최근 대화: {input_messages}")
+        else:
+            # 마지막 10개의 메시지는 그대로 사용
+            recent_messages = conversation_history[-10:]
+            # 나머지 이전 메시지들은 요약 대상
+            old_messages = conversation_history[:-10]
+
+            # 10개 단위로 chunking하여 요약
+            summaries = []
+            for i in range(0, len(old_messages), 10):
+                chunk = old_messages[i:i+10]
+                summary_text = summarize_conversation(chunk)
+                # 요약 메시지는 시스템 역할로 추가 (기존 시스템 프롬프트 이후에 추가됨)
+                summaries.append({'role': 'system', 'content': f"대화 요약: {summary_text}"})
+
+            input_messages = [system_prompt, meta_prompt] + summaries + recent_messages
+            print(f"대화 요약: {summaries}")
+
+        print("GPT에 전달할 메시지:")
+        for msg in input_messages:
+            print(f"{msg['role']}: {msg['content']}")
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=input_messages
+            messages=input_messages,
+            temperature=1.0  # 예시 값: 0.7 (0.0 ~ 2.0 범위, 기본값은 1.0)
         )
 
         chatgpt_response = response.choices[0].message.content
@@ -141,13 +195,34 @@ def ask_chatgpt(conversation_history):
         return '챗봇 응답을 가져오는 도중에 오류가 발생했습니다.'
 
 
+# 대화 chunk(10개 단위)를 요약하는 함수
+def summarize_conversation(conversation_chunk):
+    try:
+        prompt = "다음 대화 내용을 간략하게 요약해줘:\n\n"
+        for msg in conversation_chunk:
+            prompt += f"{msg['role']}: {msg['content']}\n"
+
+        summary_response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "너는 훌륭한 요약 전문가야."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
+        )
+        summary = summary_response.choices[0].message.content.strip()
+        return summary
+    except Exception as e:
+        print("Error summarizing conversation:", str(e))
+        return "요약 정보를 가져오는 도중에 오류가 발생했습니다."
+
+
 # 최근 10개의 대화 내용을 JSON으로 반환
 @app.route('/api/history')
 def get_history():
     try:
         # 모든 세션의 대화 내용을 가져오기
         conversation_history = get_conversation_all_sessions()
-        # return jsonify({'conversationHistory': recent_conversation})
         return json.dumps({'conversationHistory': conversation_history}, ensure_ascii=False)
     except Exception as e:
         print('Error getting recent conversation:', str(e))
@@ -158,7 +233,7 @@ def get_history():
 def get_conversation_all_sessions():
     with app.app_context():
         conn = get_db()
-        conn.row_factory = dict_factory # 딕셔너리로 변환
+        conn.row_factory = dict_factory  # 딕셔너리로 변환
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM conversation ORDER BY id DESC")
@@ -187,7 +262,7 @@ def new_session():
 def get_current_session():
     with app.app_context():
         conn = get_db()
-        conn.row_factory = dict_factory # 딕셔너리로 변환
+        conn.row_factory = dict_factory  # 딕셔너리로 변환
         cursor = conn.cursor()
 
         cursor.execute("SELECT id, start_time FROM session ORDER BY start_time DESC LIMIT 1")
@@ -217,18 +292,6 @@ def current_session():
         return jsonify({'error': 'Internal Server Error'}), 500
 
 
-# 세션별 대화 내용 가져오기
-def get_conversation_by_session(session_id):
-    with app.app_context():
-        conn = get_db()
-        conn.row_factory = dict_factory # 딕셔너리로 변환
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT * FROM conversation WHERE session_id = ? ORDER BY id DESC", (session_id,))
-        conversation_history = cursor.fetchall()
-        return conversation_history[::-1]
-
-
 # 모든 세션 가져오기
 @app.route('/api/all-sessions', methods=['GET'])
 def all_sessions():
@@ -244,7 +307,7 @@ def all_sessions():
 def get_all_sessions():
     with app.app_context():
         conn = get_db()
-        conn.row_factory = dict_factory # 딕셔너리로 변환
+        conn.row_factory = dict_factory  # 딕셔너리로 변환
         cursor = conn.cursor()
 
         cursor.execute("SELECT id, start_time FROM session ORDER BY start_time DESC")
@@ -269,25 +332,13 @@ def specific_session(sessionId):
 def get_specific_session(session_id):
     with app.app_context():
         conn = get_db()
-        conn.row_factory = dict_factory # 딕셔너리로 변환
+        conn.row_factory = dict_factory  # 딕셔너리로 변환
         cursor = conn.cursor()
 
         cursor.execute("SELECT id, start_time FROM session WHERE id = ?", (session_id,))
         specific_session = cursor.fetchone()
         return specific_session
 
-@app.route('/api/session/<int:sessionId>', methods=['DELETE'])
-def delete_session(sessionId):
-    try:
-        with app.app_context():
-            conn = get_db()
-            cursor = conn.cursor()
-            cursor.execute("DELETE FROM conversation WHERE session_id = ?", (sessionId,))
-            cursor.execute("DELETE FROM session WHERE id = ?", (sessionId,))
-            conn.commit()
-        return jsonify({'success': True})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port)

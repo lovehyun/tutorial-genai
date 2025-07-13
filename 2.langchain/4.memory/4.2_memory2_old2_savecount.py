@@ -1,7 +1,15 @@
 from dotenv import load_dotenv
+
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+    MessagesPlaceholder,
+)
+
 from langchain_openai import ChatOpenAI
 from langchain.memory import ConversationBufferWindowMemory
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
 
 # 1. API 키 불러오기
@@ -11,7 +19,7 @@ load_dotenv()
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
 
 # 3. 메모리 구성 (최근 3턴만 기억)
-memory = ConversationBufferWindowMemory(
+memory = ConversationBufferWindowMemory( # - v0.2.7부터 사용 중단(deprecated)
     memory_key="history",
     return_messages=True,
     k=3  # 최근 대화 3개만 유지
@@ -22,6 +30,12 @@ prompt = ChatPromptTemplate.from_messages([
     ("system", "너는 기억력이 좋은 챗봇이야."),
     MessagesPlaceholder(variable_name="history"),
     ("human", "{input}")
+])
+
+prompt = ChatPromptTemplate.from_messages([
+    SystemMessagePromptTemplate.from_template("너는 기억력이 좋은 챗봇이야."),
+    MessagesPlaceholder(variable_name="history"),
+    HumanMessagePromptTemplate.from_template("{input}")
 ])
 
 # 5. 체인 정의

@@ -15,8 +15,8 @@ prompt = PromptTemplate(
 )
 
 # 2. OpenAI LLM 모델 생성 및 연동
-llm = OpenAI(temperature=0.9) # temperature=0.9로 설정되어 있어 창의적인 결과를 유도함
-# llm = OpenAI(model="gpt-4", temperature=0.7) 
+# llm = OpenAI(temperature=0.9) # temperature=0.9로 설정되어 있어 창의적인 결과를 유도함
+llm = OpenAI(model="gpt-4o-mini", temperature=0.7) 
 
 # 3. 후처리 함수 정의: 출력 문자열 로그 찍고 정리
 def debug_response(output):

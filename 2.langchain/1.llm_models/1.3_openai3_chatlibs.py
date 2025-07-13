@@ -25,19 +25,33 @@ openai_api_key = os.environ.get("OPENAI_API_KEY")
 #                gpt-3.5-turbo-instruct 가 기본값임.
 
 # 모델: 문장완성모델(completion-model) vs 챗모델(chat-model)
-# llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0.9)
+print('--- 1 ---')
+llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0.9)
+
+print('--- 2 ---')
+prompt = "What's a good company name that makes arcade games?"
+result = llm.invoke(prompt)
+print(result)
+
+
+print('--- 3 ---')
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.9)
 print(llm)
 
-# prompt = "What's a good company name that makes arcade games?"
+prompt = "What's a good company name that makes arcade games?"
+result = llm.invoke(prompt) # 바로 문자열(str) 을 넣어도 내부적으로는 HumanMessage() 로 변환됨
+print(result.content)
+
+
+print('--- 4 ---')
 messages = [HumanMessage(content="안녕!")]
 print(messages)
 
-# result = llm.invoke(prompt) # 바로 문자열(str) 을 넣어도 내부적으로는 HumanMessage() 로 변환됨
 result = llm.invoke(messages)
 print(result.content)
 
 
+print('--- 5 ---')
 # 메시지 구성
 messages = [
     SystemMessage(content="너는 매우 유쾌한 농담을 잘하는 AI야."),
@@ -46,8 +60,5 @@ messages = [
     HumanMessage(content="하나만 더!")
 ]
 
-# 대화 흐름을 LLM에 전달
-response = llm.invoke(messages)
-
-# 결과 출력
-print(response.content)
+result = llm.invoke(messages)
+print(result.content)

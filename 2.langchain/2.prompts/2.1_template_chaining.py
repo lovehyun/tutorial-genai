@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 
 from langchain_core.prompts import PromptTemplate
+
 from langchain_openai import OpenAI
 from langchain_core.output_parsers import StrOutputParser
 
@@ -16,23 +17,18 @@ prompt = PromptTemplate(
 
 # 2. OpenAI LLM 모델 정의
 llm = OpenAI(temperature=0.9) # temperature=0.9로 설정되어 있어 창의적인 결과를 유도함
-# llm = OpenAI(model="gpt-4", temperature=0.7) 
+# llm = OpenAI(model="gpt-4o-mini", temperature=0.7) 
 
 # 3. 출력 파서 정의
 parser = StrOutputParser()
 
-# 5. 체인 구성 (프롬프트 → LLM → 후처리) 을 보통 먼저...
+# 4. 체인 구성 (프롬프트 → LLM → 후처리) 을 보통 먼저...
 # Runnable Composition (체이너블 객체 조합)
 # | 연산자 기반의 체이닝 문법은 LangChain Expression Language (LCEL) 라고 불립니다.
 chain = prompt | llm | parser
 
-# 4. 입력 예제
+# 5. 입력 예제
 inputs = {"company": "High Tech Startup", "product": "Web Game"}
-
-# 5. LLM 실행 (프롬프트 → LLM → 후처리)
-# formatted_prompt = prompt.format(**inputs)
-# llm_output = llm.invoke(formatted_prompt)
-# final_result = parser.invoke(llm_output)
 
 # 6. 실행
 print("Invoking chain with inputs:", inputs)

@@ -2,6 +2,12 @@ import os
 from dotenv import load_dotenv
 
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import (
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+    AIMessagePromptTemplate
+)
+
 from langchain_openai import ChatOpenAI
 from langchain_core.runnables import RunnableLambda
 from langchain_core.output_parsers import StrOutputParser
@@ -10,15 +16,22 @@ from langchain_core.output_parsers import StrOutputParser
 load_dotenv()
 
 # 2. 메시지 기반 프롬프트 템플릿
+# prompt = ChatPromptTemplate.from_messages([
+#     ("system", "You are a naming consultant for new companies."),
+#     ("human", "What is a good name for a {company} that makes {product}?")
+# ])
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a naming consultant for new companies."),
-    ("human", "What is a good name for a {company} that makes {product}?")
+    SystemMessagePromptTemplate.from_template("You are a naming consultant for new companies"),
+    HumanMessagePromptTemplate.from_template("What is a good name for a {company} that makes {product}?")
 ])
 
 # 3. Chat LLM 모델 설정
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.9)
 
-# 4. 후처리 함수 (AIMessage 객체의 .content 접근)
+# 4-1. 후처리 함수
+parser = StrOutputParser()
+
+# 4-2. 후처리 함수 (AIMessage 객체의 .content 접근)
 def debug_response(message):
     print("\nRaw Chat Output:")
     print(message)
@@ -26,6 +39,7 @@ def debug_response(message):
     return {"response": cleaned}
 
 # 5. 체인 구성 (프롬프트 → ChatLLM → 후처리)
+# chain = prompt | llm | parser
 # chain = prompt | llm | RunnableLambda(debug_response)
 # 또는 간단히 문자열로 받을 때:
 chain = prompt | llm | StrOutputParser() | RunnableLambda(lambda x: {"response": x})

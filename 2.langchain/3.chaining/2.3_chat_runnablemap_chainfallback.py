@@ -1,7 +1,7 @@
-import os
 from dotenv import load_dotenv
 
 from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
+
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import CommaSeparatedListOutputParser
 from langchain_core.runnables import RunnableLambda, RunnableParallel, RunnableMap

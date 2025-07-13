@@ -90,17 +90,17 @@ def chat():
             print(f' => 실제(프롬푸트) 요청: {formatted_conversation}')
 
             # ChatGPT에 대화 내용 전송
-            chatgpt_response = get_chat_gpt_response(formatted_conversation)
+            response = ask_chatgpt(formatted_conversation)
 
             # 응답 결과를 DB에 추가
-            cursor.execute("INSERT INTO conversation (session_id, role, content) VALUES (?, ?, ?)", (session_id, 'assistant', chatgpt_response))
+            cursor.execute("INSERT INTO conversation (session_id, role, content) VALUES (?, ?, ?)", (session_id, 'assistant', response))
             conn.commit()
 
         end = time.time() * 1000  # 응답 완료 시간 기록
-        print(f' <= ChatGPT 응답: {chatgpt_response}')
+        print(f' <= ChatGPT 응답: {response}')
         print(f' == 요청 및 응답 시간: {end - start} ms')
 
-        return jsonify({'chatGPTResponse': chatgpt_response})
+        return jsonify({'chatGPTResponse': response})
     except Exception as e:
         print('Error processing chat request:', str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
@@ -121,7 +121,7 @@ def get_recent_conversation(session_id):
 
 
 # ChatGPT에 전송할 대화 내용 구성
-def get_chat_gpt_response(conversation_history):
+def ask_chatgpt(conversation_history):
     try:
         input_messages = [
             # 'system' 역할을 사용하여 사용자와 챗봇 간의 대화를 초기화합니다.

@@ -13,7 +13,7 @@ llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.1)
 # 메모리 설정
 memory = ConversationBufferMemory()
 
-# ConversationChain 생성
+# ConversationChain 생성 - v0.2.7부터 사용 중단(deprecated)
 conversation = ConversationChain(
     llm=llm,
     memory=memory,
@@ -25,6 +25,7 @@ def chat(message):
     # conversation.predict 사용
     response = conversation.predict(input=message)
     return response
+
 
 # 테스트
 print(chat("Hello"))
