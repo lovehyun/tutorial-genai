@@ -99,8 +99,6 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
 
         micBtn.innerHTML = '<i class="bi bi-mic-fill text-danger"></i>';
         // micBtn.textContent = '🛑';  // 종료 아이콘
-
-        startVisualizer();
     };
 
     recognition.onend = () => {
@@ -109,8 +107,6 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         
         micBtn.innerHTML = '<i class="bi bi-mic-fill text-danger"></i>';
         // micBtn.textContent = '🎤';  // 마이크 아이콘 복귀
-
-        stopVisualizer();
     };
 
     recognition.onresult = (event) => {
@@ -135,70 +131,3 @@ micBtn.addEventListener('click', () => {
         recognition.start();
     }
 });
-
-// 마이크 입력시 소리에 따라 마이크 펄스 그래프 추가
-let visAudioCtx, analyser, micStream;
-const canvas = document.getElementById('waveform');
-const ctx = canvas.getContext('2d');
-
-async function startVisualizer() {
-    canvas.style.display = 'block';
-
-    // 마이크 권한 요청
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    micStream = stream;
-
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-
-    const source = audioCtx.createMediaStreamSource(stream);
-    source.connect(analyser);
-
-    analyser.fftSize = 2048;
-    const bufferLength = analyser.fftSize;
-    const dataArray = new Uint8Array(bufferLength);
-
-    function draw() {
-        requestAnimationFrame(draw);
-
-        analyser.getByteTimeDomainData(dataArray);
-
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "#3498db";
-        ctx.beginPath();
-
-        const sliceWidth = canvas.width / bufferLength;
-        let x = 0;
-
-        for (let i = 0; i < bufferLength; i++) {
-            const v = dataArray[i] / 128.0;
-            const y = v * canvas.height / 2;
-
-            if (i === 0) {
-                ctx.moveTo(x, y);
-            } else {
-                ctx.lineTo(x, y);
-            }
-
-            x += sliceWidth;
-        }
-
-        ctx.lineTo(canvas.width, canvas.height / 2);
-        ctx.stroke();
-    }
-
-    draw();
-}
-
-function stopVisualizer() {
-    canvas.style.display = 'none';
-    if (micStream) {
-        micStream.getTracks().forEach(track => track.stop());
-    }
-    if (audioCtx) {
-        audioCtx.close();
-    }
-}
