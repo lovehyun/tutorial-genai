@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>멀티모달 GPT 테스트</title>
+</head>
+<body>
+    <h1>이미지 설명 생성기</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" /><br /><br />
+        <button type="submit">설명 생성</button>
+    </form>
+    {% if result %}
+    <h3>GPT 설명:</h3>
+    <p>{{ result }}</p>
+    {% endif %}
+</body>
+</html>

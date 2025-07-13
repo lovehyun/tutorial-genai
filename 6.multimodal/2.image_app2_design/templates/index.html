@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>멀티모달 GPT 테스트</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    <h1>이미지 설명 생성기</h1>
+
+    <form id="uploadForm">
+        <input type="file" name="image" id="imageInput" accept="image/*" /><br /><br />
+        <img src="#" style="display: none" id="preview" /><br /><br />
+        <button type="submit" id="submitBtn">설명 생성</button>
+        <div id="progressBar" class="progress" style="display: none;">
+            <div class="bar"></div>
+        </div>
+    </form>
+
+    <div id="result" class="result-box"></div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

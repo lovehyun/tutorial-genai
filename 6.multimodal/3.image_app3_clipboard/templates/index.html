@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>멀티모달 챗</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    <h1>멀티모달 GPT 챗</h1>
+
+    <!-- 질문 입력 -->
+    <textarea id="questionBox" placeholder="이미지에 대해 궁금한 점을 입력하세요…"></textarea>
+
+    <!-- 프로그래스바 -->
+    <div id="progressBar" class="progress" style="display: none">
+        <div class="bar"></div>
+    </div>
+    
+    <!-- 이미지 첨부 UI -->
+    <div class="img-controls">
+        <button id="addImgBtn">이미지 추가</button>
+        <button id="sendBtn">질문 보내기</button>
+    </div>
+    
+    <!-- 붙여넣기·버튼으로 선택된 이미지 미리보기 -->
+    <input type="file" id="imgInput" accept="image/*" hidden />
+    <img id="preview" style="display: none" />
+
+    <!-- GPT 응답 -->
+    <div id="answerBox" class="result-box"></div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
