@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>Voice GPT-4o</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 2em;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.5em 1em;
+            border-radius: 8px;
+            color: white;
+        }
+        .bg-danger {
+            background: crimson;
+        }
+        .bg-secondary {
+            background: gray;
+        }
+    </style>
+</head>
+<body>
+    <h2>🖼 이미지 업로드</h2>
+    <form id="imgForm">
+        <input type="file" id="image" name="image" accept="image/*" />
+        <button type="submit">업로드</button>
+    </form>
+    <div id="uploadStatus"></div>
+
+    <hr />
+
+    <h2>🎤 음성 대화</h2>
+    <button id="micBtn">🎙 마이크 시작/중지</button>
+    <span id="voiceStatus" class="badge bg-secondary">마이크 OFF</span>
+
+    <script src="/static/audio.js"></script>
+</body>
+</html>

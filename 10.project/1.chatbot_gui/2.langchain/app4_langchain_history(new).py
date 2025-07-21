@@ -80,7 +80,7 @@ def chat():
             config={"configurable": {"session_id": session_id}}
         )
     except Exception as e:
-        print("❌ 오류 발생:", e)
+        print("[ERROR] 오류 발생:", e)
         response = "챗봇 응답 중 오류가 발생했습니다."
 
     end = time.time() * 1000

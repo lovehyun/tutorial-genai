@@ -1,0 +1,116 @@
+/* 전체 페이지 기본 스타일 */
+body {
+    font-family: Arial, sans-serif;         /* 기본 폰트 */
+    margin: 40px;                           /* 바깥 여백 */
+    background: #f9f9f9;                    /* 배경 색상 */
+    color: #333;                            /* 글자 색 */
+}
+
+/* 질문 입력창 스타일 */
+textarea#questionBox {
+    width: 100%;                            /* 가로 전체 */
+    height: 100px;                          /* 높이 지정 */
+    padding: 8px;                           /* 내부 여백 */
+    resize: vertical;                       /* 세로 크기 조절 가능 */
+    border: 1px solid #ccc;                 /* 테두리 */
+    border-radius: 4px;                     /* 테두리 둥글게 */
+}
+
+/* 버튼 컨테이너 영역 (이미지 추가 / 질문 보내기) */
+.img-controls {
+    margin: 10px 0;                         /* 위아래 여백 */
+}
+
+/* 이미지 추가 / 질문 보내기 버튼 공통 스타일 */
+.img-controls button {
+    padding: 6px 12px;                      /* 버튼 내부 여백 */
+}
+
+/* 이미지 미리보기 영역 스타일 */
+img#preview {
+    max-width: 300px;                       /* 최대 너비 제한 */
+    margin-top: 10px;                       /* 위쪽 여백 */
+    border: 1px solid #ccc;                 /* 테두리 */
+    border-radius: 6px;                     /* 둥근 테두리 */
+}
+
+/* 질문 보내기 버튼이 비활성화됐을 때 스타일 */
+button#sendBtn[disabled] {
+    opacity: 0.6;                           /* 흐릿하게 보이도록 */
+    cursor: not-allowed;                    /* 마우스 포인터 변경 */
+}
+
+/* 진행바 전체 영역 */
+.progress {
+    height: 8px;                            /* 높이 고정 */
+    margin-top: 10px;                       /* 위 여백 */
+    margin-bottom: 5px;                     /* 아래 여백 */
+    background: #eee;                       /* 회색 배경 */
+    border-radius: 4px;                     /* 둥근 테두리 */
+    overflow: hidden;                       /* 넘치는 부분 자르기 */
+}
+
+/* 내부 움직이는 로딩 바 */
+.progress .bar {
+    width: 100%;                            /* 전체 너비 */
+    height: 100%;                           /* 전체 높이 */
+    background: linear-gradient(90deg, #3498db, #6dd5fa, #3498db); /* 그라디언트 */
+    animation: loading 2s linear infinite;  /* 무한 애니메이션 */
+}
+
+/* 로딩 애니메이션 정의 */
+@keyframes loading {
+    0% {
+        transform: translateX(-100%);       /* 왼쪽에서 시작 */
+    }
+    100% {
+        transform: translateX(100%);        /* 오른쪽으로 이동 */
+    }
+}
+
+/* GPT 응답 결과 박스 스타일 */
+.result-box {
+    background: #fff;                       /* 흰 배경 */
+    border-left: 5px solid #3498db;         /* 왼쪽 파란 강조선 */
+    padding: 12px;                          /* 내부 여백 */
+    margin-top: 20px;                       /* 위쪽 여백 */
+    border-radius: 4px;                     /* 둥근 테두리 */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);/* 약한 그림자 */
+    white-space: pre-wrap;                  /* 줄바꿈 유지 */
+}
+
+/* 마이크 입력 */
+.input-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#micBtn {
+    font-size: 24px;
+    padding: 0 12px;
+    cursor: pointer;
+    border: none;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 3px rgba(0,0,0,0.1);
+}
+
+/* 인식 중일 때 마이크 버튼을 빨갛게 바꿔주는 스타일 */
+#micBtn.active {
+    background: #ff5252;
+    color: white;
+}
+
+/* 마이크 인식중일때 간단한 펄스 에니메이션 추가 */
+#micBtn.pulsing {
+    animation: pulse 1s infinite;
+    background-color: #ff5252;
+    color: white;
+}
+
+@keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(255,82,82, 0.6); }
+    70%  { box-shadow: 0 0 0 10px rgba(255,82,82, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,82,82, 0); }
+}
