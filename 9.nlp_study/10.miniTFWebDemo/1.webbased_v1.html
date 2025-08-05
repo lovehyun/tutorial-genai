@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple LLM Demo</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .input-group {
+            margin: 15px 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        
+        textarea, input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+        
+        .vector-viz {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+            gap: 5px;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .vector-cell {
+            background: #3498db;
+            color: white;
+            padding: 5px;
+            text-align: center;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            transition: width 0.3s;
+            border-radius: 10px;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .attention-viz {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 2px;
+            margin: 10px 0;
+        }
+        
+        .attention-cell {
+            aspect-ratio: 1;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Simple LLM Implementation</h1>
+        
+        <div class="section">
+            <h2>📚 1. 훈련 데이터 입력</h2>
+            <div class="input-group">
+                <label>훈련할 텍스트 데이터:</label>
+                <textarea id="trainingData" rows="6" placeholder="훈련할 텍스트를 입력하세요. 예: 안녕하세요. 저는 AI입니다. AI는 인공지능을 의미합니다...">안녕하세요. 저는 AI입니다. AI는 인공지능을 의미합니다. 인공지능은 컴퓨터가 사람처럼 생각하고 학습하는 기술입니다. 기술은 우리 삶을 편리하게 만듭니다. 삶은 소중합니다. 소중한 것들을 지켜야 합니다.</textarea>
+            </div>
+            <button onclick="preprocessData()">데이터 전처리 시작</button>
+        </div>
+        
+        <div class="section">
+            <h2>🔤 2. 토크나이제이션 & 어휘집 구축</h2>
+            <div class="output" id="tokenizationOutput">데이터를 전처리하면 토큰화 결과가 여기에 표시됩니다.</div>
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-value" id="vocabSize">0</div>
+                    <div>어휘집 크기</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="sequenceLength">0</div>
+                    <div>시퀀스 길이</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🧠 3. 모델 아키텍처 초기화</h2>
+            <div class="input-group">
+                <label>임베딩 차원:</label>
+                <input type="number" id="embeddingDim" value="32" min="16" max="128">
+            </div>
+            <div class="input-group">
+                <label>어텐션 헤드 수:</label>
+                <input type="number" id="numHeads" value="4" min="1" max="8">
+            </div>
+            <button onclick="initializeModel()">모델 초기화</button>
+            <div class="output" id="modelOutput">모델을 초기화하면 아키텍처 정보가 여기에 표시됩니다.</div>
+        </div>
+        
+        <div class="section">
+            <h2>📊 4. 벡터 공간 시각화</h2>
+            <div id="embeddingViz">
+                <p>모델을 초기화하면 임베딩 벡터들이 여기에 시각화됩니다.</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🏃‍♂️ 5. 모델 훈련</h2>
+            <div class="input-group">
+                <label>에포크 수:</label>
+                <input type="number" id="epochs" value="50" min="10" max="200">
+            </div>
+            <div class="input-group">
+                <label>학습률:</label>
+                <input type="number" id="learningRate" value="0.01" step="0.001" min="0.001" max="0.1">
+            </div>
+            <button onclick="trainModel()">훈련 시작</button>
+            <div class="progress-bar">
+                <div class="progress-fill" id="trainingProgress" style="width: 0%"></div>
+            </div>
+            <div class="output" id="trainingOutput">훈련을 시작하면 손실값과 진행상황이 여기에 표시됩니다.</div>
+        </div>
+        
+        <div class="section">
+            <h2>🔍 6. 어텐션 시각화</h2>
+            <div id="attentionViz">
+                <p>훈련 후 어텐션 패턴이 여기에 시각화됩니다.</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>💭 7. 추론 테스트</h2>
+            <div class="input-group">
+                <label>시작 텍스트:</label>
+                <input type="text" id="seedText" placeholder="예: 안녕" value="안녕">
+            </div>
+            <div class="input-group">
+                <label>생성할 토큰 수:</label>
+                <input type="number" id="generateLength" value="10" min="1" max="50">
+            </div>
+            <button onclick="generateText()">텍스트 생성</button>
+            <div class="output" id="generationOutput">생성된 텍스트가 여기에 표시됩니다.</div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수들
+        let vocabulary = new Map();
+        let reverseVocab = new Map();
+        let tokenizedData = [];
+        let model = null;
+        let trainingData = [];
+        
+        // 간단한 Matrix 클래스
+        class Matrix {
+            constructor(rows, cols, values = null) {
+                this.rows = rows;
+                this.cols = cols;
+                this.data = values || Array(rows).fill().map(() => 
+                    Array(cols).fill().map(() => (Math.random() - 0.5) * 0.1)
+                );
+            }
+            
+            multiply(other) {
+                if (this.cols !== other.rows) {
+                    throw new Error("Matrix dimensions don't match");
+                }
+                const result = new Matrix(this.rows, other.cols);
+                for (let i = 0; i < this.rows; i++) {
+                    for (let j = 0; j < other.cols; j++) {
+                        result.data[i][j] = 0;
+                        for (let k = 0; k < this.cols; k++) {
+                            result.data[i][j] += this.data[i][k] * other.data[k][j];
+                        }
+                    }
+                }
+                return result;
+            }
+            
+            add(other) {
+                const result = new Matrix(this.rows, this.cols);
+                for (let i = 0; i < this.rows; i++) {
+                    for (let j = 0; j < this.cols; j++) {
+                        result.data[i][j] = this.data[i][j] + other.data[i][j];
+                    }
+                }
+                return result;
+            }
+            
+            transpose() {
+                const result = new Matrix(this.cols, this.rows);
+                for (let i = 0; i < this.rows; i++) {
+                    for (let j = 0; j < this.cols; j++) {
+                        result.data[j][i] = this.data[i][j];
+                    }
+                }
+                return result;
+            }
+            
+            softmax() {
+                const result = new Matrix(this.rows, this.cols);
+                for (let i = 0; i < this.rows; i++) {
+                    const max = Math.max(...this.data[i]);
+                    const exps = this.data[i].map(x => Math.exp(x - max));
+                    const sum = exps.reduce((a, b) => a + b, 0);
+                    result.data[i] = exps.map(x => x / sum);
+                }
+                return result;
+            }
+        }
+        
+        // 간단한 Transformer 모델
+        class SimpleTransformer {
+            constructor(vocabSize, embeddingDim, numHeads) {
+                this.vocabSize = vocabSize;
+                this.embeddingDim = embeddingDim;
+                this.numHeads = numHeads;
+                
+                // 임베딩 레이어
+                this.embedding = new Matrix(vocabSize, embeddingDim);
+                
+                // 어텐션 가중치
+                this.wq = new Matrix(embeddingDim, embeddingDim);
+                this.wk = new Matrix(embeddingDim, embeddingDim);
+                this.wv = new Matrix(embeddingDim, embeddingDim);
+                this.wo = new Matrix(embeddingDim, embeddingDim);
+                
+                // 피드포워드 레이어
+                this.w1 = new Matrix(embeddingDim, embeddingDim * 2);
+                this.w2 = new Matrix(embeddingDim * 2, embeddingDim);
+                
+                // 출력 레이어
+                this.outputLayer = new Matrix(embeddingDim, vocabSize);
+            }
+            
+            forward(tokenIds) {
+                // 임베딩
+                const embeddings = [];
+                for (let tokenId of tokenIds) {
+                    const embedding = [];
+                    for (let j = 0; j < this.embeddingDim; j++) {
+                        embedding.push(this.embedding.data[tokenId][j]);
+                    }
+                    embeddings.push(embedding);
+                }
+                
+                // 간단한 셀프 어텐션 (단순화된 버전)
+                const seqLen = embeddings.length;
+                const attentionOutput = [];
+                
+                for (let i = 0; i < seqLen; i++) {
+                    let weightedSum = new Array(this.embeddingDim).fill(0);
+                    let totalWeight = 0;
+                    
+                    for (let j = 0; j < seqLen; j++) {
+                        // 간단한 어텐션 스코어 계산
+                        let score = 0;
+                        for (let k = 0; k < this.embeddingDim; k++) {
+                            score += embeddings[i][k] * embeddings[j][k];
+                        }
+                        score = Math.exp(score / Math.sqrt(this.embeddingDim));
+                        totalWeight += score;
+                        
+                        for (let k = 0; k < this.embeddingDim; k++) {
+                            weightedSum[k] += score * embeddings[j][k];
+                        }
+                    }
+                    
+                    // 정규화
+                    for (let k = 0; k < this.embeddingDim; k++) {
+                        weightedSum[k] /= totalWeight;
+                    }
+                    
+                    attentionOutput.push(weightedSum);
+                }
+                
+                // 마지막 토큰의 출력만 사용 (다음 토큰 예측)
+                const lastOutput = attentionOutput[attentionOutput.length - 1];
+                
+                // 출력 레이어
+                const logits = [];
+                for (let i = 0; i < this.vocabSize; i++) {
+                    let sum = 0;
+                    for (let j = 0; j < this.embeddingDim; j++) {
+                        sum += lastOutput[j] * this.outputLayer.data[j][i];
+                    }
+                    logits.push(sum);
+                }
+                
+                return logits;
+            }
+            
+            // 간단한 훈련 함수
+            train(sequences, epochs, learningRate, progressCallback) {
+                for (let epoch = 0; epoch < epochs; epoch++) {
+                    let totalLoss = 0;
+                    
+                    for (let seq of sequences) {
+                        if (seq.length < 2) continue;
+                        
+                        for (let i = 1; i < seq.length; i++) {
+                            const input = seq.slice(0, i);
+                            const target = seq[i];
+                            
+                            const logits = this.forward(input);
+                            
+                            // 소프트맥스
+                            const max = Math.max(...logits);
+                            const exps = logits.map(x => Math.exp(x - max));
+                            const sum = exps.reduce((a, b) => a + b, 0);
+                            const probs = exps.map(x => x / sum);
+                            
+                            // 크로스 엔트로피 손실
+                            const loss = -Math.log(probs[target] + 1e-10);
+                            totalLoss += loss;
+                            
+                            // 간단한 그래디언트 업데이트 (실제로는 역전파가 필요)
+                            // 여기서는 시뮬레이션만 수행
+                            for (let j = 0; j < this.vocabSize; j++) {
+                                const error = (j === target ? 1 : 0) - probs[j];
+                                for (let k = 0; k < this.embeddingDim; k++) {
+                                    this.outputLayer.data[k][j] += learningRate * error * 0.01;
+                                }
+                            }
+                        }
+                    }
+                    
+                    const avgLoss = totalLoss / sequences.length;
+                    progressCallback(epoch, epochs, avgLoss);
+                }
+            }
+        }
+        
+        // 데이터 전처리 함수
+        function preprocessData() {
+            const text = document.getElementById('trainingData').value;
+            
+            // 단순한 토크나이제이션 (공백과 구두점 기준)
+            const tokens = text.toLowerCase()
+                .replace(/[^\w\s가-힣]/g, ' ')
+                .split(/\s+/)
+                .filter(token => token.length > 0);
+            
+            // 어휘집 구축
+            vocabulary.clear();
+            reverseVocab.clear();
+            let vocabIndex = 0;
+            
+            // 특수 토큰 추가
+            vocabulary.set('<pad>', vocabIndex++);
+            vocabulary.set('<unk>', vocabIndex++);
+            vocabulary.set('<start>', vocabIndex++);
+            vocabulary.set('<end>', vocabIndex++);
+            
+            // 고유 토큰들 추가
+            const uniqueTokens = [...new Set(tokens)];
+            for (let token of uniqueTokens) {
+                if (!vocabulary.has(token)) {
+                    vocabulary.set(token, vocabIndex++);
+                }
+            }
+            
+            // 역방향 어휘집 생성
+            for (let [token, id] of vocabulary) {
+                reverseVocab.set(id, token);
+            }
+            
+            // 토큰을 ID로 변환
+            tokenizedData = tokens.map(token => vocabulary.get(token));
+            
+            // 시퀀스 생성 (윈도우 크기: 5)
+            trainingData = [];
+            const windowSize = 5;
+            for (let i = 0; i <= tokenizedData.length - windowSize; i++) {
+                trainingData.push(tokenizedData.slice(i, i + windowSize));
+            }
+            
+            // 결과 출력
+            const output = document.getElementById('tokenizationOutput');
+            output.textContent = `원본 텍스트: ${text.substring(0, 100)}...
+토큰들: ${tokens.slice(0, 20).join(', ')}...
+토큰 ID들: ${tokenizedData.slice(0, 20).join(', ')}...
+훈련 시퀀스 수: ${trainingData.length}
+
+어휘집:
+${Array.from(vocabulary.entries()).slice(0, 10).map(([token, id]) => `${id}: ${token}`).join('\n')}
+${vocabulary.size > 10 ? '...' : ''}`;
+            
+            document.getElementById('vocabSize').textContent = vocabulary.size;
+            document.getElementById('sequenceLength').textContent = trainingData.length;
+        }
+        
+        // 모델 초기화 함수
+        function initializeModel() {
+            const embeddingDim = parseInt(document.getElementById('embeddingDim').value);
+            const numHeads = parseInt(document.getElementById('numHeads').value);
+            
+            if (vocabulary.size === 0) {
+                alert('먼저 데이터를 전처리해주세요!');
+                return;
+            }
+            
+            model = new SimpleTransformer(vocabulary.size, embeddingDim, numHeads);
+            
+            const output = document.getElementById('modelOutput');
+            output.textContent = `모델 아키텍처:
+- 어휘집 크기: ${vocabulary.size}
+- 임베딩 차원: ${embeddingDim}
+- 어텐션 헤드 수: ${numHeads}
+- 파라미터 수: 약 ${Math.round((vocabulary.size * embeddingDim + embeddingDim * embeddingDim * 4 + embeddingDim * embeddingDim * 2 + embeddingDim * vocabulary.size) / 1000)}K
+
+모델이 성공적으로 초기화되었습니다!`;
+            
+            visualizeEmbeddings();
+        }
+        
+        // 임베딩 시각화 함수
+        function visualizeEmbeddings() {
+            if (!model) return;
+            
+            const container = document.getElementById('embeddingViz');
+            container.innerHTML = '<h3>초기 임베딩 벡터 (처음 5개 토큰)</h3>';
+            
+            for (let i = 0; i < Math.min(5, model.vocabSize); i++) {
+                const tokenDiv = document.createElement('div');
+                tokenDiv.innerHTML = `<h4>토큰: "${reverseVocab.get(i)}"</h4>`;
+                
+                const vectorDiv = document.createElement('div');
+                vectorDiv.className = 'vector-viz';
+                
+                for (let j = 0; j < model.embeddingDim; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'vector-cell';
+                    cell.textContent = model.embedding.data[i][j].toFixed(3);
+                    vectorDiv.appendChild(cell);
+                }
+                
+                tokenDiv.appendChild(vectorDiv);
+                container.appendChild(tokenDiv);
+            }
+        }
+        
+        // 모델 훈련 함수
+        function trainModel() {
+            if (!model || trainingData.length === 0) {
+                alert('먼저 데이터 전처리와 모델 초기화를 완료해주세요!');
+                return;
+            }
+            
+            const epochs = parseInt(document.getElementById('epochs').value);
+            const learningRate = parseFloat(document.getElementById('learningRate').value);
+            const output = document.getElementById('trainingOutput');
+            const progressBar = document.getElementById('trainingProgress');
+            
+            output.textContent = '훈련을 시작합니다...\n';
+            
+            const startTime = Date.now();
+            
+            model.train(trainingData, epochs, learningRate, (epoch, totalEpochs, loss) => {
+                const progress = ((epoch + 1) / totalEpochs) * 100;
+                progressBar.style.width = progress + '%';
+                
+                if (epoch % 10 === 0 || epoch === totalEpochs - 1) {
+                    output.textContent += `Epoch ${epoch + 1}/${totalEpochs}, Loss: ${loss.toFixed(4)}\n`;
+                    output.scrollTop = output.scrollHeight;
+                }
+                
+                if (epoch === totalEpochs - 1) {
+                    const endTime = Date.now();
+                    output.textContent += `\n훈련 완료! 소요 시간: ${((endTime - startTime) / 1000).toFixed(2)}초\n`;
+                    visualizeAttention();
+                    visualizeEmbeddings(); // 훈련 후 임베딩 업데이트
+                }
+            });
+        }
+        
+        // 어텐션 시각화 함수
+        function visualizeAttention() {
+            const container = document.getElementById('attentionViz');
+            container.innerHTML = '<h3>어텐션 패턴 시뮬레이션</h3>';
+            
+            // 간단한 어텐션 패턴 시뮬레이션
+            const seqLen = 8;
+            const attentionDiv = document.createElement('div');
+            attentionDiv.className = 'attention-viz';
+            
+            for (let i = 0; i < seqLen; i++) {
+                for (let j = 0; j < seqLen; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'attention-cell';
+                    
+                    // 간단한 어텐션 스코어 시뮬레이션
+                    const score = Math.exp(-Math.abs(i - j) * 0.5) + Math.random() * 0.3;
+                    const intensity = Math.min(score, 1);
+                    
+                    cell.style.backgroundColor = `rgba(102, 126, 234, ${intensity})`;
+                    cell.textContent = intensity.toFixed(2);
+                    
+                    attentionDiv.appendChild(cell);
+                }
+            }
+            
+            container.appendChild(attentionDiv);
+            
+            const legend = document.createElement('p');
+            legend.textContent = '어텐션 강도: 진한 파랑색일수록 높은 어텐션 (토큰 간 관련성)';
+            container.appendChild(legend);
+        }
+        
+        // 텍스트 생성 함수
+        function generateText() {
+            if (!model) {
+                alert('먼저 모델을 훈련해주세요!');
+                return;
+            }
+            
+            const seedText = document.getElementById('seedText').value.toLowerCase();
+            const generateLength = parseInt(document.getElementById('generateLength').value);
+            const output = document.getElementById('generationOutput');
+            
+            // 시드 텍스트 토크나이징
+            const seedTokens = seedText.split(/\s+/).filter(token => token.length > 0);
+            let currentSequence = seedTokens.map(token => 
+                vocabulary.has(token) ? vocabulary.get(token) : vocabulary.get('<unk>')
+            );
+            
+            let generatedText = seedText;
+            output.textContent = `시드 텍스트: "${seedText}"\n생성 과정:\n\n`;
+            
+            for (let i = 0; i < generateLength; i++) {
+                // 다음 토큰 예측
+                const logits = model.forward(currentSequence);
+                
+                // 소프트맥스 적용
+                const max = Math.max(...logits);
+                const exps = logits.map(x => Math.exp(x - max));
+                const sum = exps.reduce((a, b) => a + b, 0);
+                const probs = exps.map(x => x / sum);
+                
+                // 상위 3개 후보 표시
+                const topIndices = probs
+                    .map((prob, idx) => ({prob, idx}))
+                    .sort((a, b) => b.prob - a.prob)
+                    .slice(0, 3);
+                
+                output.textContent += `Step ${i + 1}:\n`;
+                output.textContent += `상위 후보들:\n`;
+                for (let candidate of topIndices) {
+                    const token = reverseVocab.get(candidate.idx);
+                    output.textContent += `  "${token}": ${(candidate.prob * 100).toFixed(2)}%\n`;
+                }
+                
+                // 가장 높은 확률의 토큰 선택 (또는 샘플링)
+                const nextTokenId = topIndices[0].idx;
+                const nextToken = reverseVocab.get(nextTokenId);
+                
+                generatedText += ' ' + nextToken;
+                currentSequence.push(nextTokenId);
+                
+                // 시퀀스 길이 제한 (메모리 절약)
+                if (currentSequence.length > 10) {
+                    currentSequence = currentSequence.slice(-10);
+                }
+                
+                output.textContent += `선택된 토큰: "${nextToken}"\n`;
+                output.textContent += `현재 텍스트: "${generatedText}"\n\n`;
+                output.scrollTop = output.scrollHeight;
+            }
+            
+            output.textContent += `\n최종 생성된 텍스트:\n"${generatedText}"`;
+        }
+        
+        // 페이지 로드 시 초기화
+        console.log('Simple LLM Demo 준비 완료!');
+    </script>
+</body>
+</html>
