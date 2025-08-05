@@ -1,9 +1,9 @@
 from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
-from langchain_community.chat_message_histories import ChatMessageHistory
-from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.output_parsers import StrOutputParser
 
 # 1. 환경 변수 로드
@@ -12,12 +12,19 @@ load_dotenv()
 # 2. LLM 초기화
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7)
 
-# 3. 프롬프트 정의
+# 3. 프롬프트 정의 (수동 vs 라이브러리)
+# prompt = ChatPromptTemplate.from_messages([
+#     ("system", "You are a helpful assistant having a conversation."),
+#     MessagesPlaceholder(variable_name="history"),  # 여기에 이전 대화 삽입됨
+#     ("human", "{input}")
+# ])
+
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful assistant having a conversation."),
-    MessagesPlaceholder(variable_name="history"),  # 여기에 이전 대화 삽입됨
-    ("human", "{input}")
+    SystemMessage(content="You are a helpful assistant having a conversation."),
+    MessagesPlaceholder(variable_name="history"),  # 이전 대화가 리스트 형태로 들어감
+    HumanMessage(content="{input}")
 ])
+
 
 # 4. 체인 구성
 chain = prompt | llm | StrOutputParser()

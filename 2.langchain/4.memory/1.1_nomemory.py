@@ -17,22 +17,22 @@ llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.1)
 
 
 # 프롬프트 템플릿 생성
-prompt = ChatPromptTemplate.from_messages([
+prompt1 = ChatPromptTemplate.from_messages([
     ("human", "{input}")
 ])
 
-prompt = ChatPromptTemplate.from_messages([
+prompt2 = ChatPromptTemplate.from_messages([
     ChatMessagePromptTemplate.from_template(role="human", template="{input}")
 ])
 # 참고: LangChain에서 "human"과 "user"는 같은 역할로 간주되며, "ai"와 "assistant"도 동일하게 취급됩니다.
 
-prompt = ChatPromptTemplate.from_messages([
+prompt3 = ChatPromptTemplate.from_messages([
     HumanMessagePromptTemplate.from_template("{input}")
 ])
 # HumanMessagePromptTemplate을 직접 사용하는 예제는 프롬프트를 더 명확하게 구성하고 싶거나, 역할을 직접 컨트롤하고 싶은 상황에서 유용합니다.
 
 # 대화 체인 생성 - 메모리가 연결되지 않음
-chain = prompt | llm
+chain = prompt3 | llm
 
 # 대화 수행
 def chat(message):

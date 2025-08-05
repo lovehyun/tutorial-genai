@@ -24,7 +24,7 @@ parser = StrOutputParser()
 
 # 4. 체인 구성 (프롬프트 → LLM → 후처리) 을 보통 먼저...
 # Runnable Composition (체이너블 객체 조합)
-# | 연산자 기반의 체이닝 문법은 LangChain Expression Language (LCEL) 라고 불립니다.
+# "|"" 연산자 기반의 체이닝 문법은 LangChain Expression Language (LCEL) 라고 불립니다.
 chain = prompt | llm | parser
 
 # 5. 입력 예제

@@ -18,7 +18,6 @@ from dotenv import load_dotenv
 
 from langchain_openai import OpenAI
 from langchain_openai import ChatOpenAI
-from langchain.schema import HumanMessage
 
 
 # os.environ['OPENAI_API_KEY'] = 'OPENAI_API_KEY'
@@ -50,6 +49,18 @@ result = llm.invoke(prompt)
 print(result.content)
 
 print('--- 3 ---')
-prompt = [HumanMessage(content="What's a good company name that makes arcade games?")]
-result = llm.invoke(prompt)
+from langchain.schema import SystemMessage, HumanMessage, AIMessage
+
+prompt1 = [
+    HumanMessage(content="What's a good company name that makes arcade games?")
+    # HumanMessage(content="아케이드 게임을 만드는 좋은 회사 이름을 지어줘.")
+]
+prompt2 = [
+    SystemMessage(content="You are a creative branding expert for game companies."),
+    HumanMessage(content="What's a good company name that makes arcade games?")
+    # SystemMessage(content="당신은 창의적인 게임 회사 작명 전문가입니다."),
+    # HumanMessage(content="아케이드 게임을 만드는 좋은 회사 이름을 지어줘.")
+]
+
+result = llm.invoke(prompt1)
 print(result.content)

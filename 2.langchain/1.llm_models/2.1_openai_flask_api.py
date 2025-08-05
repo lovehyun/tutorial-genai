@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 from langchain_openai import OpenAI
 from langchain_openai import ChatOpenAI
-from langchain.schema import HumanMessage
+from langchain.schema import SystemMessage, HumanMessage
 
 # 환경 변수 로드
 load_dotenv(dotenv_path='../.env')
@@ -58,13 +58,38 @@ def generate_company_names():
         "company_names": names
     })
 
+@app.route("/api/name2", methods=["POST"])
+def generate_company_name2():
+    data = request.get_json()
+    product = data.get("product", "arcade games")
+
+    prompt = f"What's a good company name that makes {product}?"
+
+    # 시스템 메시지 + 사용자 프롬프트 하나만 전달
+    messages = [
+        SystemMessage(content="You are a creative branding expert for game companies."),
+        HumanMessage(content=prompt)
+    ]
+
+    result = llm2.invoke(messages)
+
+    return jsonify({
+        "product": product,
+        "company_name": result.content.strip().strip('"')
+    })
+
 @app.route("/api/names2", methods=["POST"])
 def generate_company_names2():
     data = request.get_json()
     product = data.get("product", "arcade games")
 
     prompt = f"What's a good company name that makes {product}?"
-    prompts = [[HumanMessage(content=prompt)] for _ in range(5)]
+    
+    # 시스템 메시지 포함한 메시지 리스트 5개 생성
+    prompts = [[
+        SystemMessage(content="You are a creative branding expert for game companies."),
+        HumanMessage(content=prompt)
+    ] for _ in range(5)]
 
     result = llm2.generate(prompts)
     

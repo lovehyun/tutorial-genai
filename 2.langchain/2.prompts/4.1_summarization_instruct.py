@@ -13,6 +13,14 @@ llm = OpenAI(temperature=0.5)
 # llm = OpenAI(model="gpt-4o-mini", temperature=0.5)
 print(llm)
 
+# 줄 단위 정리 함수 (람다)
+process_lines = RunnableLambda(
+    lambda x: {
+        "summary": [line.strip() for line in x.strip().split('\n') if line.strip()]
+    }
+)
+
+# chain = prompt | llm | process_lines
 chain = prompt | llm | RunnableLambda(lambda x: {"summary": x.strip()})
 
 input_text = {
@@ -20,4 +28,11 @@ input_text = {
 }
 result = chain.invoke(input_text)
 
-print("Summary:", result["summary"])
+print("Summary:", result)
+# print("Summary:", result["summary"])
+
+# lines = result["summary"].split('\n')
+# for line in lines:
+#     cleaned = line.strip()
+#     if cleaned:  # 빈 줄 무시
+#         print(cleaned)

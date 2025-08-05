@@ -23,7 +23,9 @@ def debug_response(output):
     print("\nRaw LLM Output:")
     print(output)
     # return {"response": output.strip()}
-    cleaned = output.strip().strip('"').strip()  # 앞뒤 따옴표 및 추가 공백 제거
+    # cleaned = output.strip().strip('"').strip()  # 앞뒤 따옴표 및 추가 공백 제거
+    # cleaned = output.strip().replace('.')  # 문장 내의 . 제거
+    cleaned = output.strip().split('.')[-1].strip()  # . 으로 나눠서 뒷부분만 유지
     return {"response": cleaned}
 
 # 4. 체인 구성 (프롬프트 → LLM → 후처리)
