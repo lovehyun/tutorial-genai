@@ -12,8 +12,8 @@ document.addEventListener('DOMContentLoaded', function () {
         appendMessage('user', userInput);
 
         try {
-            const chatGPTResponse = await getChatGPTResponse(userInput);
-            appendMessage('chatbot', chatGPTResponse);
+            const response = await getChatGPTResponse(userInput);
+            appendMessage('chatbot', response);
         } catch (error) {
             console.error('Error making ChatGPT API request:', error.message);
             appendMessage('chatbot', '챗봇 응답을 가져오는 도중에 오류가 발생했습니다.');
@@ -24,8 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function appendMessage(role, content) {
         const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', role);
-        messageDiv.textContent = content;
+        messageDiv.textContent = `[${role}] ${content}`;
         chatContainer.appendChild(messageDiv);
     }
 
@@ -39,6 +38,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         const data = await response.json();
-        return data.chatGPTResponse;
+
+        console.log(data)
+        return data.chatbot;
     }
 });

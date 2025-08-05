@@ -2,6 +2,7 @@ from flask import Flask, request, send_from_directory, jsonify
 import requests
 from dotenv import load_dotenv
 import os
+import time
 
 load_dotenv('../.env')
 
@@ -14,13 +15,16 @@ def chat():
     data = request.get_json()
     user_input = data.get('userInput', '')
     chatgpt_response = ask_chatgpt(user_input)
-    return jsonify({'chatGPTResponse': chatgpt_response})
+    return jsonify({'chatgpt': chatgpt_response})
 
 @app.route('/')
 def index():
     return send_from_directory('public', 'index.html')
 
 def ask_chatgpt(user_input):
+    # time.sleep(3)
+    # return user_input # Echo 서버
+
     try:
         response = requests.post(
             'https://api.openai.com/v1/chat/completions',

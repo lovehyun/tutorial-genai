@@ -27,7 +27,7 @@ def chat():
     print(f' <= [ChatGPT 응답]: {response}')
     print(f'    (요청 및 응답 시간: {end - start} ms)')
     
-    return jsonify({'chatGPTResponse': response})
+    return jsonify({'chatgpt': response})
 
 @app.route('/')
 def index():

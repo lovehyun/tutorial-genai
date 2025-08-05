@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         appendMessage('user', userInput);
         showLoadingIndicator();
-        scrollToBottom();
 
         try {
             const chatGPTResponse = await getChatGPTResponse(sessionId, userInput);
@@ -44,7 +43,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         userInputField.value = '';
-        scrollToBottom();
     }
 
     function appendMessage(role, content) {
@@ -52,6 +50,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         messageDiv.className = `chat-message ${role}`;
         messageDiv.innerHTML = '<div class="message-content">' + content + '</div>';
         chatContainer.appendChild(messageDiv);
+
+        // 화면 맨 아래로 스크롤 이동
+        document.scrollingElement.scrollTop = document.scrollingElement.scrollHeight;
     }
 
     async function showSession(sessionId) {

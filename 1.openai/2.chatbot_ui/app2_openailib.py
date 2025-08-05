@@ -2,31 +2,33 @@ from flask import Flask, request, send_from_directory, jsonify
 import openai
 from dotenv import load_dotenv
 import os
+import time
 
 load_dotenv('../.env')
 
 app = Flask(__name__, static_folder='public')
 port = int(os.environ.get("PORT", 5000))
-openai.api_key = os.environ.get("OPENAI_API_KEY")
-
+api_key = os.environ.get("OPENAI_API_KEY")
+client = openai.OpenAI(api_key=api_key)
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.get_json()
     user_input = data.get('userInput', '')
-    chatgpt_response = ask_chatgpt(user_input)
-    print(f"Response: {chatgpt_response}")
-    return jsonify({'chatGPTResponse': chatgpt_response})
-
+    response = ask_chatgpt(user_input)
+    print(f"Response: {response}")
+    return jsonify({'chatgpt': response})
 
 @app.route('/')
 def index():
     return send_from_directory('public', 'index.html')
 
-
 def ask_chatgpt(user_input):
+    # time.sleep(3)
+    # return user_input # Echo 서버
+    
     try:
-        response = openai.chat.completions.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},

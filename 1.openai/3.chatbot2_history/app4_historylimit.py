@@ -66,7 +66,7 @@ def chat():
     while len(conversation_history) > MAX_HISTORY_LENGTH:
         conversation_history.pop(0)  # 가장 오래된 대화들 삭제
 
-    return jsonify({'chatGPTResponse': response})
+    return jsonify({'chatgpt': response})
 
 @app.route('/')
 def index():

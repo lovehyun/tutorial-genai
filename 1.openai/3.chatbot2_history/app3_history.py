@@ -55,7 +55,7 @@ def chat():
     # 이전 대화 내용에 ChatGPT 응답 추가
     conversation_history.append({'role': 'assistant', 'content': response})
 
-    return jsonify({'chatGPTResponse': response})
+    return jsonify({'chatgpt': response})
 
 @app.route('/')
 def index():

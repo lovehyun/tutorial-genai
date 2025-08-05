@@ -17,8 +17,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             data.conversationHistory.forEach(item => {
                 appendMessage(item.role, item.content);
             });
-
-            scrollToBottom();
         } catch (error) {
             console.error('Error loading chat history:', error.message);
         }
@@ -57,7 +55,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         userInputField.value = '';
-        scrollToBottom();
     }
 
     function appendMessage(role, content) {
@@ -65,6 +62,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         messageDiv.className = `chat-message ${role}`;
         messageDiv.innerHTML = '<div class="message-content">' + content + '</div>';
         chatContainer.appendChild(messageDiv);
+
+        // 화면 맨 아래로 스크롤 이동
+        document.scrollingElement.scrollTop = document.scrollingElement.scrollHeight;
     }
 
     function showLoadingIndicator() {
@@ -85,11 +85,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
 
         const data = await response.json();
-        return data.chatGPTResponse;
-    }
-
-    function scrollToBottom() {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        return data.chatbot;
     }
 
     // 개행 문자(\n)를 <br> 태그로 변환하는 함수

@@ -100,7 +100,7 @@ def chat():
         cursor.execute("INSERT INTO conversation (role, content) VALUES (?, ?)", ('assistant', response))
         conn.commit()
 
-        return jsonify({'chatGPTResponse': response})
+        return jsonify({'chatbot': response})
     except Exception as e:
         print('Error processing chat request:', str(e))
         return jsonify({'error': 'Internal Server Error'}), 500

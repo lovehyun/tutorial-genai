@@ -37,14 +37,17 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         userInputField.value = '';
-        scrollToBottom();
     }
 
     function appendMessage(role, content) {
         const messageDiv = document.createElement('div');
-        messageDiv.className = `chat-message ${role}`;
+        // messageDiv.className = `chat-message ${role}`;  // 아래와 같음
+        messageDiv.classList.add('chat-message', role) // 'chat-message', role 두개 클래스 추가
         messageDiv.innerHTML = '<div class="message-content">' + content + '</div>';
         chatContainer.appendChild(messageDiv);
+
+        // 화면 맨 아래로 스크롤 이동
+        document.scrollingElement.scrollTop = document.scrollingElement.scrollHeight;
     }
 
     function showLoadingIndicator() {
@@ -65,11 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         const data = await response.json();
-        return data.chatGPTResponse;
-    }
-
-    function scrollToBottom() {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        return data.chatgpt;
     }
 
     // 개행 문자(\n)를 <br> 태그로 변환하는 함수
