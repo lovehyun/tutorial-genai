@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 
-from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
 
 from langchain_openai import ChatOpenAI
 from langchain_core.runnables import RunnableLambda
@@ -9,6 +9,10 @@ load_dotenv()
 
 # 메시지 프롬프트 구성
 chat_prompt = ChatPromptTemplate.from_messages([
+    SystemMessagePromptTemplate.from_template(
+        "You are an expert corporate communications specialist. "
+        "Write in a formal, professional tone."
+    ),
     HumanMessagePromptTemplate.from_template(
         "Write a formal email to {recipient} requesting a meeting regarding {topic}."
     )
@@ -36,6 +40,14 @@ topics = [
     "budget allocation for Q3",
     "company-wide policy update"
 ]
+
+# 각 조합에 대해 이메일 생성
+# for recipient in recipients:
+#     for topic in topics:
+#         print(f"\nTo: {recipient} | Topic: {topic}")
+#         result = chain.invoke({"recipient": recipient, "topic": topic})
+#         print(result["email"])
+#         print("-" * 60)
 
 # 일대일 매칭 실행
 for recipient, topic in zip(recipients, topics):

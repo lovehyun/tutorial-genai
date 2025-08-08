@@ -1,9 +1,16 @@
 # pip install transformers pymupdf
-
 import fitz  # PyMuPDF
 from typing import List, Optional
 from collections import Counter
 from transformers import AutoTokenizer, AutoModelForQuestionAnswering, pipeline
+
+# PDF 문서에서 텍스트를 추출한 뒤, 내용을 여러 조각으로 나눠서(Chunking) DistilBERT 기반 QA 모델로 질문에 답변을 생성하는 프로그램입니다.
+# - 앞서 보여주신 이전 코드보다 한 단계 업그레이드된 형태이고, 
+# - 핵심 의도는 긴 PDF 문서를 모델이 처리 가능한 길이로 나누어 각 조각별로 답변을 구하고, 
+# - 그중 가장 많이 나온 답변을 최종 결과로 선택하는 방식입니다.
+
+# 각 청크별 답변을 모아 빈도수 높은 것을 최종 선택
+# 전체 단어 수, 청크 수, 각 청크별 답변을 출력
 
 def extract_text_from_pdf(pdf_path: str) -> str:
    """PDF 문서에서 텍스트를 추출합니다."""

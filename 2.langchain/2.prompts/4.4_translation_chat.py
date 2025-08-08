@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 
-from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
 
 from langchain_openai import ChatOpenAI
 from langchain_core.runnables import RunnableLambda
@@ -9,6 +9,7 @@ load_dotenv()
 
 # 프롬프트 템플릿 (Chat 메시지 형식)
 chat_prompt = ChatPromptTemplate.from_messages([
+    #     SystemMessagePromptTemplate.from_template("You are an expert language translator."),
     HumanMessagePromptTemplate.from_template(
         "Translate the following English sentence into Korean:\n\n{sentence}"
     )

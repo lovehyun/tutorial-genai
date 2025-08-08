@@ -17,28 +17,38 @@ load_dotenv(dotenv_path='../.env')
 
 # 2. Chroma 벡터 DB 저장 디렉토리
 PERSIST_DIR = "./chroma_db"
-COLLECTION_NAME = "nvme"
+COLLECTION_NAME = "my_collection_name"
+FILES = ["./nvme.txt", "./ssd.txt"]
+
+splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
 
 # 2-1. 최초 1회 실행 시: 문서 로드 → 임베딩 → Chroma DB에 저장
-def create_vector_db():
-    loader = TextLoader('./nvme.txt', encoding='utf-8')
-    documents = loader.load()
-
-    # 원본 문서에 source, page 추가 (page는 기본 1로 가정)
-    for doc in documents:
-        doc.metadata.update({"source": "nvme.txt", "page": 1})
-
-    # 문서 분할 (1000자 단위, 100자 중복 유지)
-    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-    texts = text_splitter.split_documents(documents)
-
-    # chunk_id 부여
-    for i, chunk in enumerate(texts, start=1):
-        chunk.metadata.update({"chunk_id": i})
+def build_chunks_per_file(file_paths):
+    """파일별로 split하고, 파일 내부에서 chunk_id를 1부터 부여"""
+    all_chunks = []
+    for path in file_paths:
+        # 보통 TextLoader는 한 개 Document를 반환하지만 리스트 형태이므로 all_chunks 에 합칩니다.
+        loader = TextLoader(path, encoding='utf-8')
+        docs = loader.load()
         
-    # 임베딩 생성 및 Chroma DB에 저장 (collection 이름 지정, 저장 경로 지정)
+        # 파일 메타 부여
+        for d in docs:
+            d.metadata.update({"source": os.path.basename(path)})
+
+        # 파일 단위로 분할
+        file_chunks = splitter.split_documents(docs)
+        # 여기서 파일 내부 chunk_id를 1부터
+        for i, chunk in enumerate(file_chunks, start=1):
+            chunk.metadata.update({"chunk_id": i}) # 파일 내부 chunk 번호
+        
+        all_chunks.extend(file_chunks)
+
+    return all_chunks
+
+def create_vector_db(file_paths=FILES):
+    chunks = build_chunks_per_file(file_paths)
     embeddings = OpenAIEmbeddings()
-    store = Chroma.from_documents(texts, embeddings, collection_name=COLLECTION_NAME, persist_directory=PERSIST_DIR)
+    store = Chroma.from_documents(chunks, embedding=embeddings, collection_name=COLLECTION_NAME, persist_directory=PERSIST_DIR)
     return store
 
 # 2-2. 이미 저장된 벡터 DB가 있을 경우: 불러오기
@@ -54,7 +64,7 @@ if os.path.exists(PERSIST_DIR):
     store = load_vector_db()
 else:
     print("새로운 데이터베이스를 생성합니다.")
-    store = create_vector_db()
+    store = create_vector_db(FILES)
 
 
 # 4. OpenAI ChatGPT 모델 초기화
@@ -63,8 +73,7 @@ llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
 # 5. 프롬프트 템플릿 정의 (문서 기반 + 규칙 명시)
 template2 = """주어진 문서들을 참고하여 질문에 답변해주세요.
 
-문서 내용: 
-{context}
+문서 내용: {context}
 
 질문: {question}
 
@@ -78,9 +87,8 @@ template2 = """주어진 문서들을 참고하여 질문에 답변해주세요.
 
 # 6. 프롬프트 + 검색 + LLM + 출력 포맷 체인 구성
 prompt = ChatPromptTemplate.from_template(template2)
-retriever = store.as_retriever(search_kwargs={"k": 5})  # 유사도 기준 상위 5개 문서 검색
+retriever = store.as_retriever(search_kwargs={"k": 3})  # 유사도 기준 상위 3개 문서 검색
 
-# 질의응답을 위한 결과 및 메타데이터 일부 추가 표시
 def format_docs_with_meta(docs):
     if not docs:
         return "관련 문서를 찾지 못했습니다."
@@ -88,8 +96,7 @@ def format_docs_with_meta(docs):
     for i, d in enumerate(docs, start=1):
         src = d.metadata.get("source", "unknown")
         cid = d.metadata.get("chunk_id", "?")
-        page = d.metadata.get("page", "?")
-        parts.append(f"문서 {i}: [출처: {src}:{cid} (page {page})]\n{d.page_content.strip()}")
+        parts.append(f"문서 {i}: [출처: {src}:{cid}]\n{d.page_content.strip()}")
     return "\n\n---\n\n".join(parts)
 
 def peek_prompt(prompt_value):  # 디버깅용 함수
@@ -106,26 +113,13 @@ chain = (
     | StrOutputParser()  # 결과를 문자열로 출력
 )
 
-# 7. 질문을 받아 답변 + 출처를 포멧에 맞게 반환하는 함수
-def answer_question_with_nochain(question):
-    # 7-1. 질문마다 직접 문서를 뽑아서 텍스트로 변환
-    docs = retriever.invoke(question)
-    ctx = format_docs_with_meta(docs)
-
-    # 7-2. 프롬프트 → LLM
-    prompt_value = prompt.invoke({"context": ctx, "question": question})
-    answer_msg = llm.invoke(prompt_value)
-    answer = StrOutputParser().invoke(answer_msg)
-    
-    # 7-3. 최종 결과 출력
-    print(f"\n=====\n질문: {question}\n---\n응답: {answer}\n=====\n")
-
+# 7. 질문을 받아 답변 + 출처를 포맷에 맞게 반환하는 함수
 def answer_question(question):
     # 7-1. 체인 실행
     result = chain.invoke(question)
     answer = result.strip()
 
-    # 7-2. 최종 결과 출력
+    # 7-2. 결과 반환
     print(f"\n=====\n질문: {question}\n---\n응답: {answer}\n=====\n")
 
 

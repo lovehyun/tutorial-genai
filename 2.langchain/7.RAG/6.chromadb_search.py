@@ -13,11 +13,7 @@ COLLECTION_NAME = "secure_coding_python"  # 확인할 컬렉션 이름
 embeddings = OpenAIEmbeddings()
 
 # Chroma 벡터 DB 로드
-store = Chroma(
-    collection_name=COLLECTION_NAME,
-    embedding_function=embeddings,
-    persist_directory=PERSIST_DIR
-)
+store = Chroma(collection_name=COLLECTION_NAME, embedding_function=embeddings, persist_directory=PERSIST_DIR)
 
 # 저장된 문서 개수 확인
 count = store._collection.count()
@@ -37,6 +33,7 @@ for i, doc in enumerate(docs):
     print("---\n")
 
 print("-" * 50)
+
 
 # 상위 5개 문서 조회 및 내용 출력
 docs = store.similarity_search("시큐어 코딩", k=5)

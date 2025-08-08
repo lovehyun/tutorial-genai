@@ -5,9 +5,10 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough, RunnableLambda
 
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 
 # 1. .env에서 OpenAI API 키 로드
@@ -19,16 +20,18 @@ loader = PyPDFLoader(pdf_filename)
 pages = loader.load()  # 페이지별로 문서 객체 반환
 
 # 3. 로드된 페이지 수 및 첫 페이지 일부 확인
-print(f"총 페이지 수: {len(pages)}")
-print(f"1페이지 내용 샘플:\n{pages[1].page_content}")
+# print(f"총 페이지 수: {len(pages)}")
+# print(f"2페이지 내용 샘플:\n{pages[1].page_content}")
+# print(f"2페이지 메타데이터:\n{pages[1].metadata}")
 
-# 4. 문서 분할 (청크 단위: 2000자, 중복: 500자, 두 문단 단위로 나눔)
-text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
+# 4. 문서 분할 (청크 단위: 2000토큰, 중복: 500토큰, 두 문단 단위로 나눔)
+text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
     separator="\n\n",        # 문단 단위 기준
-    chunk_size=2000,         # 최대 2000자
-    chunk_overlap=500        # 중복 500자 포함
+    chunk_size=2000,         # 최대 2000토큰
+    chunk_overlap=500        # 중복 500토큰 포함
 )
 texts = text_splitter.split_documents(pages)
+# print(texts[:10])
 
 # 5. OpenAI Embedding 모델로 청크 벡터 생성
 embeddings = OpenAIEmbeddings()
@@ -41,13 +44,15 @@ store = Chroma.from_documents(
     persist_directory="./chroma_db"  # 저장 위치
 )
 
+
 # 7. OpenAI ChatGPT 모델 설정
-llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.2)
 
 # 8. 문서 기반 질문응답을 위한 프롬프트 템플릿 정의
 template = """주어진 문서 내용을 바탕으로 질문에 답변해주세요.
 
-문서 내용: {context}
+문서 내용: 
+{context}
 
 질문: {question}
 
@@ -56,30 +61,59 @@ template = """주어진 문서 내용을 바탕으로 질문에 답변해주세�
 2. 기술적 내용은 실제 예시를 포함하여 설명하세요
 3. 보안 관련 내용은 위험성과 대응방안을 함께 설명하세요
 4. 리스트 형태로 요청된 경우 번호를 매겨 구분하여 작성하세요
+5. 답변에는 출처를 추가해 주세요
 """
 
 prompt = ChatPromptTemplate.from_template(template)
 
 # 9. 검색기 설정 (문서 5개 검색 후 사용)
-retriever = store.as_retriever(search_kwargs={"k": 5})
+retriever = store.as_retriever(search_kwargs={"k": 3})
+
+def format_docs_with_meta(docs):
+    if not docs:
+        return "관련 문서를 찾지 못했습니다."
+    parts = []
+    for i, d in enumerate(docs, start=1):
+        src = d.metadata.get("source", "unknown")
+        cid = d.metadata.get("chunk_id", "?")
+        parts.append(f"문서 {i}: [출처: {src}:{cid}]\n{d.page_content.strip()}")
+    return "\n\n---\n\n".join(parts)
+
+def peek_prompt(prompt_value):  # 디버깅용 함수
+    print("=== LLM 직전 프롬프트 ===")
+    print(prompt_value.to_string())
+    return prompt_value  # 반드시 그대로 반환해서 체인이 계속 흘러가게 함
 
 # 10. 전체 체인 구성: 문서검색 → 프롬프트 생성 → GPT 응답 → 문자열로 출력
-chain = (
-    {"context": retriever, "question": lambda x: x}
+
+chain1_rawdata = (  # Documents 가 그대로 포함됨 (metadata 포함)
+    {"context": retriever, "question": lambda x: x} # RunnablePassthrough()
     | prompt
+    | RunnableLambda(peek_prompt)  # <- 여기서 디버깅용 프린트
+    | llm
+    | StrOutputParser()
+)
+
+chain2_formatteddata = (  # Documents 를 의미 있는 체인으로 변경
+    {"context": retriever | RunnableLambda(format_docs_with_meta), 
+     "question": lambda x: x} # RunnablePassthrough()
+    | prompt
+    | RunnableLambda(peek_prompt)  # <- 여기서 디버깅용 프린트
     | llm
     | StrOutputParser()
 )
 
 # 11. 질문을 입력하면 답변을 출력하는 함수 정의
-def ask_question(question):
+def answer_question(question):
     try:
-        response = chain.invoke(question)
+        response = chain2_formatteddata.invoke(question)
         print(f"\n질문: {question}")
         print(f"답변: {response}\n")
+        print(f"\n=====\n질문: {question}\n---\n응답: {response}\n=====\n")
     except Exception as e:
         print(f"오류 발생: {str(e)}")
 
+
 # 12. 예시 질문 실행 (시큐어코딩 가이드 문서 기반)
-ask_question("시큐어코딩의 주요 기법들에 대해서 리스트 형태로 요약해서 설명해줘")
-ask_question("입력데이터 검증 및 오류 기법에 대해서 상세히 설명해줘")
+answer_question("시큐어코딩의 주요 기법들에 대해서 리스트 형태로 요약해서 설명해줘")
+# answer_question("입력데이터 검증 및 오류 기법에 대해서 상세히 설명해줘")

@@ -14,7 +14,7 @@ load_dotenv()
 PERSIST_DIR = "./chroma_db"
 COLLECTION_NAMES = ["secure_coding_python", "nvme"]
 
-# 2. 컬렉션 로딩
+# 2. 컬렉션 로딩 전용
 embeddings = OpenAIEmbeddings()
 collections = {
     name: Chroma(
@@ -56,18 +56,21 @@ def search_documents(question: str, k=3, target=None) -> list[Document]:
         return docs
 
 # 5. 질문 실행 함수
-def ask(question: str, target_collection: str = None):
+def answer_question(question: str, target_collection: str = None):
     docs = search_documents(question, target=target_collection)
 
     context = "\n\n".join([doc.page_content for doc in docs])
     response = chain.invoke({"context": context, "question": question})
 
-    print(f"\n질문: {question}")
+    print(f"\n=====\n질문: {question}")
     if target_collection:
         print(f"대상 컬렉션: {target_collection}")
+    else:
+        print(f"대상 컬랙션: ALL")
     print(f"참고 문서 수: {len(docs)}")
     print(f"GPT 응답:\n{response}\n")
+    print(f"=====\n")
 
 # 6. 테스트
-ask("NVMe의 특징은?", target_collection="nvme")     # 단일 컬렉션 검색
-ask("보안 로그 분석이란?", target_collection=None)   # 전체 컬렉션 검색
+answer_question("NVMe의 특징은?", target_collection="nvme")     # 단일 컬렉션 검색
+answer_question("보안 로그 분석이란?", target_collection=None)   # 전체 컬렉션 검색

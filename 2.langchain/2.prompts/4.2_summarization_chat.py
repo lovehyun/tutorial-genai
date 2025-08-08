@@ -8,8 +8,10 @@ from langchain_core.runnables import RunnableLambda
 load_dotenv()
 
 # ChatPromptTemplate 사용
+template = "Summarize the following article in 3 sentences:\n\n{article}"
 chat_prompt = ChatPromptTemplate.from_messages([
-    HumanMessagePromptTemplate.from_template("Summarize the following article in 3 sentences:\n\n{article}")
+    HumanMessagePromptTemplate.from_template(template)
+    # HumanMessagePromptTemplate.from_template("Summarize the following article in 3 sentences:\n\n{article}")
 ])
 
 # chat_prompt = ChatPromptTemplate.from_messages([

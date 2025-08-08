@@ -3,8 +3,9 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
-from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.output_parsers import StrOutputParser
+
+from langchain_community.chat_message_histories import ChatMessageHistory
 
 # 1. 환경 변수 로드
 load_dotenv()
@@ -43,10 +44,12 @@ formatted_messages = prompt.format_messages(
     input=user_input
 )
 
-print("\n실제 프롬프트에 포함될 메시지:")
+print("\n--- 실제 프롬프트에 포함될 메시지 ---")
+print(f"{formatted_messages}\n")
 for msg in formatted_messages:
     role = msg.type.upper()
-    print(f"{role}: {msg.content}")
+    content = msg.content
+    print(f"{role}: {content}")
 
 # 8. 체인 실행
 response = chain.invoke({
@@ -55,9 +58,41 @@ response = chain.invoke({
 })
 
 # 9. 응답 출력
-print("\nAI 응답:")
-print(response)
+print("\n--- 사용자 질문 / AI 응답 ---")
+print(f"Q: {user_input}")
+print(f"A: {response}")
 
 # 10. history 업데이트 (다음 대화를 위한 상태 유지)
 history.add_user_message(user_input)
 history.add_ai_message(response)
+
+print("\n--- 다음 히스토리 ---")
+print(history)
+
+
+# =========================================================
+# 11. 이어서 질문
+next_input = "How tall are they?"
+
+# 12. 디버깅: 실제 프롬프트 메시지 확인
+print("\n--- 실제 프롬프트에 포함될 메시지 (2번째 질문) ---")
+for msg in formatted_messages:
+    print(f"{msg.type.upper()}: {msg.content}")
+
+# 13. 체인 실행
+next_response = chain.invoke({
+    "history": history.messages,
+    "input": next_input
+})
+
+print("\n--- 사용자 질문 / AI 응답 (2번째) ---")
+print(f"Q: {next_input}")
+print(f"A: {next_response}")
+
+# 14. history 업데이트
+history.add_user_message(next_input)
+history.add_ai_message(next_response)
+
+print("\n--- 최종 히스토리 ---")
+for msg in history.messages:
+    print(f"{msg.type.upper()}: {msg.content}")

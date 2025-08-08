@@ -1,8 +1,16 @@
 # pip install transformers pymupdf
-
 import fitz  # PyMuPDF
 from typing import Optional
 from transformers import AutoTokenizer, AutoModelForQuestionAnswering, pipeline
+
+# 모델 설명
+# - DistilBERT: BERT를 경량화(distillation)한 모델 → 속도는 빠르고, 메모리 사용량이 적음.
+# - base-uncased: 영어 소문자 기반 토크나이저(대소문자 구분 안 함).
+# - distilled-squad: SQuAD(Stanford Question Answering Dataset) 데이터셋으로 파인튜닝된 질의응답(QA) 전용 모델.
+# - 용도: 문맥(context)과 질문(question)을 입력하면, 해당 문맥에서 가장 가능성이 높은 답변 구간을 찾아 반환.
+
+# PDF 전체를 한 번에 모델에 넣음 → 토큰 제한 걸릴 수 있음
+# 첫 번째 답변만 사용	
 
 def extract_text_from_pdf(pdf_path: str) -> str:
    """PDF 문서에서 텍스트를 추출합니다."""
