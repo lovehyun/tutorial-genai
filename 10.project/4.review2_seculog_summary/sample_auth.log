@@ -1,0 +1,20 @@
+Aug  6 09:12:05 testhost sshd[1012]: Failed password for invalid user admin from 203.0.113.45 port 55214 ssh2
+Aug  6 09:12:07 testhost sshd[1012]: Failed password for invalid user admin from 203.0.113.45 port 55214 ssh2
+Aug  6 09:12:10 testhost sshd[1012]: Connection closed by authenticating user root 192.168.0.12 port 60221 [preauth]
+Aug  6 09:14:33 testhost sshd[1104]: Accepted password for ubuntu from 198.51.100.23 port 42105 ssh2
+Aug  6 09:14:33 testhost sshd[1104]: pam_unix(sshd:session): session opened for user ubuntu by (uid=0)
+Aug  6 09:15:01 testhost CRON[1120]: pam_unix(cron:session): session opened for user root by (uid=0)
+Aug  6 09:15:01 testhost CRON[1120]: pam_unix(cron:session): session closed for user root
+Aug  6 09:16:14 testhost sudo:     ubuntu : TTY=pts/0 ; PWD=/home/ubuntu ; USER=root ; COMMAND=/bin/apt update
+Aug  6 09:16:14 testhost sudo: pam_unix(sudo:session): session opened for user root by ubuntu(uid=0)
+Aug  6 09:16:22 testhost sudo: pam_unix(sudo:session): session closed for user root
+Aug  6 09:17:45 testhost sshd[1188]: Failed password for invalid user test from 203.0.113.88 port 55433 ssh2
+Aug  6 09:17:49 testhost sshd[1188]: Failed password for invalid user test from 203.0.113.88 port 55433 ssh2
+Aug  6 09:18:01 testhost sshd[1195]: Accepted password for root from 192.168.0.15 port 60225 ssh2
+Aug  6 09:18:01 testhost sshd[1195]: pam_unix(sshd:session): session opened for user root by (uid=0)
+Aug  6 09:18:55 testhost sshd[1201]: Received disconnect from 198.51.100.33 port 42311:11: disconnected by user
+Aug  6 09:18:55 testhost sshd[1201]: Disconnected from user guest 198.51.100.33 port 42311
+Aug  6 09:19:42 testhost sshd[1210]: Failed password for ubuntu from 203.0.113.45 port 55218 ssh2
+Aug  6 09:19:44 testhost sshd[1210]: Accepted password for ubuntu from 203.0.113.45 port 55218 ssh2
+Aug  6 09:19:44 testhost sshd[1210]: pam_unix(sshd:session): session opened for user ubuntu by (uid=0)
+Aug  6 09:20:05 testhost sshd[1210]: pam_unix(sshd:session): session closed for user ubuntu

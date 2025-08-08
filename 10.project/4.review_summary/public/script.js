@@ -1,5 +1,3 @@
-let reviews = [];
-
 async function submitReview() {
     const rating = document.querySelector('input[name="rating"]:checked');
     const opinion = document.getElementById('opinion').value;
@@ -47,30 +45,15 @@ async function fetchReviews() {
         }
 
         const data = await response.json();
-        reviews = data.reviews;
-        displayReviews();
+        const reviews = data.reviews;
+        displayReviews(reviews);
     } catch (error) {
         console.error(error);
         alert('Error fetching reviews.');
     }
 }
 
-async function fetchAISummary() {
-    try {
-        const response = await fetch('/api/ai-summary');
-        if (!response.ok) {
-            throw new Error('Failed to fetch AI summary');
-        }
-
-        const data = await response.json();
-        displayAISummary(data.summary, data.averageRating);
-    } catch (error) {
-        console.error(error);
-        alert('Error fetching AI summary.');
-    }
-}
-
-function displayReviews() {
+function displayReviews(reviews) {
     const reviewsContainer = document.getElementById('reviews-container');
 
     // Remove existing review elements except the AI summary
@@ -88,9 +71,27 @@ function displayReviews() {
     });
 }
 
+async function fetchAISummary() {
+    try {
+        const response = await fetch('/api/ai-summary');
+        if (!response.ok) {
+            throw new Error('Failed to fetch AI summary');
+        }
+
+        const data = await response.json();
+        displayAISummary(data.summary, data.averageRating);
+    } catch (error) {
+        console.error(error);
+        alert('Error fetching AI summary.');
+    }
+}
+
 function displayAISummary(summary, averageRating) {
     const summaryBox = document.querySelector('.ai-summary');
-    summaryBox.innerHTML = `<p><strong>AI 요약:</strong> ${summary}</p><p><strong>평균 별점:</strong> ${averageRating.toFixed(2)}</p>`;
+    summaryBox.innerHTML = `
+        <p><strong>AI 요약:</strong>${summary}</p>
+        <p><strong>평균 별점:</strong> ${averageRating.toFixed(2)}</p>
+        `;
 }
 
 // Initial fetch of reviews and AI summary

@@ -1,9 +1,10 @@
 # pip install flask python-dotenv openai
 import os
 import logging
+from dotenv import load_dotenv
+
 from flask import Flask, request, jsonify, send_from_directory
 from openai import OpenAI
-from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.INFO)
 
@@ -58,8 +59,9 @@ def get_ai_summary():
         return jsonify({'error': 'Failed to generate AI summary'}), 500
 
 @app.route('/')
-def serve_frontend():
-    return send_from_directory(app.static_folder, 'index.html')
+def index():
+    # return send_from_directory(app.static_folder, 'index.html')
+    return app.send_static_file('index.html')
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

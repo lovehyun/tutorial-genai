@@ -55,23 +55,6 @@ async function fetchReviews() {
     }
 }
 
-async function fetchAISummary() {
-    const lang = document.getElementById('languageSelect').value;
-
-    try {
-        const response = await fetch(`/api/ai-summary?lang=${lang}`);
-        if (!response.ok) {
-            throw new Error('Failed to fetch AI summary');
-        }
-
-        const data = await response.json();
-        displayAISummary(data.summary, data.averageRating);
-    } catch (error) {
-        console.error(error);
-        alert('Error fetching AI summary.');
-    }
-}
-
 function displayReviews() {
     const reviewsContainer = document.getElementById('reviews-container');
 
@@ -99,6 +82,23 @@ const i18n = {
     fr: { summaryLabel: "Résumé IA", avgLabel: "Note Moyenne" },
     it: { summaryLabel: "Riepilogo IA", avgLabel: "Valutazione Media" }
 };
+
+async function fetchAISummary() {
+    const lang = document.getElementById('languageSelect').value;
+
+    try {
+        const response = await fetch(`/api/ai-summary?lang=${lang}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch AI summary');
+        }
+
+        const data = await response.json();
+        displayAISummary(data.summary, data.averageRating);
+    } catch (error) {
+        console.error(error);
+        alert('Error fetching AI summary.');
+    }
+}
 
 // AI 요약 및 평균 별점 렌더링
 function displayAISummary(summary, averageRating) {
