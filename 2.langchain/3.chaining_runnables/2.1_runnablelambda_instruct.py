@@ -8,12 +8,12 @@ from langchain_core.runnables import RunnableLambda
 # 환경 변수 로드 (경로 없이 실행하면 자동으로 .env 검색)
 load_dotenv()
 
-# input: "웹게임"
-# ↓
-# prompt1: "웹게임을 만드는 회사명을 지어줘"
-# → "Playverse"
-# prompt2: "Playverse에 어울리는 캐치프레이즈는?"
-# → "Unleash the fun. Rule the game."
+# 1. input: "웹게임"
+#    ↓
+# 2. prompt1: "웹게임을 만드는 회사명을 지어줘"
+#    → "Playverse"
+# 3. prompt2: "Playverse에 어울리는 캐치프레이즈는?"
+#    → "Unleash the fun. Rule the game."
 
 
 # OpenAI 모델 생성

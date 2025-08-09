@@ -1,37 +1,35 @@
 from dotenv import load_dotenv
 
-from langchain_openai import ChatOpenAI
+from langchain_openai import OpenAI
 
-from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 
 # 환경 변수 로드 (경로 없이 실행하면 자동으로 .env 검색)
 load_dotenv()
 
-# input: "웹게임"
-# ↓
-# prompt1: "웹게임을 만드는 회사명을 지어줘"
-# → "Playverse"
-# prompt2: "Playverse에 어울리는 캐치프레이즈는?"
-# → "Unleash the fun. Rule the game."
+# 1. inputs: "웹게임"
+#    ↓
+# 2. prompt1: "웹게임을 만드는 회사명을 지어줘"
+#    → "Playverse"
+# 3. prompt2: "Playverse에 어울리는 캐치프레이즈는?"
+#    → "Unleash the fun. Rule the game."
 
 
 # OpenAI 모델 생성
-llm = ChatOpenAI(model="gpt-4o", temperature=0.9)
+llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0.9)
 
-# 1. 제품 기반 회사명 생성 프롬프트
-prompt1 = ChatPromptTemplate.from_messages([
-    HumanMessagePromptTemplate.from_template(
-        "You are a naming consultant for new companies. What is a good name for a company that makes {product}?"
-    )
-])
+# 1. 제품 기반으로 회사명 생성
+prompt1 = PromptTemplate(
+    input_variables=["product"],
+    template="You are a naming consultant for new companies. What is a good name for a company that makes {product}?"
+)
 
-# 2. 회사명 기반 슬로건 생성 프롬프트
-prompt2 = ChatPromptTemplate.from_messages([
-    HumanMessagePromptTemplate.from_template(
-        "Write a catch phrase for the following company: {company_name}"
-    )
-])
+# 2. 회사명 기반으로 슬로건(캐치프레이즈) 생성
+prompt2 = PromptTemplate(
+    input_variables=["company_name"],
+    template="Write a catch phrase for the following company: {company_name}"
+)
 
 # 3. LangChain 방식 적용
 # 전체 체인: 회사명 보존하면서 캐치프레이즈 추가
@@ -51,8 +49,8 @@ chain = (
 
 
 # 4. 입력값 넣고 실행
-input = {"product": "웹게임"}
-result = chain.invoke(input)
+inputs = {"product": "웹게임"}
+result = chain.invoke(inputs)
 
 # 5. 결과 출력
 print("회사명:", result["company_name"])

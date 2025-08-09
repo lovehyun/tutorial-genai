@@ -1,0 +1,112 @@
+from dotenv import load_dotenv
+import os, sys, json
+
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+    MessagesPlaceholder,
+)
+from langchain_core.chat_history import InMemoryChatMessageHistory
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_community.chat_message_histories import FileChatMessageHistory
+from langchain_community.chat_message_histories import SQLChatMessageHistory
+from sqlalchemy import create_engine
+
+# 세션 개념이 없어서 모든 대화가 한 히스토리에 쌓입니다 → 여러 유저/세션을 지원하려면 세션별 히스토리 맵이 필요
+# langchain_community.chat_message_histories.ChatMessageHistory는 구버전 느낌이라, 보통은 InMemoryChatMessageHistory(core)나 RunnableWithMessageHistory 사용을 권장
+
+# 0. 환경 변수 로드
+load_dotenv()
+if not os.getenv("OPENAI_API_KEY"):
+    print("OPENAI_API_KEY 미설정", file=sys.stderr); sys.exit(1)
+    
+# 1. OpenAI 채팅 모델 설정
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+
+# 2. LangChain의 공식 메모리 기능 사용 (ChatMessageHistory)
+
+# chat_history = ChatMessageHistory()
+# chat_history = InMemoryChatMessageHistory()
+# chat_history = FileChatMessageHistory("history.json")
+
+# SQLite 파일 경로
+DB_URL = "sqlite:///chat_history.db"
+
+# 세션 구분을 위해 session_id 사용
+# session_id = "user_123"
+session_id = "default"
+
+# DB 엔진 생성
+engine = create_engine(DB_URL)
+
+# SQL 기반 대화 히스토리 객체 생성
+chat_history = SQLChatMessageHistory(
+    session_id=session_id,
+    connection=engine
+)
+
+# 현재 메시지 출력
+print("초기 메시지 개수:", len(chat_history.messages))
+# chat_history.clear() # 초기화 (삭제)
+# 확인
+# print("초기화 후 메시지 개수:", len(chat_history.messages))
+
+
+# 3. 프롬프트 템플릿 생성
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "답변은 간결하게 해주세요."),
+    MessagesPlaceholder(variable_name="history"),  # 메시지 기록
+    ("human", "{input}")
+])
+
+# prompt = ChatPromptTemplate.from_messages([
+#     SystemMessagePromptTemplate.from_template("You are a helpful assistant."),
+#     MessagesPlaceholder(variable_name="history"),
+#     HumanMessagePromptTemplate.from_template("{input}")
+# ])
+
+# 4. 체인 생성
+chain = prompt | llm
+
+# 5. 대화 수행
+
+# 히스토리 내용 출력 함수
+def print_history():
+    print("\n===== 현재 메시지 히스토리 =====")
+    for i, message in enumerate(chat_history.messages):
+        role = "User" if message.type == "human" else "AI"
+        print(f"{i+1}. {role}: {message.content}")
+    print("================================\n")
+
+def chat(message):
+    # 현재 턴의 user 메시지는 {input}으로만 주고,
+    # 호출 이후에 history에 추가 (중복 방지)
+    
+    print(f"Q: {message}")
+
+    result = chain.invoke({
+        "input": message,
+        "history": chat_history.messages  # ChatMessageHistory에서 메시지 목록 가져오기
+    })
+    
+    # 응답 출력
+    print(f"A: {result.content}")
+    
+    # 대화 기록에 추가 (중복 방지: 호출 후에 저장)
+    chat_history.add_user_message(message)
+    chat_history.add_ai_message(result.content)
+    
+    # print_history()
+
+# 6. 테스트
+# chat("Hello")
+# chat("Can we talk about sports?")
+# chat("What's a good sport to play outdoor?")
+
+chat("내가 지금까지 한 말들은?")
+# chat("안녕하세요")
+# chat("운동에 대해서 이야기해 볼까요?")
+# chat("아웃도어 스포츠에 대해서 알려주세요.")

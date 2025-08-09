@@ -1,6 +1,13 @@
 # 필요한 라이브러리 설치
 # pip install langgraph langchain-openai
 
+# 항목	            RunnableWithMessageHistory	    LangGraph
+# 구조	            단일 체인 기반	                 노드-엣지 기반 그래프
+# 분기 처리	        어려움 (조건문 직접 구현)	      노드 연결로 간단
+# 멀티모델/병렬	    복잡	                         자연스럽게 지원
+# 메모리	        session_id 기반	                 thread_id 기반 + 자동 저장/복원
+# 복잡도	        간단한 대화형 앱에 적합	          복잡한 워크플로우에 적합
+
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
