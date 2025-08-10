@@ -5,6 +5,7 @@ gapi-*.json
 # python
 *.pyc
 __pycache__/
+.venv/
 
 # database
 *.db
@@ -25,6 +26,9 @@ chroma_db
 model_outputs/
 generated.png
 uploads/*
+
+# logging
+*.log
 
 # temp working directory
 TEMP/

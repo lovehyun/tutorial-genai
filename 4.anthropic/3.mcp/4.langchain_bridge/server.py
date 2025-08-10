@@ -1,6 +1,7 @@
-from mcp.server.fastmcp import FastMCP
 from datetime import datetime
 import math
+
+from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("LangChainMCPServer")
 
