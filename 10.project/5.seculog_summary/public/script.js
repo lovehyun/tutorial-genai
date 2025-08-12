@@ -31,7 +31,8 @@ function updateRawUI(data) {
 }
 
 function updateSummaryUI(data) {
-    summaryBox.innerHTML = (data.summary || '').replace(/\n/g, '<br>');
+    summaryBox.innerHTML = (data.summary || '');
+    // summaryBox.innerHTML = (data.summary || '').replace(/\n/g, '<br>');
 }
 
 // --- 유틸 ---
