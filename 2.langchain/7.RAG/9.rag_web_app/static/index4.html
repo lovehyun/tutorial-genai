@@ -76,9 +76,10 @@
             loadFileList();
         });
 
+        const fileListElem = document.getElementById('file-list');
+        
         // 1. 파일 목록 가져와서 렌더링
         function loadFileList() {
-            const fileListElem = document.getElementById('file-list');
             fetch('/files')
                 .then(res => res.json())
                 .then(({ files }) => {

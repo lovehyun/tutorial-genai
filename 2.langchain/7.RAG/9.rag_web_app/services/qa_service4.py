@@ -120,8 +120,8 @@ def answer_question_score(question: str) -> str:
     # 2. context 구성
     # context = "\n\n".join([doc.page_content for doc, _ in docs_with_scores])
     context = "\n\n".join(
-        [f"[문서 {i+1}] (유사도 {round((1 - score) * 100, 2)}%)\n{doc.page_content}"
-        for i, (doc, score) in enumerate(docs_with_scores)]
+        [f"[문서 {i}] (유사도 {round((1 - score) * 100, 2)}%)\n{doc.page_content}"
+        for i, (doc, score) in enumerate(docs_with_scores, start=1)]
     )
     print(context)
     
