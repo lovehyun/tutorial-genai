@@ -1,15 +1,18 @@
 from dotenv import load_dotenv
-from langchain_openai import OpenAI
+
+from langchain_openai import OpenAI, ChatOpenAI
 from langchain.agents import initialize_agent, AgentType
 from langchain.tools import tool
 
-# 환경 변수 로드
+# 0. 환경 변수 로드
 load_dotenv()
 
-# OpenAI 모델 초기화
-llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0)
+# 1. OpenAI 모델 초기화
+# llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0)
+# llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
-# 사용자 정의 도구 생성
+# 2. 사용자 정의 도구 생성
 @tool
 def get_current_weather(location: str) -> str:
     """특정 위치의 현재 날씨 정보를 가져옵니다."""
@@ -36,7 +39,7 @@ def get_population(city: str) -> str:
 # 도구 목록 생성
 tools = [get_current_weather, get_population]
 
-# 에이전트 초기화
+# 3. 에이전트 초기화
 agent = initialize_agent(
     tools=tools,
     llm=llm,
@@ -44,6 +47,8 @@ agent = initialize_agent(
     verbose=True
 )
 
-# 에이전트 실행
-result = agent.invoke({"input": "서울의 날씨는 어때? 그리고 인구는 몇 명이야?"})
+# 4. 에이전트 실행
+# result = agent.invoke({"input": "서울의 날씨는 어때? 그리고 인구는 몇 명이야?"})
+result = agent.invoke({"input": "인천의 날씨는 어때? 그리고 인구는 몇 명이야?"})
+# result = agent.invoke({"input": "제주의 날씨는 어때? 그리고 인구는 몇 명이야?"})
 print(result["output"])

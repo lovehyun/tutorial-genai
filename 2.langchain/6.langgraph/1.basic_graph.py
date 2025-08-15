@@ -4,11 +4,11 @@
 이 파일은 LangGraph의 가장 기본적인 그래프 구조를 생성하고 실행하는 방법을 보여줍니다.
 """
 
-import os
 from dotenv import load_dotenv
 
-from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage, SystemMessage
+
 from langgraph.graph import StateGraph, START, END, MessagesState
 
 load_dotenv()

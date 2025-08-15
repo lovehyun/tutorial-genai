@@ -1,11 +1,15 @@
 from dotenv import load_dotenv
-from langchain_openai import OpenAI
+
+from langchain_openai import OpenAI, ChatOpenAI
+
 from langchain_community.utilities.google_serper import GoogleSerperAPIWrapper
 from langchain.tools import Tool
 from langchain.agents import initialize_agent, AgentType
+
 import os
 
-# 환경 변수 로드
+
+# 0. 환경 변수 로드
 load_dotenv()
 
 # 환경 변수 확인
@@ -15,11 +19,18 @@ if not serper_api_key:
     print("Serper.dev에서 API 키를 발급받아 .env 파일에 추가하세요.")
     exit(1)
 
-# OpenAI 모델 초기화 
-llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0)
+# 1. OpenAI 모델 초기화 
+# llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
-# Serper 검색 초기화
-search = GoogleSerperAPIWrapper()
+# 2. Serper 검색 초기화
+search = GoogleSerperAPIWrapper()  # 간단 버전
+# search = GoogleSerperAPIWrapper(
+#     k=5,           # 상위 5건
+#     gl="kr",       # 국가
+#     hl="ko",       # 언어
+#     location="Seoul, South Korea"  # 위치 바이어스
+# )
 
 # 검색 도구 생성
 tools = [
@@ -30,7 +41,7 @@ tools = [
     )
 ]
 
-# 에이전트 초기화
+# 3. 에이전트 초기화
 agent = initialize_agent(
     tools=tools,
     llm=llm,
@@ -39,6 +50,6 @@ agent = initialize_agent(
     # verbose=False  # 중간 과정을 출력하지 않음
 )
 
-# 에이전트에게 검색 요청
+# 4. 에이전트에게 검색 요청
 result = agent.invoke({"input": "서울의 오늘 날씨는 어때?"})
 print(result["output"])

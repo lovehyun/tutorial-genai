@@ -5,14 +5,14 @@
 사용자의 의도에 따라 다른 경로로 분기하여 특화된 응답을 생성할 수 있습니다.
 """
 
-import os
 import uuid
 from dotenv import load_dotenv
-
 from typing import TypedDict, List, Dict, Any
+
+from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_core.runnables import RunnableConfig
-from langchain_openai import ChatOpenAI
+
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 

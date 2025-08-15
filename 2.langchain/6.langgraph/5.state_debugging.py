@@ -5,20 +5,19 @@
 복잡한 에이전트 시스템의 상태 변화를 분석하고 디버깅하는 기술을 배울 수 있습니다.
 """
 
-import os
 import uuid
 import json
 from dotenv import load_dotenv
 from datetime import datetime
-
 from pydantic import BaseModel, Field
 from typing import Dict, List, Any, Optional, Union
 
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, ToolMessage, BaseMessage
-from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
-from langgraph.prebuilt import create_react_agent
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, ToolMessage, BaseMessage
+
+from langchain_core.tools import tool
 from langgraph.checkpoint.memory import MemorySaver
+from langgraph.prebuilt import create_react_agent
 
 load_dotenv()
 

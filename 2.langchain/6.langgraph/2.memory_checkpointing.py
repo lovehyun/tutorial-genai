@@ -5,12 +5,12 @@
 체크포인팅을 사용하면 대화 세션을 지속적으로 유지하고 이전 대화 내용을 기억할 수 있습니다.
 """
 
-import os
 import uuid
 from dotenv import load_dotenv
 
-from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage, SystemMessage
+
 from langgraph.graph import StateGraph, START, END, MessagesState
 from langgraph.checkpoint.memory import MemorySaver
 

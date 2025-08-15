@@ -6,6 +6,10 @@ from langchain_community.agent_toolkits.load_tools import load_tools
 from langchain.agents import initialize_agent, AgentType
 from langchain_core.runnables import RunnableLambda
 
+# 효율성: 모든 질문에 검색을 돌리면 느리고 API 비용이 커집니다.
+# 정확성: 최신 정보·날씨·가격 등 실시간/외부 데이터가 필요한 경우만 검색 툴을 호출하고, 나머지는 모델 자체 지식으로 답하도록 분기합니다.
+# 유연성: 조건(키워드 리스트)을 바꿔서 "검색 필요 여부" 를 쉽게 조정할 수 있습니다.
+
 # 1. 환경변수 로드
 load_dotenv()
 
