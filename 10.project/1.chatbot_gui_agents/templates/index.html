@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent Chatbot</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>AI Agent System</h2>
+                <p>다중 Agent 기반 챗봇</p>
+            </div>
+            
+            <div class="agent-status">
+                <h3>Agent 상태</h3>
+                <div class="agent-list" id="agentList">
+                    <div class="agent-item" data-agent="memory">
+                        <div class="agent-name">
+                            <div class="agent-icon memory">💾</div>
+                            Memory Agent
+                        </div>
+                        <div class="agent-status-text">대기 중</div>
+                        <div class="agent-details">
+                            <div class="agent-detail-item">
+                                <div class="agent-detail-label">저장된 대화:</div>
+                                <div class="agent-detail-value memory-entries" id="memoryEntries">
+                                    대화 기록이 없습니다.
+                                </div>
+                            </div>
+                            <div class="agent-detail-item">
+                                <div class="agent-detail-label">메모리 사용량:</div>
+                                <div class="agent-detail-value" id="memoryUsage">0/100</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="agent-item" data-agent="search">
+                        <div class="agent-name">
+                            <div class="agent-icon search">🔍</div>
+                            Search Agent
+                        </div>
+                        <div class="agent-status-text">대기 중</div>
+                        <div class="agent-details">
+                            <div class="agent-detail-item">
+                                <div class="agent-detail-label">검색 쿼리:</div>
+                                <div class="agent-detail-value" id="searchQuery">-</div>
+                            </div>
+                            <div class="agent-detail-item">
+                                <div class="agent-detail-label">검색 결과:</div>
+                                <div class="agent-detail-value search-results-mini" id="searchResults">
+                                    검색 결과가 없습니다.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="agent-item" data-agent="calculation">
+                        <div class="agent-name">
+                            <div class="agent-icon calculation">🧮</div>
+                            Calculation Agent
+                        </div>
+                        <div class="agent-status-text">대기 중</div>
+                        <div class="agent-details">
+                            <div class="agent-detail-item">
+                                <div class="agent-detail-label">수식:</div>
+                                <div class="agent-detail-value" id="calcExpression">-</div>
+                            </div>
+                            <div class="agent-detail-item">
+                                <div class="agent-detail-label">계산 과정:</div>
+                                <div class="agent-detail-value calculation-steps" id="calcSteps">-</div>
+                            </div>
+                            <div class="agent-detail-item">
+                                <div class="agent-detail-label">결과:</div>
+                                <div class="agent-detail-value" id="calcResult">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="agent-item" data-agent="chat">
+                        <div class="agent-name">
+                            <div class="agent-icon chat">💬</div>
+                            Chat Agent
+                        </div>
+                        <div class="agent-status-text">대기 중</div>
+                        <div class="agent-details">
+                            <div class="agent-detail-item">
+                                <div class="agent-detail-label">생각 과정:</div>
+                                <div class="agent-detail-value" id="chatThinking">-</div>
+                            </div>
+                            <div class="agent-detail-item">
+                                <div class="agent-detail-label">응답 생성:</div>
+                                <div class="agent-detail-value" id="chatResponse">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="chat-header">
+                <h1>AI Agent Chatbot</h1>
+                <div class="connection-status">
+                    <div class="status-indicator" id="statusIndicator"></div>
+                    <span id="statusText">연결 중...</span>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message assistant">
+                    <div class="message-avatar">AI</div>
+                    <div class="message-content">
+                        <div class="message-text">
+                            안녕하세요! 저는 다양한 Agent들과 함께 작동하는 AI 챗봇입니다. 
+                            질문하시거나 계산, 검색이 필요하시면 언제든 말씀해 주세요!
+                        </div>
+                        <div class="message-meta">시스템 메시지</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="processing-indicator" id="processingIndicator">
+                <div class="spinner"></div>
+                <span id="processingText">메시지를 처리하고 있습니다...</span>
+            </div>
+
+            <div class="chat-input">
+                <div class="input-container">
+                    <textarea 
+                        class="message-input" 
+                        id="messageInput" 
+                        placeholder="메시지를 입력하세요..."
+                        rows="1"
+                    ></textarea>
+                    <button class="send-button" id="sendButton">전송</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script src="{{ url_for('static', filename='js/socket-manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/connection-manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/agent-manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chat-manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/input-manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

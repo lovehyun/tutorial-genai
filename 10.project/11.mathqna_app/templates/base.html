@@ -1,0 +1,189 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LangChain Agent 기반 지능형 수학 교육 플랫폼">
+    <meta name="keywords" content="수학, 교육, AI, LangChain, 문제해결">
+    <meta name="author" content="Math Q&A System">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% block og_title %}수학 Q&A 시스템{% endblock %}">
+    <meta property="og:description" content="AI가 도와주는 지능형 수학 학습 플랫폼">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    
+    <title>{% block title %}수학 Q&A 시스템{% endblock %}</title>
+    
+    <!-- CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/theme.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/animation.css') }}" rel="stylesheet">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Skip to Content (접근성) -->
+    <a href="#main-content" class="sr-only sr-only-focusable btn btn-primary position-absolute">
+        메인 콘텐츠로 이동
+    </a>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary" role="navigation">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                <i class="fas fa-calculator me-2" aria-hidden="true"></i>
+                <span>수학 Q&A 시스템</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">
+                            <i class="fas fa-home me-1" aria-hidden="true"></i>
+                            홈
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-book me-1" aria-hidden="true"></i>
+                            문제
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% for problem in range(1, 6) %}
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('problem_detail', problem_id=problem) }}">
+                                    문제 {{ problem }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+                
+                <div class="navbar-text text-light d-none d-lg-block">
+                    <i class="fas fa-robot me-1" aria-hidden="true"></i>
+                    LangChain Agent 기반 교육 플랫폼
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- AI 서비스 상태 표시 -->
+    <div class="service-status" role="status" aria-live="polite">
+        <div id="serviceStatus" class="badge bg-secondary">
+            <span class="sr-only">AI 서비스</span>
+            상태 확인 중...
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main-content" role="main">
+        <div class="container mt-4">
+            <!-- 브레드크럼 -->
+            {% block breadcrumb %}{% endblock %}
+            
+            <!-- 메인 콘텐츠 -->
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-light mt-5 py-4" role="contentinfo">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>수학 Q&A 시스템</h6>
+                    <p class="text-muted small">
+                        LangChain Agent 기반 지능형 수학 교육 플랫폼
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="printPage()" title="페이지 인쇄">
+                        <i class="fas fa-print me-1"></i>
+                        인쇄
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm ms-2" onclick="window.MathQA.ServiceStatus.check()" title="상태 새로고침">
+                        <i class="fas fa-sync-alt me-1"></i>
+                        상태 확인
+                    </button>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-12 text-center text-muted small">
+                    <p class="mb-0">
+                        &copy; 2024 Math Q&A System. 
+                        <span class="d-none d-sm-inline">교육 목적으로 제작되었습니다.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 전역 로딩 오버레이 -->
+    <div class="loading-overlay" id="globalLoadingOverlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner-dots">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <p class="mt-3" id="loadingMessage">AI가 작업 중입니다...</p>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- MathJax Configuration (스크립트 로딩 전에 설정) -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                tags: 'ams'
+            },
+            svg: {
+                fontCache: 'global'
+            },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    console.log('MathJax startup ready');
+                    // MathRenderer가 로드된 후에 상태 업데이트
+                    if (window.MathQA?.MathRenderer) {
+                        window.MathQA.MathRenderer.isReady = true;
+                        console.log('MathRenderer status updated');
+                    }
+                },
+                pageReady: () => {
+                    MathJax.startup.defaultPageReady();
+                    console.log('MathJax page ready');
+                }
+            }
+        };
+    </script>
+    
+    <!-- MathJax Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/config.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    {% block extra_js %}{% endblock %}
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

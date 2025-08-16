@@ -1,0 +1,597 @@
+<!-- templates/error.html -->
+{% extends "base.html" %}
+
+{% block title %}오류 - 수학 Q&A 시스템{% endblock %}
+{% block og_title %}오류가 발생했습니다{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-page {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+    }
+    
+    .error-icon {
+        animation: pulse 2s infinite;
+    }
+    
+    .error-code {
+        font-size: 6rem;
+        font-weight: bold;
+        color: #6c757d;
+        line-height: 1;
+    }
+    
+    .error-actions .btn {
+        margin: 0.5rem;
+    }
+    
+    .error-details {
+        background: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin: 1rem 0;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .help-section {
+        background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .status-check {
+        display: none;
+    }
+    
+    .troubleshooting-step {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 0.5rem;
+        border-left: 4px solid #007bff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-body text-center py-5">
+                        <!-- 오류 아이콘과 코드 -->
+                        <div class="error-header mb-4">
+                            <div class="error-icon mb-3">
+                                <i class="fas fa-exclamation-triangle fa-4x text-warning"></i>
+                            </div>
+                            
+                            <!-- HTTP 상태 코드별 표시 -->
+                            {% if request.endpoint and '404' in error %}
+                            <div class="error-code text-muted">404</div>
+                            {% elif '500' in error %}
+                            <div class="error-code text-muted">500</div>
+                            {% elif '503' in error %}
+                            <div class="error-code text-muted">503</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- 오류 제목 -->
+                        <h2 class="error-title mb-3">
+                            {% if '404' in error %}
+                                페이지를 찾을 수 없습니다
+                            {% elif '500' in error %}
+                                서버 내부 오류
+                            {% elif '503' in error %}
+                                서비스를 사용할 수 없습니다
+                            {% else %}
+                                문제가 발생했습니다
+                            {% endif %}
+                        </h2>
+                        
+                        <!-- 오류 메시지 -->
+                        <div class="error-message mb-4">
+                            <div class="alert alert-light border">
+                                <p class="mb-0">
+                                    <i class="fas fa-info-circle me-2 text-info"></i>
+                                    {{ error }}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- 상세 오류 정보 (개발 환경에서만) -->
+                        {% if config.DEBUG and error_details %}
+                        <div class="error-details text-start">
+                            <strong>상세 정보:</strong><br>
+                            {{ error_details }}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- 주요 액션 버튼들 -->
+                        <div class="error-actions mb-4">
+                            <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-home me-2"></i>
+                                홈으로 돌아가기
+                            </a>
+                            
+                            <button onclick="history.back()" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                이전 페이지
+                            </button>
+                            
+                            <button onclick="location.reload()" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-sync-alt me-2"></i>
+                                페이지 새로고침
+                            </button>
+                        </div>
+                        
+                        <!-- AI 서비스 관련 오류인 경우 -->
+                        {% if '503' in error or 'AI 서비스' in error %}
+                        <div class="status-check">
+                            <button onclick="checkServiceStatus()" class="btn btn-warning">
+                                <i class="fas fa-stethoscope me-2"></i>
+                                서비스 상태 확인
+                            </button>
+                            <div id="statusResult" class="mt-3"></div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- 도움말 섹션 -->
+                <div class="help-section">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>
+                                <i class="fas fa-question-circle me-2 text-primary"></i>
+                                자주 발생하는 문제들
+                            </h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-wifi text-warning me-2"></i>
+                                    <strong>네트워크 연결 문제:</strong> 인터넷 연결을 확인해주세요
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-server text-danger me-2"></i>
+                                    <strong>서버 일시 중단:</strong> 잠시 후 다시 시도해주세요
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-robot text-info me-2"></i>
+                                    <strong>AI 서비스 오류:</strong> 일부 기능이 제한될 수 있습니다
+                                </li>
+                                <li>
+                                    <i class="fas fa-browser text-secondary me-2"></i>
+                                    <strong>브라우저 호환성:</strong> 최신 브라우저 사용을 권장합니다
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5>
+                                <i class="fas fa-tools me-2 text-success"></i>
+                                문제 해결 방법
+                            </h5>
+                            
+                            <div class="troubleshooting-step">
+                                <h6 class="mb-2">
+                                    <span class="badge bg-primary me-2">1</span>
+                                    페이지 새로고침
+                                </h6>
+                                <p class="small mb-0">
+                                    Ctrl+F5 (Windows) 또는 Cmd+R (Mac)로 강제 새로고침을 시도하세요.
+                                </p>
+                            </div>
+                            
+                            <div class="troubleshooting-step">
+                                <h6 class="mb-2">
+                                    <span class="badge bg-success me-2">2</span>
+                                    브라우저 캐시 삭제
+                                </h6>
+                                <p class="small mb-0">
+                                    브라우저 설정에서 캐시와 쿠키를 삭제해보세요.
+                                </p>
+                            </div>
+                            
+                            <div class="troubleshooting-step">
+                                <h6 class="mb-2">
+                                    <span class="badge bg-warning me-2">3</span>
+                                    다른 브라우저 시도
+                                </h6>
+                                <p class="small mb-0">
+                                    Chrome, Firefox, Safari 등 다른 브라우저로 접속해보세요.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 연락처 정보 -->
+                    <hr class="my-4">
+                    <div class="text-center">
+                        <h6 class="text-muted">문제가 계속 발생하나요?</h6>
+                        <p class="small text-muted mb-3">
+                            아래 정보를 포함하여 문의해주세요:
+                        </p>
+                        <div class="error-report-info">
+                            <div class="row text-center">
+                                <div class="col-md-3">
+                                    <small class="text-muted">오류 시간</small>
+                                    <div class="fw-bold" id="errorTime"></div>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">페이지 URL</small>
+                                    <div class="fw-bold small" id="errorUrl"></div>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">브라우저</small>
+                                    <div class="fw-bold" id="userBrowser"></div>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">오류 ID</small>
+                                    <div class="fw-bold" id="errorId"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <button onclick="copyErrorInfo()" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-copy me-1"></i>
+                                오류 정보 복사
+                            </button>
+                            <button onclick="reportError()" class="btn btn-outline-primary btn-sm ms-2">
+                                <i class="fas fa-bug me-1"></i>
+                                오류 신고
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 추가 도움말 링크 -->
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-8 text-center">
+                <div class="additional-help">
+                    <h6 class="text-muted mb-3">추가 도움이 필요하신가요?</h6>
+                    <div class="help-links">
+                        <a href="{{ url_for('index') }}#help" class="btn btn-outline-info btn-sm me-2">
+                            <i class="fas fa-question-circle me-1"></i>
+                            도움말
+                        </a>
+                        <a href="{{ url_for('index') }}#contact" class="btn btn-outline-secondary btn-sm me-2">
+                            <i class="fas fa-envelope me-1"></i>
+                            문의하기
+                        </a>
+                        <button onclick="showSystemDiagnostic()" class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-stethoscope me-1"></i>
+                            시스템 진단
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 시스템 진단 모달 -->
+<div class="modal fade" id="diagnosticModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-stethoscope me-2"></i>
+                    시스템 진단
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="diagnosticResults">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">진단 중...</span>
+                        </div>
+                        <p class="mt-2">시스템을 진단하고 있습니다...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="runDiagnostic()">
+                    <i class="fas fa-sync-alt me-1"></i>
+                    다시 진단
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 오류 정보 표시
+    displayErrorInfo();
+    
+    // AI 서비스 관련 오류인 경우 상태 확인 버튼 표시
+    if ('{{ error }}'.includes('AI') || '{{ error }}'.includes('503')) {
+        document.querySelector('.status-check').style.display = 'block';
+    }
+});
+
+function displayErrorInfo() {
+    // 현재 시간
+    const now = new Date();
+    document.getElementById('errorTime').textContent = now.toLocaleString('ko-KR');
+    
+    // 현재 URL
+    const url = window.location.href;
+    document.getElementById('errorUrl').textContent = url.length > 30 ? 
+        url.substring(0, 30) + '...' : url;
+    
+    // 브라우저 정보
+    const browser = getBrowserInfo();
+    document.getElementById('userBrowser').textContent = browser;
+    
+    // 오류 ID 생성
+    const errorId = generateErrorId();
+    document.getElementById('errorId').textContent = errorId;
+}
+
+function getBrowserInfo() {
+    const ua = navigator.userAgent;
+    if (ua.includes('Chrome')) return 'Chrome';
+    if (ua.includes('Firefox')) return 'Firefox';
+    if (ua.includes('Safari')) return 'Safari';
+    if (ua.includes('Edge')) return 'Edge';
+    return 'Unknown';
+}
+
+function generateErrorId() {
+    return 'ERR-' + Date.now().toString(36).toUpperCase();
+}
+
+async function checkServiceStatus() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    const resultDiv = document.getElementById('statusResult');
+    
+    // 로딩 상태
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>확인 중...';
+    button.disabled = true;
+    
+    try {
+        const response = await fetch('/api/status');
+        const data = await response.json();
+        
+        if (data.status === 'available') {
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    AI 서비스가 정상적으로 작동하고 있습니다.
+                </div>
+            `;
+            
+            // 3초 후 페이지 새로고침 제안
+            setTimeout(() => {
+                if (confirm('서비스가 복구되었습니다. 페이지를 새로고침하시겠습니까?')) {
+                    location.reload();
+                }
+            }, 3000);
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    서비스에 여전히 문제가 있습니다: ${data.message}
+                </div>
+            `;
+        }
+    } catch (error) {
+        resultDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-times-circle me-2"></i>
+                서비스 상태를 확인할 수 없습니다.
+            </div>
+        `;
+    } finally {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    }
+}
+
+function copyErrorInfo() {
+    const errorInfo = {
+        time: document.getElementById('errorTime').textContent,
+        url: window.location.href,
+        browser: document.getElementById('userBrowser').textContent,
+        errorId: document.getElementById('errorId').textContent,
+        error: '{{ error }}',
+        userAgent: navigator.userAgent
+    };
+    
+    const infoText = Object.entries(errorInfo)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join('\n');
+    
+    if (window.MathQAUtils?.copyToClipboard) {
+        window.MathQAUtils.copyToClipboard(infoText).then(success => {
+            if (success) {
+                showToast('오류 정보가 클립보드에 복사되었습니다.', 'success');
+            } else {
+                showToast('복사에 실패했습니다.', 'error');
+            }
+        });
+    } else {
+        // 폴백: 텍스트 선택
+        const textarea = document.createElement('textarea');
+        textarea.value = infoText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            showToast('오류 정보가 복사되었습니다.', 'success');
+        } catch (err) {
+            showToast('복사에 실패했습니다.', 'error');
+        }
+        document.body.removeChild(textarea);
+    }
+}
+
+function reportError() {
+    // 오류 신고 기능 (실제 구현시 서버로 전송)
+    const errorReport = {
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        error: '{{ error }}',
+        userAgent: navigator.userAgent,
+        userId: localStorage.getItem('user_id') || 'anonymous'
+    };
+    
+    // 개발 환경에서는 콘솔에 출력
+    console.log('Error Report:', errorReport);
+    
+    showToast('오류가 신고되었습니다. 빠른 시일 내에 수정하겠습니다.', 'info');
+}
+
+function showSystemDiagnostic() {
+    const modal = new bootstrap.Modal(document.getElementById('diagnosticModal'));
+    modal.show();
+    
+    // 모달이 표시된 후 진단 실행
+    setTimeout(runDiagnostic, 500);
+}
+
+async function runDiagnostic() {
+    const resultDiv = document.getElementById('diagnosticResults');
+    
+    // 로딩 표시
+    resultDiv.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">진단 중...</span>
+            </div>
+            <p class="mt-2">시스템을 진단하고 있습니다...</p>
+        </div>
+    `;
+    
+    // 진단 수행
+    const diagnostics = [];
+    
+    // 네트워크 연결 확인
+    try {
+        await fetch('/', { method: 'HEAD' });
+        diagnostics.push({ name: '네트워크 연결', status: 'success', message: '정상' });
+    } catch (error) {
+        diagnostics.push({ name: '네트워크 연결', status: 'error', message: '연결 실패' });
+    }
+    
+    // 로컬 스토리지 확인
+    try {
+        localStorage.setItem('test', 'test');
+        localStorage.removeItem('test');
+        diagnostics.push({ name: '로컬 스토리지', status: 'success', message: '정상' });
+    } catch (error) {
+        diagnostics.push({ name: '로컬 스토리지', status: 'error', message: '사용 불가' });
+    }
+    
+    // JavaScript 오류 확인
+    if (window.MathQAUtils?.errorReporter) {
+        const errors = window.MathQAUtils.errorReporter.getErrors(5);
+        if (errors.length > 0) {
+            diagnostics.push({ 
+                name: 'JavaScript 오류', 
+                status: 'warning', 
+                message: `최근 ${errors.length}개 오류 발견` 
+            });
+        } else {
+            diagnostics.push({ name: 'JavaScript 오류', status: 'success', message: '오류 없음' });
+        }
+    }
+    
+    // AI 서비스 상태 확인
+    try {
+        const response = await fetch('/api/status');
+        const data = await response.json();
+        diagnostics.push({ 
+            name: 'AI 서비스', 
+            status: data.status === 'available' ? 'success' : 'error',
+            message: data.message 
+        });
+    } catch (error) {
+        diagnostics.push({ name: 'AI 서비스', status: 'error', message: '응답 없음' });
+    }
+    
+    // 결과 표시
+    const resultsHtml = diagnostics.map(diag => {
+        const iconClass = diag.status === 'success' ? 'fa-check-circle text-success' :
+                         diag.status === 'warning' ? 'fa-exclamation-triangle text-warning' :
+                         'fa-times-circle text-danger';
+        
+        return `
+            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                <span>${diag.name}</span>
+                <span>
+                    <i class="fas ${iconClass} me-2"></i>
+                    ${diag.message}
+                </span>
+            </div>
+        `;
+    }).join('');
+    
+    resultDiv.innerHTML = `
+        <h6 class="mb-3">진단 결과</h6>
+        ${resultsHtml}
+        <div class="mt-3 text-muted small">
+            진단 완료 시간: ${new Date().toLocaleString('ko-KR')}
+        </div>
+    `;
+}
+
+function showToast(message, type = 'info') {
+    // 간단한 토스트 메시지 (실제로는 Bootstrap Toast 사용 권장)
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type} position-fixed`;
+    toast.style.cssText = `
+        top: 20px; 
+        right: 20px; 
+        z-index: 9999; 
+        min-width: 300px;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'info'}-circle me-2"></i>
+        ${message}
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => document.body.removeChild(toast), 300);
+    }, 3000);
+}
+
+// CSS 애니메이션 동적 추가
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}
