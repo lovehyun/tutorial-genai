@@ -3,35 +3,43 @@ import json
 import sys
 import subprocess
 import threading
+import os
 
 def log_message(msg):
     """로그를 stderr과 별도 파일에 동시 출력"""
     print(msg, file=sys.stderr)
     # 로그 파일에도 저장
-    with open("proxy_debug.log", "a", encoding="utf-8") as f:
+    with open("debug_proxy.log", "a", encoding="utf-8") as f:
         f.write(msg + "\n")
         f.flush()
 
 def main():
     if len(sys.argv) < 2:
-        log_message("[PROXY] 사용법: python simple_proxy.py <서버파일>")
+        log_message("[PROXY] 사용법: python debug_proxy.py <서버파일>")
         return
     
     server_file = sys.argv[1]
     
     # 로그 파일 초기화
-    with open("proxy_debug.log", "w") as f:
+    with open("debug_proxy.log", "w", encoding="utf-8") as f:
         f.write("=== MCP Proxy Debug Log ===\n")
     
     # 서버 시작
     log_message(f"[PROXY] 서버 시작: {server_file}")
+    env = os.environ.copy()
+    env['PYTHONIOENCODING'] = 'utf-8'
+    env['PYTHONUNBUFFERED'] = '1'
+    
     server = subprocess.Popen(
         ["python", server_file],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
-        bufsize=1
+        encoding='utf-8',
+        errors='replace',  # 인코딩 에러 시 ?로 대체
+        bufsize=1,
+        env=env
     )
     
     # 서버 stderr 로깅

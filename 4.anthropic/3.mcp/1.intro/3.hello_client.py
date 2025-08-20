@@ -1,4 +1,10 @@
 import asyncio
+# MCP 클라이언트/서버 프로토콜이 비동기 스트림 기반
+# stdio_client()가 내부적으로 프로세스를 띄우고 stdin/stdout을 비동기 스트림으로 관리합니다.
+# JSON-RPC 메시지가 계속 오가는데, 한쪽에서는 읽기(read), 다른 쪽에서는 쓰기(write)가 동시에 일어나야 합니다.
+# MCP는 단일 요청-응답뿐 아니라 알림(notification), 여러 도구 호출, 서버 로그 메시지 등 다양한 이벤트를 비동기적으로 받아야 합니다.
+# asyncio 이벤트 루프가 있어야 이런 동시성을 자연스럽게 다룰 수 있습니다.
+
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 

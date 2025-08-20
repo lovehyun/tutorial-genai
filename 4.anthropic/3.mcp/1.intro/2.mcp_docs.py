@@ -1,7 +1,8 @@
 # 주요 목적: MCP 라이브러리의 구조와 사용법을 이해하기 위해 클래스와 함수들의 문서와 소스코드를 출력합니다.
 
-import inspect
 from importlib.metadata import version
+import inspect
+
 from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 from mcp.server.fastmcp import FastMCP
@@ -11,17 +12,19 @@ print(f"\n---\nMCP version: {version('mcp')}")
 
 
 # FastMCP: MCP 서버를 빠르게 구축하기 위한 클래스
-# sse_app: Server-Sent Events 애플리케이션 관련 메서드
 print("\n---\nFastMCP class documentation:")
 print(inspect.getdoc(FastMCP))
+
+# sse_app: Server-Sent Events 애플리케이션 관련 메서드
 print("\n---\nFastMCP.sse_app method documentation:")
 print(inspect.getdoc(FastMCP.sse_app))
 
 
 # ClientSession: MCP 클라이언트 세션을 관리하는 클래스
-# initialize: 클라이언트 세션 초기화 메서드
 print("\n---\nClientSession class documentation:")
 print(inspect.getdoc(ClientSession))
+
+# initialize: 클라이언트 세션 초기화 메서드
 print("\n---\nClientSession.initialize method documentation:")
 print(inspect.getdoc(ClientSession.initialize))
 # 주요 특징:

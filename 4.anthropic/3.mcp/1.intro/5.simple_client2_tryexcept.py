@@ -5,18 +5,18 @@ from mcp.client.stdio import stdio_client
 
 async def main():
     print("==================================================")
-    print("MCP 디버깅 시작")
+    print("MCP 디버깅 시작 - Proxy 중계 서버를 통한 메시지 디버깅")
     print("==================================================")
     
     # 기존 로그 파일 삭제
-    if os.path.exists("proxy_debug.log"):
-        os.remove("proxy_debug.log")
+    if os.path.exists("debug_proxy.log"):
+        os.remove("debug_proxy.log")
     
     # 프록시를 통해 서버에 연결
     server_params = StdioServerParameters(
         command="python", 
         # args=["simple_server.py"]
-        args=["simple_proxy.py", "simple_server.py"]
+        args=["debug_proxy.py", "simple_server.py"]
     )
     
     try:
@@ -35,15 +35,13 @@ async def main():
                 
                 print("[CLIENT] hello 도구 호출 중...")
                 result = await asyncio.wait_for(
-                    session.call_tool("hello", {"name": "John"}), 
-                    timeout=5.0
+                    session.call_tool("hello", {"name": "John"}), timeout=5.0
                 )
                 print(f"[CLIENT] 결과: {result.content[0].text}")
                 
                 print("[CLIENT] 두 번째 호출...")
                 result2 = await asyncio.wait_for(
-                    session.call_tool("hello", {"name": "Alice"}), 
-                    timeout=5.0
+                    session.call_tool("hello", {"name": "Alice"}), timeout=5.0
                 )
                 print(f"[CLIENT] 결과: {result2.content[0].text}")
                 
@@ -66,8 +64,8 @@ async def main():
         # 잠깐 기다려서 로그가 완전히 기록되도록
         await asyncio.sleep(0.5)
         
-        if os.path.exists("proxy_debug.log"):
-            with open("proxy_debug.log", "r", encoding="utf-8") as f:
+        if os.path.exists("debug_proxy.log"):
+            with open("debug_proxy.log", "r", encoding="utf-8") as f:
                 content = f.read()
                 print(content)
         else:

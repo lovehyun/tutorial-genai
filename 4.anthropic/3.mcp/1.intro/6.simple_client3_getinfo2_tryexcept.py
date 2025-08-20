@@ -1,9 +1,24 @@
 import asyncio
+import os
+import sys
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
+# 인코딩 환경변수 설정 (한글 이슈)
+os.environ['PYTHONIOENCODING'] = 'utf-8'
+os.environ['PYTHONUNBUFFERED'] = '1'
+
 async def main():
-    server_params = StdioServerParameters(command="python", args=["simple_server2.py"])
+    # 프록시를 통해 서버에 연결
+    server_params = StdioServerParameters(
+        command="python", 
+        # args=["simple_server2.py"]
+        args=["debug_proxy.py", "simple_server2.py"],
+        env={  # 한글 이슈
+            "PYTHONIOENCODING": "utf-8",
+            "PYTHONUNBUFFERED": "1"
+        }
+    )
 
     async with stdio_client(server_params) as (read, write):
         async with ClientSession(read, write) as session:

@@ -3,7 +3,7 @@ import json
 from mcp.server.fastmcp import FastMCP
 
 # 최소 확장 MCP 서버 생성
-mcp = FastMCP("MinimalServer")
+mcp = FastMCP("SimpleServer2")
 
 # === 도구 1개 ===
 @mcp.tool()
@@ -18,7 +18,7 @@ def get_info() -> str:
     """서버 정보를 반환합니다."""
     print(f"[SERVER] get_info 리소스 요청됨", file=sys.stderr)
     info = {
-        "server_name": "MinimalServer",
+        "server_name": "SimpleServer2",
         "message": "이것은 테스트 리소스입니다"
     }
     return json.dumps(info, indent=2, ensure_ascii=False)

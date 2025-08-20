@@ -1,3 +1,7 @@
+# 서버 개발 디버깅
+# pip install "mcp[cli]"
+# uv run mcp dev hello_server.py
+
 from mcp.server.fastmcp import FastMCP
 
 # FastMCP 객체 생성

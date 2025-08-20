@@ -53,27 +53,33 @@ async def main():
             
             # 2. 사용 가능한 도구 목록 조회
             print(f"\n사용 가능한 도구:")
-            tools_response = await session.list_tools()
-            if tools_response and hasattr(tools_response, 'tools') and tools_response.tools:
-                for i, tool in enumerate(tools_response.tools, 1):
-                    print(f"   {i}. {tool.name}")
-                    if hasattr(tool, 'description'):
-                        print(f"      설명: {tool.description}")
-                    
-                    # 매개변수 정보 출력
-                    if hasattr(tool, 'inputSchema') and tool.inputSchema:
-                        schema = tool.inputSchema
-                        if isinstance(schema, dict) and 'properties' in schema:
-                            print(f"      매개변수:")
-                            for param_name, param_info in schema['properties'].items():
-                                param_type = param_info.get('type', 'unknown')
-                                param_desc = param_info.get('description', '설명 없음')
-                                required = param_name in schema.get('required', [])
-                                required_mark = " (필수)" if required else " (선택)"
-                                print(f"         - {param_name} ({param_type}){required_mark}: {param_desc}")
-                    print()
-            else:
-                print("   사용 가능한 도구가 없습니다.")
+            try:
+                tools_response = await session.list_tools()
+                if tools_response and hasattr(tools_response, 'tools') and tools_response.tools:
+                    for i, tool in enumerate(tools_response.tools, 1):
+                        print(f"   {i}. {tool.name}")
+                        if hasattr(tool, 'description'):
+                            print(f"      설명: {tool.description}")
+                        
+                        # 매개변수 정보 출력
+                        if hasattr(tool, 'inputSchema') and tool.inputSchema:
+                            schema = tool.inputSchema
+                            if isinstance(schema, dict) and 'properties' in schema:
+                                print(f"      매개변수:")
+                                for param_name, param_info in schema['properties'].items():
+                                    param_type = param_info.get('type', 'unknown')
+                                    param_desc = param_info.get('description', '설명 없음')
+                                    required = param_name in schema.get('required', [])
+                                    required_mark = " (필수)" if required else " (선택)"
+                                    print(f"         - {param_name} ({param_type}){required_mark}: {param_desc}")
+                        print()
+                else:
+                    print("   사용 가능한 도구가 없습니다.")
+            except Exception as e:
+                print(f"   도구 목록 조회 실패: {e}")
+                # 에러 상세 정보 출력
+                import traceback
+                print(f"   에러 상세: {traceback.format_exc()}")
             
             print(f"\n도구 실행 데모:")
             # ===== 도구 1: hello 도구 호출 =====
