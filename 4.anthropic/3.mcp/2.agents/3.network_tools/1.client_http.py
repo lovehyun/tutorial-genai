@@ -6,11 +6,11 @@ async def main():
     print("=" * 50)
     print("HTTP MCP 클라이언트 시작")
     print("=" * 50)
-    print("서버 연결 중: http://localhost:8000/mcp/")
+    print("서버 연결 중: http://localhost:8000/mcp")
     
     try:
         # Streamable HTTP로 연결
-        async with streamablehttp_client("http://localhost:8000/mcp/") as (read, write, _):
+        async with streamablehttp_client("http://localhost:8000/mcp") as (read, write, _):
             async with ClientSession(read, write) as session:
                 
                 # 서버와 핸드셰이크 수행

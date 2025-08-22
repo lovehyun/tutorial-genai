@@ -15,7 +15,7 @@
 # uv run hello_server.py
  
 # 5.1 설정 파일 위치
-# Windows: %APPDATA%\Claude\claude_desktop_config.json
+# Windows: %APPDATA%\Claude\claude_desktop_config.json  (APPDATA = C:\Users\loveh\AppData\Roaming)
 # macOS: ~/Library/Application Support/Claude/claude_desktop_config.json
 
 from mcp.server.fastmcp import FastMCP
