@@ -8,9 +8,9 @@ SERVER_FILE = "math_server.py"  # 서버 스크립트 파일명
 
 def _extract_text(result) -> str:
     """MCP call_tool 응답에서 텍스트를 안전하게 추출"""
-    if hasattr(result, "content") and result.content:
+    if hasattr(result, "content") and result.content:  # 'content' 라는 속성이 있고 빈 리스트가 아닐 경우
         item = result.content[0]
-        return getattr(item, "text", None) or str(item)
+        return getattr(item, "text", None) or str(item)  # text 속성이 있으면 그 값을 가져옴, 아니면 문자열 파싱
     return ""
 
 async def main():

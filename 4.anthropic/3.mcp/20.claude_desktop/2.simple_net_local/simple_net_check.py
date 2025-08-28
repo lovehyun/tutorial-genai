@@ -2,7 +2,7 @@
 # 최소 기능: ping, 주요 포트(22/80/443/3000/5000/8000) 열림/닫힘 확인, 80/5000 페이지 내용 가져오기
 # stdout 에 print() 절대 금지! 로깅은 stderr로만.
 from mcp.server.fastmcp import FastMCP
-import asyncio, platform, socket, logging
+import asyncio, platform, socket, sys, logging
 from typing import Dict, List
 from urllib.parse import quote
 from urllib.request import Request, urlopen
@@ -121,5 +121,12 @@ async def fetch_page(host: str, port: int = 80, path: str = "/", max_bytes: int 
 
 if __name__ == "__main__":
     # 절대 stdout 에 print() 금지. logging 은 stderr 로 출력됨.
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(
+        level=logging.INFO,
+        stream=sys.stderr,
+        format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+    )
+    
+    logger = logging.getLogger("simple-net-server")
+    logger.info("MCP server stopped")
     mcp.run(transport="stdio")

@@ -23,7 +23,7 @@ def get_info() -> str:
     }
     return json.dumps(info, indent=2, ensure_ascii=False)
 
-# === 프롬프트 1개 ===
+# === 프롬프트 2개 ===
 @mcp.prompt()
 def greeting(name: str = "사용자") -> str:
     """간단한 인사 프롬프트입니다."""
@@ -33,7 +33,20 @@ def greeting(name: str = "사용자") -> str:
     
     return prompt
 
+@mcp.prompt()
+def translate(text: str, target_lang: str = "English") -> str:
+    """텍스트를 다른 언어로 번역하는 프롬프트 템플릿"""
+    return f"""
+다음 문장을 {target_lang}로 번역해 주세요:
+
+{text}
+"""
+
 if __name__ == "__main__":
     print("[SERVER] 최소 확장 서버 시작됨", file=sys.stderr)
-    print("[SERVER] 제공 기능: 도구 1개, 리소스 1개, 프롬프트 1개", file=sys.stderr)
+    print("[SERVER] 제공 기능: 도구 1개, 리소스 1개, 프롬프트 2개", file=sys.stderr)
     mcp.run()
+
+# tool = 실행할 수 있는 기능(API 호출)
+# resource = URI로 접근 가능한 데이터
+# prompt = LLM에 전달할 수 있는 프롬프트 템플릿

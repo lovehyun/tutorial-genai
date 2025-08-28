@@ -6,12 +6,7 @@ from contextlib import AsyncExitStack
 # 여러 서버 세션을 동시에 열고, main 루프가 끝날 때까지 유지하기 위해 AsyncExitStack 사용
 
 import traceback  # 실패 시 오류 분석용
-
 import re  # 인자갓 추출용
-
-import asyncio
-from contextlib import AsyncExitStack
-# 여러 서버 세션을 동시에 열고, main 루프가 끝날 때까지 유지하기 위해 ExitStack 사용
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -154,7 +149,7 @@ async def main():
             executed = False
             # 모든 세션을 돌면서 해당 도구가 있는 서버에 호출 시도
             for server_name, session, tools in sessions:
-                if tool_name not in tools:
+                if tool_name not in tools:  # 현재 세션에 해당 도구 없으면 건너뛰기
                     continue
                 try:
                     result = await session.call_tool(tool_name, params)

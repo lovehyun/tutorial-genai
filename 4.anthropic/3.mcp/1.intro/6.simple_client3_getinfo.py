@@ -66,5 +66,26 @@ async def main():
                 result = await session.call_tool(first_tool.name, test_args)
                 print(f"결과: {result.content[0].text}")
 
+             # 5. 프롬프트 호출 → OpenAI로 번역 실행을 위한 프롬프트 받아오기
+            print("\n=== 프롬프트 호출: translate → 번역을 위한 프롬프트 요청 ===")
+            prompt_args = {
+                "text": "안녕하세요. 오늘 회의는 오후 3시에 시작합니다.",
+                "target_lang": "English"
+            }
+            
+            # 5-1) 최신 스타일 우선 시도
+            if hasattr(session, "prompts") and hasattr(session.prompts, "get"):
+                prompt_text = await session.prompts.get("translate", prompt_args)
+
+            # 5-2) 구버전 API 시도
+            elif hasattr(session, "get_prompt"):
+                prompt_text = await session.get_prompt("translate", prompt_args)
+
+            else:
+                raise RuntimeError("이 MCP 클라이언트에는 prompt get API가 없어 프롬프트를 가져올 수 없습니다.")
+
+            print("\n=== 생성된 프롬프트(LLM에 보낼 지시문) ===")
+            print(prompt_text)
+
 if __name__ == "__main__":
     asyncio.run(main())
