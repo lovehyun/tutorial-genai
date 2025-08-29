@@ -1,16 +1,19 @@
 # simple_net_server.py
 # 최소 기능: ping, 주요 포트(22/80/443/3000/5000/8000) 열림/닫힘 확인, 80/5000 페이지 내용 가져오기
 # stdout 에 print() 절대 금지! 로깅은 stderr로만.
-from mcp.server.fastmcp import FastMCP
 import asyncio, platform, socket, sys, logging
 from typing import Dict, List
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
+from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("simple-net-local")  # Claude 도구 패널에 표시될 서버 이름
 
 COMMON_PORTS: List[int] = [22, 80, 443, 3000, 5000, 8000]
+
+# ===== 로거 준비 =====
+logger = logging.getLogger("simple-net-server")
 
 def _clamp(v: int, lo: int, hi: int) -> int:
     return max(lo, min(hi, v))
@@ -22,6 +25,8 @@ async def ping_host(host: str, count: int = 3, timeout_sec: int = 3) -> str:
     - count: 1~5
     - timeout_sec: 1~5 (패킷 당 타임아웃)
     """
+    logger.info(f"ping_host 호출됨: host={host}, count={count}, timeout_sec={timeout_sec}")
+    
     host = (host or "").strip()
     if not host:
         raise ValueError("host 를 입력하세요.")
@@ -39,10 +44,15 @@ async def ping_host(host: str, count: int = 3, timeout_sec: int = 3) -> str:
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
-    out, err = await proc.communicate()
-    text = (out or b"").decode("utf-8", "ignore")
-    if not text:
-        text = (err or b"").decode("utf-8", "ignore")
+    out, err = await proc.communicate()  # 윈도우 기준 결과는 bytes 타입임
+    
+    if isinstance(out, bytes): # bytes 인 경우 decode 통해서 str 타입으로 변환
+        text = (out or b"").decode("utf-8", "ignore")
+        if not text:
+            text = (err or b"").decode("utf-8", "ignore")
+    else:
+        text = out or err
+    
     return text
 
 async def _check_one_port(host: str, port: int, timeout_sec: float) -> str:
@@ -62,6 +72,8 @@ async def check_common_ports(host: str, timeout_sec: int = 1) -> Dict[str, str]:
     host 의 주요 포트(22,80,443,3000,5000,8000)를 빠르게 확인합니다.
     반환: {"22": "open/closed", ...}
     """
+    logger.info(f"check_common_ports 호출됨: host={host}, timeout_sec={timeout_sec}")
+    
     host = (host or "").strip()
     if not host:
         raise ValueError("host 를 입력하세요.")
@@ -69,6 +81,7 @@ async def check_common_ports(host: str, timeout_sec: int = 1) -> Dict[str, str]:
 
     tasks = [asyncio.create_task(_check_one_port(host, p, timeout_sec)) for p in COMMON_PORTS]
     results = await asyncio.gather(*tasks)
+    
     return {str(p): status for p, status in zip(COMMON_PORTS, results)}
 
 @mcp.tool()
@@ -78,6 +91,8 @@ async def fetch_page(host: str, port: int = 80, path: str = "/", max_bytes: int 
     - path 는 기본 "/" (간단히 사용)
     - max_bytes 만큼만 본문을 읽어 반환(기본 100KB)
     """
+    logger.info(f"fetch_page 호출됨: host={host}, port={port}, path={path}, max_bytes={max_bytes}")
+    
     host = (host or "").strip()
     if not host:
         raise ValueError("host 를 입력하세요.")
@@ -89,6 +104,7 @@ async def fetch_page(host: str, port: int = 80, path: str = "/", max_bytes: int 
     url = f"http://{host}:{port}{quote(path)}"
 
     req = Request(url, headers={"User-Agent": "simple-net-mcp/1.0", "Accept": "*/*"})
+
     try:
         # blocking I/O -> thread
         def _do_request():
@@ -123,10 +139,9 @@ if __name__ == "__main__":
     # 절대 stdout 에 print() 금지. logging 은 stderr 로 출력됨.
     logging.basicConfig(
         level=logging.INFO,
-        stream=sys.stderr,
+        stream=sys.stderr, # 기본도 stderr지만, 명시하면 의도 명확
         format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
     )
     
-    logger = logging.getLogger("simple-net-server")
-    logger.info("MCP server stopped")
+    logger.info("MCP server started")
     mcp.run(transport="stdio")

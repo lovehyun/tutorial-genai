@@ -18,10 +18,10 @@ simple-file-mcp/
 ## 서버 코드 (server.py)
 
 ```python
-from mcp.server.fastmcp import FastMCP
 import os
 import shutil
 from pathlib import Path
+from mcp.server.fastmcp import FastMCP
 
 # 작업 디렉토리 설정
 WORK_DIR = Path("./files")

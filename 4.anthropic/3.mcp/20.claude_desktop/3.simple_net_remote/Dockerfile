@@ -3,10 +3,10 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY simple_net_server_http.py /app/
+COPY simple_net_server.py /app/
 
 RUN pip install --no-cache-dir "mcp[cli]"
 
-EXPOSE 8888
+EXPOSE 8000
 
-CMD ["python", "simple_net_server_http.py"]
+CMD ["python", "simple_net_server.py"]

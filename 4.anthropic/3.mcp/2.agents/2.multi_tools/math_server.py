@@ -22,15 +22,15 @@ if __name__ == "__main__":
     print("[MATH_SERVER] 제공 기능: hello, add", file=sys.stderr)
     mcp.run()
 
-# 초기화
+# 1. 초기화
 # {"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"cli-test","version":"0.1.0"}}}
-# initialized 알림(중요, id 없음)
+# 2. initialized 알림(중요, id 없음)
 # {"jsonrpc":"2.0","method":"notifications/initialized"}
-# 도구 목록 조회
+# 3. 도구 목록 조회
 # {"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}
-# hello 호출
+# 4. hello 호출
 # {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"hello","arguments":{"name":"Alice"}}}
-# add 호출
+# 5. add 호출
 # {"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"add","arguments":{"a":5,"b":7}}}
 
 # python math_server.py <<'EOF'

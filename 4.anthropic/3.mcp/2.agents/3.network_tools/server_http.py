@@ -57,3 +57,16 @@ if __name__ == "__main__":
     
     # HTTP 서버로 실행
     mcp.run(transport="streamable-http")
+
+
+# 1. SSE (Server-Sent Events) 방식
+# MCP 버전: 2024-11-05 프로토콜 버전에서 사용된 구식 방식
+# 현재 상태: 2025-03-26 MCP 명세 버전부터 deprecated(폐지 예정)
+# mcp.run(transport="sse", host="127.0.0.1", port=8000)
+
+# 2. Streamable HTTP 방식
+# MCP 버전: 2025-03-26 프로토콜 버전에서 도입된 새로운 방식
+# mcp.run(transport="streamable-http", host="127.0.0.1", port=8000)
+# 또는
+# mcp.run(transport="http", host="127.0.0.1", port=8000, path="/mcp")
+# (결과는 동일) http -> streamable-http 의 별칭일뿐 둘다 결론은 streamable-http임

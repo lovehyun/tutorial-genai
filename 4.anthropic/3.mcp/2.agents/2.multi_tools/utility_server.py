@@ -1,4 +1,4 @@
-import sys
+import logging
 import datetime
 from mcp.server.fastmcp import FastMCP
 
@@ -8,14 +8,14 @@ mcp = FastMCP("UtilityServer")
 @mcp.tool()
 def current_time() -> str:
     """현재 시간을 반환합니다."""
-    print(f"[UTILITY_SERVER] current_time 호출됨", file=sys.stderr)
+    logging.info("current_time 호출됨")
     now = datetime.datetime.now()
     return f"현재 시간: {now.strftime('%Y-%m-%d %H:%M:%S')}"
 
 @mcp.tool()
 def weather(city: str = "서울") -> str:
     """지정된 도시의 날씨 정보를 반환합니다 (가상 데이터)."""
-    print(f"[UTILITY_SERVER] weather 호출됨: city={city}", file=sys.stderr)
+    logging.info(f"weather 호출됨: city={city}")
     
     # 가상 날씨 데이터
     weather_data = {
@@ -26,12 +26,18 @@ def weather(city: str = "서울") -> str:
     }
     
     weather_info = weather_data.get(city, "해당 도시의 날씨 정보는 없습니다.")
-    
     return f"{city} 날씨: {weather_info}"
 
 if __name__ == "__main__":
-    print("[UTILITY_SERVER] 유틸리티 서버 시작됨", file=sys.stderr)
-    print("[UTILITY_SERVER] 제공 기능: current_time, weather", file=sys.stderr)
+    # 로깅 설정: 시간, 레벨, 메시지를 포함하여 stderr에 출력
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    )
+
+    logging.info("유틸리티 서버 시작됨")
+    logging.info("제공 기능: current_time, weather")
+
     mcp.run()
 
 
