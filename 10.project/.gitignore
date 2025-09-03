@@ -1,2 +1,7 @@
+# pyinstaller
 build/
 dist/
+*.spec
+
+# iss installer
+*/installer/Output
