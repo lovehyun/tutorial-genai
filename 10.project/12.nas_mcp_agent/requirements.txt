@@ -1,0 +1,9 @@
+# runtime deps for mcp_filescan_* agent
+mcp==1.12.4            # FastMCP가 들어있는 MCP Python SDK
+python-dotenv==1.0.1   # .env 로드
+chardet==5.2.0         # 텍스트 인코딩 감지
+PyMuPDF==1.25.2        # PDF 텍스트 추출 (import fitz)
+python-docx==1.2.0     # DOCX 텍스트 추출
+
+# 선택: OS 마운트 없이 파이썬에서 SMB 직접 접근할 때만 필요
+# smbprotocol==1.15.0
