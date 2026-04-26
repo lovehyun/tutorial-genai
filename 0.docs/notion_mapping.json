@@ -1,0 +1,587 @@
+{
+  "00_OT": {
+    "notion_id": "3476ebae-57e1-8076-b1d5-dd250225d05d",
+    "notion_title": "0.오리엔테이션",
+    "action": "update",
+    "files": {
+      "01_schedule.md": {
+        "notion_id": "3476ebae-57e1-8091-883a-c467f98a3ad0",
+        "notion_title": "1.스케쥴",
+        "status": "matched",
+        "action": "update"
+      },
+      "02_developer_evolution.md": {
+        "notion_id": "3486ebae-57e1-80e3-a14d-f955352180c6",
+        "notion_title": "2.개발자의 진화",
+        "status": "matched",
+        "action": "update"
+      },
+      "03_developer_roles.md": {
+        "notion_id": "3486ebae-57e1-8084-8f46-fa79ef199c47",
+        "notion_title": "3.개발직군의 변화",
+        "status": "matched",
+        "action": "update"
+      },
+      "04_programming_languages.md": {
+        "notion_id": "3476ebae-57e1-80f3-878f-e4bf2c553d7e",
+        "notion_title": "4.개발언어의 변화",
+        "status": "matched",
+        "action": "update"
+      },
+      "05_generative_ai_intro.md": {
+        "notion_id": "3476ebae-57e1-8052-b661-df813170de47",
+        "notion_title": "5.생성형AI 개요",
+        "status": "matched",
+        "action": "update"
+      },
+      "06_vibe_coding.md": {
+        "notion_id": "3476ebae-57e1-80d4-b7b3-cb72b2b211a0",
+        "notion_title": "6.바이브코딩이란",
+        "status": "matched",
+        "action": "update"
+      },
+      "07_dev_environment_setup.md": {
+        "notion_id": "3476ebae-57e1-80d6-b084-f1bf5596c0cd",
+        "notion_title": "7.개발환경구축",
+        "status": "matched",
+        "action": "update"
+      },
+      "08_github_and_git_auth.md": {
+        "notion_id": "3496ebae-57e1-8148-abd9-feab16bec11c",
+        "notion_title": "8.GitHub와 Git 인증",
+        "status": "matched",
+        "action": "update"
+      }
+    }
+  },
+  "01_genai_intro": {
+    "notion_id": "3476ebae-57e1-80d1-a2f4-e59a2de5b9d8",
+    "notion_title": "1.생성형AI(입문)",
+    "action": "update",
+    "files": {
+      "01_genai_landscape.md": {
+        "notion_id": "3486ebae-57e1-808b-a365-e816e13db6b0",
+        "notion_title": "1.생성형AI 오버뷰",
+        "status": "matched",
+        "action": "update"
+      },
+      "02_llm_companies_models.md": {
+        "notion_id": "3486ebae-57e1-8071-aeb9-def18e0e7537",
+        "notion_title": "2.주요 LLM회사 및 모델들",
+        "status": "matched",
+        "action": "update"
+      },
+      "03_chatgpt_deep_dive.md": {
+        "notion_id": "3486ebae-57e1-8042-9815-ea4585a74945",
+        "notion_title": "3.ChatGPT 활용",
+        "status": "matched",
+        "action": "update"
+      },
+      "04_prompt_engineering.md": {
+        "notion_id": "3486ebae-57e1-80ab-b740-cb34af701b0c",
+        "notion_title": "4.프롬프트 엔지니어링",
+        "status": "matched",
+        "action": "update"
+      },
+      "05_so_what_now.md": {
+        "notion_id": "3486ebae-57e1-80c5-b01f-eb33f54ae327",
+        "notion_title": "5.지금시대의 프롬프트",
+        "status": "matched",
+        "action": "update"
+      }
+    }
+  },
+  "02_web_basics": {
+    "notion_id": "3476ebae-57e1-802b-807c-f4533a6ea3cb",
+    "notion_title": "2.웹개발기초",
+    "action": "update",
+    "files": {
+      "01_web_and_internet.md": {
+        "notion_id": "3486ebae-57e1-8080-9fdf-f70e4e0834a0",
+        "notion_title": "1.인터넷의 역사",
+        "status": "matched",
+        "action": "update"
+      },
+      "02_html.md": {
+        "notion_id": "3486ebae-57e1-807e-8d63-e486821734c2",
+        "notion_title": "2.HTML",
+        "status": "matched",
+        "action": "update"
+      },
+      "03_css.md": {
+        "notion_id": "3486ebae-57e1-80d7-8750-caa665147505",
+        "notion_title": "3.CSS",
+        "status": "matched",
+        "action": "update"
+      },
+      "04_javascript.md": {
+        "notion_id": "3486ebae-57e1-8075-8c2c-db5a5ef3bb23",
+        "notion_title": "4.JavaScript",
+        "status": "matched",
+        "action": "update"
+      },
+      "05_http_protocol.md": {
+        "notion_id": "3486ebae-57e1-8054-afae-eb0cefcb3013",
+        "notion_title": "5.HTTP",
+        "status": "matched",
+        "action": "update"
+      },
+      "06_web_servers_and_architecture.md": {
+        "notion_id": "3486ebae-57e1-8029-b9e9-e4e5ca95bbd4",
+        "notion_title": "6.웹서버",
+        "status": "matched",
+        "action": "update"
+      },
+      "07_was.md": {
+        "notion_id": "3486ebae-57e1-80b5-88b2-f81ad083b0db",
+        "notion_title": "7.WAS",
+        "status": "matched",
+        "action": "update"
+      },
+      "08_three_tier_and_ha.md": {
+        "notion_id": "3486ebae-57e1-8052-989e-ed5c3553149a",
+        "notion_title": "8.3-Tier 아키텍처",
+        "status": "matched",
+        "action": "update"
+      }
+    }
+  },
+  "03_python_webdev": {
+    "notion_id": "3496ebae-57e1-80a9-be96-ff8d22e49f3e",
+    "notion_title": "3.파이썬웹개발",
+    "action": "update",
+    "files": {
+      "01_python_history.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "create"
+      },
+      "02_python_syntax_basics.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "create"
+      },
+      "03_data_structures.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "create"
+      },
+      "04_functions_and_objects.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "create"
+      },
+      "05_builtins_stdlib_packages.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "create"
+      },
+      "06_flask_intro.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "create"
+      },
+      "07_fastapi_basics.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "create"
+      },
+      "08_template_engine.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "create"
+      },
+      "09_rest_api_design.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "create"
+      },
+      "10_board_project.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "create"
+      },
+      "11_auth_and_session.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "create"
+      },
+      "12_file_io_and_logging.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "create"
+      },
+      "13_external_api_and_gpt.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "create"
+      },
+      "14_social_login_oauth.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "create"
+      }
+    }
+  },
+  "04_database": {
+    "notion_id": null,
+    "notion_title": null,
+    "action": "skip",
+    "files": {
+      "01_database_fundamentals.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "02_rdbms_concepts.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "03_sql_basics_with_sqlite.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "04_sql_advanced.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "05_keys_constraints_indexes.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "06_normalization_and_transactions.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "07_python_db_integration.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "08_mysql_and_production_db.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "09_nosql_and_cap_theorem.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "10_mongodb_basics.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "11_vector_databases.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "12_vector_db_implementations.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "13_binary_storage_and_performance.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      }
+    }
+  },
+  "05_genai_advanced": {
+    "notion_id": null,
+    "notion_title": null,
+    "action": "skip",
+    "files": {
+      "01_openai_advanced.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "02_claude_api.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "03_gemini_api.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "04_prompt_engineering_code.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "05_context_engineering.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "06_rag_system.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "07_langchain_lcel.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "08_multimodal_ai.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "09_ai_agent_overview.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "10_langgraph_agents.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "11_mcp_model_context_protocol.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "12_huggingface_local.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "13_finetuning_lora.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "14_evaluation_safety.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "15_inference_serving.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      }
+    }
+  },
+  "06_genai_applied": {
+    "notion_id": null,
+    "notion_title": null,
+    "action": "skip",
+    "files": {
+      "01_document_qa_chatbot.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "02_code_review_service.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "03_exam_grading_service.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "04_ai_search_engine.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "05_content_generation.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "06_model_management_saas.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "07_ai_agent_service.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      }
+    }
+  },
+  "07_cloud": {
+    "notion_id": null,
+    "notion_title": null,
+    "action": "skip",
+    "files": {
+      "01_cloud_computing_fundamentals.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "02_aws_overview_and_iam.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "03_ec2_deep_dive.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "04_networking_vpc.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "05_storage_s3_ebs.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "06_docker_containerization.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "07_aws_managed_services.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "08_deployment_architecture.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "09_monitoring_and_cost.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "10_cloud_rag_application.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      }
+    }
+  },
+  "08_team_project": {
+    "notion_id": null,
+    "notion_title": null,
+    "action": "skip",
+    "files": {
+      "01_project_management.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "02_service_planning.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "03_collaboration_and_git.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "04_issue_management.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "05_cicd_fundamentals.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "06_github_actions.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "07_project_topics_and_evaluation.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      }
+    }
+  }
+}

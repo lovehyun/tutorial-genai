@@ -1,0 +1,5 @@
+# Notion 동기화 도구 의존성
+# pip install -r requirements-notion.txt
+
+notion-client>=2.0
+python-dotenv>=1.0

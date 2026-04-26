@@ -1,5 +1,6 @@
 # project credentials
 .env
+!.env.example
 gapi-*.json
 
 # python
@@ -26,9 +27,17 @@ chroma_db
 model_outputs/
 generated.png
 uploads/*
+pdf_output/
+
+# 별도 book 프로젝트 (각자 자체 git 리포)
+0.docs/09_vibe_coding_book/
+0.docs/10_data_analysis_book/
 
 # logging
 *.log
 
 # temp working directory
 TEMP/
+
+# Claude Code 자동 메모리/상태
+.claude/

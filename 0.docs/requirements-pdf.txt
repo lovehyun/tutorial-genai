@@ -1,0 +1,9 @@
+# PDF 핸드아웃 생성기 의존성
+# pip install -r requirements-pdf.txt
+
+markdown>=3.5
+pymdown-extensions>=10.0
+playwright>=1.40
+
+# 설치 후 Chromium 브라우저도 설치 필요:
+# playwright install chromium
