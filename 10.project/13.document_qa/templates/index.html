@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문서 QA</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; height: 100vh; display: flex; }
+
+        /* 사이드바 */
+        .sidebar { width: 280px; background: #fff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid #e0e0e0; }
+        .sidebar-header h2 { font-size: 16px; color: #333; margin-bottom: 12px; }
+
+        /* 업로드 영역 */
+        .upload-area {
+            border: 2px dashed #d0d0d0; border-radius: 8px; padding: 20px;
+            text-align: center; cursor: pointer; transition: all 0.3s;
+        }
+        .upload-area:hover, .upload-area.dragover { border-color: #4a90d9; background: #f0f7ff; }
+        .upload-area p { color: #888; font-size: 13px; margin-top: 8px; }
+        .upload-icon { font-size: 28px; }
+
+        /* 문서 목록 */
+        .doc-list { flex: 1; overflow-y: auto; padding: 12px; }
+        .doc-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 12px; background: #f8f9fa; border-radius: 6px; margin-bottom: 8px;
+        }
+        .doc-item .name { font-size: 13px; color: #333; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .doc-item .size { font-size: 11px; color: #999; margin: 0 8px; }
+        .doc-item .delete-btn {
+            background: none; border: none; color: #cc0000; cursor: pointer; font-size: 14px; padding: 2px 6px;
+        }
+        .doc-item .delete-btn:hover { background: #fee; border-radius: 4px; }
+
+        /* 채팅 영역 */
+        .main { flex: 1; display: flex; flex-direction: column; }
+        .chat-header { padding: 16px 24px; background: #fff; border-bottom: 1px solid #e0e0e0; }
+        .chat-header h1 { font-size: 18px; color: #333; }
+        .chat-header p { font-size: 12px; color: #888; margin-top: 4px; }
+
+        .chat-container { flex: 1; overflow-y: auto; padding: 24px; }
+        .message { max-width: 720px; margin: 0 auto 16px; }
+        .message.user .bubble { background: #4a90d9; color: #fff; border-radius: 12px 12px 4px 12px; padding: 12px 16px; display: inline-block; max-width: 80%; float: right; }
+        .message.assistant .bubble { background: #fff; color: #333; border: 1px solid #e0e0e0; border-radius: 12px 12px 12px 4px; padding: 12px 16px; display: inline-block; max-width: 80%; }
+        .message .label { font-size: 11px; color: #999; margin-bottom: 4px; }
+        .message.user .label { text-align: right; }
+        .message .sources { font-size: 11px; color: #888; margin-top: 8px; clear: both; }
+        .message .sources span { background: #f0f2f5; padding: 2px 8px; border-radius: 4px; margin-right: 4px; }
+        .clear { clear: both; }
+
+        .cursor { display: inline-block; width: 7px; height: 14px; background: #333; animation: blink 1s infinite; vertical-align: text-bottom; }
+        @keyframes blink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
+
+        /* 입력 영역 */
+        .input-area { background: #fff; border-top: 1px solid #e0e0e0; padding: 16px 24px; }
+        .input-wrapper { max-width: 720px; margin: 0 auto; display: flex; gap: 12px; }
+        .input-wrapper input {
+            flex: 1; padding: 12px 16px; border: 1px solid #d0d0d0; border-radius: 8px;
+            font-size: 14px; outline: none;
+        }
+        .input-wrapper input:focus { border-color: #4a90d9; }
+        .input-wrapper button {
+            padding: 12px 24px; background: #4a90d9; color: #fff; border: none; border-radius: 8px;
+            cursor: pointer; font-size: 14px; white-space: nowrap;
+        }
+        .input-wrapper button:hover { background: #3a7bc8; }
+        .input-wrapper button:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* 상태 메시지 */
+        .status { padding: 8px 12px; margin: 8px 12px; border-radius: 6px; font-size: 12px; text-align: center; }
+        .status.success { background: #e8f5e9; color: #2e7d32; }
+        .status.error { background: #fce4ec; color: #c62828; }
+        .status.info { background: #e3f2fd; color: #1565c0; }
+
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+    </style>
+</head>
+<body>
+    <!-- 사이드바 -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>문서 관리</h2>
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📄</div>
+                <p>클릭 또는 드래그하여<br>PDF/TXT 파일 업로드</p>
+            </div>
+            <input type="file" id="fileInput" accept=".pdf,.txt" style="display:none" onchange="uploadFile(this.files[0])">
+            <div id="uploadStatus"></div>
+        </div>
+        <div class="doc-list" id="docList">
+            <div class="empty-state">업로드된 문서가 없습니다</div>
+        </div>
+    </div>
+
+    <!-- 메인 채팅 영역 -->
+    <div class="main">
+        <div class="chat-header">
+            <h1>문서 QA</h1>
+            <p>업로드한 문서를 기반으로 질문에 답변합니다</p>
+        </div>
+        <div class="chat-container" id="chat">
+            <div class="empty-state">문서를 업로드하고 질문을 시작하세요</div>
+        </div>
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="questionInput" placeholder="문서에 대해 질문하세요..." onkeypress="if(event.key==='Enter')askQuestion()">
+                <button id="askBtn" onclick="askQuestion()">질문</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chat = document.getElementById('chat');
+        const docList = document.getElementById('docList');
+        let isFirstMessage = true;
+
+        // 드래그 앤 드롭
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) uploadFile(e.dataTransfer.files[0]);
+        });
+
+        // 파일 업로드
+        async function uploadFile(file) {
+            if (!file) return;
+            const status = document.getElementById('uploadStatus');
+            status.innerHTML = '<div class="status info">업로드 중...</div>';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetch('/upload', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (res.ok) {
+                    status.innerHTML = `<div class="status success">${data.message} (${data.chunks}개 청크)</div>`;
+                    loadDocuments();
+                } else {
+                    status.innerHTML = `<div class="status error">${data.error}</div>`;
+                }
+            } catch (e) {
+                status.innerHTML = `<div class="status error">업로드 실패: ${e.message}</div>`;
+            }
+            setTimeout(() => status.innerHTML = '', 3000);
+        }
+
+        // 문서 목록 로드
+        async function loadDocuments() {
+            try {
+                const res = await fetch('/documents');
+                const data = await res.json();
+                if (data.documents.length === 0) {
+                    docList.innerHTML = '<div class="empty-state">업로드된 문서가 없습니다</div>';
+                    return;
+                }
+                docList.innerHTML = data.documents.map(doc =>
+                    `<div class="doc-item">
+                        <span class="name" title="${doc.name}">${doc.name}</span>
+                        <span class="size">${doc.size}</span>
+                        <button class="delete-btn" onclick="deleteDoc('${doc.name}')" title="삭제">✕</button>
+                    </div>`
+                ).join('');
+            } catch (e) {
+                docList.innerHTML = '<div class="empty-state">목록 로드 실패</div>';
+            }
+        }
+
+        // 문서 삭제
+        async function deleteDoc(name) {
+            if (!confirm(`'${name}'을(를) 삭제하시겠습니까?`)) return;
+            await fetch(`/documents/${name}`, { method: 'DELETE' });
+            loadDocuments();
+        }
+
+        // 질문하기
+        async function askQuestion() {
+            const input = document.getElementById('questionInput');
+            const question = input.value.trim();
+            if (!question) return;
+
+            input.value = '';
+            document.getElementById('askBtn').disabled = true;
+
+            if (isFirstMessage) { chat.innerHTML = ''; isFirstMessage = false; }
+
+            // 사용자 메시지
+            const userDiv = document.createElement('div');
+            userDiv.className = 'message user';
+            userDiv.innerHTML = `<div class="label">사용자</div><div class="bubble">${escapeHtml(question)}</div><div class="clear"></div>`;
+            chat.appendChild(userDiv);
+
+            // AI 응답
+            const aiDiv = document.createElement('div');
+            aiDiv.className = 'message assistant';
+            aiDiv.innerHTML = `<div class="label">AI</div><div class="bubble"><span class="cursor"></span></div>`;
+            chat.appendChild(aiDiv);
+            const bubble = aiDiv.querySelector('.bubble');
+            chat.scrollTop = chat.scrollHeight;
+
+            let fullText = '';
+
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    bubble.innerHTML = err.error || '오류가 발생했습니다';
+                    document.getElementById('askBtn').disabled = false;
+                    return;
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let sources = [];
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    for (const line of chunk.split('\n')) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (data === '[DONE]') continue;
+                            try {
+                                const parsed = JSON.parse(data);
+                                if (parsed.content) {
+                                    fullText += parsed.content;
+                                    bubble.innerHTML = fullText.replace(/\n/g, '<br>') + '<span class="cursor"></span>';
+                                    chat.scrollTop = chat.scrollHeight;
+                                }
+                                if (parsed.sources) sources = parsed.sources;
+                            } catch (e) {}
+                        }
+                    }
+                }
+
+                bubble.innerHTML = fullText.replace(/\n/g, '<br>');
+                if (sources.length > 0) {
+                    const srcDiv = document.createElement('div');
+                    srcDiv.className = 'sources';
+                    srcDiv.innerHTML = '참고: ' + sources.map(s => `<span>${s}</span>`).join('');
+                    aiDiv.appendChild(srcDiv);
+                }
+            } catch (e) {
+                bubble.innerHTML = '오류가 발생했습니다: ' + e.message;
+            }
+
+            document.getElementById('askBtn').disabled = false;
+            input.focus();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 초기 문서 목록 로드
+        loadDocuments();
+    </script>
+</body>
+</html>
