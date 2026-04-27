@@ -23,7 +23,6 @@ LLM API는 기본적으로 **무상태(stateless)** — 매 호출마다 이전 
 | `0.langchain_review.py` | LangChain 기본 복습 |
 | `1.1_nomemory.py` | 메모리 없는 기본 상태 (비교용) |
 | `1.2_nomemory2_chatbot_cli.py` | 메모리 없는 CLI 챗봇 |
-| `2.1_memory_old.py` | 구버전 메모리 API |
 | `2.2_memory_old2_savecnt.py` | 구버전 메모리 (저장 횟수 제한) |
 | `3.1~3.4` | 신버전 메모리 (파일, SQLite 저장) |
 | `4.1~4.3` | 히스토리 관리 (세션, 세션 카운트) |

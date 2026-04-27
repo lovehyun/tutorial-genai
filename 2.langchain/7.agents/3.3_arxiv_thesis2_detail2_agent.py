@@ -2,7 +2,7 @@
 from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
-from langchain.schema import SystemMessage
+from langchain_core.messages import SystemMessage
 
 from langchain.agents import initialize_agent, AgentType
 from langchain_community.utilities.arxiv import ArxivAPIWrapper

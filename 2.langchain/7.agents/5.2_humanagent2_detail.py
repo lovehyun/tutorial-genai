@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
 from langchain.agents import load_tools, initialize_agent, AgentType
-from langchain.schema import SystemMessage
+from langchain_core.messages import SystemMessage
 
 load_dotenv()
 

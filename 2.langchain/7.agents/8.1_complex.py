@@ -5,7 +5,7 @@
 from dotenv import load_dotenv
 
 from langchain_openai import OpenAI, ChatOpenAI
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 from langchain.agents import initialize_agent, AgentType

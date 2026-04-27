@@ -3,10 +3,10 @@
 
 # pip install langchain langchain-openai
 # 현재 시점의 버전
-# langchain                 0.3.15
-# langchain-community       0.3.15
-# langchain-core            0.3.31
-# langchain-openai          0.2.14
+# langchain                 1.2.15
+# langchain-community       0.4.1
+# langchain-core            1.3.2
+# langchain-openai          1.2.1
 
 # | 클래스        | 모델 타입                  | 입력 타입                                                              | 설명                                             |
 # | ------------ | -------------------------- | --------------------------------------------------------------------- | ------------------------------------------------ |
@@ -49,7 +49,7 @@ result = llm.invoke(prompt)
 print(result.content)
 
 print('--- 3 ---')
-from langchain.schema import SystemMessage, HumanMessage, AIMessage
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 
 prompt1 = [
     HumanMessage(content="What's a good company name that makes arcade games?")

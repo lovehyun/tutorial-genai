@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 from langchain_openai import OpenAI
 from langchain_openai import ChatOpenAI
-from langchain.schema import SystemMessage, HumanMessage
+from langchain_core.messages import SystemMessage, HumanMessage
 
 # 환경 변수 로드
 load_dotenv(dotenv_path='../.env')

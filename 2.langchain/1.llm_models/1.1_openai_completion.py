@@ -3,10 +3,10 @@
 
 # pip install langchain langchain-openai
 # 현재 시점의 버전
-# langchain                 0.3.15
-# langchain-community       0.3.15
-# langchain-core            0.3.31
-# langchain-openai          0.2.14
+# langchain                 1.2.15
+# langchain-community       0.4.1
+# langchain-core            1.3.2
+# langchain-openai          1.2.1
 
 import os
 from dotenv import load_dotenv

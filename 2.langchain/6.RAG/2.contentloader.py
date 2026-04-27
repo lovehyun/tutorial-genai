@@ -9,7 +9,7 @@ from langchain_core.output_parsers import StrOutputParser
 # 임베딩 라이브러리
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import CharacterTextSplitter
+from langchain_text_splitters import CharacterTextSplitter
 
 # LangChain의 커뮤니티 통합 모듈 안에 있는 Chroma 래퍼 (Legacy)
 # pip install langchain-community chromadb tiktoken

@@ -11,7 +11,7 @@ from mcp.client.stdio import stdio_client
 from langchain.tools import BaseTool
 from langchain_openai import ChatOpenAI
 from langchain.agents import create_react_agent, AgentExecutor
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 
 load_dotenv()
 
