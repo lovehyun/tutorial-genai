@@ -15,7 +15,7 @@ client = anthropic.Anthropic(
 
 # 간단한 메시지 보내기
 message = client.messages.create(
-    model="claude-3-7-sonnet-20250219",  # 최신 모델, 사용 가능한 모델은 달라질 수 있음
+    model="claude-sonnet-4-20250514",  # 최신 모델, 사용 가능한 모델은 달라질 수 있음
     max_tokens=1000,
     temperature=0.7,
     messages=[

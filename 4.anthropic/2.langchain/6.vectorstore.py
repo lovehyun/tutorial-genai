@@ -1,14 +1,16 @@
-# pip install chromadb
+# pip install chromadb langchain-chroma langchain-openai
 
 import os
 from dotenv import load_dotenv
 
 from langchain_anthropic import ChatAnthropic
-from langchain.document_loaders import TextLoader
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.vectorstores import Chroma
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.chains import RetrievalQA
+from langchain_community.document_loaders import TextLoader
+from langchain_text_splitters import CharacterTextSplitter
+from langchain_chroma import Chroma
+from langchain_openai import OpenAIEmbeddings
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
 
 # 환경 변수 로드
 load_dotenv()
@@ -40,7 +42,7 @@ with open("ai_sample.txt", "w", encoding="utf-8") as f:
 
 # Claude 모델 초기화
 llm = ChatAnthropic(
-    model="claude-3-7-sonnet-20250219",  # 최신 모델
+    model="claude-sonnet-4-20250514",
     anthropic_api_key=anthropic_api_key,
     temperature=0.7,
     max_tokens=1000
@@ -77,43 +79,28 @@ similar_docs = vectorstore.similarity_search(query, k=3)
 print(f"질문: {query}")
 print(f"관련 문서 {len(similar_docs)}개를 찾았습니다.")
 
-# 관련 문서 내용 출력
 for i, doc in enumerate(similar_docs):
     print(f"\n관련 문서 #{i+1}:")
-    print(doc.page_content[:150] + "...")  # 문서 내용 일부만 출력
+    print(doc.page_content[:150] + "...")
 
-# 검색 결과를 기반으로 답변 생성
-retrieval_qa = RetrievalQA.from_chain_type(
-    llm=llm,
-    chain_type="stuff",
-    retriever=vectorstore.as_retriever(),
-    verbose=True
+# LCEL 기반 RAG 체인
+retriever = vectorstore.as_retriever()
+
+prompt = ChatPromptTemplate.from_template(
+    "다음 문서를 참고하여 질문에 답변해주세요.\n\n"
+    "문서:\n{context}\n\n질문: {question}"
 )
 
-result = retrieval_qa.invoke({"query": query})
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+rag_chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+result = rag_chain.invoke(query)
 print("\n최종 답변:")
-print(result["result"])
-
-
-# 임시 파일 삭제 (선택 사항)
-
-# 벡터스토어를 참조하는 변수를 해제하여 리소스를 정리
-# 최신 Chroma 버전에서는 persist() 메서드는 더 이상 필요 없으며 close() 메서드도 현재 버전에서 지원되지 않음
-# retrieval_qa = None
-# vectorstore = None
-# embeddings = None
-
-# # 약간의 시간 지연을 줘서 리소스가 해제되도록 함
-# import time
-# import shutil
-# print("\n리소스 정리 중...")
-# time.sleep(3)
-
-# try:
-#     if os.path.exists("./chroma_db"):
-#         shutil.rmtree("./chroma_db")
-#     if os.path.exists("ai_sample.txt"):
-#         os.remove("ai_sample.txt")
-#     print("임시 텍스트 파일이 삭제되었습니다.")
-# except Exception as e:
-#     print(f"파일 삭제 중 오류 발생: {e}")
+print(result)

@@ -12,7 +12,7 @@ class ModelParameterTester:
     def __init__(self, base_prompt="지구 온난화에 대해 설명해주세요."):
         self.client = client
         self.base_prompt = base_prompt
-        self.model = "claude-3-7-sonnet-20250219"
+        self.model = "claude-sonnet-4-20250514"
         self.results = {}
     
     def test_temperature(self, temperatures=[0.0, 0.5, 1.0], iterations=2):

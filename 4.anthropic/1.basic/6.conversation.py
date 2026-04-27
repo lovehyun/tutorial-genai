@@ -9,7 +9,7 @@ api_key = os.getenv("ANTHROPIC_API_KEY")
 client = anthropic.Anthropic(api_key=api_key)
 
 class ConversationManager:
-    def __init__(self, model="claude-3-7-sonnet-20250219", max_tokens=1000):
+    def __init__(self, model="claude-sonnet-4-20250514", max_tokens=1000):
         self.client = client
         self.model = model
         self.max_tokens = max_tokens

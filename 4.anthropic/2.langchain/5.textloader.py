@@ -2,17 +2,17 @@ import os
 from dotenv import load_dotenv
 
 from langchain_anthropic import ChatAnthropic
-from langchain.prompts import PromptTemplate, ChatPromptTemplate
-from langchain.chains import LLMChain
-from langchain.document_loaders import TextLoader
-from langchain.text_splitter import CharacterTextSplitter
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_community.document_loaders import TextLoader
+from langchain_text_splitters import CharacterTextSplitter
 
 # 환경 변수 로드
 load_dotenv()
 
 # Claude 모델 초기화
 llm = ChatAnthropic(
-    model="claude-3-7-sonnet-20250219",
+    model="claude-sonnet-4-20250514",
     anthropic_api_key=os.getenv("ANTHROPIC_API_KEY"),
     temperature=0.7
 )
@@ -31,14 +31,13 @@ docs = text_splitter.split_documents(documents)
 
 print(f"문서가 {len(docs)}개의 청크로 분할되었습니다.")
 
-# 첫 번째 청크에 대한 요약 생성
-summary_template = PromptTemplate(
-    input_variables=["text"],
-    template="다음 텍스트를 간결하게 요약해주세요:\n\n{text}"
+# LCEL 체인으로 요약
+summary_prompt = PromptTemplate.from_template(
+    "다음 텍스트를 간결하게 요약해주세요:\n\n{text}"
 )
+chain = summary_prompt | llm | StrOutputParser()
 
-summary_chain = LLMChain(llm=llm, prompt=summary_template)
 if docs:
-    summary = summary_chain.invoke({"text": docs[0].page_content})
+    summary = chain.invoke({"text": docs[0].page_content})
     print("첫 번째 청크 요약:")
-    print(summary["text"])
+    print(summary)
