@@ -91,7 +91,7 @@ user_message = "서울 날씨가 어때? 그리고 강남에 맛있는 일식집
 print(f"사용자: {user_message}\n")
 
 response = client.chat.completions.create(
-    model="gpt-3.5-turbo",
+    model="gpt-4o-mini",
     messages=[
         {"role": "system", "content": "당신은 유용한 AI 도우미입니다. 필요한 경우 도구를 사용하세요."},
         {"role": "user", "content": user_message}
@@ -135,7 +135,7 @@ if message.tool_calls:
 
     # 도구 결과를 포함한 최종 응답
     final_response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=messages,
         temperature=0,
     )
@@ -147,7 +147,7 @@ print("[2] Structured Output (JSON 모드)")
 print("-" * 40)
 
 response = client.chat.completions.create(
-    model="gpt-3.5-turbo",
+    model="gpt-4o-mini",
     messages=[
         {"role": "system", "content": "당신은 영화 정보를 JSON 형식으로 제공하는 도우미입니다. 반드시 JSON 형식으로 응답하세요."},
         {"role": "user", "content": "최근 인기 있는 한국 영화 3편의 제목, 감독, 장르, 평점을 알려줘"}
@@ -196,7 +196,7 @@ text = "안녕하세요, 저는 테크스타트 주식회사의 CTO 김민수입
 print(f"입력 텍스트: {text}\n")
 
 response = client.chat.completions.create(
-    model="gpt-3.5-turbo",
+    model="gpt-4o-mini",
     messages=[
         {"role": "system", "content": "텍스트에서 연락처 정보를 추출하세요."},
         {"role": "user", "content": text}

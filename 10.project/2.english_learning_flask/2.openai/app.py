@@ -39,7 +39,7 @@ def curriculum(grade, curriculum_id):
         if request.method == 'POST':
             user_input = request.form['user_input']
             response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o-mini",
                 # messages=[
                 #     {"role": "system", "content": f"당신은 학생이 {curriculum_title}에 대해 학습하도록 돕는 교사입니다."},
                 #     {"role": "user", "content": user_input}

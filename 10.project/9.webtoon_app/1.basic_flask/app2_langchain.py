@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 # LangChain LLM 초기화 (GPT 모델)
 llm = ChatOpenAI(
-    model="gpt-3.5-turbo",
+    model="gpt-4o-mini",
     temperature=0.5
 )
 

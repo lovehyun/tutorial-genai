@@ -15,7 +15,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # 소설 내용을 요약하는 함수 (최신 OpenAI SDK 사용)
 def summarize_text(text):
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": f"Summarize the following text into 5 short sentences:\n\n{text}"}
@@ -34,7 +34,7 @@ def summarize_text(text):
 def rewrite_for_image(text):
     try:
         response = client.chat.completions.create(
-            model="gpt-4o",  # 또는 gpt-3.5-turbo, 속도/비용 고려
+            model="gpt-4o",  # 또는 gpt-4o-mini, 속도/비용 고려
             messages=[
                 {"role": "system", "content": "You are a prompt safety editor for an image generator. Rephrase sentences to be safe and suitable for children's fairy tale illustrations. Avoid words like kill, murder, poison, death, etc."},
                 {"role": "user", "content": f"Rewrite the following sentence to be soft, safe, and appropriate for a children's story illustration:\n\n{text}"}

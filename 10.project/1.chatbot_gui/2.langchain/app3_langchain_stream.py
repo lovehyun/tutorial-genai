@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 # 스트리밍 가능한 LLM 구성
 llm = ChatOpenAI(
-    # model="gpt-3.5-turbo",
+    # model="gpt-4o-mini",
     model="gpt-4o",
     temperature=0.7,
     api_key=os.environ.get("OPENAI_API_KEY"),

@@ -71,7 +71,7 @@ def create_chain(grade, curriculum_title):
     
     # LLM 설정
     llm = ChatOpenAI(
-        model_name="gpt-3.5-turbo",
+        model_name="gpt-4o-mini",
         temperature=0.7,
         api_key=openai_api_key,
     )

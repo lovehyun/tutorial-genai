@@ -35,7 +35,7 @@ print(result)
 
 
 print('--- 3 ---')
-llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.9)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.9)
 print(llm)
 
 prompt = "What's a good company name that makes arcade games?"

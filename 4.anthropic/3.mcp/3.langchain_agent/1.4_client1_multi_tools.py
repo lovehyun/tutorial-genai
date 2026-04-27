@@ -141,7 +141,7 @@ async def main():
     tools = create_server_compatible_tools()
     
     # 2. LangChain Agent 설정
-    llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo")
+    llm = ChatOpenAI(temperature=0, model="gpt-4o-mini")
     prompt = hub.pull("hwchase17/react")  # ReAct 프롬프트 템플릿
     
     # 3. Agent 생성 (여러 도구 등록)

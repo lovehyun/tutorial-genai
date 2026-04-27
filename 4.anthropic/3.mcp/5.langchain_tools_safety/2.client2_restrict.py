@@ -114,7 +114,7 @@ prompt = PromptTemplate(
 )
 
 # LangChain 에이전트 초기화 (최신 방식)
-llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo")
+llm = ChatOpenAI(temperature=0, model="gpt-4o-mini")
 
 # 에이전트 생성
 agent = create_react_agent(llm, tools, prompt)

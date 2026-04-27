@@ -37,7 +37,7 @@ def chat():
             }), 400
         
         # LangChain을 사용하여 모델 및 프롬프트 설정
-        model = ChatOpenAI(api_key=os.environ.get('OPENAI_API_KEY'), model="gpt-3.5-turbo")
+        model = ChatOpenAI(api_key=os.environ.get('OPENAI_API_KEY'), model="gpt-4o-mini")
         
         prompt = ChatPromptTemplate.from_messages([
             ("system", 

@@ -77,7 +77,7 @@ def ask_chatgpt(conversation_history):
 
         # Use the updated method for chat completions
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=input_messages
         )
 

@@ -13,7 +13,7 @@ app = Flask(__name__, static_folder='public', static_url_path='')
 
 # LLM 초기화 (OpenAI)
 llm = ChatOpenAI(
-    model="gpt-3.5-turbo",
+    model="gpt-4o-mini",
     temperature=0.2,
     api_key=os.getenv("OPENAI_API_KEY"),
     max_tokens=2048  # 응답 토큰 최대 길이 설정

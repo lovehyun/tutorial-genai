@@ -6,7 +6,7 @@ from langchain_core.output_parsers import StrOutputParser
 
 load_dotenv()
 
-llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.2)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
 
 def build_prompt():
     return (

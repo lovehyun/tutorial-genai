@@ -11,7 +11,7 @@
 # | 클래스        | 모델 타입                  | 입력 타입                                                              | 설명                                             |
 # | ------------ | -------------------------- | --------------------------------------------------------------------- | ------------------------------------------------ |
 # | `OpenAI`     | Completion 모델 (문장 완성) | `str` (프롬프트)                                                       | 예: `text-davinci-003`, `gpt-3.5-turbo-instruct` |
-# | `ChatOpenAI` | Chat 모델 (대화형)          | `List[BaseMessage]` (`HumanMessage`, `SystemMessage`, `AIMessage` 등) | 예: `gpt-3.5-turbo`, `gpt-4`, `gpt-4o`           |
+# | `ChatOpenAI` | Chat 모델 (대화형)          | `List[BaseMessage]` (`HumanMessage`, `SystemMessage`, `AIMessage` 등) | 예: `gpt-4o-mini`, `gpt-4`, `gpt-4o`           |
 
 import os
 from dotenv import load_dotenv
@@ -40,7 +40,7 @@ print(result)
 
 # ChatOpenAI.invoke()는 내부적으로 문자열 입력을 HumanMessage로 자동 변환해줍니다.
 print('--- 2 ---')
-llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.9)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.9)
 print(llm)
 
 # 즉, 아래 두개의 코드는 결과적으로 동일하게 처리 되지만 "명시적으로 작성" 하는 것이 더 좋은 형태입니다.

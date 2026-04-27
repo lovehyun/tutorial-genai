@@ -122,7 +122,7 @@ async def main():
         simple_tool = create_simple_mcp_tool()
         
         # LangChain Agent 설정
-        llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo")
+        llm = ChatOpenAI(temperature=0, model="gpt-4o-mini")
         
         # 프롬프트 가져오기
         try:

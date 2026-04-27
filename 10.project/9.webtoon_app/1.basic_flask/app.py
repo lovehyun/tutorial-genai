@@ -14,7 +14,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # 소설 내용을 요약하는 함수 (최신 OpenAI SDK 사용)
 def summarize_text(text):
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": f"Summarize the following text into 5 short sentences:\n\n{text}"}

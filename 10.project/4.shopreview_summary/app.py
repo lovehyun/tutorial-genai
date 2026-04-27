@@ -46,7 +46,7 @@ def get_ai_summary():
 
     try:
         response = openai.chat.completions.create(
-            model='gpt-3.5-turbo',
+            model='gpt-4o-mini',
             messages=[{
                 'role': 'user',
                 'content': f'다음 리뷰 목록을 기반으로 간결한 한글 요약을 작성하세요:\n\n{reviews_text}'

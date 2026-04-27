@@ -38,7 +38,7 @@ def index():
 def get_chatgpt_response(user_input):
     try:
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[
                 # {"role": "system", "content": "You are a helpful assistant."},
                 # {"role": "system", "content": "You are a first-class hotel chef providing culinary recommendations."},

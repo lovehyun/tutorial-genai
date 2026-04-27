@@ -183,7 +183,7 @@ def ask_chatgpt(conversation_history):
             print(f"{msg['role']}: {msg['content']}")
 
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=input_messages,
             temperature=1.0  # 예시 값: 0.7 (0.0 ~ 2.0 범위, 기본값은 1.0)
         )
@@ -203,7 +203,7 @@ def summarize_conversation(conversation_chunk):
             prompt += f"{msg['role']}: {msg['content']}\n"
 
         summary_response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "너는 훌륭한 요약 전문가야."},
                 {"role": "user", "content": prompt}

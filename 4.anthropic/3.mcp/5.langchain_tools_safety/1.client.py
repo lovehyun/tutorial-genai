@@ -69,7 +69,7 @@ class NowTool(BaseTool):
 tools = [HelloTool(), AddTool(), NowTool()]
 
 # 최신 LangChain 에이전트 생성
-llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo")
+llm = ChatOpenAI(temperature=0, model="gpt-4o-mini")
 
 # ReAct 프롬프트 가져오기
 prompt = hub.pull("hwchase17/react")

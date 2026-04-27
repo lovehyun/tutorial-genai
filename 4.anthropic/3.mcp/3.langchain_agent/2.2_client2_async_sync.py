@@ -118,7 +118,7 @@ def create_agent():
     # LLM 설정
     llm = ChatOpenAI(
         temperature=0,
-        model="gpt-3.5-turbo"
+        model="gpt-4o-mini"
     )
     
     # 프롬프트 설정 (Hub 없이)

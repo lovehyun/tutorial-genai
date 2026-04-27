@@ -24,7 +24,7 @@ logging.getLogger("werkzeug").setLevel(logging.WARNING)
 
 # 모델 구성
 llm = ChatOpenAI(
-    model="gpt-3.5-turbo",
+    model="gpt-4o-mini",
     temperature=0.7,
     api_key=os.environ.get("OPENAI_API_KEY")
 )

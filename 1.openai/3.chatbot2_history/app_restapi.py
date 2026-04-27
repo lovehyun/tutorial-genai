@@ -39,7 +39,7 @@ def ask_chatgpt(user_input):
         response = requests.post(
             'https://api.openai.com/v1/chat/completions',
             json={
-                'model': 'gpt-3.5-turbo',
+                'model': 'gpt-4o-mini',
                 'messages': [
                     {'role': 'system', 'content': 'You are a helpful assistant.'},
                     # {'role': 'system', 'content': 'You are a first-class hotel chef providing culinary recommendations.'},

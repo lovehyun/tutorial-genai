@@ -28,7 +28,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # 2. LangChain 컴포넌트 초기화
 embeddings = OpenAIEmbeddings()
-llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
 
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -135,7 +135,7 @@ def ask():
     def generate():
         try:
             response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": "다음 문서들을 참고하여 질문에 답변하세요. 문서에 관련 내용이 없으면 '문서에서 관련 정보를 찾을 수 없습니다'라고 답변하세요. 한국어로 답변하세요."},
                     {"role": "user", "content": f"문서들:\n{context}\n\n질문: {question}"}

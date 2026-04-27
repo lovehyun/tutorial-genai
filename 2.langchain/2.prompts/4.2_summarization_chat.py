@@ -20,7 +20,7 @@ chat_prompt = ChatPromptTemplate.from_messages([
 # ])
 
 # ChatOpenAI로 gpt-4o 모델 설정
-# llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.5)
+# llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.5)
 llm = ChatOpenAI(model="gpt-4o", temperature=0.5)
 
 # 체인 구성

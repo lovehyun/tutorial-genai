@@ -11,7 +11,7 @@ class AISettings:
     LLM_CONFIG = {
         "temperature": 0.1,
         "max_tokens": 2000,
-        "model_name": "gpt-3.5-turbo"
+        "model_name": "gpt-4o-mini"
     }
     
     # 시스템 메시지 (한글 응답 강화)

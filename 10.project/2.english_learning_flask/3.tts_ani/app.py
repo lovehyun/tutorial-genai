@@ -78,7 +78,7 @@ def curriculum(grade, curriculum_id):
         if request.method == 'POST':
             user_input = request.form['user_input']
             response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o-mini",
                 messages=[
                     {
                         "role": "system",

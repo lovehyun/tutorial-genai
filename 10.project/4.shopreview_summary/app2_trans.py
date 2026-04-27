@@ -62,7 +62,7 @@ def get_ai_summary():
         print('[최종 요청 프롬프트]: ', prompt)
         
         response = openai.chat.completions.create(
-            model='gpt-3.5-turbo',
+            model='gpt-4o-mini',
             messages=[{'role': 'user', 'content': prompt}]
         )
         summary_ko = response.choices[0].message.content.strip()
@@ -71,7 +71,7 @@ def get_ai_summary():
         # 2단계: 번역 (ko가 아닌 경우만)
         if target_lang != 'ko':
             translated = openai.chat.completions.create(
-                model='gpt-3.5-turbo',
+                model='gpt-4o-mini',
                 messages=[
                     {'role': 'user', 'content': f'다음 한국어 문장을 {lang_name}로 번역해줘:\n\n{summary_ko}'}
                 ]

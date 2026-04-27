@@ -18,7 +18,7 @@ generated_images = ["/static/placeholder.png"] * 5
 # 소설 텍스트를 5개의 짧은 문장으로 요약하는 함수
 def summarize_text(text):
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": f"Summarize the following text into 5 short sentences:\n\n{text}"}

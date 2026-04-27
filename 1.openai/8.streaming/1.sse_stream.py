@@ -27,7 +27,7 @@ def stream():
     def generate():
         try:
             response = client.chat.completions.create(
-                model='gpt-3.5-turbo',
+                model='gpt-4o-mini',
                 messages=[
                     {'role': 'system', 'content': '당신은 친절한 AI 도우미입니다. 한국어로 답변하세요.'},
                     {'role': 'user', 'content': user_message}

@@ -60,7 +60,7 @@ def check_code():
 
     try:
         response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "당신은 보안 코드 분석 전문가입니다."},
                 {"role": "user", "content": prompt}

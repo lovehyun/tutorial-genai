@@ -34,7 +34,7 @@ def chat():
     try:
         # 일반 방식으로 응답 요청
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=chat_history
         )
 
