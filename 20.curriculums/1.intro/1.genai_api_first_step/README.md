@@ -33,6 +33,15 @@
 pip install openai google-generativeai requests
 ```
 
+## 이론 교안
+
+| 교안 | 내용 |
+|------|------|
+| `0.docs/01_genai_intro/01_genai_landscape.md` | 생성형 AI 생태계 개요 |
+| `0.docs/01_genai_intro/02_llm_companies_models.md` | LLM 기업과 모델 비교 |
+| `0.docs/05_genai_advanced/01_openai_advanced.md` | OpenAI API 심화 |
+| `0.docs/05_genai_advanced/03_gemini_api.md` | Gemini API |
+
 ## 참고 자료
 - [OpenAI API 공식 문서](https://platform.openai.com/docs)
 - [Google Gemini API 문서](https://ai.google.dev/docs)

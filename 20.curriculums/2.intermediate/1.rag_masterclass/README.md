@@ -66,6 +66,12 @@
 pip install langchain langchain-openai langchain-community chromadb faiss-cpu flask pypdf
 ```
 
+## 이론 교안
+
+| 교안 | 내용 |
+|------|------|
+| `0.docs/05_genai_advanced/06_rag_system.md` | RAG 시스템 (임베딩, 벡터DB, 파이프라인) |
+
 ## 참고 자료
 - `9.study/6.embedding/` — 임베딩 이론 및 시각화
 - `1.openai/7.rag/1.faiss/` — FAISS 기초

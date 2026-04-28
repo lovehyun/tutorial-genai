@@ -53,6 +53,14 @@
 pip install langchain langchain-openai langchain-community langgraph
 ```
 
+## 이론 교안
+
+| 교안 | 내용 |
+|------|------|
+| `0.docs/05_genai_advanced/07_langchain_lcel.md` | LangChain LCEL 아키텍처 |
+| `0.docs/05_genai_advanced/04_prompt_engineering_code.md` | 프롬프트 엔지니어링 코드 실전 |
+| `0.docs/05_genai_advanced/05_context_engineering.md` | 컨텍스트 엔지니어링 |
+
 ## 참고 자료
 - `2.langchain/1.llm_models/` — 모델 호출
 - `2.langchain/2.prompts/` — 프롬프트 템플릿

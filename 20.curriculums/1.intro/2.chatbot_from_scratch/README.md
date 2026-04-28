@@ -48,6 +48,13 @@
 pip install openai gradio flask
 ```
 
+## 이론 교안
+
+| 교안 | 내용 |
+|------|------|
+| `0.docs/01_genai_intro/03_chatgpt_deep_dive.md` | ChatGPT 심층 이해 |
+| `0.docs/05_genai_advanced/01_openai_advanced.md` | OpenAI API 심화 (대화, 스트리밍) |
+
 ## 참고 자료
 - `1.openai/2.chatbot_ui/` — 기본 챗봇 UI
 - `1.openai/3.chatbot2_history/` — 히스토리 관리

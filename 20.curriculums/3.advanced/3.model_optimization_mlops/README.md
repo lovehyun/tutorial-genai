@@ -52,6 +52,15 @@
 pip install transformers torch datasets flask fastapi uvicorn matplotlib
 ```
 
+## 이론 교안
+
+| 교안 | 내용 |
+|------|------|
+| `0.docs/05_genai_advanced/15_model_optimization.md` | 모델 최적화 (양자화, 가지치기, 지식증류) |
+| `0.docs/05_genai_advanced/13_huggingface_local.md` | 로컬 LLM 활용 (양자화, GGUF 포맷) |
+| `0.docs/05_genai_advanced/14_finetuning_lora.md` | LoRA 파인튜닝 |
+| `0.docs/05_genai_advanced/17_inference_serving.md` | 추론 프레임워크와 모델 서빙 |
+
 ## 참고 자료
 - `3.local/1.transformers/` — Transformer 기초
 - `3.local/2.mymodel/` — 모델 학습/경량화

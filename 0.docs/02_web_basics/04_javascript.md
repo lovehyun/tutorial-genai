@@ -438,6 +438,8 @@ flowchart TD
 
 ### DOM 요소 선택하기
 
+아래 HTML을 기준으로 5가지 선택 메서드를 비교한다.
+
 ```html
 <div id="app">
     <h1 class="title">제목입니다</h1>
@@ -447,18 +449,71 @@ flowchart TD
 </div>
 ```
 
+#### 1) getElement 시리즈 — 전통적 선택 (단수/복수 구분)
+
 ```javascript
-// getElementById — ID로 하나의 요소 선택
+// ① getElementById — ID로 "하나"의 요소 선택 (단수)
+//    → Element 1개 또는 null 반환
 const app = document.getElementById('app');
 
-// querySelector — CSS 선택자로 첫 번째 요소 선택 (추천!)
+// ② getElementsByClassName — 클래스명으로 "여러" 요소 선택 (복수)
+//    → HTMLCollection 반환 (유사 배열, 실시간 업데이트)
+const contents = document.getElementsByClassName('content');
+console.log(contents.length);      // 2
+console.log(contents[0].textContent); // '첫 번째 문단'
+
+// ③ getElementsByTagName — 태그명으로 "여러" 요소 선택 (복수)
+//    → HTMLCollection 반환
+const allParagraphs = document.getElementsByTagName('p');
+console.log(allParagraphs.length); // 2
+```
+
+> **이름에 주목**: `getElement` (단수) vs `getElements` (복수). 복수형은 항상 컬렉션을 반환한다.
+
+#### 2) querySelector 시리즈 — 모던 선택 (CSS 선택자 사용)
+
+```javascript
+// ④ querySelector — CSS 선택자로 "첫 번째" 요소 선택 (단수)
+//    → Element 1개 또는 null 반환
 const title = document.querySelector('.title');
 const btn = document.querySelector('#myBtn');
+const firstContent = document.querySelector('.content');  // 첫 번째만
 
-// querySelectorAll — CSS 선택자로 모든 요소 선택 (NodeList 반환)
+// ⑤ querySelectorAll — CSS 선택자로 "모든" 요소 선택 (복수)
+//    → NodeList 반환 (정적 스냅샷, forEach 사용 가능)
 const paragraphs = document.querySelectorAll('.content');
 paragraphs.forEach(p => console.log(p.textContent));
 ```
+
+#### 3) 비교 정리
+
+| 메서드 | 반환 | 개수 | 선택 기준 | 실시간 반영 |
+|--------|------|------|-----------|------------|
+| `getElementById` | Element | 단수 | ID | - |
+| `getElementsByClassName` | HTMLCollection | 복수 | 클래스명 | O (Live) |
+| `getElementsByTagName` | HTMLCollection | 복수 | 태그명 | O (Live) |
+| `querySelector` | Element | 단수 | CSS 선택자 | - |
+| `querySelectorAll` | NodeList | 복수 | CSS 선택자 | X (Static) |
+
+**HTMLCollection vs NodeList**
+
+```javascript
+// HTMLCollection — 실시간(Live). DOM이 바뀌면 자동으로 반영됨
+const liveList = document.getElementsByClassName('content');
+
+// NodeList — 정적(Static). 호출 시점의 스냅샷
+const staticList = document.querySelectorAll('.content');
+
+// 새 요소를 추가하면?
+const newP = document.createElement('p');
+newP.className = 'content';
+document.getElementById('app').appendChild(newP);
+
+console.log(liveList.length);   // 3 ← 자동 반영!
+console.log(staticList.length); // 2 ← 변화 없음 (스냅샷)
+```
+
+> **실무 권장**: `querySelector` / `querySelectorAll`이 CSS 선택자를 그대로 사용할 수 있어 가장 직관적이고 유연하다. `getElementById`는 ID 접근 시 가장 빠르므로 여전히 유용하다.
 
 ### DOM 요소 내용 변경
 

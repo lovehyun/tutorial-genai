@@ -47,6 +47,13 @@
 pip install langchain langchain-openai langgraph agentops
 ```
 
+## 이론 교안
+
+| 교안 | 내용 |
+|------|------|
+| `0.docs/05_genai_advanced/10_langgraph_agents.md` | LangGraph 에이전트 (StateGraph, 순환, 분기) |
+| `0.docs/05_genai_advanced/11_agentic_design_patterns.md` | 5대 Agentic 디자인 패턴 |
+
 ## 참고 자료
 - `2.langchain/8.langgraph/` — LangGraph 예제 전체
 - `2.langchain/9.agentic_patterns/` — 5대 Agentic 패턴

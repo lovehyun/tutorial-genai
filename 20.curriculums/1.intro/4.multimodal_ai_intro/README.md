@@ -34,6 +34,12 @@
 pip install openai gradio pydub pyaudio
 ```
 
+## 이론 교안
+
+| 교안 | 내용 |
+|------|------|
+| `0.docs/05_genai_advanced/08_multimodal_ai.md` | 멀티모달 AI (DALL-E, Whisper, Vision) |
+
 ## 참고 자료
 - `1.openai/10.multimodal/1.dall-e/` — DALL-E 이미지 생성
 - `1.openai/10.multimodal/2.dall-e-app-edit/` — 이미지 편집 앱

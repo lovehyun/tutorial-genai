@@ -64,6 +64,12 @@
 pip install langchain langchain-openai langchain-community wikipedia arxiv google-search-results flask
 ```
 
+## 이론 교안
+
+| 교안 | 내용 |
+|------|------|
+| `0.docs/05_genai_advanced/09_ai_agent_overview.md` | AI 에이전트 개요 (ReAct, 도구 사용) |
+
 ## 참고 자료
 - `2.langchain/7.agents/` — LangChain 에이전트 전체
 - `10.project/10.ai_agent/` — AI 에이전트 프로젝트

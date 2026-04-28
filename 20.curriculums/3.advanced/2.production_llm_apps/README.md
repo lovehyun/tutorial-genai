@@ -67,6 +67,15 @@
 pip install openai langchain langchain-openai flask gradio chromadb pypdf
 ```
 
+## 이론 교안
+
+| 교안 | 내용 |
+|------|------|
+| `0.docs/06_genai_applied/01_document_qa_chatbot.md` | 문서 QA 챗봇 설계 |
+| `0.docs/06_genai_applied/02_code_review_service.md` | 코드 리뷰 서비스 |
+| `0.docs/06_genai_applied/03_exam_grading_service.md` | 시험 채점 서비스 |
+| `0.docs/06_genai_applied/05_content_generation.md` | 콘텐츠 생성 (웹툰 등) |
+
 ## 참고 자료
 - `10.project/1.chatbot_gui/` — 챗봇 GUI 프로젝트
 - `10.project/1.chatbot_gui_agents/` — 에이전트 챗봇

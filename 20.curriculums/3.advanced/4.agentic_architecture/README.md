@@ -87,6 +87,16 @@
 pip install langchain langchain-openai langchain-anthropic langgraph anthropic mcp agentops flask
 ```
 
+## 이론 교안
+
+| 교안 | 내용 |
+|------|------|
+| `0.docs/05_genai_advanced/09_ai_agent_overview.md` | AI 에이전트 개요 |
+| `0.docs/05_genai_advanced/10_langgraph_agents.md` | LangGraph 에이전트 |
+| `0.docs/05_genai_advanced/11_agentic_design_patterns.md` | 5대 Agentic 디자인 패턴 |
+| `0.docs/05_genai_advanced/12_mcp_model_context_protocol.md` | MCP 프로토콜 |
+| `0.docs/05_genai_advanced/16_evaluation_safety.md` | 평가와 안전성 |
+
 ## 참고 자료
 - `2.langchain/8.langgraph/` — LangGraph 전체
 - `2.langchain/9.agentic_patterns/` — 5대 Agentic 패턴

@@ -37,6 +37,12 @@ pip install transformers torch flask gradio gpt4all
 # Ollama: https://ollama.ai 에서 별도 설치
 ```
 
+## 이론 교안
+
+| 교안 | 내용 |
+|------|------|
+| `0.docs/05_genai_advanced/13_huggingface_local.md` | 로컬 LLM 활용 — HuggingFace · Ollama · GPT4All |
+
 ## 참고 자료
 - `3.local/1.transformers/` — HuggingFace Transformers 기초
 - `3.local/3.huggingface/` — HuggingFace 파이프라인

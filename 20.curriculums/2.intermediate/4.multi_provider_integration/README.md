@@ -52,6 +52,13 @@
 pip install langchain langchain-openai langchain-anthropic langchain-google-genai anthropic google-generativeai flask
 ```
 
+## 이론 교안
+
+| 교안 | 내용 |
+|------|------|
+| `0.docs/05_genai_advanced/02_claude_api.md` | Claude API (Anthropic) |
+| `0.docs/05_genai_advanced/03_gemini_api.md` | Gemini API (Google) |
+
 ## 참고 자료
 - `4.anthropic/1.basic/` — Claude API 기초
 - `4.anthropic/2.langchain/` — Claude + LangChain

@@ -387,31 +387,43 @@
         "status": "local_only",
         "action": "skip"
       },
-      "11_mcp_model_context_protocol.md": {
+      "11_agentic_design_patterns.md": {
         "notion_id": null,
         "notion_title": null,
         "status": "local_only",
         "action": "skip"
       },
-      "12_huggingface_local.md": {
+      "12_mcp_model_context_protocol.md": {
         "notion_id": null,
         "notion_title": null,
         "status": "local_only",
         "action": "skip"
       },
-      "13_finetuning_lora.md": {
+      "13_huggingface_local.md": {
         "notion_id": null,
         "notion_title": null,
         "status": "local_only",
         "action": "skip"
       },
-      "14_evaluation_safety.md": {
+      "14_finetuning_lora.md": {
         "notion_id": null,
         "notion_title": null,
         "status": "local_only",
         "action": "skip"
       },
-      "15_inference_serving.md": {
+      "15_model_optimization.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "16_evaluation_safety.md": {
+        "notion_id": null,
+        "notion_title": null,
+        "status": "local_only",
+        "action": "skip"
+      },
+      "17_inference_serving.md": {
         "notion_id": null,
         "notion_title": null,
         "status": "local_only",

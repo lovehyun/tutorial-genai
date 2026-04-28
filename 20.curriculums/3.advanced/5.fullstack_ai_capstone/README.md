@@ -84,6 +84,12 @@
 pip install openai anthropic langchain langchain-openai langchain-anthropic langgraph chromadb flask gradio pypdf mcp
 ```
 
+## 이론 교안
+
+| 교안 | 내용 |
+|------|------|
+| `0.docs/06_genai_applied/` | 전체 응용 프로젝트 교안 (문서QA, 코드리뷰, 채점, 검색엔진, 콘텐츠생성, 에이전트) |
+
 ## 참고 자료
 - `10.project/` — 전체 프로젝트 디렉토리
   - `1.chatbot_gui/` — 챗봇 GUI

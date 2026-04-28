@@ -69,6 +69,12 @@
 pip install anthropic mcp langchain langchain-anthropic langgraph
 ```
 
+## 이론 교안
+
+| 교안 | 내용 |
+|------|------|
+| `0.docs/05_genai_advanced/12_mcp_model_context_protocol.md` | MCP 프로토콜 (서버/클라이언트/전송 계층) |
+
 ## 참고 자료
 - `4.anthropic/3.mcp/1.intro/` — MCP 기초
 - `4.anthropic/3.mcp/2.agents/` — MCP 에이전트
