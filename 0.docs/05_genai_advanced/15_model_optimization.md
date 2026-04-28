@@ -18,11 +18,9 @@
 | **에너지** | 전력 소비가 크고 탄소 배출이 증가함 | A100 1장 TDP: 300~400W |
 | **엣지 배포** | 모바일/IoT 기기에 모델을 올릴 수 없음 | 스마트폰 RAM: 6~12GB |
 
-예를 들어, Llama 2 70B 모델을 FP32로 로드하려면 약 280GB의 메모리가 필요합니다. 이는 가장 고가의 GPU인 A100 80GB 4장이 필요한 수준입니다. 경량화 기법을 적용하면 동일한 모델을 4bit 양자화하여 약 35GB로 줄일 수 있고, A100 1장으로도 추론이 가능해집니다.
+예를 들어, Llama 2 70B 모델을 FP32로 로드하려면 약 280GB의 메모리가 필요하지만, 4bit 양자화하면 약 35GB로 줄일 수 있습니다.
 
 ### 경량화 vs 파인튜닝 vs 프롬프트 엔지니어링
-
-모델을 효율적으로 활용하는 세 가지 접근법은 목적이 서로 다릅니다.
 
 | 비교 항목 | 프롬프트 엔지니어링 | 파인튜닝 (LoRA/QLoRA) | 경량화 (Optimization) |
 |---|---|---|---|
@@ -50,21 +48,12 @@ flowchart TB
     Root --> LR["레이어 축소\nLayer Reduction"]
     Root --> VR["어휘 축소\nVocabulary Reduction"]
 
-    Q --> Q1["Post-Training\nQuantization (PTQ)"]
-    Q --> Q2["Quantization-Aware\nTraining (QAT)"]
-    Q1 --> Q1a["동적 양자화"]
-    Q1 --> Q1b["정적 양자화"]
-    Q1 --> Q1c["GPTQ / AWQ"]
-
-    P --> P1["비구조적 가지치기\nUnstructured"]
-    P --> P2["구조적 가지치기\nStructured"]
-
-    KD --> KD1["소프트 라벨\n증류"]
-    KD --> KD2["특징 기반\n증류"]
-
-    LR --> LR1["중요도 기반\n레이어 제거"]
-
-    VR --> VR1["도메인 특화\n어휘 최적화"]
+    Q --> Q1["PTQ: 동적/정적/GPTQ/AWQ"]
+    Q --> Q2["QAT: 학습 중 양자화"]
+    P --> P1["비구조적 / 구조적"]
+    KD --> KD1["소프트 라벨 / 특징 기반"]
+    LR --> LR1["중요도 기반 레이어 제거"]
+    VR --> VR1["도메인 특화 어휘 최적화"]
 
     style Root fill:#6c5ce7,stroke:#a29bfe,color:#fff
     style Q fill:#0984e3,stroke:#74b9ff,color:#fff
@@ -72,20 +61,9 @@ flowchart TB
     style KD fill:#00b894,stroke:#55efc4,color:#2d3436
     style LR fill:#fdcb6e,stroke:#f39c12,color:#2d3436
     style VR fill:#fd79a8,stroke:#e84393,color:#fff
-    style Q1 fill:#74b9ff,stroke:#0984e3,color:#2d3436
-    style Q2 fill:#74b9ff,stroke:#0984e3,color:#2d3436
-    style Q1a fill:#dfe6e9,stroke:#b2bec3,color:#2d3436
-    style Q1b fill:#dfe6e9,stroke:#b2bec3,color:#2d3436
-    style Q1c fill:#dfe6e9,stroke:#b2bec3,color:#2d3436
-    style P1 fill:#fab1a0,stroke:#e17055,color:#2d3436
-    style P2 fill:#fab1a0,stroke:#e17055,color:#2d3436
-    style KD1 fill:#55efc4,stroke:#00b894,color:#2d3436
-    style KD2 fill:#55efc4,stroke:#00b894,color:#2d3436
-    style LR1 fill:#ffeaa7,stroke:#fdcb6e,color:#2d3436
-    style VR1 fill:#fab1a0,stroke:#fd79a8,color:#2d3436
 ```
 
-각 기법은 독립적으로 적용할 수도 있고, 여러 기법을 조합하여 더 큰 효과를 얻을 수도 있습니다. 예를 들어, 지식증류로 작은 모델을 만든 뒤 양자화를 적용하면 크기와 속도를 동시에 개선할 수 있습니다.
+각 기법은 독립적으로 적용할 수도 있고, 여러 기법을 조합하여 더 큰 효과를 얻을 수도 있습니다.
 
 ---
 
@@ -102,14 +80,7 @@ INT8 양자화:         31         → 8비트  (1바이트)  -- 크기 1/4
 INT4 양자화:         3          → 4비트  (0.5바이트) -- 크기 1/8
 ```
 
-양자화의 핵심 원리는 **스케일 팩터(scale factor)**와 **제로 포인트(zero point)**를 사용한 선형 매핑입니다.
-
-```
-양자화:   q = round((x - zero_point) / scale)
-역양자화: x_approx = q * scale + zero_point
-```
-
-여기서 `scale`은 실수 범위를 정수 범위로 매핑하는 비율이고, `zero_point`는 실수 0에 대응하는 정수 값입니다.
+양자화의 핵심 원리는 **스케일 팩터(scale)**와 **제로 포인트(zero point)**를 사용한 선형 매핑입니다: `q = round((x - zero_point) / scale)`, 역양자화: `x_approx = q * scale + zero_point`.
 
 ### 비트별 메모리와 품질 비교
 
@@ -144,9 +115,7 @@ INT4 양자화:         3          → 4비트  (0.5바이트) -- 크기 1/8
 
 PTQ는 다시 **동적(Dynamic)**과 **정적(Static)** 양자화로 나뉩니다.
 
-**동적 양자화**는 추론 시점에 가중치를 실시간으로 양자화합니다. 캘리브레이션 데이터가 필요 없어 즉시 적용할 수 있지만, 매 추론마다 양자화 오버헤드가 발생합니다.
-
-**정적 양자화**는 소량의 캘리브레이션 데이터를 사용하여 활성화 값의 범위를 미리 측정하고, 최적의 스케일 팩터를 사전에 계산합니다. 추론 시 오버헤드가 없어 더 빠르지만, 대표적인 데이터 샘플이 필요합니다.
+**동적 양자화**는 추론 시점에 가중치를 실시간으로 양자화합니다. 캘리브레이션 데이터가 필요 없어 즉시 적용할 수 있습니다. **정적 양자화**는 소량의 캘리브레이션 데이터로 활성화 값의 범위를 미리 측정하여 최적의 스케일 팩터를 사전에 계산합니다.
 
 | 비교 항목 | 동적 양자화 | 정적 양자화 |
 |---|---|---|
@@ -305,15 +274,11 @@ flowchart LR
 
 **가지치기(Pruning)**는 모델에서 중요하지 않은 가중치, 뉴런, 또는 레이어를 제거하여 모델을 경량화하는 기법입니다. 나무에서 불필요한 가지를 잘라내는 것처럼, 모델의 성능에 크게 기여하지 않는 파라미터를 제거합니다.
 
-핵심 가정은 **복권 가설(Lottery Ticket Hypothesis)**에 기반합니다. 대규모 신경망 내에는 원본과 동등한 성능을 낼 수 있는 작은 부분 네트워크(winning ticket)가 존재한다는 이론입니다.
+핵심 가정은 **복권 가설(Lottery Ticket Hypothesis)**에 기반합니다. 대규모 신경망 내에는 원본과 동등한 성능을 낼 수 있는 작은 부분 네트워크가 존재한다는 이론입니다.
 
 ### 비구조적 가지치기 vs 구조적 가지치기
 
-가지치기는 제거하는 단위에 따라 두 가지로 분류됩니다.
-
-**비구조적 가지치기(Unstructured Pruning)**는 개별 가중치 값을 0으로 만듭니다. 세밀한 제어가 가능하지만, 실제 메모리 절감을 위해서는 희소 행렬(sparse matrix) 연산을 지원하는 하드웨어나 라이브러리가 필요합니다.
-
-**구조적 가지치기(Structured Pruning)**는 뉴런, 채널, 어텐션 헤드 등 구조적 단위를 통째로 제거합니다. 모델의 실제 크기가 줄어들고 일반 하드웨어에서 즉시 속도 향상을 얻을 수 있지만, 성능 손실이 비구조적 방식보다 클 수 있습니다.
+**비구조적 가지치기(Unstructured Pruning)**는 개별 가중치 값을 0으로 만듭니다. 실제 속도 향상은 희소 행렬 연산 지원 하드웨어가 필요합니다. **구조적 가지치기(Structured Pruning)**는 뉴런, 채널, 헤드 등 구조적 단위를 통째로 제거하여 즉시 크기/속도 개선을 얻습니다.
 
 | 비교 항목 | 비구조적 가지치기 | 구조적 가지치기 |
 |---|---|---|
@@ -409,33 +374,20 @@ Movement Pruning은 학습 과정에서 가중치의 **변화 방향(movement)**
 
 ```mermaid
 flowchart LR
-    Input["입력 데이터"]
+    Input["입력 데이터"] --> Teacher["Teacher\nBERT-large 340M"]
+    Input --> Student["Student\nDistilBERT 66M"]
 
-    Input --> Teacher["Teacher 모델\n(대형, 고성능)\nBERT-large 340M"]
-    Input --> Student["Student 모델\n(소형, 경량)\nDistilBERT 66M"]
+    Teacher --> Soft["소프트 라벨\n[0.7, 0.2, 0.1]"]
+    Student --> StudentOut["Student 출력"]
 
-    Teacher --> Soft["소프트 라벨\n[0.7, 0.2, 0.1]\nTemperature T 적용"]
-    Teacher --> Hard["하드 라벨\n[1, 0, 0]\n정답"]
-
-    Soft --> Loss["증류 손실\nKL Divergence"]
-    Hard --> Loss2["분류 손실\nCross Entropy"]
-    Student --> StudentOut["Student 출력\n[0.6, 0.25, 0.15]"]
+    Soft --> Loss["KL Divergence\n+ Cross Entropy"]
     StudentOut --> Loss
-    StudentOut --> Loss2
+    Loss --> Update["Student 가중치 업데이트"]
 
-    Loss --> Total["총 손실\nalpha * L_distill\n+ (1-alpha) * L_ce"]
-    Loss2 --> Total
-    Total --> Update["Student\n가중치 업데이트"]
-
-    style Input fill:#dfe6e9,stroke:#b2bec3,color:#2d3436
     style Teacher fill:#6c5ce7,stroke:#a29bfe,color:#fff
     style Student fill:#0984e3,stroke:#74b9ff,color:#fff
     style Soft fill:#e17055,stroke:#fab1a0,color:#fff
-    style Hard fill:#fdcb6e,stroke:#f39c12,color:#2d3436
     style Loss fill:#00b894,stroke:#55efc4,color:#2d3436
-    style Loss2 fill:#00b894,stroke:#55efc4,color:#2d3436
-    style StudentOut fill:#74b9ff,stroke:#0984e3,color:#2d3436
-    style Total fill:#fd79a8,stroke:#e84393,color:#fff
     style Update fill:#dfe6e9,stroke:#b2bec3,color:#2d3436
 ```
 
@@ -445,15 +397,7 @@ flowchart LR
 
 **소프트 라벨(Soft Label)**은 Teacher 모델의 확률 분포를 그대로 사용합니다. 예를 들어, `[0.7, 0.2, 0.1]`은 "고양이일 확률 70%, 개일 확률 20%, 새일 확률 10%"라는 정보를 담고 있습니다.
 
-소프트 라벨이 더 많은 정보를 담고 있는 이유는 **클래스 간 관계**를 포함하기 때문입니다. "고양이가 개와 20% 유사하다"는 정보는 하드 라벨로는 전달할 수 없지만, 소프트 라벨에는 자연스럽게 포함됩니다.
-
-Temperature 파라미터 `T`를 높이면 확률 분포가 더 부드러워져(소프트해져), 클래스 간 관계 정보가 더 잘 드러납니다.
-
-```
-Temperature T=1 (기본): [0.90, 0.07, 0.03]  -- 지배적 클래스에 집중
-Temperature T=3:        [0.55, 0.28, 0.17]  -- 분포가 부드러워짐
-Temperature T=10:       [0.39, 0.33, 0.28]  -- 거의 균등 분포
-```
+소프트 라벨이 더 많은 정보를 담고 있는 이유는 **클래스 간 관계**를 포함하기 때문입니다. "고양이가 개와 20% 유사하다"는 정보는 하드 라벨로는 전달할 수 없지만, 소프트 라벨에는 자연스럽게 포함됩니다. Temperature `T`를 높이면 분포가 더 부드러워져 클래스 간 관계 정보가 잘 드러납니다 (`T=1: [0.90, 0.07, 0.03]` -> `T=3: [0.55, 0.28, 0.17]`).
 
 ### 증류 손실 함수 (KL Divergence)
 
@@ -570,23 +514,12 @@ student_model.save_pretrained("./distilled_model")
 
 ### BERT 레이어 역할 분석
 
-```mermaid
-flowchart TB
-    Input["입력 토큰"]
-
-    Input --> L1["레이어 1~3\n구문 정보\n(품사, 구문 구조)"]
-    L1 --> L2["레이어 4~8\n의미 정보\n(문맥 이해, 관계 파악)"]
-    L2 --> L3["레이어 9~12\n태스크 특화\n(분류, QA 등)"]
-    L3 --> Output["출력"]
-
-    Remove["제거 후보\n(태스크에 따라\n상위 레이어 제거)"] -.-> L3
-
-    style Input fill:#dfe6e9,stroke:#b2bec3,color:#2d3436
-    style L1 fill:#6c5ce7,stroke:#a29bfe,color:#fff
-    style L2 fill:#0984e3,stroke:#74b9ff,color:#fff
-    style L3 fill:#e17055,stroke:#fab1a0,color:#fff
-    style Output fill:#dfe6e9,stroke:#b2bec3,color:#2d3436
-    style Remove fill:#fdcb6e,stroke:#f39c12,color:#2d3436
+```
+입력 토큰
+  -> [레이어 1~3]  구문 정보 (품사, 구문 구조)
+  -> [레이어 4~8]  의미 정보 (문맥 이해, 관계 파악)
+  -> [레이어 9~12] 태스크 특화 (분류, QA 등)  <-- 제거 후보
+  -> 출력
 ```
 
 ### 실습: BERT 레이어 축소
@@ -757,39 +690,23 @@ model = torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torc
 어떤 경량화 기법을 적용해야 할지 결정하는 플로차트입니다.
 
 ```mermaid
-flowchart TB
-    Start["모델 경량화 필요"]
-    Start --> Q1{"배포 환경은?"}
+flowchart LR
+    Start["경량화 필요"] --> Q1{"배포 환경?"}
 
-    Q1 -->|"GPU 서버"| Q2{"메모리 부족?"}
-    Q1 -->|"CPU 서버"| Q3{"모델 크기가\n메모리 초과?"}
-    Q1 -->|"엣지/모바일"| Q4["증류 + 양자화\n(최대 경량화)"]
+    Q1 -->|"GPU"| Q2{"메모리 부족?"}
+    Q1 -->|"CPU"| Q9["GGUF 변환"]
+    Q1 -->|"엣지"| Q4["증류 + 양자화"]
 
-    Q2 -->|"예"| Q5{"추가 학습\n가능?"}
-    Q2 -->|"아니오"| Q6["양자화 (INT8)\n최소 품질 손실"]
-
-    Q5 -->|"예"| Q7["QAT 양자화\n또는\n가지치기 + 재학습"]
-    Q5 -->|"아니오"| Q8["PTQ 양자화\nbitsandbytes / GPTQ"]
-
-    Q3 -->|"예"| Q9["GGUF 변환\n+ CPU 양자화"]
-    Q3 -->|"아니오"| Q10{"속도 향상\n필요?"}
-
-    Q10 -->|"예"| Q11["레이어 축소\n+ 양자화"]
-    Q10 -->|"아니오"| Q12["현재 모델\n유지"]
+    Q2 -->|"예"| Q8["PTQ 양자화\nbitsandbytes/GPTQ"]
+    Q2 -->|"아니오"| Q6["INT8 양자화"]
 
     style Start fill:#6c5ce7,stroke:#a29bfe,color:#fff
     style Q1 fill:#0984e3,stroke:#74b9ff,color:#fff
     style Q2 fill:#0984e3,stroke:#74b9ff,color:#fff
-    style Q3 fill:#0984e3,stroke:#74b9ff,color:#fff
     style Q4 fill:#e17055,stroke:#fab1a0,color:#fff
-    style Q5 fill:#0984e3,stroke:#74b9ff,color:#fff
     style Q6 fill:#00b894,stroke:#55efc4,color:#2d3436
-    style Q7 fill:#fdcb6e,stroke:#f39c12,color:#2d3436
     style Q8 fill:#00b894,stroke:#55efc4,color:#2d3436
     style Q9 fill:#e17055,stroke:#fab1a0,color:#fff
-    style Q10 fill:#0984e3,stroke:#74b9ff,color:#fff
-    style Q11 fill:#fdcb6e,stroke:#f39c12,color:#2d3436
-    style Q12 fill:#dfe6e9,stroke:#b2bec3,color:#2d3436
 ```
 
 ### 경량화 기법별 적용 우선순위
@@ -812,28 +729,10 @@ flowchart TB
 
 모델을 학습한 후 경량화를 적용하고 실제 서비스로 배포하는 전체 파이프라인입니다.
 
-```mermaid
-flowchart LR
-    A["1. 사전학습 모델\n선택"]
-    A --> B["2. 파인튜닝\n(LoRA/QLoRA)"]
-    B --> C["3. 경량화\n적용"]
-    C --> D["4. 평가\n(원본 대비)"]
-    D --> E{"품질\n충분?"}
-    E -->|"예"| F["5. 모델 변환\n(GGUF/ONNX)"]
-    E -->|"아니오"| C2["경량화 수준\n조정"]
-    C2 --> C
-    F --> G["6. 서빙\n(FastAPI/vLLM)"]
-    G --> H["7. 모니터링\n(성능/품질)"]
-
-    style A fill:#6c5ce7,stroke:#a29bfe,color:#fff
-    style B fill:#0984e3,stroke:#74b9ff,color:#fff
-    style C fill:#e17055,stroke:#fab1a0,color:#fff
-    style D fill:#00b894,stroke:#55efc4,color:#2d3436
-    style E fill:#fdcb6e,stroke:#f39c12,color:#2d3436
-    style F fill:#0984e3,stroke:#74b9ff,color:#fff
-    style C2 fill:#dfe6e9,stroke:#b2bec3,color:#2d3436
-    style G fill:#fd79a8,stroke:#e84393,color:#fff
-    style H fill:#dfe6e9,stroke:#b2bec3,color:#2d3436
+```
+사전학습 모델 선택 -> 파인튜닝(LoRA/QLoRA) -> 경량화 적용 -> 평가(원본 대비)
+  -> 품질 충분? [예] -> 모델 변환(GGUF/ONNX) -> 서빙(FastAPI/vLLM) -> 모니터링
+                [아니오] -> 경량화 수준 조정 -> (반복)
 ```
 
 ### 경량화 후 품질 평가

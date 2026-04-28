@@ -30,11 +30,11 @@ uploads/*
 pdf_output/
 
 # 별도 book 프로젝트 (각자 자체 git 리포)
-0.docs/09_vibe_coding_book/
-0.docs/10_data_analysis_book/
+books/
 
 # logging
 *.log
+*.log.*
 
 # temp working directory
 TEMP/
