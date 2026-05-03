@@ -32,6 +32,9 @@ pdf_output/
 # 별도 book 프로젝트 (각자 자체 git 리포)
 books/
 
+# 별도 lecture 프로젝트 (lecture-platform2026 — 통합 강의 repo)
+lectures/
+
 # logging
 *.log
 *.log.*
