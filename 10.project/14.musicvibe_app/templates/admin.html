@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Control Cockpit - Vibe 관리자{% endblock %}
+
+{% block content %}
+<div>
+    <h2 class="page-title" data-i18n="admin_title">⚙️ Admin Control Cockpit</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2.5rem; font-size: 1.05rem;" data-i18n="admin_desc">
+        커뮤니티 모니터링, 악성 유저 정지, 유해 콘텐츠(댓글, 캐싱 음악) 영구 삭제 등 관리 제어 권한을 행사합니다.
+    </p>
+
+    <!-- System KPIs Grid -->
+    <div class="admin-grid">
+        <div class="metric-card">
+            <span class="metric-value">{{ total_users }}</span>
+            <span class="metric-label" data-i18n="admin_kpi_users">총 가입 유저</span>
+        </div>
+        <div class="metric-card" style="border-color: rgba(0, 242, 254, 0.2);">
+            <span class="metric-value" style="color: var(--primary-cyan);">{{ total_songs }}</span>
+            <span class="metric-label" data-i18n="admin_kpi_songs">DB 저장 음악</span>
+        </div>
+        <div class="metric-card" style="border-color: rgba(127, 0, 255, 0.2);">
+            <span class="metric-value" style="color: var(--accent-purple);">{{ total_comments }}</span>
+            <span class="metric-label" data-i18n="admin_kpi_comments">등록된 댓글</span>
+        </div>
+        <div class="metric-card">
+            <span class="metric-value" style="color: #ff1744;">{{ total_likes }}</span>
+            <span class="metric-label" data-i18n="admin_kpi_likes">누적 좋아요 수</span>
+        </div>
+    </div>
+
+    <!-- Administration Moderation Panels -->
+    <div class="admin-sections">
+        
+        <!-- 1. User Management Grid -->
+        <section class="admin-section">
+            <h3 class="admin-section-header" data-i18n="admin_sec_users">👤 가입 사용자 제어 및 관리</h3>
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th data-i18n="admin_th_num">가입 번호</th>
+                            <th data-i18n="admin_th_user">사용자 아이디</th>
+                            <th data-i18n="admin_th_joined">가입 시각</th>
+                            <th data-i18n="admin_th_role">관리자 여부</th>
+                            <th data-i18n="admin_th_status">상태 (정지 유무)</th>
+                            <th data-i18n="admin_th_actions">제어 작업</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                            <tr>
+                                <td>{{ u.id }}</td>
+                                <td style="font-weight: 600;">{{ u.username }}</td>
+                                <td>{{ u.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td>
+                                    {% if u.is_admin %}
+                                        <span style="color: var(--primary-cyan); font-weight: 700;">ADMIN</span>
+                                    {% else %}
+                                        <span data-i18n="admin_role_user">일반 유저</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if u.is_blocked %}
+                                        <span style="color: #ff1744; font-weight: 700;" data-i18n="admin_status_blocked">🛑 정지됨</span>
+                                    {% else %}
+                                        <span style="color: var(--success); font-weight: 700;" data-i18n="admin_status_active">✅ 활성</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form action="{{ url_for('admin_toggle_block_user', target_id=u.id) }}" method="POST" style="display: inline;">
+                                        {% if u.is_blocked %}
+                                            <button type="submit" class="btn-warning" style="font-size: 0.8rem;" data-i18n="admin_btn_unblock">정지 해제</button>
+                                        {% else %}
+                                            <button type="submit" class="btn-danger" style="font-size: 0.8rem;" data-i18n="admin_btn_block">계정 정지</button>
+                                        {% endif %}
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-dark); padding: 2rem;" data-i18n="admin_no_users">가입한 일반 사용자가 아직 없습니다.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 2. Comment Moderation Timeline -->
+        <section class="admin-section">
+            <h3 class="admin-section-header" data-i18n="admin_sec_comments">💬 커뮤니티 댓글 필터링 및 악플 차단</h3>
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th data-i18n="admin_th_num">댓글 번호</th>
+                            <th data-i18n="admin_th_user">작성자</th>
+                            <th data-i18n="admin_th_song">연결 노래</th>
+                            <th data-i18n="admin_th_comment_body">댓글 본문 내용</th>
+                            <th data-i18n="admin_th_joined">작성 일자</th>
+                            <th data-i18n="admin_th_actions">제어 작업</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in comments %}
+                            <tr>
+                                <td>{{ c.id }}</td>
+                                <td style="color: var(--primary-cyan); font-weight: 600;">{{ c.user.username }}</td>
+                                <td>
+                                    <a href="{{ url_for('song_detail', track_id=c.song.track_id) }}" style="color: white; text-decoration: none;">
+                                        {{ c.song.track_name }}
+                                    </a>
+                                </td>
+                                <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ c.content }}">
+                                    {{ c.content }}
+                                </td>
+                                <td>{{ c.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td>
+                                    <form action="{{ url_for('admin_delete_comment', comment_id=c.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('이 댓글을 정말로 강제 삭제하시겠습니까?');">
+                                        <button type="submit" class="btn-danger" style="font-size: 0.8rem;" data-i18n="admin_btn_delete">강제 삭제</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-dark); padding: 2rem;" data-i18n="admin_no_comments">최근 등록된 댓글이 없습니다.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 3. Song Log Cache Management -->
+        <section class="admin-section">
+            <h3 class="admin-section-header" data-i18n="admin_sec_songs">💿 DB 인덱싱 노래 캐시 관리</h3>
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th data-i18n="admin_th_num">곡 인덱스</th>
+                            <th data-i18n="admin_th_track_artist">곡명 및 아티스트</th>
+                            <th data-i18n="admin_th_vibe_body">소개글(Vibe) 본문</th>
+                            <th data-i18n="admin_th_likes_count">좋아요 수</th>
+                            <th data-i18n="admin_th_actions">제어 작업</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in songs %}
+                            <tr>
+                                <td>{{ s.id }}</td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <img src="{{ s.artwork_url }}" alt="art" style="width: 30px; height: 30px; border-radius: 4px;">
+                                        <div>
+                                            <a href="{{ url_for('song_detail', track_id=s.track_id) }}" style="color: white; font-weight: 600; text-decoration: none; display: block;">
+                                                {{ s.track_name }}
+                                            </a>
+                                            <span style="font-size: 0.75rem; color: var(--text-muted);">{{ s.artist_name }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ s.description or '' }}">
+                                    {% if s.description %}
+                                        {{ s.description }}
+                                    {% else %}
+                                        <span data-i18n="admin_no_description">소개 없음</span>
+                                    {% endif %}
+                                </td>
+                                <td style="font-weight: 700; color: #ff1744;">♥ {{ s.likes|length }}</td>
+                                <td>
+                                    <form action="{{ url_for('admin_delete_song', song_id=s.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('이 노래를 삭제하면 관련 좋아요 및 댓글이 함께 삭제됩니다. 계속하시겠습니까?');">
+                                        <button type="submit" class="btn-danger" style="font-size: 0.8rem;" data-i18n="admin_btn_db_delete">DB 삭제</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-dark); padding: 2rem;" data-i18n="admin_no_songs">인덱싱된 곡 정보가 없습니다.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+</div>
+{% endblock %}

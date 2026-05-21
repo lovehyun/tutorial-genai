@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Top Likes - Vibe 인기 곡 순위{% endblock %}
+
+{% block content %}
+<div>
+    <h2 class="page-title" data-i18n="top_likes_title">🔥 Top Likes Chart</h2>
+    <p data-i18n="top_likes_desc" style="color: var(--text-muted); margin-bottom: 2rem; font-size: 1.05rem;">
+        Vibe 커뮤니티 유저들이 가장 많은 하트(좋아요)를 보낸 노래 순위입니다.
+    </p>
+
+    {% if top_songs %}
+        <div class="songs-grid">
+            {% for song, like_count in top_songs %}
+                <div class="song-card">
+                    <!-- High res rank index indicator -->
+                    <div style="position: absolute; top: 0.5rem; left: 0.5rem; background: var(--bg-dark); border: 1px solid var(--border-active); color: var(--primary-cyan); font-weight: 800; font-family: var(--font-outfit); font-size: 0.95rem; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 5; box-shadow: var(--shadow-cyan);">
+                        #{{ loop.index }}
+                    </div>
+                    
+                    <div class="artwork-wrapper">
+                        <img class="artwork-image" src="{{ song.artwork_url or 'https://via.placeholder.com/300' }}" alt="{{ song.track_name }}">
+                    </div>
+                    
+                    <div class="song-info">
+                        <h4 class="song-title" title="{{ song.track_name }}">{{ song.track_name }}</h4>
+                        <div class="song-artist" title="{{ song.artist_name }}">{{ song.artist_name }}</div>
+                        <div class="song-album" title="{{ song.collection_name }}">{{ song.collection_name }}</div>
+                    </div>
+                    
+                    <div class="song-card-actions">
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #ff1744; display: flex; align-items: center; gap: 0.2rem;">
+                            ♥ {{ like_count }}
+                        </span>
+                        <a href="{{ url_for('song_detail', track_id=song.track_id) }}" class="view-btn" data-i18n="view_vibe">Vibe 감상 &rarr;</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; color: var(--text-muted); padding: 5rem 0; background: var(--bg-surface); border-radius: 16px; border: 1px solid var(--border-color);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+            <p data-i18n="no_top_likes_alert" style="font-size: 1.1rem; line-height: 1.6;">아직 추천/좋아요가 누적된 곡이 존재하지 않습니다.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

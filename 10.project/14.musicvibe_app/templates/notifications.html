@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - 알림 내역{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    
+    <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 class="page-title" style="margin-bottom: 0;" data-i18n="notif_page_title">🔔 Notifications</h2>
+            {% if notifications %}
+                <button id="mark-all-read-btn" class="nav-btn" data-i18n="mark_all_read" style="padding: 0.5rem 1rem !important; font-size: 0.85rem !important; cursor: pointer; border-radius: 8px !important; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color);">
+                    모두 읽음으로 표시
+                </button>
+            {% endif %}
+        </div>
+        <p data-i18n="notif_page_desc" style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.3rem;">실시간 소셜 피드 알림입니다. 내가 좋아요 한 노래의 새로운 소식을 확인해 보세요.</p>
+    </div>
+
+    <!-- Notifications List -->
+    {% if notifications %}
+        <ul id="notifications-page-list" class="comments-list">
+            {% for notif in notifications %}
+                <li class="comment-card {% if not notif.is_read %}unread-notif{% endif %}" style="transition: border-color 0.3s; position: relative;">
+                    
+                    {% if not notif.is_read %}
+                        <!-- Blue glowing dot for unread state -->
+                        <span style="position: absolute; top: 1.2rem; left: 0.5rem; width: 8px; height: 8px; background: var(--primary-cyan); border-radius: 50%; box-shadow: var(--shadow-cyan);"></span>
+                    {% endif %}
+                    
+                    <div class="comment-meta" style="padding-left: 0.8rem;">
+                        <span class="comment-author">
+                            👤 {{ notif.sender.username }}
+                        </span>
+                        <span class="comment-time">{{ notif.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                    </div>
+                    
+                    <div class="comment-body" style="padding-left: 0.8rem;">
+                        <span data-i18n-notif-comment="{{ notif.song.track_name }}" data-song-url="{{ url_for('song_detail', track_id=notif.song.track_id) }}">
+                            내가 좋아요 한 노래 
+                            <a href="{{ url_for('song_detail', track_id=notif.song.track_id) }}" style="color: var(--primary-cyan); font-weight: 600; text-decoration: none;">
+                                {{ notif.song.track_name }}
+                            </a>에 새로운 댓글을 남겼습니다.
+                        </span>
+                        
+                        {% if notif.comment %}
+                            <div style="background: rgba(255,255,255,0.02); border-left: 3px solid var(--accent-purple); padding: 0.5rem 0.8rem; border-radius: 0 8px 8px 0; margin-top: 0.4rem; font-style: italic; color: var(--text-muted);">
+                                "{{ notif.comment.content }}"
+                            </div>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div id="notif-empty-state" style="text-align: center; color: var(--text-muted); padding: 6rem 0; background: var(--bg-surface); border-radius: 16px; border: 1px solid var(--border-color);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🔔</div>
+            <p data-i18n="no_notifs_alert" style="font-size: 1.1rem; font-weight: 600; line-height: 1.6;">아직 새로운 알림이 없습니다. 활발한 커뮤니티 활동을 즐겨보세요!</p>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

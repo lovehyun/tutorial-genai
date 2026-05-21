@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ user.username }}님의 Profile - Vibe{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 3rem;">
+    
+    <!-- User Meta Banner -->
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 20px; padding: 2.5rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 2rem;">
+            <div id="profile-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-cyan), var(--accent-purple)); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: 800; color: var(--bg-dark); box-shadow: var(--shadow-cyan); transition: all 0.3s ease;">
+                {{ user.username[0]|upper }}
+            </div>
+            <div>
+                <!-- Username display & inline form container -->
+                <div id="username-display-wrapper" style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.3rem;">
+                    <h2 id="profile-username" style="font-family: var(--font-outfit); font-size: 2rem; margin: 0;">{{ user.username }}</h2>
+                    <button id="edit-username-btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--primary-cyan); cursor: pointer; padding: 0.3rem 0.6rem; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.2rem; transition: all 0.2s;" title="닉네임 변경">
+                        <span data-i18n="profile_edit_btn">✏️ 수정</span>
+                    </button>
+                </div>
+                
+                <!-- Inline Username Form (hidden by default) -->
+                <form id="edit-username-form" style="display: none; align-items: center; gap: 0.6rem; margin-bottom: 0.3rem; flex-wrap: wrap;">
+                    <input type="text" id="edit-username-input" class="input-premium" value="{{ user.username }}" placeholder="새 닉네임" data-i18n-placeholder="profile_nickname_placeholder" style="font-size: 1.1rem; padding: 0.5rem 0.8rem; max-width: 200px; border-color: var(--primary-cyan);">
+                    <button type="submit" class="btn-primary" data-i18n="save" style="font-size: 0.85rem; padding: 0.5rem 1.0rem; align-self: center; margin: 0; box-shadow: 0 0 10px rgba(0,242,254,0.15);">저장</button>
+                    <button type="button" id="cancel-edit-btn" data-i18n="cancel" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; padding: 0.5rem 1rem; border-radius: 30px; font-size: 0.85rem; font-weight: 600; transition: all 0.2s;">취소</button>
+                </form>
+
+                <div style="color: var(--text-muted); font-size: 0.95rem;">
+                    <span data-i18n="profile_joined" data-date="{{ user.created_at.strftime('%Y-%m-%d') }}">가입일: {{ user.created_at.strftime('%Y년 %m월 %d일') }}</span>
+                    {% if user.is_admin %}
+                        <span style="font-size: 0.75rem; background: var(--primary-cyan); color: var(--bg-dark); padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 700; margin-left: 0.5rem; vertical-align: middle;">ADMINISTRATOR</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Panel: Tabs or Two-column layout -->
+    <div class="recent-activity-panel" style="margin-top: 0;">
+        
+        <!-- Column 1: Liked Songs -->
+        <div class="activity-box">
+            <h3 class="activity-title" data-i18n="profile_likes_tab" data-count="{{ likes|length }}">💖 내가 좋아요 한 노래 ({{ likes|length }})</h3>
+            {% if likes %}
+                <ul class="activity-list">
+                    {% for like in likes %}
+                        <li class="activity-item" style="padding: 0.8rem 0;">
+                            <img src="{{ like.song.artwork_url or 'https://via.placeholder.com/50' }}" alt="cover" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover;">
+                            <div class="activity-text" style="flex: 1;">
+                                <a href="{{ url_for('song_detail', track_id=like.song.track_id) }}" style="font-weight: 600; text-decoration: none; color: white;">
+                                    {{ like.song.track_name }}
+                                </a>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.1rem;">{{ like.song.artist_name }}</div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div data-i18n="no_profile_likes" style="text-align: center; color: var(--text-dark); padding: 3rem 0; font-size: 0.9rem;">
+                    좋아요를 누른 곡이 아직 없습니다.
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Column 2: Written Comments -->
+        <div class="activity-box">
+            <h3 class="activity-title" data-i18n="profile_comments_tab" data-count="{{ comments|length }}">💬 내가 작성한 댓글 ({{ comments|length }})</h3>
+            {% if comments %}
+                <ul class="activity-list">
+                    {% for comment in comments %}
+                        <li class="activity-item" style="align-items: flex-start; padding: 0.8rem 0; flex-direction: column; gap: 0.4rem;">
+                            <div style="font-size: 0.75rem; color: var(--text-dark); display: flex; justify-content: space-between; width: 100%;">
+                                <span>곡: <a href="{{ url_for('song_detail', track_id=comment.song.track_id) }}" style="color: var(--primary-cyan); font-weight: 600; text-decoration: none;">{{ comment.song.track_name }}</a></span>
+                                <span>{{ comment.created_at.strftime('%m-%d %H:%M') }}</span>
+                            </div>
+                            <div style="color: var(--text-muted); font-size: 0.85rem; font-style: italic; background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.5rem 0.8rem; border-radius: 8px; width: 100%;">
+                                "{{ comment.content }}"
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div data-i18n="no_profile_comments" style="text-align: center; color: var(--text-dark); padding: 3rem 0; font-size: 0.9rem;">
+                    작성한 댓글이 아직 없습니다.
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const editBtn = document.getElementById('edit-username-btn');
+    const cancelBtn = document.getElementById('cancel-edit-btn');
+    const displayWrapper = document.getElementById('username-display-wrapper');
+    const form = document.getElementById('edit-username-form');
+    const input = document.getElementById('edit-username-input');
+    const usernameText = document.getElementById('profile-username');
+    const avatar = document.getElementById('profile-avatar');
+    
+    if (!editBtn || !cancelBtn || !displayWrapper || !form || !input) return;
+    
+    // Toggle edit mode
+    editBtn.addEventListener('click', () => {
+        displayWrapper.style.display = 'none';
+        form.style.display = 'flex';
+        input.focus();
+    });
+    
+    // Cancel edit mode
+    cancelBtn.addEventListener('click', () => {
+        form.style.display = 'none';
+        displayWrapper.style.display = 'flex';
+        input.value = usernameText.textContent.trim();
+    });
+    
+    // Submit username update
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const newUsername = input.value.trim();
+        if (!newUsername) {
+            if (window.showToast) {
+                window.showToast('닉네임을 입력해 주세요.', 'error');
+            } else {
+                alert('닉네임을 입력해 주세요.');
+            }
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('username', newUsername);
+        
+        fetch('/api/profile/update', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Update display username
+                usernameText.textContent = data.new_username;
+                
+                // Update avatar text
+                if (avatar) {
+                    avatar.textContent = data.avatar_char;
+                }
+                
+                // Update navbar username Profile (...) if possible
+                const profileNavText = document.querySelector('[data-i18n="nav_profile"]');
+                if (profileNavText) {
+                    profileNavText.setAttribute('data-username', data.new_username);
+                    if (window.updateLanguageUI) {
+                        const currentLang = localStorage.getItem('lang') || 'ko';
+                        window.updateLanguageUI(currentLang);
+                    } else {
+                        profileNavText.innerHTML = `Profile (${data.new_username})`;
+                    }
+                }
+                
+                // Show dynamic success toast
+                if (window.showToast) {
+                    window.showToast(data.message, 'success');
+                }
+                
+                // Hide edit mode
+                form.style.display = 'none';
+                displayWrapper.style.display = 'flex';
+            } else {
+                if (window.showToast) {
+                    window.showToast(data.message, 'error');
+                } else {
+                    alert(data.message);
+                }
+            }
+        })
+        .catch(err => {
+            console.error('Profile update failed:', err);
+            if (window.showToast) {
+                window.showToast('닉네임 변경 중 서버 오류가 발생했습니다.', 'error');
+            } else {
+                alert('서버 오류가 발생했습니다.');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

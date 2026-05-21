@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Vibe - 음악 SNS{% endblock %}</title>
+    <!-- Meta tags for premium SEO -->
+    <meta name="description" content="실시간 음악 SNS 플랫폼 Vibe. 좋아하는 노래를 검색하고 의견을 나누며 소통해 보세요.">
+    <!-- Premium Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.8">
+    <!-- Inline non-flicker theme loader -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="nav-container">
+            <a href="{{ url_for('home') }}" class="logo-link" id="nav-logo">
+                <span class="logo-text">VIBE</span>
+            </a>
+            
+            <ul class="nav-menu">
+                <li class="nav-item {% if request.path == '/' %}active{% endif %}">
+                    <a href="{{ url_for('home') }}">
+                        <span>🏠</span> <span data-i18n="nav_home">Home</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if request.path == '/top-likes' %}active{% endif %}">
+                    <a href="{{ url_for('top_likes') }}">
+                        <span>🔥</span> <span data-i18n="nav_top_likes">TopLikes</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if request.path == '/hashtags' %}active{% endif %}">
+                    <a href="{{ url_for('hashtags') }}">
+                        <span>🏷️</span> <span data-i18n="nav_hashtags">Hashtags</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if request.path == '/notifications' %}active{% endif %}">
+                    <a href="{% if user %}{{ url_for('notifications_page') }}{% else %}{{ url_for('login_page') }}{% endif %}">
+                        <span>🔔</span> <span data-i18n="nav_notifications">Notifications</span>
+                        <span id="notif-badge" class="badge" style="{% if unread_count == 0 %}display: none;{% endif %}">
+                            {{ unread_count }}
+                        </span>
+                    </a>
+                </li>
+                
+                {% if user %}
+                    <li class="nav-item {% if request.path == '/profile' %}active{% endif %}">
+                        <a href="{{ url_for('profile') }}">
+                            <span>👤</span> <span data-i18n="nav_profile" data-username="{{ user.username }}">Profile ({{ user.username }})</span>
+                        </a>
+                    </li>
+                    {% if user.is_admin %}
+                        <li class="nav-item {% if request.path == '/admin' %}active{% endif %}">
+                            <a href="{{ url_for('admin_dashboard') }}" style="color: var(--primary-cyan); border: 1px solid var(--border-active);">
+                                ⚙️ <span data-i18n="nav_admin">Admin</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('logout') }}" class="nav-btn">
+                            <span data-i18n="nav_logout">Logout</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('login_page') }}" class="nav-btn">
+                            <span data-i18n="nav_login">Login</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                <!-- Theme / Lang switch pill -->
+                <li class="nav-item theme-lang-container" style="display: flex; gap: 0.5rem; align-items: center; margin-left: 0.8rem;">
+                    <button id="theme-toggle-btn" class="theme-toggle-btn" title="Toggle Theme">
+                        🌙
+                    </button>
+                    <button id="lang-toggle-btn" class="lang-toggle-btn" title="Toggle Language">
+                        KO
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Real-time HTML5 Toast Alerts Overlay -->
+    <div id="toast-container"></div>
+
+    <!-- Footer section -->
+    <footer>
+        <p data-i18n="footer_text">&copy; 2026 Vibe. Originally Crafted by GenAI Labs. Powered by iTunes Search. Built beautifully with Vanilla JS/CSS.</p>
+    </footer>
+
+    <!-- Global Dynamic App JavaScript -->
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

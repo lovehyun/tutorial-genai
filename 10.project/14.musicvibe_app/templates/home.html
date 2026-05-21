@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Vibe - 당신만의 음악적 감성을 나누는 곳{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <h1 class="hero-title" data-i18n="hero_title">Discover Your Vibe</h1>
+    <p class="hero-subtitle" data-i18n="hero_subtitle">실시간으로 음악을 검색하고, 당신의 소중한 감상평(Vibe)을 남겨 다른 사람들과 소통해 보세요.</p>
+</div>
+
+<!-- Premium Search System -->
+<div class="search-box-wrapper">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search-input" class="search-input" placeholder="노래 제목, 아티스트 이름 등으로 검색해 보세요..." data-i18n-placeholder="search_placeholder" autocomplete="off">
+    <div id="search-spinner" class="spinner"></div>
+</div>
+
+<!-- Real-time Debounced Search Results Grid -->
+<div id="search-results-container" class="songs-grid">
+    <!-- Rendered dynamically by Vanilla JS -->
+</div>
+
+<!-- Explore & Community Activities Feed (Shown when search is empty) -->
+<div id="explore-feed" class="recent-activity-panel">
+    
+    <!-- Recent Vibes / Comments -->
+    <div class="activity-box">
+        <h3 class="activity-title" data-i18n="feed_title_music">🎵 실시간 음악 피드</h3>
+        {% if recent_comments %}
+            <ul class="activity-list">
+                {% for comment in recent_comments %}
+                    <li class="activity-item">
+                        <div class="activity-avatar">
+                            {{ comment.user.username[0]|upper }}
+                        </div>
+                        <div class="activity-text" data-i18n-feed-comment="{{ comment.user.username }}" data-song-title="{{ comment.song.track_name }}" data-song-url="{{ url_for('song_detail', track_id=comment.song.track_id) }}">
+                            <strong>{{ comment.user.username }}</strong>님이 
+                            <a href="{{ url_for('song_detail', track_id=comment.song.track_id) }}">
+                                {{ comment.song.track_name }}
+                            </a>에 댓글을 달았습니다:
+                        </div>
+                        <div style="font-style: italic; margin-top: 0.2rem; color: var(--text-white); margin-left: 2.8rem; flex-basis: 100%;">
+                            "{{ comment.content }}"
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div data-i18n="feed_no_comments" style="text-align: center; color: var(--text-muted); padding: 2rem 0;">
+                아직 피드 글이 없습니다. 첫 Vibe를 남겨보세요!
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Popular Interactions / Recent Likes -->
+    <div class="activity-box">
+        <h3 class="activity-title" data-i18n="feed_title_likes">💖 최근 좋아요 소식</h3>
+        {% if recent_likes %}
+            <ul class="activity-list">
+                {% for like in recent_likes %}
+                    <li class="activity-item">
+                        <div class="activity-avatar" style="background: linear-gradient(135deg, #ff1744, #ff5252);">
+                            ♥
+                        </div>
+                        <div class="activity-text" data-i18n-feed-like="{{ like.user.username }}" data-song-title="{{ like.song.track_name }}" data-song-url="{{ url_for('song_detail', track_id=like.song.track_id) }}">
+                            <strong>{{ like.user.username }}</strong>님이 
+                            <a href="{{ url_for('song_detail', track_id=like.song.track_id) }}">
+                                {{ like.song.track_name }}
+                            </a> 곡을 좋아합니다.
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div data-i18n="feed_no_likes" style="text-align: center; color: var(--text-muted); padding: 2rem 0;">
+                아직 하트 신호가 없습니다. 곡을 탐색하고 하트를 꾹 눌러보세요!
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

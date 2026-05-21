@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ song.track_name }} - Vibe 상세 정보{% endblock %}
+
+{% block content %}
+<div class="detail-layout">
+    
+    <!-- Left Column: Premium Rotating Player Visualizer -->
+    <div class="detail-visual">
+        <div class="vinyl-player">
+            <div id="vinyl-disc" class="vinyl-disc">
+                <img class="vinyl-cover" src="{{ song.artwork_url or 'https://via.placeholder.com/300' }}" alt="cover">
+                <div class="vinyl-center"></div>
+            </div>
+        </div>
+
+        <!-- Custom Styled Audio Control -->
+        <div class="audio-player-control">
+            <button id="detail-play-btn" class="btn-play-pause" data-preview-url="{{ song.preview_url }}">
+                &#9658;
+            </button>
+            <div style="flex: 1;">
+                <div style="font-weight: 600; font-size: 0.95rem;" data-i18n="preview_title">30초 미리듣기 재생</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="preview_desc">클릭 시 레코드가 회전하며 음악이 스트리밍됩니다.</div>
+            </div>
+        </div>
+
+        <!-- Dynamic Action Row (Like / Hearts) -->
+        <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem;">
+            <button id="like-btn" class="nav-btn {% if user_liked %}liked{% endif %}" data-track-id="{{ song.track_id }}" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: {% if user_liked %}#ff1744{% else %}white{% endif %}; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; border-radius: 30px; padding: 0.6rem 1.5rem;">
+                <span id="like-icon" style="font-size: 1.2rem;">{% if user_liked %}&#9829;{% else %}&#9825;{% endif %}</span> 
+                <span id="likes-count-label" style="font-weight: 600;">{{ likes_count }} Likes</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Right Column: Metadata, Description & Social Conversations -->
+    <div class="detail-info">
+        
+        <!-- Metadata Header -->
+        <div class="detail-header">
+            <h2 class="detail-title">{{ song.track_name }}</h2>
+            <div class="detail-artist">{{ song.artist_name }}</div>
+            {% if song.collection_name %}
+                <div class="detail-album">💿 Album: {{ song.collection_name }}</div>
+            {% endif %}
+
+            <!-- Song Hashtags List & Inline Add Form -->
+            <div class="song-tags-list" style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+                {% for tag in song_tags %}
+                    <a href="/hashtags?tag={{ tag|urlencode }}" class="hashtag-pill" style="font-size: 0.85rem; padding: 0.3rem 0.8rem; border-radius: 15px; margin-bottom: 0.2rem;">{{ tag }}</a>
+                {% endfor %}
+                {% if user %}
+                    <form action="{{ url_for('add_tag', track_id=song.track_id) }}" method="POST" style="display: flex; gap: 0.3rem; align-items: center; margin-left: 0.5rem;">
+                        <input type="text" name="tag" class="input-premium" placeholder="#태그 추가..." data-i18n-placeholder="add_tag_placeholder" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; border-radius: 15px; width: 120px; height: 30px;">
+                        <button type="submit" class="btn-primary" data-i18n="add_tag_btn" style="padding: 0 0.8rem; height: 30px; font-size: 0.8rem; font-weight: 600; border-radius: 15px; align-self: center;">추가</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Vibe Description Box (Collaborative Wiki-style Commentary) -->
+        <div class="vibe-description-box">
+            <h3 class="vibe-title" data-i18n="vibe_title">✨ Music Vibe & Description</h3>
+            {% if song.description %}
+                <p class="vibe-text">"{{ song.description }}"</p>
+            {% else %}
+                <p class="vibe-text" style="font-style: normal; color: var(--text-dark);" data-i18n="no_description_alert">이 노래에 등록된 소개글이 아직 없습니다. 아래에서 첫 음악적 감상을 등록해 보세요!</p>
+            {% endif %}
+
+            {% if user %}
+                <button onclick="document.getElementById('edit-vibe-form').style.display='block'; this.style.display='none';" class="view-btn" style="background: none; border: none; margin-top: 1rem; cursor: pointer; text-align: left; padding: 0;">
+                    <span data-i18n="edit_description_btn">📝 소개글 작성/수정하기</span>
+                </button>
+                <form id="edit-vibe-form" action="{{ url_for('edit_vibe', track_id=song.track_id) }}" method="POST" style="display: none; margin-top: 1rem;">
+                    <textarea name="description" class="textarea-premium" placeholder="이 음악의 스토리나 당신의 특별한 감성 피드, 해시태그(예: #chill #신나는)를 적어주세요..." data-i18n-placeholder="edit_description_placeholder">{{ song.description or '' }}</textarea>
+                    <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.5rem;">
+                        <button type="button" onclick="location.reload();" class="btn-danger" style="padding: 0.5rem 1rem;" data-i18n="cancel">취소</button>
+                        <button type="submit" class="btn-primary" style="padding: 0.5rem 1rem;" data-i18n="save">저장하기</button>
+                    </div>
+                </form>
+            {% else %}
+                <div data-i18n="login_prompt_vibe" style="font-size: 0.85rem; color: var(--text-dark); margin-top: 0.8rem;">
+                    💡 <a href="{{ url_for('login_page') }}" style="color: var(--primary-cyan); text-decoration: none;">로그인</a> 후 이 노래의 감상글과 해시태그를 수정할 수 있습니다.
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- YouTube Official Music Video Integration -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; margin-top: 1.5rem;">
+            <h3 style="font-family: var(--font-outfit); font-size: 1.25rem; font-weight: 700; color: var(--primary-cyan); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;" data-i18n="youtube_title">
+                📺 Official YouTube Video
+            </h3>
+            <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-purple); border: 1px solid var(--border-color);">
+                {% if song.youtube_id %}
+                    <iframe 
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
+                        src="https://www.youtube.com/embed/{{ song.youtube_id }}?autoplay=0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                {% else %}
+                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); color: var(--text-muted); font-size: 0.9rem;" data-i18n="youtube_empty">
+                        📺 해당 곡의 유튜브 영상을 불러오는 중이거나 찾을 수 없습니다.
+                    </div>
+                {% endif %}
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-dark); margin-top: 0.8rem; text-align: center;" data-i18n="youtube_bottom">
+                🎵 VIBE YouTube Integration: 아티스트와 노래를 매칭하여 최적의 뮤직비디오/영상을 실시간으로 가져옵니다.
+            </div>
+        </div>
+
+        <!-- Comments & Conversation Thread Section -->
+        <div>
+            <h3 class="comments-section-title" data-i18n="comments_title" data-count="{{ comments|length }}">💬 Comments ({{ comments|length }})</h3>
+            
+            {% if user %}
+                <!-- Comment submission Form -->
+                <form action="{{ url_for('add_comment', track_id=song.track_id) }}" method="POST" class="comment-form">
+                    <textarea name="content" class="textarea-premium" placeholder="이 곡에 대해 자유롭게 이야기해 보세요! 해시태그도 사용 가능해요 (#추천 #드라이브)..." data-i18n-placeholder="comment_placeholder" required></textarea>
+                    <button type="submit" class="btn-primary" data-i18n="add_comment_btn">댓글 남기기</button>
+                </form>
+            {% else %}
+                <div data-i18n="login_prompt_comment" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 1rem; border-radius: 12px; text-align: center; margin-bottom: 2rem;">
+                    💬 댓글을 달고 싶으신가요? <a href="{{ url_for('login_page') }}" style="color: var(--primary-cyan); text-decoration: none; font-weight: 600;">로그인</a>이 필요합니다.
+                </div>
+            {% endif %}
+
+            <!-- Comments Timeline List -->
+            <div class="comments-list">
+                {% for comment in comments %}
+                    <div class="comment-card">
+                        <div class="comment-meta">
+                            <span class="comment-author">
+                                👤 {{ comment.user.username }} 
+                                {% if comment.user.is_admin %}
+                                    <span style="font-size: 0.7rem; background: var(--primary-cyan); color: var(--bg-dark); padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 700; margin-left: 0.2rem;">ADMIN</span>
+                                {% endif %}
+                            </span>
+                            <span class="comment-time">{{ comment.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                        </div>
+                        <div class="comment-body">
+                            {{ comment.content }}
+                        </div>
+                    </div>
+                {% else %}
+                    <div data-i18n="no_comments_alert" style="text-align: center; color: var(--text-muted); padding: 3rem 0; background: rgba(255,255,255,0.01); border-radius: 12px;">
+                        아직 댓글 대화가 없습니다. 따뜻한 이야기를 먼저 시작해 보세요!
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

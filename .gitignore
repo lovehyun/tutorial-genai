@@ -44,3 +44,6 @@ TEMP/
 
 # Claude Code 자동 메모리/상태
 .claude/
+
+# VS Code 설정 파일
+.vscode/

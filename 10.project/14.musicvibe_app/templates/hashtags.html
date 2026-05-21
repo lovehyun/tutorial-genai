@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Hashtags - 감성 태그 분류 탐색{% endblock %}
+
+{% block content %}
+<div>
+    <h2 class="page-title" data-i18n="hashtags_page_title">🏷️ Vibe Hashtags Explorer</h2>
+    <p data-i18n="hashtags_page_desc" style="color: var(--text-muted); margin-bottom: 2rem; font-size: 1.05rem;">
+        음악 설명글과 댓글에서 추출한 감성 태그로 노래들을 모아 탐색할 수 있습니다.
+    </p>
+
+    <!-- Popular Tags Carousel / Grid -->
+    <div class="tags-container">
+        {% for tag, count in popular_tags %}
+            <a href="{{ url_for('hashtags', tag=tag) }}" class="hashtag-pill {% if selected_tag == tag %}active{% endif %}">
+                {{ tag }} <span style="font-size: 0.75rem; opacity: 0.7; margin-left: 0.2rem;">{{ count }}</span>
+            </a>
+        {% else %}
+            <div data-i18n="no_hashtags_alert" style="color: var(--text-dark); font-size: 0.95rem;">아직 커뮤니티에 등록된 해시태그가 없습니다. 노래 설명이나 댓글에 #태그를 적어 보세요!</div>
+        {% endfor %}
+    </div>
+
+    <!-- Active Tag Results Grid -->
+    {% if selected_tag %}
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem; margin-bottom: 1.5rem;">
+            <h3 style="font-family: var(--font-outfit); font-size: 1.4rem;" data-i18n="hashtag_search_result" data-tag="{{ selected_tag }}" data-count="{{ filtered_songs|length }}">
+                🔍 <span style="color: var(--primary-cyan);">{{ selected_tag }}</span> 검색 결과 ({{ filtered_songs|length }})
+            </h3>
+            <a href="{{ url_for('hashtags') }}" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;" data-i18n="clear_filter">필터 지우기 &times;</a>
+        </div>
+
+        {% if filtered_songs %}
+            <div class="songs-grid">
+                {% for song in filtered_songs %}
+                    <div class="song-card">
+                        <div class="artwork-wrapper">
+                            <img class="artwork-image" src="{{ song.artwork_url or 'https://via.placeholder.com/300' }}" alt="{{ song.track_name }}">
+                        </div>
+                        <div class="song-info">
+                            <h4 class="song-title" title="{{ song.track_name }}">{{ song.track_name }}</h4>
+                            <div class="song-artist" title="{{ song.artist_name }}">{{ song.artist_name }}</div>
+                            <div class="song-album" title="{{ song.collection_name }}">{{ song.collection_name }}</div>
+                        </div>
+                        <div class="song-card-actions">
+                            <a href="{{ url_for('song_detail', track_id=song.track_id) }}" class="view-btn" data-i18n="view_vibe">Vibe 보기 &rarr;</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div data-i18n="no_tag_songs_alert" style="text-align: center; color: var(--text-muted); padding: 4rem 0; background: var(--bg-surface); border-radius: 12px; border: 1px solid var(--border-color);">
+                지정된 태그를 포함한 활성 데이터가 유실되었거나 없습니다.
+            </div>
+        {% endif %}
+    {% else %}
+        {% if popular_tags %}
+            <div style="text-align: center; padding: 4rem 2rem; background: var(--bg-surface); border-radius: 16px; border: 1px solid var(--border-color); color: var(--text-muted);">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🏷️</div>
+                <p data-i18n="hashtags_page_prompt" style="font-size: 1.1rem; font-weight: 600; line-height: 1.6;">상단의 해시태그를 클릭하여 음악적 테마를 탐색해 보세요! #드라이브 #퇴근길 #새벽감성 #신나는 등 원하는 분위기를 필터링할 수 있습니다.</p>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
