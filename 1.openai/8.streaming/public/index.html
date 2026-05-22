@@ -2,7 +2,9 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>{{ title }}</title>
+    <!-- REST API 방식: 이 파일은 정적 파일 그대로 전달된다 (템플릿 엔진 처리 없음).
+         서버 데이터를 넣을 자리가 없으므로 제목을 HTML에 직접 적는다. -->
+    <title>OpenAI SSE 스트리밍 — REST API 방식</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f7f7f8; height: 100vh; display: flex; flex-direction: column; }
@@ -24,8 +26,7 @@
     </style>
 </head>
 <body>
-    <!-- {{ title }} — 서버(render_template)가 채워 넣는 자리 (템플릿 엔진) -->
-    <div class="header">{{ title }}</div>
+    <div class="header">OpenAI SSE 스트리밍 — REST API 방식</div>
     <div class="chat-container" id="chat"></div>
     <div class="input-area">
         <div class="input-wrapper">
