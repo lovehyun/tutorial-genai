@@ -1,4 +1,4 @@
-# gpt-image-1 앱 - 2단계: 특정 영역만 편집 (인페인팅)
+# gpt-image 앱 - 2단계: 특정 영역만 편집 (인페인팅)
 # pip install flask openai pillow python-dotenv
 #
 # 1단계(생성) 대비 새로 추가된 것:
@@ -31,7 +31,7 @@ def generate():
     if not prompt:
         return jsonify({'error': '프롬프트를 입력하세요.'}), 400
     result = client.images.generate(
-        model='gpt-image-1', prompt=prompt, size='1024x1024', quality='medium',
+        model='gpt-image-1.5', prompt=prompt, size='1024x1024', quality='medium',
     )
     return jsonify({'image': result.data[0].b64_json})
 
@@ -48,7 +48,7 @@ def edit():
     image = Image.open(io.BytesIO(base64.b64decode(image_b64))).convert('RGBA')
     W, H = image.size
 
-    # [관전 포인트] 인페인팅 마스크 만들기 (gpt-image-1 규칙)
+    # [관전 포인트] 인페인팅 마스크 만들기 (gpt-image 규칙)
     #   마스크는 원본과 같은 크기의 RGBA 이미지.
     #   '투명한(alpha=0)' 픽셀 = 편집 대상,  불투명한 픽셀 = 그대로 유지.
     mask = Image.new('RGBA', (W, H), (0, 0, 0, 255))   # 전체 불투명 → 전부 유지
@@ -62,7 +62,7 @@ def edit():
 
     # [관전 포인트] images.edit + mask → 마스크의 '투명 영역'만 prompt대로 재생성된다
     result = client.images.edit(
-        model='gpt-image-1',
+        model='gpt-image-1.5',
         image=img_buf,
         mask=mask_buf,
         prompt=prompt,

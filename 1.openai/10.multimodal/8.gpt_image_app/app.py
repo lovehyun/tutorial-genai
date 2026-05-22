@@ -1,9 +1,9 @@
-# gpt-image-1 앱 - 1단계: 이미지 생성
+# gpt-image 앱 - 1단계: 이미지 생성
 # pip install flask openai python-dotenv
 #
-# gpt-image-1(OpenAI 최신 이미지 모델)으로 텍스트 → 이미지를 만드는 웹앱.
+# OpenAI 이미지 모델(gpt-image-1.5)로 텍스트 → 이미지를 만드는 웹앱.
 #
-# 이 폴더 묶음(8.gpt_image_app*)은 gpt-image-1의 3가지 기능을 단계별로 다룬다:
+# 이 폴더 묶음(8.gpt_image_app*)은 gpt-image의 3가지 기능을 단계별로 다룬다:
 #   1단계 생성  →  2단계 특정 영역만 편집(인페인팅)  →  3단계 주인공 유지 변형
 
 import os
@@ -26,10 +26,10 @@ def generate():
     if not prompt:
         return jsonify({'error': '프롬프트를 입력하세요.'}), 400
 
-    # [관전 포인트] gpt-image-1 이미지 생성
+    # [관전 포인트] gpt-image-1.5 이미지 생성
     #   quality 는 low / medium / high / auto 중 선택
     result = client.images.generate(
-        model='gpt-image-1',
+        model='gpt-image-1.5',
         prompt=prompt,
         size='1024x1024',
         quality='medium',
