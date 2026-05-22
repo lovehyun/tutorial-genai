@@ -1,4 +1,13 @@
-# Fixed Python Code (app.py)
+# DALL-E 이미지 편집 웹앱
+# pip install flask openai pillow requests python-dotenv
+#
+# DALL-E로 이미지를 생성하고, 마우스로 영역을 선택해 그 부분만 편집(인페인팅)하는 웹앱.
+# 라우트 4개가 하나의 흐름을 이룬다:
+#   /generate       프롬프트로 이미지 생성
+#   /upload         편집할 이미지를 직접 업로드 (생성 대신 올리기)
+#   /generate_mask  프론트에서 선택한 좌표로 마스크(흑백 이미지) 생성
+#   /edit           원본 + 마스크 + 프롬프트로 '선택 영역만' 편집
+# 영역 선택 UI는 프론트엔드(static/scripts.js)에 있다.
 
 import requests
 from openai import OpenAI

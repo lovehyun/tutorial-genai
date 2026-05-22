@@ -1,3 +1,12 @@
+# 이미지 분석(Vision) 앱 - 5단계: 음성 입력 + 음성 출력(TTS)
+# pip install flask openai python-dotenv
+#
+# 4단계 대비 새로 추가된 것:
+#   - 답변을 음성으로 읽어주는 기능(TTS)이 추가된다.
+#   - ★ 이 단계의 변화는 전적으로 '프론트엔드'에 있다.
+#     백엔드(app.py)는 4단계와 완전히 동일하다 — 브라우저가 SpeechSynthesis로
+#     서버 응답 텍스트를 직접 음성으로 출력하기 때문이다 (static/script.js 참고).
+
 import os, base64
 from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
@@ -29,7 +38,7 @@ def ask():
     mime = img.mimetype or "image/jpeg"
     b64 = base64.b64encode(img.read()).decode()
     img.seek(0)  # 파일 포인터 맨 앞으로 이동 (img 를 이후에 또 사용한다면, 포인터 이동 안하면 현재는 끝에 있어서 0바이트 반납됨.)
-    
+
     data_url = f"data:{mime};base64,{b64}"  # 또는 S3 에 업로드 이후 해당 링크 전달 (가장 효율적)
 
     resp = openai.chat.completions.create(
@@ -44,7 +53,7 @@ def ask():
         max_tokens=400,
         temperature=0.4
     )
-    
+
     return jsonify({"success": True,
                     "answer": resp.choices[0].message.content})
 

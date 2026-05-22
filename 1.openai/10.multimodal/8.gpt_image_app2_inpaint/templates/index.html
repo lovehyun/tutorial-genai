@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>gpt-image-1 · 영역 편집</title>
+  <style>
+    body { font-family: sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; }
+    h1 { font-size: 20px; }
+    textarea { width: 100%; height: 56px; padding: 8px; box-sizing: border-box; }
+    button { padding: 10px 18px; margin-top: 8px; background: #10a37f; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+    button:disabled { background: #ccc; }
+    canvas { border: 1px solid #ddd; border-radius: 8px; cursor: crosshair; margin-top: 8px; touch-action: none; }
+    .status { color: #888; }
+    .step { margin-top: 20px; }
+    .step.disabled { opacity: 0.4; pointer-events: none; }
+    #result img { max-width: 100%; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>gpt-image-1 · 2단계: 특정 영역만 편집 (인페인팅)</h1>
+
+  <div class="step">
+    <b>① 이미지 생성</b><br>
+    <textarea id="genPrompt" placeholder="예: 책상 위의 빨간 머그컵, 사진"></textarea>
+    <button id="genBtn" onclick="generate()">생성</button>
+  </div>
+
+  <div class="step disabled" id="editStep">
+    <b>② 편집할 영역을 캔버스에서 드래그한 뒤, 무엇으로 바꿀지 입력</b><br>
+    <canvas id="canvas" width="512" height="512"></canvas><br>
+    <textarea id="editPrompt" placeholder="예: 파란색 머그컵으로 바꿔줘"></textarea>
+    <button id="editBtn" onclick="edit()">선택 영역 편집</button>
+  </div>
+
+  <div class="step"><div id="result"></div></div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let currentImage = null;   // 현재 이미지 base64 (png)
+    let imgEl = null;
+    let rect = null;           // 선택 영역 (캔버스 좌표)
+    let dragging = false, startX = 0, startY = 0;
+
+    async function generate() {
+      const prompt = document.getElementById('genPrompt').value.trim();
+      if (!prompt) return;
+      const btn = document.getElementById('genBtn');
+      btn.disabled = true;
+      setResult('<p class="status">생성 중...</p>');
+      try {
+        const data = await postJSON('/generate', { prompt });
+        if (data.error) { setResult('오류: ' + data.error); }
+        else { loadImage(data.image); setResult(''); }
+      } catch (e) { setResult('요청 실패: ' + e.message); }
+      btn.disabled = false;
+    }
+
+    // 이미지를 캔버스에 올리고, 편집 단계를 활성화한다
+    function loadImage(b64) {
+      currentImage = b64;
+      rect = null;
+      imgEl = new Image();
+      imgEl.onload = drawCanvas;
+      imgEl.src = 'data:image/png;base64,' + b64;
+      document.getElementById('editStep').classList.remove('disabled');
+    }
+
+    // 캔버스에 이미지 + 선택 영역 사각형을 그린다
+    function drawCanvas() {
+      ctx.drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+      if (rect) {
+        ctx.strokeStyle = '#10a37f';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+        ctx.fillStyle = 'rgba(16,163,127,0.25)';
+        ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+      }
+    }
+
+    // 마우스 드래그로 사각형 영역 선택
+    canvas.addEventListener('mousedown', e => {
+      const r = canvas.getBoundingClientRect();
+      startX = e.clientX - r.left; startY = e.clientY - r.top;
+      dragging = true;
+    });
+    canvas.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const r = canvas.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      rect = { x: Math.min(startX, x), y: Math.min(startY, y),
+               w: Math.abs(x - startX), h: Math.abs(y - startY) };
+      drawCanvas();
+    });
+    canvas.addEventListener('mouseup', () => { dragging = false; });
+
+    async function edit() {
+      const prompt = document.getElementById('editPrompt').value.trim();
+      if (!currentImage || !rect || !prompt) {
+        alert('이미지 생성 → 영역 드래그 → 프롬프트 입력이 필요합니다.');
+        return;
+      }
+      const btn = document.getElementById('editBtn');
+      btn.disabled = true;
+      setResult('<p class="status">편집 중...</p>');
+      // 캔버스 좌표를 0~1 비율로 변환해 전송 → 서버가 실제 이미지 크기에 맞춰 마스크 생성
+      const frac = {
+        x: rect.x / canvas.width, y: rect.y / canvas.height,
+        w: rect.w / canvas.width, h: rect.h / canvas.height,
+      };
+      try {
+        const data = await postJSON('/edit', { image: currentImage, prompt, rect: frac });
+        if (data.error) { setResult('오류: ' + data.error); }
+        else {
+          loadImage(data.image);   // 편집 결과를 다시 캔버스로 → 이어서 또 편집 가능
+          setResult('<p class="status">편집 완료. 이어서 다른 영역도 편집할 수 있습니다.</p>');
+        }
+      } catch (e) { setResult('요청 실패: ' + e.message); }
+      btn.disabled = false;
+    }
+
+    async function postJSON(url, body) {
+      const res = await fetch(url, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      return res.json();
+    }
+    function setResult(html) { document.getElementById('result').innerHTML = html; }
+  </script>
+</body>
+</html>

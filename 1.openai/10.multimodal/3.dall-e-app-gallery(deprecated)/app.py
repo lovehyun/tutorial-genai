@@ -1,3 +1,12 @@
+# DALL-E 이미지 갤러리 웹앱
+# pip install flask openai pillow requests python-dotenv
+#
+# DALL-E로 생성한 이미지를 파일로 저장하고, 썸네일·메타데이터(프롬프트·생성시각)와
+# 함께 갤러리로 보여주는 웹앱.
+#   /generate              이미지 생성 → 원본 저장 + 썸네일 생성 + metadata.json 갱신
+#   get_gallery_images()   저장된 이미지 + 메타데이터를 모아 최신순으로 정렬
+# 갤러리 표시 UI는 프론트엔드(static/script.js)에 있다.
+
 import requests
 from openai import OpenAI
 from PIL import Image
