@@ -34,8 +34,12 @@ index.add(doc_embeddings)
 def rag_query(user_query):
     query_embedding = get_embedding(user_query)
     _, indices = index.search(np.array([query_embedding]), k=1)  # 가장 가까운 문서 검색
+    # 첫 번째 리턴값 → 거리(distance)
+    # 두 번째 리턴값 → 인덱스(index 번호)
+
     retrieved_doc = documents[indices[0][0]]  # 검색된 문서
     
+    # print(f"\nindicies: {indices}\n")  # 검색된 문서 인덱스
     # print(f"\n🔍 FAISS 검색된 문서:\n{retrieved_doc}\n")  # 검색된 문서 출력
 
     prompt = f"""
@@ -55,5 +59,23 @@ def rag_query(user_query):
     return response.choices[0].message.content
 
 # 테스트 실행
-query = "OpenAI는 어떤 기업인가요?"
+query = "Python은 어떤 언어인가요?"
+# query = "OpenAI는 어떤 기업인가요?"
 print(rag_query(query))
+
+
+# 문서들
+#  ↓
+# 임베딩(벡터화)
+#  ↓
+# FAISS 저장
+#  ↓
+# 사용자 질문
+#  ↓
+# 질문도 벡터화
+#  ↓
+# 가장 유사한 문서 검색
+#  ↓
+# 검색 문서를 GPT에 전달
+#  ↓
+# 답변 생성

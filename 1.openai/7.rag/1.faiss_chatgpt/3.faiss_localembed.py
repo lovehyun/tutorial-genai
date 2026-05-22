@@ -15,7 +15,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # 경고 제거용
 # os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-# 로컬 임베딩 모델 (Hugging Face 사용)
+# 로컬 임베딩 모델 (HuggingFace 사용)
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")  # 빠르고 가벼운 모델
 
 # 문서 데이터 (FAISS에 저장할 데이터)
@@ -45,7 +45,7 @@ def rag_query(user_query):
 
     print("\n🔍 FAISS 검색 결과:")
     print(f"   📄 검색된 문서: {retrieved_doc}")
-    print(f"   🎯 검색 정확도(유사도 점수): {similarity_score:.4f}")
+    print(f"   🎯 검색 정확도(유사도 점수): {similarity_score:.3f}")
 
     # OpenAI API를 활용한 최종 응답 생성
     prompt = f"""

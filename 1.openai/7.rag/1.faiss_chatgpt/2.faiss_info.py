@@ -31,7 +31,7 @@ def get_embedding(text):
     return np.array(response.data[0].embedding)
 
 # 문서 임베딩 생성 및 벡터DB(Faiss) 구축
-index = faiss.IndexFlatL2(1536)  # OpenAI 임베딩 차원(1536)
+index = faiss.IndexFlatL2(1536)  # OpenAI 임베딩 차원(1536),  # L2거리 =  ∣∣A−B∣∣ ^ 2   유클리디언 거리
 doc_embeddings = np.array([get_embedding(doc) for doc in documents])
 index.add(doc_embeddings)
 
