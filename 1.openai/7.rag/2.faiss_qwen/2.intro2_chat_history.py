@@ -3,6 +3,7 @@
 import requests
 
 MODEL_NAME = "qwen2.5:1.5b"
+# MODEL_NAME = "exaone-3.5:2.4b"
 
 # 전체 대화 기록
 conversation_history = ""
@@ -36,7 +37,7 @@ def ask_qwen(user_input):
 # CLI 채팅
 # -----------------------------
 
-print("Qwen CLI 채팅 시작")
+print("로컬 ollama (qwen/exaone) 채팅 시작")
 print("종료하려면 exit 입력\n")
 
 while True:

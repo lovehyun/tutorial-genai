@@ -2,10 +2,11 @@
 import requests
 
 MODEL_NAME = "qwen2.5:1.5b"
+# MODEL_NAME = "exaone-3.5:2.4b"
 
 conversation_history = ""
 
-print("로컬 Qwen 채팅 시작")
+print("로컬 ollama (qwen/exaone) 채팅 시작")
 print("종료하려면 exit 입력\n")
 
 while True:
