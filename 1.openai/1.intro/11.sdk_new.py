@@ -1,7 +1,7 @@
-# OpenAI SDK - 6단계: 신버전 SDK (v1.x) — 현재 표준
+# OpenAI SDK - 11단계: 신버전 SDK (v1.x) — 현재 표준
 # pip install openai
 #
-# 5단계(구버전)와 같은 일을 v1.x 스타일로. 달라진 점:
+# 10단계(구버전)와 같은 일을 v1.x 스타일로. 달라진 점:
 #   ① openai.OpenAI()로 client 인스턴스를 먼저 만든다
 #   ② client.chat.completions.create() 를 호출한다
 #   ③ 응답은 딕셔너리가 아닌 객체 → response.choices[0].message.content 로 접근

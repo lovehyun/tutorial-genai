@@ -1,6 +1,6 @@
-# OpenAI SDK - 7단계: SDK에서 파라미터 적용
+# OpenAI SDK - 12단계: SDK에서 파라미터 적용
 #
-# 6단계 대비 추가: 3단계(REST)에서 다룬 응답 제어 파라미터를 SDK 방식으로.
+# 11단계 대비 추가: 3단계(REST)에서 다룬 응답 제어 파라미터를 SDK 방식으로.
 # REST에서는 json={...} 안에 넣었지만, SDK에서는 create()의 인자로 직접 전달한다.
 
 import os

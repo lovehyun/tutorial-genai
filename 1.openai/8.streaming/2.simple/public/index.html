@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <!-- REST API 방식: 이 파일은 정적 파일 그대로 전달된다 (템플릿 엔진 처리 없음). -->
+    <title>OpenAI 스트리밍 — 단순화 (REST API 방식)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f7f7f8; height: 100vh; display: flex; flex-direction: column; }
+        .header { background: #fff; padding: 16px 24px; border-bottom: 1px solid #e5e5e5; text-align: center; font-size: 18px; font-weight: 600; }
+        .chat-container { flex: 1; overflow-y: auto; padding: 24px; max-width: 768px; margin: 0 auto; width: 100%; }
+        .message { margin-bottom: 16px; line-height: 1.6; }
+        .message.user { background: #e3f2fd; padding: 12px 16px; border-radius: 12px; }
+        .message.assistant { background: #fff; padding: 12px 16px; border-radius: 12px; border: 1px solid #e5e5e5; }
+        .message .role { font-weight: 600; margin-bottom: 4px; color: #666; font-size: 12px; }
+        .cursor { display: inline-block; width: 8px; height: 16px; background: #333; animation: blink 1s infinite; vertical-align: text-bottom; }
+        @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+        .input-area { background: #fff; border-top: 1px solid #e5e5e5; padding: 16px 24px; }
+        .input-wrapper { max-width: 768px; margin: 0 auto; display: flex; gap: 12px; }
+        input[type="text"] { flex: 1; padding: 12px 16px; border: 1px solid #d9d9e3; border-radius: 8px; font-size: 14px; outline: none; }
+        input[type="text"]:focus { border-color: #10a37f; }
+        button { padding: 12px 24px; background: #10a37f; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #0d8c6d; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="header">OpenAI 스트리밍 — 단순화 (REST API 방식)</div>
+    <div class="chat-container" id="chat"></div>
+    <div class="input-area">
+        <div class="input-wrapper">
+            <input type="text" id="userInput" placeholder="메시지를 입력하세요..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button id="sendBtn" onclick="sendMessage()">전송</button>
+        </div>
+    </div>
+
+    <script>
+        const chat = document.getElementById('chat');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        function addMessage(role, content) {
+            const div = document.createElement('div');
+            div.className = 'message ' + role;
+            div.innerHTML = '<div class="role">' + (role === 'user' ? '사용자' : 'AI') + '</div><div class="content">' + content + '</div>';
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+            return div;
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            userInput.value = '';
+            sendBtn.disabled = true;
+
+            addMessage('user', message);
+            const assistantDiv = addMessage('assistant', '<span class="cursor"></span>');
+            const contentDiv = assistantDiv.querySelector('.content');
+            let fullText = '';
+
+            try {
+                const response = await fetch('/stream', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+
+                // [관전 포인트] 1.chat 버전과 비교 — 파싱 단계가 통째로 사라졌다.
+                //   1.chat: split('\n') → startsWith('data: ') → slice(6) → JSON.parse
+                //   여기:    decode한 텍스트를 그대로 fullText에 이어붙이면 끝.
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    fullText += decoder.decode(value, { stream: true });
+                    contentDiv.innerHTML = fullText.replace(/\n/g, '<br>') + '<span class="cursor"></span>';
+                    chat.scrollTop = chat.scrollHeight;
+                }
+
+                contentDiv.innerHTML = fullText.replace(/\n/g, '<br>');
+            } catch (error) {
+                contentDiv.innerHTML = '오류가 발생했습니다: ' + error.message;
+            }
+
+            sendBtn.disabled = false;
+            userInput.focus();
+        }
+    </script>
+</body>
+</html>

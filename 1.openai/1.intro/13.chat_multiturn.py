@@ -1,12 +1,15 @@
-# OpenAI SDK - 8단계: 멀티턴 대화 (대화 기억의 원리)
+# OpenAI SDK - 13단계: 멀티턴 대화 (chat.completions 방식, 클라이언트 누적)
 #
-# 7단계까지는 매 호출이 독립적이었다 — 모델은 직전 질문을 기억하지 못한다.
+# 12단계까지는 매 호출이 독립적이었다 — 모델은 직전 질문을 기억하지 못한다.
 # 멀티턴의 핵심: messages 리스트에 '이전 대화'를 함께 담아 보내면 맥락이 이어진다.
 #
 # [assistant 역할의 쓰임]
 #   모델의 지난 답변을 assistant 역할로 messages에 다시 넣어야
 #   모델이 "내가 이렇게 답했지" 하고 맥락을 이어간다.
 # 이 원리를 본격적으로 다루는 곳이 다음 폴더 3.chatbot2_history 다.
+#
+# 참고: Responses API(/v1/responses)는 이 누적을 서버가 대신 해준다 —
+#       6.restapi_response_chain.py (REST) / 16.response_multiturn.py (SDK) 참고.
 
 import os
 from openai import OpenAI

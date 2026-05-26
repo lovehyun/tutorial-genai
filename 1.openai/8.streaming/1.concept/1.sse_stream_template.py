@@ -11,11 +11,12 @@
 
 import os
 import json
-from flask import Flask, Response, request, render_template
-from openai import OpenAI
-from dotenv import load_dotenv
 
-load_dotenv(dotenv_path='../.env')
+from dotenv import load_dotenv
+from flask import Flask, render_template, request, Response
+from openai import OpenAI
+
+load_dotenv(dotenv_path='../../.env')
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 app = Flask(__name__)
