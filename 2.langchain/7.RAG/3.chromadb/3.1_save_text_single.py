@@ -1,4 +1,4 @@
-﻿# pip install chromadb tiktoken langchain-chroma
+# pip install chromadb tiktoken langchain-chroma
 from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI

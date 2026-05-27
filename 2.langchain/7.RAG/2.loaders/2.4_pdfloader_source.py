@@ -1,4 +1,4 @@
-﻿# pip install pypdf langchain-chroma
+# pip install pypdf langchain-chroma
 
 from dotenv import load_dotenv
 

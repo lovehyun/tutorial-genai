@@ -1,4 +1,4 @@
-﻿# pip install transformers pymupdf
+# pip install transformers pymupdf
 import fitz  # PyMuPDF
 from typing import Optional
 from transformers import AutoTokenizer, AutoModelForQuestionAnswering, pipeline

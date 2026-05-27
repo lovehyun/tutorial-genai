@@ -1,4 +1,4 @@
-﻿from dotenv import load_dotenv
+from dotenv import load_dotenv
 
 # 대화 라이브러리
 from langchain_openai import ChatOpenAI

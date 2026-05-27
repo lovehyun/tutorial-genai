@@ -1,4 +1,4 @@
-﻿from dotenv import load_dotenv
+from dotenv import load_dotenv
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 

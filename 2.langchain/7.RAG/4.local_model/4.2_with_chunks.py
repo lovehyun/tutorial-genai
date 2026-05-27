@@ -1,4 +1,4 @@
-﻿# pip install transformers pymupdf
+# pip install transformers pymupdf
 import fitz  # PyMuPDF
 from typing import List, Optional
 from collections import Counter
