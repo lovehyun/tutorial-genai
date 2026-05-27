@@ -29,8 +29,11 @@ openai_api_key = os.environ.get("OPENAI_API_KEY")
 #                gpt-3.5-turbo-instruct 가 기본값임.
 
 # 모델: 문장완성모델(completion-model) vs 챗모델(chat-model)
+
+
+# 1. Legacy Completion 방식 — `OpenAI` 클래스 + gpt-3.5-turbo-instruct 로 단일 문자열 prompt → 문자열 결과
 print('--- 1 ---')
-llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0.9)
+llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0.9, api_key=openai_api_key)
 print(llm)
 
 prompt = "What's a good company name that makes arcade games?"
@@ -38,7 +41,7 @@ result = llm.invoke(prompt)
 print(result)
 
 
-# ChatOpenAI.invoke()는 내부적으로 문자열 입력을 HumanMessage로 자동 변환해줍니다.
+# 2. `ChatOpenAI`에 문자열을 그대로 넣어 호출 — 내부적으로 HumanMessage 로 자동 변환되고, 반환은 AIMessage 객체(.content 로 꺼내야 함)
 print('--- 2 ---')
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.9)
 print(llm)
@@ -48,6 +51,8 @@ prompt = "What's a good company name that makes arcade games?"
 result = llm.invoke(prompt)
 print(result.content)
 
+
+# 3. 메시지 객체(HumanMessage / SystemMessage)로 명시적으로 입력 구성 — Chat 모델의 본래 입력 형식 보여주기
 print('--- 3 ---')
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 

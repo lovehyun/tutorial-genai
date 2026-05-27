@@ -36,6 +36,8 @@ def grade(grade):
 def curriculum(grade, curriculum_id):
     if grade in curriculums and 0 <= curriculum_id < len(curriculums[grade]):
         curriculum_title = curriculums[grade][curriculum_id]
+        
+        # POST: 사용자 질문(채팅)에 대한 응답
         if request.method == 'POST':
             user_input = request.form['user_input']
             response = client.chat.completions.create(
@@ -61,7 +63,10 @@ def curriculum(grade, curriculum_id):
             )
             chat_response = response.choices[0].message.content.strip()
             return jsonify({'response': chat_response})
+        
+        # GET 요청에 대한 응답
         return render_template('curriculum.html', grade=grade, curriculum_title=curriculum_title, grades=curriculums.keys())
+
     return "해당 커리큘럼은 존재하지 않습니다.", 404
 
 if __name__ == '__main__':

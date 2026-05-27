@@ -45,3 +45,10 @@ LLM API는 기본적으로 **무상태(stateless)** — 매 호출마다 이전 
 pip install langchain langchain-openai python-dotenv
 python 1.1_nomemory.py
 ```
+
+## 관련 폴더
+
+- [`../2.prompts/4.advanced/`](../2.prompts/4.advanced/) — **`MessagesPlaceholder`** 가 메모리의 핵심 빌딩 블록. 메모리 구현 전 필수 학습
+- [`../4.chaining/`](../4.chaining/) — `RunnableWithMessageHistory` 는 LCEL Runnable. 체인에 메모리를 끼우는 패턴
+- [`../9.langgraph/`](../9.langgraph/) — LangGraph 의 `MemorySaver` 체크포인팅 (가장 현대적 메모리 방식)
+- [`../8.agents/`](../8.agents/) — 에이전트는 거의 항상 메모리가 필요함

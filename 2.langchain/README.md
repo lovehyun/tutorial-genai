@@ -2,19 +2,47 @@
 
 LangChain 프레임워크를 활용한 LLM 애플리케이션 개발 예제입니다.
 
-## 학습 순서
+## 학습 순서 (역할별 분리, 논리 흐름 순서)
 
-| 디렉토리 | 주제 | 설명 |
-|----------|------|------|
-| `1.llm_models/` | LLM 모델 | OpenAI 모델 연동 (Completion, Chat, Flask) |
-| `2.prompts/` | 프롬프트 | PromptTemplate, ChatPromptTemplate, 작업별 예제 |
-| `3.structured_output/` | 구조화 출력 | StrOutputParser, Pydantic, with_structured_output |
-| `4.chaining/` | 체이닝 | LCEL, RunnableLambda, RunnablePassthrough |
-| `5.memory/` | 메모리 | 대화 히스토리 관리 (RunnableWithMessageHistory) |
-| `6.RAG/` | RAG | 문서 검색 + LLM 응답 생성 파이프라인 |
-| `7.agents/` | 에이전트 | 도구 사용 자율 에이전트 (검색, 위키, 커스텀) |
-| `8.langgraph/` | LangGraph | 상태 기반 그래프 워크플로우 |
-| `9.agentic_patterns/` | Agentic 패턴 | Anthropic 5대 디자인 패턴 (Chaining, Routing, Parallelization, Orchestrator, Evaluator) |
+| # | 디렉토리 | 주제 | 핵심 내용 |
+|---|----------|------|----------|
+| 1 | `1.llm_models/` | LLM 모델 | OpenAI Chat/Completion 비교, API 키 처리, Flask 연동 |
+| 2 | `2.prompts/` | **프롬프트 작성** | `ChatPromptTemplate`, few-shot, MessagesPlaceholder, partial, composition |
+| 3 | `3.structured_output/` | **출력 파싱** | `StrOutputParser`, `PydanticOutputParser`, `.with_structured_output()` |
+| 4 | `4.chaining/` | **LCEL 체이닝** | `\|` 파이프, RunnableLambda/Passthrough/Parallel/Branch/Map, stream/batch, retry/config |
+| 5 | `5.tasks/` | **응용 태스크** | 요약 / 번역 / 이메일 / SQL 생성 (위 도구 종합 응용) |
+| 6 | `6.memory/` | 대화 메모리 | `RunnableWithMessageHistory`, ConversationMemory, LangGraph 체크포인팅 |
+| 7 | `7.RAG/` | RAG | 문서 로더, 텍스트 분할, 임베딩, 벡터스토어, 검색 + 생성 파이프라인 |
+| 8 | `8.agents/` | 에이전트 | 도구(`@tool`/`bind_tools`), `create_agent`, Tavily/Wikipedia 검색 |
+| 9 | `9.langgraph/` | LangGraph | 상태 기반 그래프 워크플로우, `StateGraph`, `MemorySaver` |
+| 10 | `10.agentic_patterns/` | Agentic 패턴 | Anthropic 5대 디자인 패턴 (Chaining, Routing, Parallelization, Orchestrator, Evaluator) |
+| 11 | `11.multimodal/` | (선택) 멀티모달 | 이미지 포함 메시지 (gpt-4o vision) — 필요할 때만 보면 OK |
+
+### 학습 흐름 그래프
+
+```
+[기초]
+1.llm_models   ─ 어떤 모델을 쓸 것인가? (Chat / Completion)
+        ↓
+[Prompt → 결과] 사이클 익히기
+2.prompts → 3.structured_output → 4.chaining
+입력 작성       출력 파싱            묶어서 흐름 만들기
+        ↓
+[응용]
+5.tasks         위 도구들로 실제 작업 (요약/번역/이메일/SQL)
+        ↓
+[상태/검색/도구 — 본격 LLM 시스템]
+6.memory → 7.RAG → 8.agents
+대화 상태   외부 데이터  LLM + 도구 + 루프
+        ↓
+[고급 오케스트레이션]
+9.langgraph → 10.agentic_patterns
+
+[부록] 11.multimodal — 이미지 입력 (필요할 때만 참고)
+```
+
+> **방침**: 각 폴더는 **하나의 주제**에 집중합니다. 예를 들어 `2.prompts/` 는 "프롬프트 작성" 만 다루고, 출력 파싱은 `3.structured_output/`, 체이닝은 `4.chaining/` 으로 분리되어 있습니다.
+> 폴더 안에 `0.legacy(instruct)/` 가 있으면 옛 `OpenAI` + `gpt-3.5-turbo-instruct` 기반 비교용입니다 — 새 프로젝트엔 사용하지 않습니다.
 
 ## 사전 준비
 

@@ -21,9 +21,15 @@ load_dotenv(dotenv_path='../.env')
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 
 
-# temperature: 0~1 (0=deterministic, 1=randomness/creativity)
+# temperature: OpenAI 공식 범위는 0 ~ 2 (기본값 1.0)
+#   - 0    → 가장 결정적(deterministic), 동일 입력에 거의 동일 출력
+#   - 1    → 기본값 (밸런스)
+#   - 1~2  → 더 랜덤/창의적이지만, 1.5 이상은 출력이 깨지기 쉬워 실무에선 잘 안 씀
+#   - 그래서 실무에서는 보통 0 ~ 1 사이를 사용 (단, API 스펙상 상한은 2)
+#   - 참고: Anthropic Claude의 temperature는 0 ~ 1 (모델마다 다르니 주의)
+#
 # default model: text-davinci-003 (deprecated - 2024.01)
-#                gpt-3.5-turbo-instruct 가 기본값임.
+#                현재는 gpt-3.5-turbo-instruct 가 langchain_openai.OpenAI 의 기본값.
 
 # 모델: 문장완성모델(completion-model) vs 챗모델(chat-model)
 # llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0.9)

@@ -19,8 +19,8 @@ prompt = ChatPromptTemplate.from_messages([
 ])
 
 # 2. Chat LLM 모델 설정
-# llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.9)
-llm = ChatOpenAI(model="gpt-4o", temperature=0.9)
+# llm = ChatOpenAI(model="gpt-4o", temperature=0.9)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.9)
 
 # 3. 후처리 파서 설정
 parser = StrOutputParser()

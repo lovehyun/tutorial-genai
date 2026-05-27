@@ -19,12 +19,12 @@ app = Flask(__name__)
 # LLM 초기화
 llm1 = OpenAI(
     temperature=0.9,
-    openai_api_key=openai_api_key  # 명시적으로 넘겨주는 방식
+    api_key=openai_api_key  # 명시적으로 넘겨주는 방식
 )
 
 llm2 = OpenAI(
     temperature=0.9,
-    openai_api_key=openai_api_key,
+    api_key=openai_api_key,
     n=5  # 한 번의 호출로 5개 생성
 )
 
