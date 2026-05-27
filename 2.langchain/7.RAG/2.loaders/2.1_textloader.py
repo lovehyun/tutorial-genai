@@ -1,4 +1,4 @@
-from dotenv import load_dotenv
+﻿from dotenv import load_dotenv
 
 # 대화 라이브러리
 from langchain_openai import ChatOpenAI
@@ -26,7 +26,7 @@ load_dotenv(dotenv_path='../.env')
 
 # 2. 문서 로드 (euc-kr로 인코딩된 텍스트 파일)
 # Windows에서 cp949 디코딩 오류를 방지하려면 euc-kr로 저장해야 함
-loader = TextLoader('./nvme.txt', encoding='utf-8')  # utf-8 또는 euc-kr
+loader = TextLoader('../DATA/nvme.txt', encoding='utf-8')  # utf-8 또는 euc-kr
 documents = loader.load()
 
 # 3. 문서를 1000자 단위로 분할하고 200자 중복 유지 - 1000개 단어 vs 1000개 토큰

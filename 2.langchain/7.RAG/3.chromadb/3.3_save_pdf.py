@@ -1,4 +1,4 @@
-# pip install pypdf langchain-chroma
+﻿# pip install pypdf langchain-chroma
 import os
 from dotenv import load_dotenv
 
@@ -16,8 +16,8 @@ from langchain_chroma import Chroma
 load_dotenv(dotenv_path='../.env')
 
 # 2. PDF 파일 및 Chroma 저장 경로 설정
-PDF_FILENAME = './DATA/Python_시큐어코딩_가이드(2023년_개정본).pdf'
-PERSIST_DIR = "./chroma_db"
+PDF_FILENAME = '../DATA/Python_시큐어코딩_가이드(2023년_개정본).pdf'
+PERSIST_DIR = "../chroma_db"
 COLLECTION_NAME = "secure_coding_python"
 
 # 3. Chroma DB를 새로 생성하는 함수

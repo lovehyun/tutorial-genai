@@ -1,4 +1,4 @@
-from dotenv import load_dotenv
+﻿from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
@@ -11,7 +11,7 @@ from langchain_chroma import Chroma
 load_dotenv()
 
 # 1. 기본 설정
-PERSIST_DIR = "./chroma_db"
+PERSIST_DIR = "../chroma_db"
 COLLECTION_NAMES = ["secure_coding_python", "nvme"]
 
 # 2. 컬렉션 로딩 전용

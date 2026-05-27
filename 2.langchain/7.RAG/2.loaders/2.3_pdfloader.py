@@ -1,4 +1,4 @@
-# pip install pypdf langchain-chroma
+﻿# pip install pypdf langchain-chroma
 
 from dotenv import load_dotenv
 
@@ -15,7 +15,7 @@ from langchain_chroma import Chroma
 load_dotenv(dotenv_path='../.env')
 
 # 2. PDF 파일 로드 (LangChain의 PyPDFLoader 사용)
-pdf_filename = './DATA/Python_시큐어코딩_가이드(2023년_개정본).pdf'
+pdf_filename = '../DATA/Python_시큐어코딩_가이드(2023년_개정본).pdf'
 loader = PyPDFLoader(pdf_filename)
 pages = loader.load()  # 페이지별로 문서 객체 반환
 
@@ -41,7 +41,7 @@ store = Chroma.from_documents(
     texts, 
     embeddings, 
     collection_name="secure_coding_python",
-    persist_directory="./chroma_db"  # 저장 위치
+    persist_directory="../chroma_db"  # 저장 위치
 )
 
 

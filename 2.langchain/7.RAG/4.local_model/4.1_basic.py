@@ -1,4 +1,4 @@
-# pip install transformers pymupdf
+﻿# pip install transformers pymupdf
 import fitz  # PyMuPDF
 from typing import Optional
 from transformers import AutoTokenizer, AutoModelForQuestionAnswering, pipeline
@@ -49,7 +49,7 @@ def answer_question(qa_pipeline: pipeline, question: str, context: str) -> str:
 
 def main():
    # PDF 경로 설정
-   pdf_path = "./DATA/Python_시큐어코딩_가이드(2023년_개정본).pdf"
+   pdf_path = "../DATA/Python_시큐어코딩_가이드(2023년_개정본).pdf"
    
    # PDF에서 텍스트 추출
    print("PDF에서 텍스트를 추출하는 중...")

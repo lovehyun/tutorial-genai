@@ -1,4 +1,4 @@
-from dotenv import load_dotenv
+﻿from dotenv import load_dotenv
 
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
@@ -6,7 +6,7 @@ from langchain_openai import OpenAIEmbeddings
 load_dotenv()
 
 # Chroma DB 설정
-PERSIST_DIR = "./chroma_db"  # 저장된 디렉토리
+PERSIST_DIR = "../chroma_db"  # 저장된 디렉토리
 COLLECTION_NAME = "secure_coding_python"  # 확인할 컬렉션 이름
 
 # 임베딩 모델 준비

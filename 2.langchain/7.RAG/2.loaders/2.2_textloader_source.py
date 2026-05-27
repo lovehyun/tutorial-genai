@@ -1,4 +1,4 @@
-# pip install langchain-chroma chromadb tiktoken
+﻿# pip install langchain-chroma chromadb tiktoken
 from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
@@ -17,8 +17,8 @@ from langchain_chroma import Chroma
 load_dotenv(dotenv_path='../.env')
 
 # 2. 문서 로드
-document1 = TextLoader('./nvme.txt', encoding='utf-8').load()
-document2 = TextLoader('./ssd.txt', encoding='utf-8').load()
+document1 = TextLoader('../DATA/nvme.txt', encoding='utf-8').load()
+document2 = TextLoader('../DATA/ssd.txt', encoding='utf-8').load()
 
 # 3. 텍스트 분할기 설정
 text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=100)

@@ -1,11 +1,11 @@
-from dotenv import load_dotenv
+﻿from dotenv import load_dotenv
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 
 load_dotenv()
 
 # Chroma DB 설정
-PERSIST_DIR = "./chroma_db"
+PERSIST_DIR = "../chroma_db"
 COLLECTION_NAME = "secure_coding_python"
 
 # 임베딩 모델 준비
