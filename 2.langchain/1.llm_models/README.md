@@ -8,6 +8,7 @@
 2. **Instruct Fine-tuning 개념** — Instruct 모델이란 무엇이고 파인튜닝과 어떤 관계인지
 3. **오픈소스 LLM 모델 비교** — GPT-2 / GPT-Neo / Mistral 등 학습/실습용 참고
 4. **실무 가이드 (2026년 기준)** — 새 프로젝트에서 어떻게 선택할지
+5. **Reasoning 모델** — 답하기 전 "생각" 단계를 거치는 LLM (gpt-5, o-series, Claude thinking)
 
 ---
 
@@ -227,3 +228,60 @@ client.completions.create(
 - 이 튜토리얼의 LangChain 예제는 모두 `ChatOpenAI` 기준으로 진행됩니다.
   `langchain_openai.OpenAI`(legacy completion 래퍼)는 "이런 게 있었다" 정도의 학습용 참조로 보면 됩니다.
 - 오픈소스 모델은 GPU 리소스가 받쳐주는 경우 Mistral / Llama 3.x / Qwen 계열의 Instruct 버전이 일반적인 선택.
+
+---
+
+## 5. Reasoning 모델 — "생각하는" LLM
+
+### 5.1 일반 Chat 모델 vs Reasoning 모델
+
+| | Chat 모델 (gpt-4o, Claude Sonnet 등) | Reasoning 모델 (gpt-5, o-series, Claude thinking) |
+|---|---|---|
+| **동작 방식** | 질문 → 즉시 응답 | 질문 → **내부 추론(reasoning) 토큰** → 응답 |
+| **추론 노출** | 안 보임 (모델 내부에만) | 텍스트 또는 요약으로 노출 가능 |
+| **강점** | 일반 대화 / 짧은 응답 | 수학·코딩·논리·계획 수립 |
+| **약점** | 복잡 추론에서 정확도 ↓ | 토큰 비용 + 지연 시간 ↑ |
+| **에이전트 적합도** | 충분히 좋음 | 도구 호출 결정도 더 똑똑함 |
+
+### 5.2 주요 모델 목록 (2026)
+
+| 모델군 | 모델 | reasoning 노출 방식 |
+|---|---|---|
+| **OpenAI** | `gpt-5`, `gpt-5-mini`, `o3`, `o4-mini` | `reasoning_effort="low/medium/high"`. 추론 텍스트는 비공개 / 요약만 |
+| **Anthropic** | `claude-opus-4-7`, `claude-sonnet-4-6` | `thinking={"type":"enabled", "budget_tokens":N}`. **thinking 블록을 명시적으로 반환** (학습/디버깅에 가장 유리) |
+| **DeepSeek** | `deepseek-r1` 계열 | `reasoning_content` 필드로 자동 노출 |
+
+### 5.3 LangChain 사용 (예시)
+
+```python
+# OpenAI
+from langchain_openai import ChatOpenAI
+llm = ChatOpenAI(model="gpt-5-mini", reasoning_effort="medium")
+response = llm.invoke("복잡한 추론 질문")
+# reasoning은 response.additional_kwargs["reasoning"] 또는 비공개 (정책상)
+
+# Anthropic — thinking 블록을 직접 받음
+from langchain_anthropic import ChatAnthropic
+claude = ChatAnthropic(
+    model="claude-opus-4-7",
+    max_tokens=8000,
+    thinking={"type": "enabled", "budget_tokens": 4000},
+)
+result = claude.invoke("복잡한 추론 질문")
+# result.content 는 [{"type": "thinking", "thinking": "..."},
+#                    {"type": "text",     "text": "..."}]
+```
+
+### 5.4 언제 reasoning 모델을 쓰나?
+
+| 상황 | 선택 |
+|---|---|
+| 짧은 대화 / FAQ / 단순 RAG | Chat 모델 (gpt-4o-mini, claude-haiku) — 비용·속도 ↑ |
+| 수학·코딩·논리 추론 | Reasoning 모델 (gpt-5, o3) — 정확도 ↑ |
+| 복잡한 멀티스텝 에이전트 | Reasoning 모델 (도구 호출 결정이 더 정확) |
+| 추론 흐름을 학습·디버깅 | Claude extended thinking (블록 명시 노출) |
+
+### 5.5 예제 파일
+
+- `1.4_reasoning_models.py` — OpenAI / Anthropic 두 방식 비교, thinking 출력 시도
+- `../8.agents/3.builtin_tools/3.1_wikipedia_think.py` — reasoning 모델을 에이전트로 묶어 "왜 그 도구를 부르기로 했는지" 함께 출력

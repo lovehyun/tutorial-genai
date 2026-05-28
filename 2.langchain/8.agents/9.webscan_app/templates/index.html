@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>서버 점검 에이전트</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>🔧 서버 점검 에이전트</h1>
+    <p>자연어로 시스템·서비스 상태를 점검하세요.</p>
+  </header>
+
+  <main>
+    <ul id="messages"></ul>
+
+    <form id="form">
+      <input id="input" type="text"
+             placeholder="예: 'google.com SSL 인증서 만료 언제야?'"
+             autocomplete="off" required>
+      <button type="submit">점검</button>
+    </form>
+
+    <p id="examples">
+      예시:
+      <button class="ex">전체 시스템 리소스 상태 보여줘</button>
+      <button class="ex">google.com 의 HTTPS 인증서 확인</button>
+      <button class="ex">8.8.8.8:53 접속 가능?</button>
+      <button class="ex">위에서 본 google.com 의 응답시간도 알려줘</button>
+    </p>
+  </main>
+
+  <div id="overlay">
+    <div id="spinner"></div>
+    <div id="loading-text">점검 중...</div>
+  </div>
+
+  <script>
+    const form     = document.getElementById('form');
+    const input    = document.getElementById('input');
+    const messages = document.getElementById('messages');
+    const overlay  = document.getElementById('overlay');
+
+    // 같은 thread_id 로 멀티턴 (메모리 유지)
+    let threadId = null;
+
+    function addMsg(role, text, toolsUsed) {
+      const li = document.createElement('li');
+      li.className = 'msg ' + role;
+      let html = `<strong>${role === 'user' ? '나' : 'AI'}:</strong> ` + text.replace(/\n/g, '<br>');
+      if (toolsUsed && toolsUsed.length) {
+        html += `<div class="tools">🛠️ 사용 도구: ${toolsUsed.join(', ')}</div>`;
+      }
+      li.innerHTML = html;
+      messages.appendChild(li);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    async function send(message) {
+      addMsg('user', message);
+      overlay.style.display = 'flex';
+      try {
+        const r = await fetch('/chat', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({message, thread_id: threadId}),
+        });
+        const d = await r.json();
+        if (d.thread_id) threadId = d.thread_id;
+        addMsg('ai', d.answer || d.error, d.tools_used);
+      } catch (e) {
+        addMsg('ai', '⚠️ 요청 실패: ' + e.message);
+      } finally {
+        overlay.style.display = 'none';
+      }
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = input.value.trim();
+      if (!v) return;
+      input.value = '';
+      send(v);
+    });
+
+    // 예시 버튼 클릭하면 자동 전송
+    document.querySelectorAll('button.ex').forEach(btn => {
+      btn.addEventListener('click', () => send(btn.textContent));
+    });
+  </script>
+</body>
+</html>

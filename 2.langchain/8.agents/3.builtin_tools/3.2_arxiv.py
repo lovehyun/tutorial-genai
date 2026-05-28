@@ -1,10 +1,14 @@
 """
-arXiv 빌트인 도구 — 논문 검색 + 한국어 번역
+arXiv 빌트인 도구 — 학술 논문 메타데이터 검색.
+이 예제: arxiv_search 도구로 논문을 찾고, 결과를 한국어로 자동 요약/번역합니다.
 
-`ArxivQueryRun` 으로 학술 논문 메타데이터 검색.
-한국어 사용자를 위해 결과를 자동 번역하도록 system prompt 로 지시.
+언제 쓰나:
+  - "최근 RAG 관련 논문 알려줘" 같은 학술 리서치 질문
+  - LLM 지식 cut-off 이후의 신규 논문 찾기
 
-legacy 의 0.legacy/2.arxiv/3.1~3.5 를 통합한 현행 버전.
+검색은 영어 키워드가 정확도 ↑.
+
+  ※ pip install arxiv
 """
 
 from dotenv import load_dotenv
@@ -13,12 +17,9 @@ from langchain_community.tools.arxiv.tool import ArxivQueryRun
 from langchain_community.utilities.arxiv import ArxivAPIWrapper
 from langgraph.prebuilt import create_react_agent
 
-# pip install arxiv
-
 load_dotenv()
 
 
-# ─── arXiv 도구 ────────────────────────────────────────────
 arxiv_tool = ArxivQueryRun(
     api_wrapper=ArxivAPIWrapper(
         top_k_results=3,
@@ -34,38 +35,36 @@ arxiv_tool = ArxivQueryRun(
 )
 
 
-# ─── 시스템 프롬프트 ──────────────────────────────────────
 system_prompt = """\
 당신은 학술 논문을 검색하고 한국어로 요약·번역해주는 비서입니다.
 
 작업 흐름:
 1) 사용자 질문에서 핵심 키워드 추출 (영어로 번역해 검색 정확도 ↑)
-2) arxiv_search 도구로 논문 검색
+2) arxiv_search 도구로 논문 검색 — **1번만**. 검색어 바꿔서 재시도 금지.
 3) 결과를 다음 형식으로 한국어 정리:
    - 제목 (원문 영어 + 한국어 번역)
    - 저자
    - 핵심 요약 (3~4문장, 한국어)
    - arXiv 링크
 
-추측이나 일반 지식 답변 금지. 반드시 검색 결과 기반.
+도구 결과가 비어 있으면 "관련 논문을 찾지 못했습니다" 라고만 답하고 종료.
 """
 
-
-# ─── 에이전트 ─────────────────────────────────────────────
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 agent = create_react_agent(llm, [arxiv_tool], prompt=system_prompt)
 
 
-# ─── 실행 ─────────────────────────────────────────────────
 question = "최근 retrieval-augmented generation (RAG) 관련 흥미로운 논문 알려줘."
 
 print("=" * 60)
 print(f"[질문] {question}")
 print("=" * 60)
 
-result = agent.invoke({"messages": [("user", question)]})
+result = agent.invoke(
+    {"messages": [("user", question)]},
+    config={"recursion_limit": 15},
+)
 
-# 도구 호출 추적
 for m in result["messages"]:
     if hasattr(m, "tool_calls") and m.tool_calls:
         for c in m.tool_calls:
