@@ -59,9 +59,12 @@ def generate_company_names_once():
     result = llm2.invoke(prompt)
 
     # invoke()는 직접적으로 list를 반환하지 않으므로, `result`는 str 타입
-    # 예상 포맷: "Name1, Name2, Name3, Name4, Name5"
-    # → 콤마로 분리하여 리스트로 변환
+
+    # 1. 예상 포맷: "Name1, Name2, Name3, Name4, Name5" -> 콤마로 분리하여 리스트로 변환
     names = [name.strip().strip('"') for name in result.split(",") if name.strip()]
+
+    # 2. 또는 "Name1\nName2\nName3\n..." 인 경우 문자열 -> 줄바꿈 기준 배열
+    # names = [line.strip() for line in result.content.split("\n") if line.strip()]
 
     return jsonify({
         "product": product,

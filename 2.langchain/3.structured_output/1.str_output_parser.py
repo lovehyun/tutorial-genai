@@ -45,6 +45,8 @@ result2 = chain2.invoke({"topic": "인공지능"})
 print(f"타입: {type(result2)}")  # <class 'list'>
 print(f"결과: {result2}")
 
+
+
 # ===== 3. StrOutputParser를 활용한 체이닝 =====
 # 문자열로 추출한 결과를 다음 프롬프트에 전달합니다.
 print("\n" + "=" * 50)

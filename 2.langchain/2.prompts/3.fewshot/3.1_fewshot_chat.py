@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from langchain_core.prompts import (
     PromptTemplate,
     FewShotPromptTemplate,
-    ChatPromptTemplate,
+    ChatPromptTemplate,    # few-shot 과의 대조군으로 시험하기 위해...
 )
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
@@ -30,16 +30,11 @@ load_dotenv()
 
 # 1. 예제 데이터 — 우리가 원하는 출력 형식을 보여주는 샘플
 examples = [
-    {"sentence": "오늘 정말 최고의 하루였어!",
-     "result":   "감정: 긍정 / 점수: 9"},
-    {"sentence": "이거 진짜 별로네요. 시간 낭비였어요.",
-     "result":   "감정: 부정 / 점수: 2"},
-    {"sentence": "그냥 평범했어요. 특별히 좋지도 나쁘지도 않았네요.",
-     "result":   "감정: 중립 / 점수: 5"},
-    {"sentence": "와 진짜 감동받았어요. 눈물이 날 정도였어요.",
-     "result":   "감정: 긍정 / 점수: 10"},
-    {"sentence": "기대했던 것보단 별로지만 그래도 쓸만은 해요.",
-     "result":   "감정: 중립 / 점수: 6"},
+    {"sentence": "오늘 정말 최고의 하루였어!", "result": "감정: 긍정 / 점수: 9"},
+    {"sentence": "이거 진짜 별로네요. 시간 낭비였어요.", "result": "감정: 부정 / 점수: 2"},
+    {"sentence": "그냥 평범했어요. 특별히 좋지도 나쁘지도 않았네요.", "result": "감정: 중립 / 점수: 5"},
+    {"sentence": "와 진짜 감동받았어요. 눈물이 날 정도였어요.", "result": "감정: 긍정 / 점수: 10"},
+    {"sentence": "기대했던 것보단 별로지만 그래도 쓸만은 해요.", "result": "감정: 중립 / 점수: 6"},
 ]
 
 # 2. 예제 한 건을 어떤 문자열로 만들지 정의

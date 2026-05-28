@@ -1,42 +1,43 @@
+"""
+[Task] 다국어 병렬 번역기
+
+같은 문장을 한국어 / 일본어 / 프랑스어로 동시에 번역합니다.
+RunnableParallel 로 3개 체인을 묶어 한 번의 invoke 로 처리합니다.
+
+핵심 패턴
+  - base_prompt.partial(language=...) 로 언어만 다른 변종 체인 만들기
+  - RunnableParallel({"korean": ..., "japanese": ..., "french": ...}) 로 동시 실행
+"""
+
 from dotenv import load_dotenv
-
-from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
-
 from langchain_openai import ChatOpenAI
-from langchain_core.runnables import RunnableLambda
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableParallel
 
 load_dotenv()
 
-# 프롬프트 템플릿 (Chat 메시지 형식)
-chat_prompt = ChatPromptTemplate.from_messages([
-    #     SystemMessagePromptTemplate.from_template("You are an expert language translator."),
-    HumanMessagePromptTemplate.from_template(
-        "Translate the following English sentence into Korean:\n\n{sentence}"
-    )
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3)
+
+base_prompt = ChatPromptTemplate.from_messages([
+    ("system", "Translate English to {language}. Only return the translation."),
+    ("human", "{text}"),
 ])
 
-# gpt-4o 모델 사용
-llm = ChatOpenAI(model="gpt-4o", temperature=0.3, max_tokens=1024)
+# 언어만 다른 3개의 변종 체인
+chain_ko = base_prompt.partial(language="Korean")   | llm | StrOutputParser()
+chain_ja = base_prompt.partial(language="Japanese") | llm | StrOutputParser()
+chain_fr = base_prompt.partial(language="French")   | llm | StrOutputParser()
 
-# 체인 구성
-chain = chat_prompt | llm | RunnableLambda(lambda x: {"translated": x.content.strip()})
+# 동시에 실행
+parallel_chain = RunnableParallel({
+    "korean":   chain_ko,
+    "japanese": chain_ja,
+    "french":   chain_fr,
+})
 
-# 실행 예시
-print('--- 1 ---')
-short_sentence = "The weather is nice today."
-result = chain.invoke({"sentence": short_sentence})
+result = parallel_chain.invoke({"text": "Hello, nice to meet you."})
 
-print("Korean Translation:", result["translated"])
-
-
-print('--- 2 ---')
-long_sentence = (
-    "Despite the ongoing economic uncertainties around the world, "
-    "many experts believe that the adoption of green energy solutions "
-    "will continue to grow rapidly in the next decade, particularly "
-    "as governments invest more in sustainable infrastructure."
-)
-
-result = chain.invoke({"sentence": long_sentence})
-
-print("Korean Translation:", result["translated"])
+print("[KO]", result["korean"])
+print("[JA]", result["japanese"])
+print("[FR]", result["french"])

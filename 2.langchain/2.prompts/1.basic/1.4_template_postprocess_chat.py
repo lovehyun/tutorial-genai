@@ -4,7 +4,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
-from langchain.output_parsers import CommaSeparatedListOutputParser
+from langchain_core.output_parsers import CommaSeparatedListOutputParser
 
 # Chat 버전: ChatPromptTemplate + ChatOpenAI + 출력 파서
 
@@ -31,6 +31,7 @@ inputs = {"company": "High Tech Startup", "product": "Web Game"}
 # 5. LLM 실행 (프롬프트 → LLM → 후처리)
 msgs = prompt.format_messages(**inputs)
 ai_message = llm.invoke(msgs)            # AIMessage 객체
+
 result_str = parser.invoke(ai_message)   # AIMessage → 문자열
 result_csv = parser2.invoke(ai_message.content)  # 콤마 분리 리스트
 
@@ -40,3 +41,5 @@ print(result_str)
 
 print("\nParsed Output (CSV to List):")
 print(result_csv)
+# for idx, name in enumerate(result_csv, start=1):
+#    print(f"{idx}. {name}")
