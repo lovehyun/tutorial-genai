@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>항공 예약 — {{ user_id }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>✈️ 항공 예약 — {{ user_id }} 님</h1>
+    <p>
+      <form method="post" action="{{ url_for('logout') }}" style="display:inline">
+        <button type="submit" class="ghost">로그아웃</button>
+      </form>
+      <a href="/admin">관리자 화면 →</a>
+    </p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. 항공편 검색</h2>
+      <form id="search">
+        <input id="origin" placeholder="출발지 (ICN)" autocomplete="off">
+        <input id="dest"   placeholder="도착지 (NRT)" autocomplete="off">
+        <button type="submit">검색</button>
+      </form>
+      <ul id="flights"></ul>
+    </section>
+
+    <section>
+      <h2>2. 내 예약</h2>
+      <ul id="my-bookings"></ul>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    async function loadFlights() {
+      const o = $('origin').value.trim();
+      const d = $('dest').value.trim();
+      const qs = new URLSearchParams();
+      if (o) qs.append('origin', o);
+      if (d) qs.append('dest', d);
+      const r = await fetch('/api/flights?' + qs);
+      const flights = await r.json();
+      $('flights').innerHTML = flights.length === 0
+        ? '<li class="empty">(결과 없음)</li>'
+        : flights.map(f => `
+            <li>
+              <strong>${f.code}</strong> ${f.origin}→${f.dest} · ${f.depart_at.slice(0,16)}
+              · 잔여 ${f.seats_left}석 · ${f.price.toLocaleString()}원
+              <button data-id="${f.id}" class="book">예약</button>
+            </li>
+          `).join('');
+    }
+
+    async function loadMyBookings() {
+      const r = await fetch('/api/my-bookings');
+      const list = await r.json();
+      if (list.error) { $('my-bookings').innerHTML = `<li>${list.error}</li>`; return; }
+      $('my-bookings').innerHTML = list.length === 0
+        ? '<li class="empty">(예약 없음)</li>'
+        : list.map(b => `
+            <li class="${b.status === 'CANCELED' ? 'canceled' : ''}">
+              <strong>${b.code}</strong> ${b.origin}→${b.dest} · ${b.depart_at.slice(0,16)}
+              · ${b.status}
+              ${b.status === 'BOOKED'
+                ? `<button data-bid="${b.id}" class="cancel">취소</button>` : ''}
+            </li>
+          `).join('');
+    }
+
+    $('search').addEventListener('submit', (e) => { e.preventDefault(); loadFlights(); });
+
+    $('flights').addEventListener('click', async (e) => {
+      if (!e.target.classList.contains('book')) return;
+      const r = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ flight_id: parseInt(e.target.dataset.id) }),
+      });
+      const d = await r.json();
+      alert(d.ok ? `예약 완료 (booking #${d.booking_id} / ${d.flight_code})` : d.error);
+      loadFlights(); loadMyBookings();
+    });
+
+    $('my-bookings').addEventListener('click', async (e) => {
+      if (!e.target.classList.contains('cancel')) return;
+      if (!confirm('취소할까요?')) return;
+      const r = await fetch(`/api/bookings/${e.target.dataset.bid}/cancel`, { method: 'POST' });
+      const d = await r.json();
+      alert(d.ok ? '취소 완료' : d.error);
+      loadFlights(); loadMyBookings();
+    });
+
+    loadFlights();
+    loadMyBookings();
+  </script>
+</body>
+</html>

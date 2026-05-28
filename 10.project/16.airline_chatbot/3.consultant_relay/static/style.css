@@ -1,0 +1,78 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  max-width: 1300px;
+  margin: 30px auto;
+  padding: 0 20px;
+  color: #222;
+  line-height: 1.5;
+}
+
+header h1 { margin-bottom: 4px; }
+header p  { color: #666; margin-top: 0; }
+header a  { margin-left: 10px; }
+
+main {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+}
+
+section h2 { font-size: 1.05em; margin-top: 16px; }
+section h2:first-of-type { margin-top: 0; }
+
+form { display: flex; gap: 6px; }
+input, button {
+  padding: 8px 10px; font-size: 0.95em; border-radius: 4px;
+}
+input { border: 1px solid #ccc; flex: 1; }
+button {
+  cursor: pointer; border: 1px solid #0a58ca;
+  background: #0a58ca; color: white;
+}
+button:hover { opacity: 0.9; }
+button.ghost  { background: white; color: #555; border: 1px solid #ccc; }
+button.cancel { background: #dc3545; border-color: #dc3545; font-size: 0.85em; padding: 4px 10px; margin-left: 6px; }
+button.book   { font-size: 0.85em; padding: 4px 10px; margin-left: 6px; }
+button.accept { background: #198754; border-color: #198754; font-size: 0.85em; padding: 4px 10px; margin-left: 6px; }
+button.open   { font-size: 0.85em; padding: 4px 10px; margin-left: 6px; }
+
+ul { list-style: none; padding: 0; }
+li {
+  padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;
+  margin: 4px 0; background: white;
+}
+li.empty { color: #888; text-align: center; }
+li.canceled { opacity: 0.5; text-decoration: line-through; }
+li.consult.requested { background: #fff3cd; }
+li.consult.active    { background: #d1e7dd; }
+
+#messages, #consult-messages {
+  min-height: 220px; max-height: 340px; overflow-y: auto;
+  background: white; padding: 12px;
+}
+.msg { margin: 6px 0; padding: 6px 8px; border-radius: 4px; }
+.msg.user { background: #e7f1ff; }
+.msg.ai   { background: #f8f9fa; }
+.cmsg { margin: 4px 0; padding: 6px 8px; border-radius: 4px; }
+.cmsg.user   { background: #e7f1ff; }
+.cmsg.admin  { background: #d1e7dd; }
+.cmsg.system { background: #fff3cd; font-style: italic; font-size: 0.9em; }
+
+.examples { margin-top: 8px; font-size: 0.85em; color: #555; }
+.examples button.ex {
+  background: white; color: #0a58ca; border: 1px solid #0a58ca;
+  padding: 4px 8px; font-size: 0.8em; margin: 2px;
+}
+
+#consult-panel {
+  margin-top: 20px;
+  padding: 16px;
+  background: #fffdf5; border: 1px solid #ffd86b; border-radius: 6px;
+}
+#consult-panel h3 { margin-top: 0; }
+#consult-close { margin-top: 8px; }
+
+.badge {
+  background: #dc3545; color: white;
+  padding: 2px 8px; border-radius: 999px; font-size: 0.85em;
+}
+
+@media (max-width: 950px) { main { grid-template-columns: 1fr; } }

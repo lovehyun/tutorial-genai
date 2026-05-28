@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Todo #2 — 챗봇 (조회 전용)</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>📝 Todo #2</h1>
+    <p>챗봇 추가 — 조회·요약 전용 (CRUD 권한 없음)</p>
+  </header>
+
+  <main>
+    <section class="todo-pane">
+      <h2>할 일</h2>
+      <form id="add-form">
+        <input id="new-text" type="text" placeholder="할 일을 입력하세요" autocomplete="off" required>
+        <button type="submit">추가</button>
+      </form>
+      <ul id="todo-list"></ul>
+    </section>
+
+    <section class="chat-pane">
+      <h2>🤖 챗봇 (조회만 가능)</h2>
+      <ul id="messages"></ul>
+      <form id="chat-form">
+        <input id="chat-input" type="text" placeholder="예: '오늘 남은 할 일 알려줘'" autocomplete="off" required>
+        <button type="submit">보내기</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const list = document.getElementById('todo-list');
+    const messages = document.getElementById('messages');
+
+    // ─── Todo CRUD (UI 직접 조작은 가능) ─────
+    async function loadTodos() {
+      const r = await fetch('/api/todos');
+      const todos = await r.json();
+      list.innerHTML = todos.length === 0
+        ? '<li class="empty">(할 일이 없습니다)</li>'
+        : todos.map(t => `
+            <li class="${t.done ? 'done' : ''}">
+              <input type="checkbox" ${t.done ? 'checked' : ''} data-id="${t.id}" class="toggle">
+              <span>${t.text}</span>
+              <button data-id="${t.id}" class="del">삭제</button>
+            </li>
+          `).join('');
+    }
+
+    document.getElementById('add-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = document.getElementById('new-text');
+      await fetch('/api/todos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: input.value }),
+      });
+      input.value = '';
+      loadTodos();
+    });
+
+    list.addEventListener('change', async (e) => {
+      if (!e.target.classList.contains('toggle')) return;
+      await fetch(`/api/todos/${e.target.dataset.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ done: e.target.checked }),
+      });
+      loadTodos();
+    });
+
+    list.addEventListener('click', async (e) => {
+      if (!e.target.classList.contains('del')) return;
+      if (!confirm('삭제할까요?')) return;
+      await fetch(`/api/todos/${e.target.dataset.id}`, { method: 'DELETE' });
+      loadTodos();
+    });
+
+    // ─── 챗봇 (조회만) ──────────────────────
+    function addMsg(role, text) {
+      const li = document.createElement('li');
+      li.className = 'msg ' + role;
+      li.innerHTML = `<strong>${role === 'user' ? '나' : 'AI'}:</strong> ` + text.replace(/\n/g, '<br>');
+      messages.appendChild(li);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    document.getElementById('chat-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const msg = input.value.trim();
+      if (!msg) return;
+      addMsg('user', msg);
+      input.value = '';
+      addMsg('ai', '...');
+      const r = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg }),
+      });
+      const d = await r.json();
+      messages.lastChild.innerHTML = `<strong>AI:</strong> ` + (d.answer || d.error).replace(/\n/g, '<br>');
+    });
+
+    loadTodos();
+  </script>
+</body>
+</html>

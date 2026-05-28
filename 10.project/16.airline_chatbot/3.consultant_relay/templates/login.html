@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>항공 예약 — 로그인</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>✈️ 항공 예약 시스템</h1>
+    <p>아무 사용자 ID 로 시작하세요 (데모)</p>
+  </header>
+
+  <main>
+    <form method="post" action="{{ url_for('login') }}">
+      <label for="user_id">사용자 ID:</label>
+      <input id="user_id" name="user_id" type="text" required autocomplete="username">
+      <button type="submit">시작</button>
+    </form>
+    <p>관리자 화면: <a href="/admin">/admin</a></p>
+  </main>
+</body>
+</html>

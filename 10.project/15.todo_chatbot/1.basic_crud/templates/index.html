@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Todo #1 — 기본 CRUD</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>📝 Todo #1</h1>
+    <p>가장 단순한 CRUD (챗봇 없음)</p>
+  </header>
+
+  <main>
+    <form id="add-form">
+      <input id="new-text" type="text" placeholder="할 일을 입력하세요" autocomplete="off" required>
+      <button type="submit">추가</button>
+    </form>
+
+    <ul id="todo-list"></ul>
+  </main>
+
+  <script>
+    const list = document.getElementById('todo-list');
+
+    async function loadTodos() {
+      const r = await fetch('/api/todos');
+      const todos = await r.json();
+      list.innerHTML = '';
+      if (todos.length === 0) {
+        list.innerHTML = '<li class="empty">(할 일이 없습니다)</li>';
+        return;
+      }
+      todos.forEach(t => {
+        const li = document.createElement('li');
+        li.className = t.done ? 'done' : '';
+        li.innerHTML = `
+          <input type="checkbox" ${t.done ? 'checked' : ''} data-id="${t.id}" class="toggle">
+          <span>${t.text}</span>
+          <button data-id="${t.id}" class="del">삭제</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    document.getElementById('add-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = document.getElementById('new-text');
+      await fetch('/api/todos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: input.value }),
+      });
+      input.value = '';
+      loadTodos();
+    });
+
+    list.addEventListener('change', async (e) => {
+      if (!e.target.classList.contains('toggle')) return;
+      const id = e.target.dataset.id;
+      await fetch(`/api/todos/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ done: e.target.checked }),
+      });
+      loadTodos();
+    });
+
+    list.addEventListener('click', async (e) => {
+      if (!e.target.classList.contains('del')) return;
+      const id = e.target.dataset.id;
+      if (!confirm('삭제할까요?')) return;
+      await fetch(`/api/todos/${id}`, { method: 'DELETE' });
+      loadTodos();
+    });
+
+    loadTodos();
+  </script>
+</body>
+</html>

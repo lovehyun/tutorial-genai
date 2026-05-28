@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>관리자 — 항공 예약</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>🛠 관리자 뷰</h1>
+    <p>
+      <a href="/">← 사용자 화면</a>
+    </p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. 시스템 통계</h2>
+      <ul id="stats"></ul>
+    </section>
+
+    <section>
+      <h2>2. 전체 예약</h2>
+      <ul id="all-bookings"></ul>
+    </section>
+
+    <section>
+      <h2>3. 예약 히스토리</h2>
+      <input id="hid" type="number" placeholder="booking id">
+      <button id="history-btn">조회</button>
+      <ul id="history"></ul>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    async function loadStats() {
+      const s = await fetch('/api/stats').then(r => r.json());
+      $('stats').innerHTML = Object.entries(s)
+        .map(([k, v]) => `<li><strong>${k}:</strong> ${v}</li>`).join('');
+    }
+
+    async function loadAll() {
+      const list = await fetch('/api/all-bookings').then(r => r.json());
+      $('all-bookings').innerHTML = list.length === 0
+        ? '<li class="empty">(예약 없음)</li>'
+        : list.map(b => `
+            <li class="${b.status === 'CANCELED' ? 'canceled' : ''}">
+              #${b.id} · ${b.user_id} · <strong>${b.code}</strong> ${b.origin}→${b.dest}
+              · ${b.depart_at.slice(0,16)} · ${b.status}
+              ${b.status === 'BOOKED'
+                ? `<button data-bid="${b.id}" class="cancel">강제 취소</button>` : ''}
+            </li>
+          `).join('');
+    }
+
+    $('all-bookings').addEventListener('click', async (e) => {
+      if (!e.target.classList.contains('cancel')) return;
+      if (!confirm('강제 취소할까요?')) return;
+      const r = await fetch(`/api/bookings/${e.target.dataset.bid}/cancel`, { method: 'POST' });
+      const d = await r.json();
+      alert(d.ok ? '취소됨' : d.error);
+      loadAll(); loadStats();
+    });
+
+    $('history-btn').addEventListener('click', async () => {
+      const id = parseInt($('hid').value);
+      if (!id) return;
+      const log = await fetch(`/api/bookings/${id}/history`).then(r => r.json());
+      $('history').innerHTML = log.length === 0
+        ? '<li class="empty">(기록 없음)</li>'
+        : log.map(l => `<li>${l.at} · ${l.action} · by ${l.actor}</li>`).join('');
+    });
+
+    loadStats();
+    loadAll();
+  </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Todo #3 — 챗봇 풀 제어</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>📝 Todo #3</h1>
+    <p>챗봇이 자연어로 추가/완료/삭제 — 화면 자동 갱신</p>
+  </header>
+
+  <main>
+    <section class="todo-pane">
+      <h2>할 일</h2>
+      <form id="add-form">
+        <input id="new-text" type="text" placeholder="할 일을 입력하세요" autocomplete="off" required>
+        <button type="submit">추가</button>
+      </form>
+      <ul id="todo-list"></ul>
+    </section>
+
+    <section class="chat-pane">
+      <h2>🤖 챗봇 (자연어로 전체 제어)</h2>
+      <ul id="messages"></ul>
+      <form id="chat-form">
+        <input id="chat-input" type="text"
+               placeholder="예: '회의 자료 준비 추가해줘', '회의 자료 완료', '회의 자료 삭제'"
+               autocomplete="off" required>
+        <button type="submit">보내기</button>
+      </form>
+
+      <p class="examples">
+        예시:
+        <button class="ex">우유 사기 추가해줘</button>
+        <button class="ex">우유 사기 완료 표시</button>
+        <button class="ex">완료한 거 다 삭제해줘</button>
+        <button class="ex">오늘 남은 할 일 보여줘</button>
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const list = document.getElementById('todo-list');
+    const messages = document.getElementById('messages');
+
+    async function loadTodos() {
+      const r = await fetch('/api/todos');
+      const todos = await r.json();
+      list.innerHTML = todos.length === 0
+        ? '<li class="empty">(할 일이 없습니다)</li>'
+        : todos.map(t => `
+            <li class="${t.done ? 'done' : ''}">
+              <input type="checkbox" ${t.done ? 'checked' : ''} data-id="${t.id}" class="toggle">
+              <span>#${t.id} ${t.text}</span>
+              <button data-id="${t.id}" class="del">삭제</button>
+            </li>
+          `).join('');
+    }
+
+    document.getElementById('add-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = document.getElementById('new-text');
+      await fetch('/api/todos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: input.value }),
+      });
+      input.value = '';
+      loadTodos();
+    });
+
+    list.addEventListener('change', async (e) => {
+      if (!e.target.classList.contains('toggle')) return;
+      await fetch(`/api/todos/${e.target.dataset.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ done: e.target.checked }),
+      });
+      loadTodos();
+    });
+
+    list.addEventListener('click', async (e) => {
+      if (!e.target.classList.contains('del')) return;
+      if (!confirm('삭제할까요?')) return;
+      await fetch(`/api/todos/${e.target.dataset.id}`, { method: 'DELETE' });
+      loadTodos();
+    });
+
+    // ─── 챗봇 ─────────────────────────────────
+    function addMsg(role, text) {
+      const li = document.createElement('li');
+      li.className = 'msg ' + role;
+      li.innerHTML = `<strong>${role === 'user' ? '나' : 'AI'}:</strong> ` + text.replace(/\n/g, '<br>');
+      messages.appendChild(li);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    async function sendChat(message) {
+      addMsg('user', message);
+      addMsg('ai', '...');
+      const r = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      });
+      const d = await r.json();
+      messages.lastChild.innerHTML = `<strong>AI:</strong> ` + (d.answer || d.error).replace(/\n/g, '<br>');
+
+      // ★ 챗봇이 변경 작업을 했으면 todo 목록 자동 새로고침
+      if (d.changed) loadTodos();
+    }
+
+    document.getElementById('chat-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const msg = input.value.trim();
+      if (!msg) return;
+      input.value = '';
+      sendChat(msg);
+    });
+
+    document.querySelectorAll('button.ex').forEach(btn => {
+      btn.addEventListener('click', () => sendChat(btn.textContent));
+    });
+
+    loadTodos();
+  </script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>관리자 — 항공 예약 + 상담</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>🛠 관리자 뷰</h1>
+    <p><a href="/">← 사용자 화면</a></p>
+  </header>
+
+  <main>
+    <section class="left">
+      <h2>1. 시스템 통계</h2>
+      <ul id="stats"></ul>
+
+      <h2>2. 전체 예약</h2>
+      <ul id="all-bookings"></ul>
+
+      <h2>3. 활성 상담 <span class="badge" id="consult-count">0</span></h2>
+      <ul id="consult-list"></ul>
+    </section>
+
+    <section class="right">
+      <h2>🤖 관리자 비서</h2>
+      <ul id="messages"></ul>
+      <form id="chat-form">
+        <input id="chat-input" placeholder="자연어로 통계/이력/취소..." required>
+        <button type="submit">보내기</button>
+      </form>
+
+      <!-- 활성 상담 채팅창 (수락 후 표시) -->
+      <div id="consult-panel" style="display:none">
+        <h3>💬 상담 #<span id="cur-cid"></span> · <span id="cur-uid"></span></h3>
+        <ul id="consult-messages"></ul>
+        <form id="consult-form">
+          <input id="consult-input" placeholder="고객에게 메시지...">
+          <button type="submit">전송</button>
+        </form>
+        <button id="consult-close" class="ghost">상담 종료</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const ADMIN_ID = "admin-01";
+
+    /* ── 통계/예약 ───────────────── */
+    async function loadStats() {
+      const s = await fetch('/api/stats').then(r => r.json());
+      $('stats').innerHTML = Object.entries(s).map(([k, v]) => `<li><strong>${k}:</strong> ${v}</li>`).join('');
+    }
+
+    async function loadAll() {
+      const list = await fetch('/api/all-bookings').then(r => r.json());
+      $('all-bookings').innerHTML = list.length === 0
+        ? '<li class="empty">(예약 없음)</li>'
+        : list.map(b => `<li class="${b.status === 'CANCELED' ? 'canceled' : ''}">
+            #${b.id} · ${b.user_id} · <strong>${b.code}</strong> ${b.origin}→${b.dest}
+            · ${b.depart_at.slice(0,16)} · ${b.status}</li>`).join('');
+    }
+
+    /* ── 활성 상담 목록 ─────────────── */
+    async function loadConsults() {
+      const list = await fetch('/api/consultations').then(r => r.json());
+      $('consult-count').textContent = list.length;
+      $('consult-list').innerHTML = list.length === 0
+        ? '<li class="empty">(없음)</li>'
+        : list.map(c => `
+            <li class="consult ${c.status.toLowerCase()}">
+              #${c.id} · ${c.user_id} · ${c.status}
+              ${c.topic ? `<br><small>주제: ${c.topic}</small>` : ''}
+              ${c.status === 'REQUESTED'
+                ? `<button data-cid="${c.id}" class="accept">수락</button>`
+                : `<button data-cid="${c.id}" class="open">열기</button>`}
+            </li>`).join('');
+    }
+
+    $('consult-list').addEventListener('click', async (e) => {
+      const cid = parseInt(e.target.dataset.cid);
+      if (e.target.classList.contains('accept')) {
+        await fetch(`/api/consultations/${cid}/accept?admin=${ADMIN_ID}`, { method: 'POST' });
+        openConsult(cid);
+        loadConsults();
+      } else if (e.target.classList.contains('open')) {
+        openConsult(cid);
+      }
+    });
+
+    /* ── 챗봇 ───────────────── */
+    const messages = $('messages');
+    function addMsg(role, text) {
+      const li = document.createElement('li');
+      li.className = 'msg ' + role;
+      li.innerHTML = `<strong>${role === 'user' ? '나' : 'AI'}:</strong> ` + text.replace(/\n/g, '<br>');
+      messages.appendChild(li); messages.scrollTop = messages.scrollHeight;
+    }
+    async function sendChat(msg) {
+      addMsg('user', msg); addMsg('ai', '...');
+      const d = await fetch('/chat/admin', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ message: msg }),
+      }).then(r => r.json());
+      messages.lastChild.innerHTML = `<strong>AI:</strong> ` + (d.answer || d.error).replace(/\n/g, '<br>');
+      if (d.changed) { loadAll(); loadStats(); }
+    }
+    $('chat-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = $('chat-input').value.trim();
+      if (!v) return; $('chat-input').value = ''; sendChat(v);
+    });
+
+    /* ── 상담 채팅 (관리자측) ───────── */
+    let curCid = null;
+    let lastMsgId = 0;
+    const consultMessages = $('consult-messages');
+
+    function openConsult(cid) {
+      curCid = cid; lastMsgId = 0;
+      consultMessages.innerHTML = '';
+      $('cur-cid').textContent = cid;
+      $('consult-panel').style.display = 'block';
+      pollMessages();
+    }
+
+    async function pollMessages() {
+      if (!curCid) return;
+      const data = await fetch(`/api/consultations/${curCid}/messages?since=${lastMsgId}`).then(r => r.json());
+      if (data.consultation) $('cur-uid').textContent = data.consultation.user_id;
+      data.messages.forEach(m => {
+        const li = document.createElement('li');
+        li.className = 'cmsg ' + m.sender;
+        li.innerHTML = `<strong>${m.sender}:</strong> ${m.text}`;
+        consultMessages.appendChild(li);
+        lastMsgId = m.id;
+      });
+      consultMessages.scrollTop = consultMessages.scrollHeight;
+    }
+
+    $('consult-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!curCid) return;
+      const text = $('consult-input').value.trim();
+      if (!text) return;
+      $('consult-input').value = '';
+      await fetch(`/api/consultations/${curCid}/messages`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ text, sender: 'admin' }),
+      });
+      pollMessages();
+    });
+
+    $('consult-close').addEventListener('click', async () => {
+      if (!curCid) return;
+      if (!confirm('이 상담을 종료할까요?')) return;
+      await fetch(`/api/consultations/${curCid}/close?admin=${ADMIN_ID}`, { method: 'POST' });
+      pollMessages(); loadConsults();
+    });
+
+    loadStats(); loadAll(); loadConsults();
+    setInterval(() => { loadConsults(); pollMessages(); loadStats(); }, 2000);
+  </script>
+</body>
+</html>

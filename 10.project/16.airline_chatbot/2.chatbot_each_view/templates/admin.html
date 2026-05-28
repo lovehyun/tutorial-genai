@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>관리자 — 항공 예약</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>🛠 관리자 뷰</h1>
+    <p><a href="/">← 사용자 화면</a></p>
+  </header>
+
+  <main>
+    <section class="left">
+      <h2>1. 시스템 통계</h2>
+      <ul id="stats"></ul>
+
+      <h2>2. 전체 예약</h2>
+      <ul id="all-bookings"></ul>
+
+      <h2>3. 예약 히스토리</h2>
+      <input id="hid" type="number" placeholder="booking id">
+      <button id="history-btn">조회</button>
+      <ul id="history"></ul>
+    </section>
+
+    <section class="right chat-pane">
+      <h2>🤖 관리자 비서</h2>
+      <ul id="messages"></ul>
+      <form id="chat-form">
+        <input id="chat-input" placeholder="예: '오늘 시스템 통계 보여줘', '#3 예약 강제 취소'" autocomplete="off" required>
+        <button type="submit">보내기</button>
+      </form>
+      <p class="examples">
+        예시:
+        <button class="ex">시스템 통계 보여줘</button>
+        <button class="ex">취소된 예약 몇 건이야?</button>
+        <button class="ex">3번 예약 이력 보여줘</button>
+        <button class="ex">2번 예약 강제 취소해줘</button>
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    async function loadStats() {
+      const s = await fetch('/api/stats').then(r => r.json());
+      $('stats').innerHTML = Object.entries(s)
+        .map(([k, v]) => `<li><strong>${k}:</strong> ${v}</li>`).join('');
+    }
+
+    async function loadAll() {
+      const list = await fetch('/api/all-bookings').then(r => r.json());
+      $('all-bookings').innerHTML = list.length === 0
+        ? '<li class="empty">(예약 없음)</li>'
+        : list.map(b => `
+            <li class="${b.status === 'CANCELED' ? 'canceled' : ''}">
+              #${b.id} · ${b.user_id} · <strong>${b.code}</strong> ${b.origin}→${b.dest}
+              · ${b.depart_at.slice(0,16)} · ${b.status}
+              ${b.status === 'BOOKED' ? `<button data-bid="${b.id}" class="cancel">강제 취소</button>` : ''}
+            </li>
+          `).join('');
+    }
+
+    $('all-bookings').addEventListener('click', async (e) => {
+      if (!e.target.classList.contains('cancel')) return;
+      if (!confirm('강제 취소할까요?')) return;
+      const r = await fetch(`/api/bookings/${e.target.dataset.bid}/cancel`, { method: 'POST' });
+      const d = await r.json();
+      alert(d.ok ? '취소됨' : d.error);
+      loadAll(); loadStats();
+    });
+
+    $('history-btn').addEventListener('click', async () => {
+      const id = parseInt($('hid').value);
+      if (!id) return;
+      const log = await fetch(`/api/bookings/${id}/history`).then(r => r.json());
+      $('history').innerHTML = log.length === 0
+        ? '<li class="empty">(기록 없음)</li>'
+        : log.map(l => `<li>${l.at} · ${l.action} · by ${l.actor}</li>`).join('');
+    });
+
+    // ─── 챗봇 ──────────────────────────────────
+    const messages = $('messages');
+    function addMsg(role, text) {
+      const li = document.createElement('li');
+      li.className = 'msg ' + role;
+      li.innerHTML = `<strong>${role === 'user' ? '나' : 'AI'}:</strong> ` + text.replace(/\n/g, '<br>');
+      messages.appendChild(li);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    async function sendChat(msg) {
+      addMsg('user', msg);
+      addMsg('ai', '...');
+      const r = await fetch('/chat/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg }),
+      });
+      const d = await r.json();
+      messages.lastChild.innerHTML = `<strong>AI:</strong> ` + (d.answer || d.error).replace(/\n/g, '<br>');
+      if (d.changed) { loadAll(); loadStats(); }
+    }
+
+    $('chat-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = $('chat-input').value.trim();
+      if (!v) return;
+      $('chat-input').value = '';
+      sendChat(v);
+    });
+
+    document.querySelectorAll('button.ex').forEach(btn => {
+      btn.addEventListener('click', () => sendChat(btn.textContent));
+    });
+
+    loadStats();
+    loadAll();
+  </script>
+</body>
+</html>

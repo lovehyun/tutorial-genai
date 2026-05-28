@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>항공 예약 — {{ user_id }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>✈️ 항공 예약 — {{ user_id }} 님</h1>
+    <p>
+      <form method="post" action="{{ url_for('logout') }}" style="display:inline">
+        <button type="submit" class="ghost">로그아웃</button>
+      </form>
+      <a href="/admin">관리자 화면 →</a>
+    </p>
+  </header>
+
+  <main>
+    <section class="left">
+      <h2>1. 항공편 검색</h2>
+      <form id="search">
+        <input id="origin" placeholder="출발 (ICN)"><input id="dest" placeholder="도착 (NRT)">
+        <button type="submit">검색</button>
+      </form>
+      <ul id="flights"></ul>
+
+      <h2>2. 내 예약</h2>
+      <ul id="my-bookings"></ul>
+    </section>
+
+    <section class="right">
+      <h2>🤖 항공 비서</h2>
+      <ul id="messages"></ul>
+      <form id="chat-form">
+        <input id="chat-input" placeholder="자연어로 예약/조회/취소... 또는 '상담사 연결'" required>
+        <button type="submit">보내기</button>
+      </form>
+      <p class="examples">
+        <button class="ex">ICN→NRT 보여줘</button>
+        <button class="ex">가장 싼 거 예약</button>
+        <button class="ex">환불 정책 문의 — 상담사 연결해줘</button>
+      </p>
+
+      <!-- 상담 패널 (상담 요청 후 표시) -->
+      <div id="consult-panel" style="display:none">
+        <h3>👤 상담사 상담 <span id="consult-status">대기 중...</span></h3>
+        <ul id="consult-messages"></ul>
+        <form id="consult-form">
+          <input id="consult-input" placeholder="상담사에게 메시지..." disabled>
+          <button type="submit" disabled>전송</button>
+        </form>
+        <button id="consult-close" class="ghost">상담 종료</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    /* ── 항공편/예약 ───────────────────── */
+    async function loadFlights() {
+      const o = $('origin').value.trim(); const d = $('dest').value.trim();
+      const qs = new URLSearchParams();
+      if (o) qs.append('origin', o); if (d) qs.append('dest', d);
+      const flights = await fetch('/api/flights?' + qs).then(r => r.json());
+      $('flights').innerHTML = flights.length === 0
+        ? '<li class="empty">(결과 없음)</li>'
+        : flights.map(f => `
+            <li><strong>${f.code}</strong> ${f.origin}→${f.dest} · ${f.depart_at.slice(0,16)}
+            · 잔여 ${f.seats_left}석 · ${f.price.toLocaleString()}원
+            <button data-id="${f.id}" class="book">예약</button></li>`).join('');
+    }
+
+    async function loadMyBookings() {
+      const list = await fetch('/api/my-bookings').then(r => r.json());
+      if (list.error) { $('my-bookings').innerHTML = `<li>${list.error}</li>`; return; }
+      $('my-bookings').innerHTML = list.length === 0
+        ? '<li class="empty">(예약 없음)</li>'
+        : list.map(b => `<li class="${b.status === 'CANCELED' ? 'canceled' : ''}">
+            #${b.id} · <strong>${b.code}</strong> ${b.origin}→${b.dest}
+            · ${b.depart_at.slice(0,16)} · ${b.status}
+            ${b.status === 'BOOKED' ? `<button data-bid="${b.id}" class="cancel">취소</button>` : ''}</li>`).join('');
+    }
+
+    $('search').addEventListener('submit', (e) => { e.preventDefault(); loadFlights(); });
+
+    $('flights').addEventListener('click', async (e) => {
+      if (!e.target.classList.contains('book')) return;
+      const d = await fetch('/api/bookings', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ flight_id: parseInt(e.target.dataset.id) }),
+      }).then(r => r.json());
+      alert(d.ok ? `예약 완료 (#${d.booking_id})` : d.error);
+      loadFlights(); loadMyBookings();
+    });
+
+    $('my-bookings').addEventListener('click', async (e) => {
+      if (!e.target.classList.contains('cancel')) return;
+      if (!confirm('취소할까요?')) return;
+      const d = await fetch(`/api/bookings/${e.target.dataset.bid}/cancel`, { method: 'POST' }).then(r => r.json());
+      alert(d.ok ? '취소 완료' : d.error);
+      loadFlights(); loadMyBookings();
+    });
+
+    /* ── 챗봇 ───────────────────── */
+    const messages = $('messages');
+    function addMsg(role, text) {
+      const li = document.createElement('li');
+      li.className = 'msg ' + role;
+      li.innerHTML = `<strong>${role === 'user' ? '나' : 'AI'}:</strong> ` + text.replace(/\n/g, '<br>');
+      messages.appendChild(li); messages.scrollTop = messages.scrollHeight;
+    }
+
+    async function sendChat(msg) {
+      addMsg('user', msg); addMsg('ai', '...');
+      const d = await fetch('/chat/user', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ message: msg }),
+      }).then(r => r.json());
+      messages.lastChild.innerHTML = `<strong>AI:</strong> ` + (d.answer || d.error).replace(/\n/g, '<br>');
+      if (d.changed) { loadFlights(); loadMyBookings(); checkConsultation(); }
+    }
+
+    $('chat-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = $('chat-input').value.trim();
+      if (!v) return;
+      $('chat-input').value = ''; sendChat(v);
+    });
+
+    document.querySelectorAll('button.ex').forEach(btn =>
+      btn.addEventListener('click', () => sendChat(btn.textContent)));
+
+    /* ── 상담 (consultation) ───────────────── */
+    let currentConsult = null;   // {id, status, ...}
+    let lastMsgId = 0;
+    const consultPanel = $('consult-panel');
+    const consultStatus = $('consult-status');
+    const consultMessages = $('consult-messages');
+    const consultInput = $('consult-input');
+
+    async function checkConsultation() {
+      const c = await fetch('/api/my-consultation').then(r => r.json());
+      if (c && c.id) {
+        currentConsult = c;
+        consultPanel.style.display = 'block';
+        consultStatus.textContent =
+          c.status === 'REQUESTED' ? '대기 중...' :
+          c.status === 'ACTIVE'    ? `상담사 ${c.admin_id} 연결됨` :
+                                     '종료됨';
+        const canSend = c.status === 'ACTIVE';
+        consultInput.disabled = !canSend;
+        consultInput.parentElement.querySelector('button').disabled = !canSend;
+        if (c.status === 'CLOSED') {
+          currentConsult = null;
+          setTimeout(() => { consultPanel.style.display = 'none'; }, 5000);
+        }
+      } else {
+        consultPanel.style.display = 'none';
+        currentConsult = null;
+      }
+    }
+
+    async function pollMessages() {
+      if (!currentConsult) return;
+      const data = await fetch(
+        `/api/consultations/${currentConsult.id}/messages?since=${lastMsgId}`
+      ).then(r => r.json());
+
+      // 상태 업데이트
+      const c = data.consultation;
+      if (c) {
+        currentConsult = c;
+        consultStatus.textContent =
+          c.status === 'REQUESTED' ? '대기 중...' :
+          c.status === 'ACTIVE'    ? `상담사 ${c.admin_id} 연결됨` :
+                                     '종료됨';
+        const canSend = c.status === 'ACTIVE';
+        consultInput.disabled = !canSend;
+        consultInput.parentElement.querySelector('button').disabled = !canSend;
+      }
+
+      // 새 메시지
+      data.messages.forEach(m => {
+        const li = document.createElement('li');
+        li.className = 'cmsg ' + m.sender;
+        li.innerHTML = `<strong>${m.sender}:</strong> ${m.text}`;
+        consultMessages.appendChild(li);
+        lastMsgId = m.id;
+      });
+      consultMessages.scrollTop = consultMessages.scrollHeight;
+    }
+
+    $('consult-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentConsult) return;
+      const text = consultInput.value.trim();
+      if (!text) return;
+      consultInput.value = '';
+      await fetch(`/api/consultations/${currentConsult.id}/messages`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ text, sender: 'user' }),
+      });
+      pollMessages();
+    });
+
+    $('consult-close').addEventListener('click', async () => {
+      if (!currentConsult) return;
+      if (!confirm('상담 종료할까요?')) return;
+      await fetch(`/api/consultations/${currentConsult.id}/close`, { method: 'POST' });
+      checkConsultation(); pollMessages();
+    });
+
+    // 초기화 + 폴링
+    loadFlights(); loadMyBookings(); checkConsultation();
+    setInterval(() => { checkConsultation(); pollMessages(); }, 2000);
+  </script>
+</body>
+</html>
