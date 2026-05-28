@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>RAG #2 — 출처 / 점수</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>RAG 챗봇 #2</h1>
+    <p>+ 출처 표시 + 유사도 점수 + 로딩 스피너</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. PDF 업로드</h2>
+      <form id="upload-form">
+        <input type="file" id="file-input" accept=".pdf" required>
+        <button type="submit">업로드</button>
+      </form>
+      <p id="upload-status"></p>
+    </section>
+
+    <section>
+      <h2>2. 질문하기</h2>
+      <form id="ask-form">
+        <input type="text" id="question-input" placeholder="질문을 입력하세요" required>
+        <button type="submit">질문</button>
+      </form>
+
+      <div id="result">
+        <div id="answer"></div>
+        <ul id="sources"></ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- 로딩 오버레이 -->
+  <div id="overlay">
+    <div id="spinner"></div>
+    <div id="loading-text">처리 중입니다...</div>
+  </div>
+
+  <script>
+    const overlay = document.getElementById('overlay');
+    const loadingText = document.getElementById('loading-text');
+    function showOverlay(msg) { loadingText.textContent = msg; overlay.style.display = 'flex'; }
+    function hideOverlay() { overlay.style.display = 'none'; }
+
+    document.getElementById('upload-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const file = document.getElementById('file-input').files[0];
+      if (!file) return;
+      const fd = new FormData(); fd.append('file', file);
+
+      showOverlay('PDF 처리 중...');
+      const r = await fetch('/upload', { method: 'POST', body: fd });
+      hideOverlay();
+      const d = await r.json();
+      document.getElementById('upload-status').textContent = d.message || d.error;
+    });
+
+    document.getElementById('ask-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const q = document.getElementById('question-input').value.trim();
+
+      showOverlay('답변 생성 중...');
+      const r = await fetch('/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q }),
+      });
+      hideOverlay();
+      const d = await r.json();
+
+      document.getElementById('answer').textContent = d.answer || d.error || '';
+
+      // 출처 표시
+      const ul = document.getElementById('sources');
+      ul.innerHTML = '';
+      (d.sources || []).forEach(s => {
+        const li = document.createElement('li');
+        li.textContent = `${s.file} (p.${s.page}, 유사도 ${s.score}%)`;
+        ul.appendChild(li);
+      });
+    });
+  </script>
+</body>
+</html>

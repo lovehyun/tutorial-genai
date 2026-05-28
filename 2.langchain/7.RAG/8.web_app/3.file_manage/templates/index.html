@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>RAG #3 — 파일 관리</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>RAG 챗봇 #3</h1>
+    <p>+ 파일 목록 + 삭제 (벡터까지 함께 정리)</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. PDF 업로드</h2>
+      <form id="upload-form">
+        <input type="file" id="file-input" accept=".pdf" required>
+        <button type="submit">업로드</button>
+      </form>
+      <p id="upload-status"></p>
+    </section>
+
+    <section>
+      <h2>2. 업로드된 파일</h2>
+      <ul id="file-list"><li>(로딩 중...)</li></ul>
+    </section>
+
+    <section>
+      <h2>3. 질문하기</h2>
+      <form id="ask-form">
+        <input type="text" id="question-input" placeholder="질문을 입력하세요" required>
+        <button type="submit">질문</button>
+      </form>
+
+      <div id="result">
+        <div id="answer"></div>
+        <ul id="sources"></ul>
+      </div>
+    </section>
+  </main>
+
+  <div id="overlay">
+    <div id="spinner"></div>
+    <div id="loading-text">처리 중입니다...</div>
+  </div>
+
+  <script>
+    const overlay = document.getElementById('overlay');
+    const loadingText = document.getElementById('loading-text');
+    function showOverlay(msg) { loadingText.textContent = msg; overlay.style.display = 'flex'; }
+    function hideOverlay() { overlay.style.display = 'none'; }
+
+    // 파일 목록 로드 & 렌더
+    async function loadFiles() {
+      const r = await fetch('/files');
+      const { files } = await r.json();
+      const ul = document.getElementById('file-list');
+      ul.innerHTML = files.length === 0
+        ? '<li>(업로드된 파일 없음)</li>'
+        : files.map(f => `<li>${f} <button class="del" data-file="${f}">삭제</button></li>`).join('');
+    }
+
+    // 삭제 버튼 (이벤트 위임)
+    document.getElementById('file-list').addEventListener('click', async (e) => {
+      if (!e.target.classList.contains('del')) return;
+      const f = e.target.dataset.file;
+      if (!confirm(`'${f}' 을 삭제하시겠습니까? (벡터까지 함께 삭제)`)) return;
+      showOverlay('삭제 중...');
+      const r = await fetch(`/files/${encodeURIComponent(f)}`, { method: 'DELETE' });
+      hideOverlay();
+      const d = await r.json();
+      alert(d.message || d.error);
+      loadFiles();
+    });
+
+    document.getElementById('upload-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const file = document.getElementById('file-input').files[0];
+      if (!file) return;
+      const fd = new FormData(); fd.append('file', file);
+      showOverlay('PDF 처리 중...');
+      const r = await fetch('/upload', { method: 'POST', body: fd });
+      hideOverlay();
+      const d = await r.json();
+      document.getElementById('upload-status').textContent = d.message || d.error;
+      loadFiles();
+    });
+
+    document.getElementById('ask-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const q = document.getElementById('question-input').value.trim();
+      showOverlay('답변 생성 중...');
+      const r = await fetch('/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q }),
+      });
+      hideOverlay();
+      const d = await r.json();
+      document.getElementById('answer').textContent = d.answer || d.error || '';
+      const ul = document.getElementById('sources');
+      ul.innerHTML = '';
+      (d.sources || []).forEach(s => {
+        const li = document.createElement('li');
+        li.textContent = `${s.file} (p.${s.page}, 유사도 ${s.score}%)`;
+        ul.appendChild(li);
+      });
+    });
+
+    loadFiles();
+  </script>
+</body>
+</html>
