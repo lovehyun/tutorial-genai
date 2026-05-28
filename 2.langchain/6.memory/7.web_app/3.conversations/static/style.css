@@ -1,0 +1,77 @@
+/* 최소 CSS — #2 + 사이드바 레이아웃 추가 */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 0 20px;
+  color: #222;
+  line-height: 1.5;
+}
+
+header h1 { margin-bottom: 4px; }
+header p  { color: #666; margin-top: 0; }
+header code { background: #eef; padding: 2px 6px; border-radius: 3px; }
+
+/* 로그인 폼 (기존 #2 와 동일) */
+main form[action$="/login"] {
+  display: flex; flex-direction: column; gap: 8px; max-width: 300px;
+}
+main form[action$="/login"] label { font-weight: bold; }
+main form[action$="/login"] input {
+  padding: 8px 10px; font-size: 1em; border: 1px solid #ccc; border-radius: 4px;
+}
+
+/* 사이드바 + 본문 2-칼럼 — CSS 없으면 위아래 흐름 */
+main {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 16px;
+}
+
+aside {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 12px;
+  background: #fafafa;
+}
+aside h2 { font-size: 1em; margin: 0 0 8px 0; }
+aside ul { list-style: none; padding: 0; margin: 8px 0 0 0; }
+aside li { margin: 4px 0; }
+aside a {
+  display: block;
+  padding: 4px 6px;
+  border-radius: 3px;
+  text-decoration: none;
+  color: #0a58ca;
+  font-family: monospace;
+}
+aside a:hover    { background: #eef; }
+aside a.current  { background: #0a58ca; color: white; font-weight: bold; }
+
+/* 메시지 박스 */
+#messages {
+  list-style: none;
+  padding: 12px;
+  margin: 0 0 12px 0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  min-height: 320px;
+  max-height: 500px;
+  overflow-y: auto;
+  background: #fafafa;
+}
+.msg { margin: 6px 0; }
+.msg.user      { color: #0a58ca; }
+.msg.assistant { color: #146c43; }
+
+/* 입력 폼 */
+#form { display: flex; gap: 8px; }
+#input {
+  flex: 1; padding: 8px 10px; font-size: 1em;
+  border: 1px solid #ccc; border-radius: 4px;
+}
+button {
+  padding: 8px 16px; font-size: 1em; cursor: pointer;
+  border: 1px solid #0a58ca; background: #0a58ca; color: white; border-radius: 4px;
+}
+button:hover { opacity: 0.9; }

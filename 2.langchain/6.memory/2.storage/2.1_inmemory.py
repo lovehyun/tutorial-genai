@@ -1,83 +1,55 @@
-from dotenv import load_dotenv
-import os, sys
+"""
+InMemoryChatMessageHistory — 프로세스 메모리에 대화 저장
 
+가장 단순한 메모리 저장소.
+직접 history 객체를 다루어 메시지를 누적·삽입하는 흐름을 익힙니다.
+
+자주 나오는 질문 → 어디서 해결되는지
+  Q. 얼마나 저장 가능? 무제한?
+    → 자료구조 차원에선 사실상 무제한(RAM 이 허용하는 만큼) 입니다. 단, 프로세스가
+      종료되면 모두 사라집니다(영속성 X — 파일/DB 가 필요하면 2.2 / 2.3).
+  Q. 메시지가 계속 쌓이면 토큰 한도 넘지 않나?
+    → 넘습니다. 모델 컨텍스트 윈도우 초과 시 호출이 실패합니다.
+      → 해결: 4.compression/ (trim_messages / 자동 요약).
+  Q. 여러 사용자/대화 분리는?
+    → 이 파일은 단일 history 하나만 씁니다. 여러 사용자 동시 사용 불가.
+      → 해결: 3.sessions/ 에서 RunnableWithMessageHistory + session_id 별 분리.
+
+즉 2.storage 는 "저장소 자체" 만 보는 단계이고, 위 문제들은 3 / 4 폴더에서 단계적으로 풀어갑니다.
+"""
+
+from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.prompts import (
-    ChatPromptTemplate,
-    SystemMessagePromptTemplate,
-    HumanMessagePromptTemplate,
-    MessagesPlaceholder,
-)
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.chat_history import InMemoryChatMessageHistory
-from langchain_community.chat_message_histories import ChatMessageHistory
 
-# 세션 개념이 없어서 모든 대화가 한 히스토리에 쌓입니다 → 여러 유저/세션을 지원하려면 세션별 히스토리 맵이 필요
-# langchain_community.chat_message_histories.ChatMessageHistory는 구버전 느낌이라, 보통은 InMemoryChatMessageHistory(core)나 RunnableWithMessageHistory 사용을 권장
-
-# 0. 환경 변수 로드
 load_dotenv()
-if not os.getenv("OPENAI_API_KEY"):
-    print("OPENAI_API_KEY 미설정", file=sys.stderr); sys.exit(1)
-    
-# 1. OpenAI 채팅 모델 설정
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
-# 2. LangChain의 공식 메모리 기능 사용 (ChatMessageHistory)
-# chat_history = ChatMessageHistory()
-chat_history = InMemoryChatMessageHistory()
-
-# 3. 프롬프트 템플릿 생성
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "답변은 간결하게 해주세요."),
-    MessagesPlaceholder(variable_name="history"),  # 메시지 기록
-    ("human", "{input}")
+    ("system", "당신은 친절한 한국어 어시스턴트입니다."),
+    MessagesPlaceholder("history"),
+    ("user", "{input}"),
 ])
+chain = prompt | llm | StrOutputParser()
 
-# prompt = ChatPromptTemplate.from_messages([
-#     SystemMessagePromptTemplate.from_template("You are a helpful assistant."),
-#     MessagesPlaceholder(variable_name="history"),
-#     HumanMessagePromptTemplate.from_template("{input}")
-# ])
+# ← 이 한 줄만 storage 종류별로 달라집니다 (2.2 / 2.3 비교)
+history = InMemoryChatMessageHistory()
 
-# 4. 체인 생성
-chain = prompt | llm
-
-# 5. 대화 수행
-
-# 히스토리 내용 출력 함수
-def print_history():
-    print("\n===== 현재 메시지 히스토리 =====")
-    for i, message in enumerate(chat_history.messages):
-        role = "User" if message.type == "human" else "AI"
-        print(f"{i+1}. {role}: {message.content}")
-    print("================================\n")
 
 def chat(message):
-    # 현재 턴의 user 메시지는 {input}으로만 주고,
-    # 호출 이후에 history에 추가 (중복 방지)
-    
-    print(f"Q: {message}")
-
-    result = chain.invoke({
-        "input": message,
-        "history": chat_history.messages  # ChatMessageHistory에서 메시지 목록 가져오기
+    print(f"\nQ: {message}")
+    answer = chain.invoke({
+        "input":   message,
+        "history": history.messages,    # 현재까지 누적된 메시지를 끼워 넣음
     })
-    
-    # 응답 출력
-    print(f"A: {result.content}")
-    
-    # 대화 기록에 추가 (중복 방지: 호출 후에 저장)
-    chat_history.add_user_message(message)
-    chat_history.add_ai_message(result.content)
-    
-    # print_history()
+    print(f"A: {answer}")
+    # 호출 후 메시지 누적
+    history.add_user_message(message)
+    history.add_ai_message(answer)
 
-# 6. 테스트
-# chat("Hello")
-# chat("Can we talk about sports?")
-# chat("What's a good sport to play outdoor?")
 
-chat("안녕하세요")
-chat("운동에 대해서 이야기해 볼까요?")
-chat("아웃도어 스포츠에 대해서 알려주세요.")
+chat("제 이름은 홍길동입니다.")
+chat("저는 등산을 좋아해요.")
+chat("제 이름과 취미를 다시 말해줄래요?")

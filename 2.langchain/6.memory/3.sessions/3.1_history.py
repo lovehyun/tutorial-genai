@@ -1,52 +1,50 @@
-from dotenv import load_dotenv
+"""
+RunnableWithMessageHistory — 메모리 자동 관리 (단일 세션)
 
+2.storage 의 패턴은 매 호출마다 history.messages 를 직접 넣고
+끝나면 add_user_message / add_ai_message 를 일일이 해야 했습니다.
+
+RunnableWithMessageHistory 가 그 작업을 자동으로 해줍니다.
+일단 세션 구분 없이 항상 같은 메모리를 쓰는 가장 단순한 형태.
+"""
+
+from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
-
-# from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import InMemoryChatMessageHistory
-
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
-# 환경 변수 로드
 load_dotenv()
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
-# LLM 초기화
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
-
-# 대화 프롬프트 설정
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "너는 친절한 AI야."),
-    MessagesPlaceholder(variable_name="history"),
-    ("human", "{input}")
+    ("system", "당신은 친절한 한국어 어시스턴트입니다."),
+    MessagesPlaceholder("history"),
+    ("user", "{input}"),
 ])
-
-# 체인 구성 (LCEL)
 chain = prompt | llm | StrOutputParser()
 
-# 단일 사용자용 메모리 (세션 없음) - 구버전도 여전히 잘 동작함
-# memory = ChatMessageHistory()
 memory = InMemoryChatMessageHistory()
 
-# 체인에 메모리 기능 결합
+# 체인을 메모리로 감싸기 — history 주입/저장이 자동
 chain_with_memory = RunnableWithMessageHistory(
     chain,
-    lambda _: memory,  # get_session_history_func 을 추가해야 하는 곳. (지금은 세션 구분 안하고 항상 같은 메모리 반환)
+    lambda _: memory,                  # 항상 같은 메모리 반환 (단일 세션)
     input_messages_key="input",
-    history_messages_key="history"
+    history_messages_key="history",
 )
 
-# 채팅 함수
-def chat(message):
-    print(f"Q: {message}")
-    response = chain_with_memory.invoke({"input": message}, config={"configurable": {"session_id": "default"}})
-    print(f"A: {response}")
-    return response
 
-# 대화 시뮬레이션
-chat("안녕하세요")
-chat("제 이름이 뭐였지요?")
-chat("제 이름은 홍길동 이에요")
-chat("저는 프로그래밍을 배우고 싶어요.")
-chat("저는 누구고 무엇을 배우고 싶다고 했나요?")
+def chat(message):
+    print(f"\nQ: {message}")
+    answer = chain_with_memory.invoke(
+        {"input": message},
+        config={"configurable": {"session_id": "default"}},   # 단일 세션이지만 키는 필수
+    )
+    print(f"A: {answer}")
+
+
+chat("제 이름은 홍길동입니다.")
+chat("저는 등산을 좋아해요.")
+chat("제 이름과 취미를 다시 말해줄래요?")

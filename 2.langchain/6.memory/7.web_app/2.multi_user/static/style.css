@@ -1,0 +1,63 @@
+/* 최소 CSS — #1 + 로그인 폼 스타일 */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 0 20px;
+  color: #222;
+  line-height: 1.5;
+}
+
+header h1 { margin-bottom: 4px; }
+header p  { color: #666; margin-top: 0; }
+
+/* 로그인 폼 */
+main form[action$="/login"] {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 300px;
+}
+main form[action$="/login"] label { font-weight: bold; }
+main form[action$="/login"] input {
+  padding: 8px 10px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* 메시지 박스 */
+#messages {
+  list-style: none;
+  padding: 12px;
+  margin: 0 0 12px 0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  min-height: 320px;
+  max-height: 500px;
+  overflow-y: auto;
+  background: #fafafa;
+}
+.msg { margin: 6px 0; }
+.msg.user      { color: #0a58ca; }
+.msg.assistant { color: #146c43; }
+
+/* 입력 폼 */
+#form { display: flex; gap: 8px; }
+#input {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+button {
+  padding: 8px 16px;
+  font-size: 1em;
+  cursor: pointer;
+  border: 1px solid #0a58ca;
+  background: #0a58ca;
+  color: white;
+  border-radius: 4px;
+}
+button:hover { opacity: 0.9; }

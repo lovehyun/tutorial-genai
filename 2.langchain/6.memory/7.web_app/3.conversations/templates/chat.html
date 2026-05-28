@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>챗봇 #3 — {{ username }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>챗봇 #3</h1>
+    <p>
+      <strong>{{ username }}</strong> 님 / 현재 대화 <code>{{ current_id }}</code>
+      <form method="post" action="{{ url_for('logout') }}" style="display:inline">
+        <button type="submit">로그아웃</button>
+      </form>
+    </p>
+  </header>
+
+  <main>
+    <aside>
+      <h2>대화 목록</h2>
+
+      <form method="post" action="{{ url_for('new_conversation') }}">
+        <button type="submit">+ 새 대화</button>
+      </form>
+
+      {% if all_convs %}
+        <ul>
+          {% for cid in all_convs %}
+            <li>
+              <a href="{{ url_for('switch_conversation', conv_id=cid) }}"
+                 class="{% if cid == current_id %}current{% endif %}">
+                {{ cid }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>(아직 대화가 없습니다)</p>
+      {% endif %}
+    </aside>
+
+    <section>
+      <ul id="messages">
+        {% for m in messages %}
+          <li class="msg {{ m.role }}">
+            <strong>{{ '나' if m.role == 'user' else 'AI' }}:</strong> {{ m.content }}
+          </li>
+        {% endfor %}
+      </ul>
+
+      <form id="form">
+        <input id="input" type="text" placeholder="메시지를 입력하세요" autocomplete="off" required>
+        <button type="submit">보내기</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById('form');
+    const input = document.getElementById('input');
+    const messages = document.getElementById('messages');
+
+    function addMessage(role, text) {
+      const li = document.createElement('li');
+      li.className = 'msg ' + role;
+      const strong = document.createElement('strong');
+      strong.textContent = (role === 'user' ? '나' : 'AI') + ': ';
+      li.appendChild(strong);
+      li.appendChild(document.createTextNode(text));
+      messages.appendChild(li);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = input.value.trim();
+      if (!message) return;
+      addMessage('user', message);
+      input.value = '';
+
+      const resp = await fetch('/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message}),
+      });
+      const data = await resp.json();
+      addMessage('assistant', data.answer);
+    });
+  </script>
+</body>
+</html>

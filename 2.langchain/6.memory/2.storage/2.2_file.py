@@ -1,95 +1,50 @@
-from dotenv import load_dotenv
-import os, sys, json
+"""
+FileChatMessageHistory — JSON 파일에 대화 저장
 
+2.1 과 비교: storage 객체 한 줄만 다릅니다.
+프로세스 종료 후에도 history.json 에 대화가 남아 다음 실행에 그대로 이어집니다.
+"""
+
+import json
+from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.prompts import (
-    ChatPromptTemplate,
-    SystemMessagePromptTemplate,
-    HumanMessagePromptTemplate,
-    MessagesPlaceholder,
-)
-from langchain_core.chat_history import InMemoryChatMessageHistory
-from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.output_parsers import StrOutputParser
 from langchain_community.chat_message_histories import FileChatMessageHistory
 
-# 세션 개념이 없어서 모든 대화가 한 히스토리에 쌓입니다 → 여러 유저/세션을 지원하려면 세션별 히스토리 맵이 필요
-# langchain_community.chat_message_histories.ChatMessageHistory는 구버전 느낌이라, 보통은 InMemoryChatMessageHistory(core)나 RunnableWithMessageHistory 사용을 권장
-
-# 0. 환경 변수 로드
 load_dotenv()
-if not os.getenv("OPENAI_API_KEY"):
-    print("OPENAI_API_KEY 미설정", file=sys.stderr); sys.exit(1)
-    
-# 1. OpenAI 채팅 모델 설정
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
-# 2. LangChain의 공식 메모리 기능 사용 (ChatMessageHistory)
-
-# 초기화 함수 - 파일 삭제
-def clear_file_history(file_path):
-    with open(file_path, "w", encoding="utf-8") as f:
-        json.dump([], f, ensure_ascii=False)
-
-# chat_history = ChatMessageHistory()
-# chat_history = InMemoryChatMessageHistory()
-# 파일 경로는 원하는대로 변경 가능 ("chat_history/default.json")
-HISTORY_FILE = "history.json"
-chat_history = FileChatMessageHistory(HISTORY_FILE)
-clear_file_history(HISTORY_FILE)  # 기록 초기화
-
-# 3. 프롬프트 템플릿 생성
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "답변은 간결하게 해주세요."),
-    MessagesPlaceholder(variable_name="history"),  # 메시지 기록
-    ("human", "{input}")
+    ("system", "당신은 친절한 한국어 어시스턴트입니다."),
+    MessagesPlaceholder("history"),
+    ("user", "{input}"),
 ])
+chain = prompt | llm | StrOutputParser()
 
-# prompt = ChatPromptTemplate.from_messages([
-#     SystemMessagePromptTemplate.from_template("You are a helpful assistant."),
-#     MessagesPlaceholder(variable_name="history"),
-#     HumanMessagePromptTemplate.from_template("{input}")
-# ])
+# 2.1 과 비교: storage 한 줄만 다름
+HISTORY_FILE = "history.json"
 
-# 4. 체인 생성
-chain = prompt | llm
+# 매번 깨끗하게 시작하고 싶으면 아래 줄 활성화
+# open(HISTORY_FILE, "w", encoding="utf-8").write(json.dumps([]))
 
-# 5. 대화 수행
+history = FileChatMessageHistory(HISTORY_FILE)
 
-# 히스토리 내용 출력 함수
-def print_history():
-    print("\n===== 현재 메시지 히스토리 =====")
-    for i, message in enumerate(chat_history.messages):
-        role = "User" if message.type == "human" else "AI"
-        print(f"{i+1}. {role}: {message.content}")
-    print("================================\n")
 
 def chat(message):
-    # 현재 턴의 user 메시지는 {input}으로만 주고,
-    # 호출 이후에 history에 추가 (중복 방지)
-    
-    print(f"Q: {message}")
-
-    result = chain.invoke({
-        "input": message,
-        "history": chat_history.messages  # ChatMessageHistory에서 메시지 목록 가져오기
+    print(f"\nQ: {message}")
+    answer = chain.invoke({
+        "input":   message,
+        "history": history.messages,
     })
-    
-    # 응답 출력
-    print(f"A: {result.content}")
-    
-    # 대화 기록에 추가 (중복 방지: 호출 후에 저장)
-    chat_history.add_user_message(message)
-    chat_history.add_ai_message(result.content)
-    
-    # print_history()
+    print(f"A: {answer}")
+    history.add_user_message(message)
+    history.add_ai_message(answer)
 
-# 6. 테스트
-# chat("Hello")
-# chat("Can we talk about sports?")
-# chat("What's a good sport to play outdoor?")
 
-chat("내가 지금까지 한 말들은?")
-# chat("안녕하세요")
-# chat("운동에 대해서 이야기해 볼까요?")
-# chat("아웃도어 스포츠에 대해서 알려주세요.")
+chat("제 이름은 홍길동입니다.")
+chat("저는 등산을 좋아해요.")
+chat("제 이름과 취미를 다시 말해줄래요?")
+
+# 실행 후 history.json 을 열어보세요. JSON 으로 메시지가 그대로 저장돼 있습니다.
+# 다시 실행하면 이전 대화 그 자리에 누적되어, 모델이 처음부터 기억합니다.

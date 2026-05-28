@@ -1,64 +1,27 @@
-# dump_history.py
-import sys, io, argparse
-from langchain_community.chat_message_histories import FileChatMessageHistory, SQLChatMessageHistory
-from sqlalchemy import create_engine
+"""
+history.json 보기 — 한글 그대로 디버그 출력
 
-ROLE_MAP = {"human": "User", "ai": "AI", "system": "System"}
+FileChatMessageHistory 가 한글을 \\uXXXX 로 escape 해서 저장하므로,
+파일을 텍스트 에디터로 직접 열면 읽기 어렵습니다.
+이 스크립트는 JSON 을 파싱해 메시지를 사람이 읽을 수 있게 출력합니다.
 
-def force_utf8_stdout():
-    """Windows 콘솔 포함 표준출력을 UTF-8로 강제."""
-    try:
-        sys.stdout.reconfigure(encoding="utf-8")
-        sys.stderr.reconfigure(encoding="utf-8")
-    except AttributeError:
-        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
-        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
+사용:
+  python 2.4_print_history_util.py                # 기본: history.json
+  python 2.4_print_history_util.py 다른파일.json
+"""
 
-def dump_file_history(path: str):
-    hist = FileChatMessageHistory(path)
-    print(f"=== FileChatMessageHistory: {path} ===")
-    if not hist.messages:
-        print("(빈 히스토리)")
-        return
-    for i, m in enumerate(hist.messages, 1):
-        role = ROLE_MAP.get(m.type, m.type)
-        print(f"{i:02d}. [{role}] {m.content}")
+import json
+import sys
 
-def dump_sql_history(db_url: str, session_id: str):
-    engine = create_engine(db_url)
-    hist = SQLChatMessageHistory(session_id=session_id, connection=engine)
-    print(f"=== SQLChatMessageHistory: {db_url} / session_id={session_id} ===")
-    if not hist.messages:
-        print("(빈 히스토리)")
-        return
-    for i, m in enumerate(hist.messages, 1):
-        role = ROLE_MAP.get(m.type, m.type)
-        print(f"{i:02d}. [{role}] {m.content}")
+PATH = sys.argv[1] if len(sys.argv) > 1 else "history.json"
 
-def build_parser():
-    p = argparse.ArgumentParser(
-        description="LangChain ChatMessageHistory dumper (UTF-8 safe)."
-    )
-    # --file / --db 둘 다 선택 가능하게 하고 기본값 부여
-    p.add_argument("--file", nargs="?", const="history.json", default=None,
-                   help="FileChatMessageHistory JSON 경로 (기본: history.json)")
-    p.add_argument("--db", nargs="?", const="sqlite:///chat_history.db", default=None,
-                   help="SQL DB URL (기본: sqlite:///chat_history.db)")
-    p.add_argument("--session", default="default",
-                   help="SQL 모드에서 사용할 session_id (기본: default)")
-    return p
+with open(PATH, "r", encoding="utf-8") as f:
+    messages = json.load(f)
 
-def main():
-    force_utf8_stdout()
-    args = build_parser().parse_args()
+ROLE = {"human": "User", "ai": "AI", "system": "System"}
 
-    # 우선순위: --file > --db > 기본 파일
-    if args.file:
-        dump_file_history(args.file)
-    elif args.db:
-        dump_sql_history(args.db, args.session)
-    else:
-        dump_file_history("history.json")
-
-if __name__ == "__main__":
-    main()
+print(f"=== {PATH} ({len(messages)} 메시지) ===\n")
+for i, m in enumerate(messages, 1):
+    role = ROLE.get(m.get("type", "?"), m.get("type", "?"))
+    content = m.get("data", {}).get("content", "")
+    print(f"{i:02d}. [{role}] {content}")

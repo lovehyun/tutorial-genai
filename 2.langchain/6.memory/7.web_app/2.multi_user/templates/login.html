@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인 — 챗봇 #2</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>챗봇 #2</h1>
+    <p>사용자별 대화 분리</p>
+  </header>
+
+  <main>
+    <form method="post" action="{{ url_for('login') }}">
+      <label for="username">사용자 이름:</label>
+      <input id="username" name="username" type="text" required autocomplete="username">
+      <button type="submit">로그인</button>
+    </form>
+  </main>
+</body>
+</html>

@@ -1,112 +1,56 @@
-from dotenv import load_dotenv
-import os, sys, json
+"""
+SQLChatMessageHistory — SQLite DB 에 대화 저장
 
+2.1 / 2.2 와 비교: storage 객체 한 줄만 다릅니다.
+
+장점:
+  - 동시 접근에 강함 (파일 lock 문제 없음)
+  - session_id 컬럼으로 여러 사용자/대화를 한 DB 에 분리해 저장
+  - 운영 환경에서도 흔히 쓰이는 패턴
+"""
+
+from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.prompts import (
-    ChatPromptTemplate,
-    SystemMessagePromptTemplate,
-    HumanMessagePromptTemplate,
-    MessagesPlaceholder,
-)
-from langchain_core.chat_history import InMemoryChatMessageHistory
-from langchain_community.chat_message_histories import ChatMessageHistory
-from langchain_community.chat_message_histories import FileChatMessageHistory
+from langchain_core.output_parsers import StrOutputParser
 from langchain_community.chat_message_histories import SQLChatMessageHistory
 from sqlalchemy import create_engine
 
-# 세션 개념이 없어서 모든 대화가 한 히스토리에 쌓입니다 → 여러 유저/세션을 지원하려면 세션별 히스토리 맵이 필요
-# langchain_community.chat_message_histories.ChatMessageHistory는 구버전 느낌이라, 보통은 InMemoryChatMessageHistory(core)나 RunnableWithMessageHistory 사용을 권장
-
-# 0. 환경 변수 로드
 load_dotenv()
-if not os.getenv("OPENAI_API_KEY"):
-    print("OPENAI_API_KEY 미설정", file=sys.stderr); sys.exit(1)
-    
-# 1. OpenAI 채팅 모델 설정
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
-# 2. LangChain의 공식 메모리 기능 사용 (ChatMessageHistory)
-
-# chat_history = ChatMessageHistory()
-# chat_history = InMemoryChatMessageHistory()
-# chat_history = FileChatMessageHistory("history.json")
-
-# SQLite 파일 경로
-DB_URL = "sqlite:///chat_history.db"
-
-# 세션 구분을 위해 session_id 사용
-# session_id = "user_123"
-session_id = "default"
-
-# DB 엔진 생성
-engine = create_engine(DB_URL)
-
-# SQL 기반 대화 히스토리 객체 생성
-chat_history = SQLChatMessageHistory(
-    session_id=session_id,
-    connection=engine
-)
-
-# 현재 메시지 출력
-print("초기 메시지 개수:", len(chat_history.messages))
-# chat_history.clear() # 초기화 (삭제)
-# 확인
-# print("초기화 후 메시지 개수:", len(chat_history.messages))
-
-
-# 3. 프롬프트 템플릿 생성
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "답변은 간결하게 해주세요."),
-    MessagesPlaceholder(variable_name="history"),  # 메시지 기록
-    ("human", "{input}")
+    ("system", "당신은 친절한 한국어 어시스턴트입니다."),
+    MessagesPlaceholder("history"),
+    ("user", "{input}"),
 ])
+chain = prompt | llm | StrOutputParser()
 
-# prompt = ChatPromptTemplate.from_messages([
-#     SystemMessagePromptTemplate.from_template("You are a helpful assistant."),
-#     MessagesPlaceholder(variable_name="history"),
-#     HumanMessagePromptTemplate.from_template("{input}")
-# ])
+# 2.1, 2.2 와 비교: storage 한 줄만 다름
+DB_URL     = "sqlite:///chat_history.db"
+SESSION_ID = "default"   # SQL 은 한 DB 에서 session_id 로 여러 대화 분리 가능
 
-# 4. 체인 생성
-chain = prompt | llm
+engine  = create_engine(DB_URL)
+history = SQLChatMessageHistory(session_id=SESSION_ID, connection=engine)
 
-# 5. 대화 수행
-
-# 히스토리 내용 출력 함수
-def print_history():
-    print("\n===== 현재 메시지 히스토리 =====")
-    for i, message in enumerate(chat_history.messages):
-        role = "User" if message.type == "human" else "AI"
-        print(f"{i+1}. {role}: {message.content}")
-    print("================================\n")
 
 def chat(message):
-    # 현재 턴의 user 메시지는 {input}으로만 주고,
-    # 호출 이후에 history에 추가 (중복 방지)
-    
-    print(f"Q: {message}")
-
-    result = chain.invoke({
-        "input": message,
-        "history": chat_history.messages  # ChatMessageHistory에서 메시지 목록 가져오기
+    print(f"\nQ: {message}")
+    answer = chain.invoke({
+        "input":   message,
+        "history": history.messages,
     })
-    
-    # 응답 출력
-    print(f"A: {result.content}")
-    
-    # 대화 기록에 추가 (중복 방지: 호출 후에 저장)
-    chat_history.add_user_message(message)
-    chat_history.add_ai_message(result.content)
-    
-    # print_history()
+    print(f"A: {answer}")
+    history.add_user_message(message)
+    history.add_ai_message(answer)
 
-# 6. 테스트
-# chat("Hello")
-# chat("Can we talk about sports?")
-# chat("What's a good sport to play outdoor?")
 
-chat("내가 지금까지 한 말들은?")
-# chat("안녕하세요")
-# chat("운동에 대해서 이야기해 볼까요?")
-# chat("아웃도어 스포츠에 대해서 알려주세요.")
+chat("제 이름은 홍길동입니다.")
+chat("저는 등산을 좋아해요.")
+chat("제 이름과 취미를 다시 말해줄래요?")
+
+# 다시 실행하면 chat_history.db 에서 그대로 이어집니다.
+# 다른 session_id 로 실행하면 같은 DB 안에서 새 대화로 분리됩니다.
+
+# DB 내용을 직접 보고 싶을 때 (shell):
+#   sqlite3 chat_history.db "SELECT session_id, message FROM message_store;"
