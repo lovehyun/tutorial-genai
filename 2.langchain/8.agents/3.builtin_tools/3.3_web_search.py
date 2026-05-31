@@ -16,7 +16,7 @@ LLM 의 지식은 cut-off 가 있어서 "오늘 날씨", "환율", "최근 뉴�
 
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langchain.agents import create_agent   # (구) langgraph.prebuilt.create_react_agent
+from langchain.agents import create_agent
 
 load_dotenv()
 

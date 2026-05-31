@@ -17,7 +17,7 @@ Human-in-the-loop — 위험한 도구 호출 전에 사람에게 승인 받기.
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
-from langchain.agents import create_agent   # (구) langgraph.prebuilt.create_react_agent
+from langchain.agents import create_agent
 from langgraph.checkpoint.memory import MemorySaver
 
 load_dotenv()

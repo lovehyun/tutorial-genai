@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.arxiv.tool import ArxivQueryRun
 from langchain_community.utilities.arxiv import ArxivAPIWrapper
-from langchain.agents import create_agent   # (구) langgraph.prebuilt.create_react_agent
+from langchain.agents import create_agent
 
 load_dotenv()
 

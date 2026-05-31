@@ -17,7 +17,7 @@ from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
-from langchain.agents import create_agent   # (구) langgraph.prebuilt.create_react_agent
+from langchain.agents import create_agent
 from langgraph.checkpoint.memory import MemorySaver
 
 from tools import ALL_TOOLS

@@ -64,6 +64,41 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 > 인자 `prompt=` → `system_prompt=`. 사용법(`invoke`/`stream`/`checkpointer`/`interrupt_before`)은 동일.
 > 그래프 LLM 노드 이름만 `agent` → `model` 로 바뀜(스트리밍 노드명 볼 때만 영향). 변경 상세는 `1.basics/1.2_first_agent.py` 주석 참고.
 
+## 핵심 함수·메서드 한눈에
+
+에이전트를 다루며 **배우게 될 주요 함수/메서드**입니다. (상세 실습은 각 폴더에서)
+모든 에이전트는 LangGraph `CompiledStateGraph` 라서, 아래 실행/상태 메서드는 공통으로 쓸 수 있습니다.
+
+### 생성
+| 함수 | 하는 일 | 배우는 곳 |
+|---|---|---|
+| `create_agent(model, tools, ...)` | LLM+도구를 묶어 에이전트(그래프) 생성. 핵심 인자: `system_prompt=` / `checkpointer=` / `interrupt_before=` / `response_format=` | 1.basics |
+| `@tool` | 파이썬 함수 → 에이전트 도구 (docstring·타입힌트가 곧 명세) | 2.custom_tools |
+| `llm.bind_tools([...])` | (저수준) LLM 에 도구만 바인딩 — ReAct 루프는 직접 | 7.1 |
+
+### 실행
+| 메서드 | 하는 일 | 배우는 곳 |
+|---|---|---|
+| `agent.invoke({"messages":[...]}, config=)` | 한 번 실행 → 최종 상태(dict) 반환 | 1.basics |
+| `agent.ainvoke(...)` | 비동기 실행 (MCP 등 async 도구) | 8.mcp |
+| `agent.stream(..., stream_mode=...)` | 스트리밍 — `"updates"`(노드별) / `"messages"`(토큰) / `"values"`(전체 스냅샷) | 5.2 |
+
+### 상태·메모리 (checkpointer 필요)
+| 메서드 | 하는 일 | 배우는 곳 |
+|---|---|---|
+| `agent.get_state(config)` | 그 thread 의 **현재 상태**(messages 등) 조회 | 4.3 |
+| `agent.get_state_history(config)` | **과거 스냅샷**(체크포인트) 목록 — 디버깅/되감기 | 4.3 |
+| `agent.update_state(config, {...})` | 상태 직접 **수정** — HITL 에서 도구 인자 교정·거부 | 5.1, 5.3 |
+
+### 자주 쓰는 구성요소
+| 이름 | 하는 일 | 배우는 곳 |
+|---|---|---|
+| `MemorySaver()` | in-memory 체크포인터(메모리). 영속화는 `SqliteSaver`/`PostgresSaver` 로 교체 | 4.memory |
+| `config={"configurable":{"thread_id":...}}` | 세션 구분 키 (+ `recursion_limit` 등 실행 옵션) | 4.memory, 7.3 |
+| `interrupt_before=["tools"]` | 도구 실행 **직전 정지** (사람 승인/수정) | 5.1, 5.3 |
+| `response_format=Pydantic` | 최종 답을 구조화 → `result["structured_response"]` | 2.3 |
+| `MultiServerMCPClient` | MCP 서버 도구 → LangChain 도구로 자동 변환 | 8.mcp |
+
 ## 폴더별 파일 상세
 
 ### `1.basics/` — 첫 에이전트
@@ -93,12 +128,15 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 | 파일 | 설명 |
 |---|---|
 | `4.1_with_memory.py` | `MemorySaver` + `thread_id` 별 격리. 같은 thread 안 맥락 유지 |
+| `4.2_multi_session.py` | 같은 에이전트, `thread_id` 다르면 기억 안 섞임 (멀티유저 격리) |
+| `4.3_inspect_state.py` | `get_state` / `get_state_history` 로 저장된 메모리 직접 들여다보기 |
 
 ### `5.hitl_streaming/` — 사용자 제어 / UX
 | 파일 | 설명 |
 |---|---|
 | `5.1_interrupt.py` | `interrupt_before=["tools"]` — 위험한 도구 호출 전 사람 승인 |
 | `5.2_streaming.py` | `agent.stream()` — 노드 단위 / 토큰 단위 두 모드 비교 |
+| `5.3_edit_and_resume.py` | 정지 후 도구 인자를 사람이 **수정**하고 재개 (`update_state` 로 tool_calls 교정) |
 
 ### `6.routing/` — 다중 도구
 | 파일 | 설명 |
@@ -118,6 +156,7 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 |---|---|
 | `8.1_mcp_intro.py` | MCP 가 뭐고 왜 표준이 되어가는지 (개념 정리) |
 | `8.2_mcp_client.py` | `langchain-mcp-adapters` 로 filesystem MCP 서버 도구를 에이전트에 |
+| `8.3_mcp_plus_local.py` | MCP 서버 도구 + 로컬 `@tool` 을 **한 에이전트에 혼합** (실무 패턴) |
 
 ### `9.webscan_app/` — 실전 풀스택
 | 파일 | 설명 |
