@@ -22,9 +22,9 @@ print(f"원본 글자수: {len(original)}\n")
 
 # 1) CharacterTextSplitter — 단순히 정해진 separator 로 나누기
 char_splitter = CharacterTextSplitter(
-    separator="\n\n",     # 빈 줄 기준
-    chunk_size=500,
-    chunk_overlap=100,
+    separator="\n\n",     # 목표는 빈 줄 기준
+    chunk_size=500,       # 그리고 여기 만족하도록 최대 500글자로 합침 (넘치지 않게)
+    chunk_overlap=100,    # 이전과 겹치게
 )
 chunks_char = char_splitter.split_documents(documents)
 print(f"[CharacterTextSplitter] {len(chunks_char)} 청크")

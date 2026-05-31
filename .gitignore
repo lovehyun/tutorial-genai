@@ -23,7 +23,7 @@ my_local_model/
 quantized_model/
 **/audio/*
 conversation.txt
-chroma_db
+chroma_db/
 model_outputs/
 generated.png
 uploads/*

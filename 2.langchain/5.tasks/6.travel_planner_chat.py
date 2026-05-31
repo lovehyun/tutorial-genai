@@ -2,33 +2,134 @@
 [Task] AI 여행 플래너
 
 도시 하나를 입력하면 음식 / 관광지 / 호텔 추천을 동시에 생성합니다.
-서로 독립적인 작업이므로 RunnableParallel 로 묶어 한 번에 호출.
+
+사용자 입력
+    │
+    ▼
+RunnableBranch
+ ├── 여행 추천 요청?
+ │      └── RunnableParallel
+ │            ├── 음식
+ │            ├── 관광지
+ │            └── 호텔
+ │
+ └── 일정/동선 요청?
+        └── RunnableParallel
+              ├── 시간표
+              ├── 동선
+              └── 교통수단
 """
 
 from dotenv import load_dotenv
+
 from langchain_openai import ChatOpenAI
+
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnableParallel
+
+from langchain_core.runnables import (
+    RunnableParallel,
+    RunnableBranch
+)
 
 load_dotenv()
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
 
-food_chain  = ChatPromptTemplate.from_template("{city}의 대표 음식 3가지를 한 줄씩 추천해줘.")  | llm | StrOutputParser()
-place_chain = ChatPromptTemplate.from_template("{city}의 관광지 3곳을 한 줄씩 추천해줘.")     | llm | StrOutputParser()
-hotel_chain = ChatPromptTemplate.from_template("{city}의 추천 호텔 3곳을 한 줄씩 추천해줘.") | llm | StrOutputParser()
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    temperature=0.7
+)
 
-travel_chain = RunnableParallel({
-    "food":   food_chain,
+# -----------------------------
+# 음식 / 관광 / 호텔
+# -----------------------------
+food_chain = (
+    ChatPromptTemplate.from_template(
+        "{city}의 대표 음식 3가지를 추천해줘."
+    )
+    | llm
+    | StrOutputParser()
+)
+
+place_chain = (
+    ChatPromptTemplate.from_template(
+        "{city}의 관광지 3곳을 추천해줘."
+    )
+    | llm
+    | StrOutputParser()
+)
+
+hotel_chain = (
+    ChatPromptTemplate.from_template(
+        "{city}의 추천 호텔 3곳을 추천해줘."
+    )
+    | llm
+    | StrOutputParser()
+)
+
+travel_recommend_chain = RunnableParallel({
+    "food": food_chain,
     "places": place_chain,
-    "hotel":  hotel_chain,
+    "hotel": hotel_chain,
 })
 
-result = travel_chain.invoke({"city": "도쿄"})
+# -----------------------------
+# 일정 / 동선 / 교통
+# -----------------------------
+schedule_chain = (
+    ChatPromptTemplate.from_template(
+        "{city} 여행 1일 추천 시간표를 작성해줘."
+    )
+    | llm
+    | StrOutputParser()
+)
 
-print("🍽️  [대표 음식]")
-print(result["food"])
-print("\n🗺️  [관광지]")
-print(result["places"])
-print("\n🏨 [호텔]")
-print(result["hotel"])
+route_chain = (
+    ChatPromptTemplate.from_template(
+        "{city} 여행 최적 동선을 추천해줘."
+    )
+    | llm
+    | StrOutputParser()
+)
+
+transport_chain = (
+    ChatPromptTemplate.from_template(
+        "{city}에서 효율적인 교통수단을 추천해줘."
+    )
+    | llm
+    | StrOutputParser()
+)
+
+planner_chain = RunnableParallel({
+    "schedule": schedule_chain,
+    "route": route_chain,
+    "transport": transport_chain,
+})
+
+# -----------------------------
+# Branch
+# -----------------------------
+main_chain = RunnableBranch(
+
+    # 일정/동선 관련 요청
+    (
+        lambda x: "일정" in x["question"]
+               or "동선" in x["question"]
+               or "교통" in x["question"],
+
+        planner_chain
+    ),
+
+    # 기본값
+    travel_recommend_chain
+)
+
+# -----------------------------
+# 실행
+# -----------------------------
+result = main_chain.invoke({
+    "city": "도쿄",
+    # "question": "맛집 추천해줘",
+    "question": "동선과 교통수단 추천해줘",
+})
+
+print(result)

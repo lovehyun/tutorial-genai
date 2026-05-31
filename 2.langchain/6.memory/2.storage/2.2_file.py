@@ -5,8 +5,10 @@ FileChatMessageHistory — JSON 파일에 대화 저장
 프로세스 종료 후에도 history.json 에 대화가 남아 다음 실행에 그대로 이어집니다.
 """
 
+# pip install langchain-community
 import json
 from dotenv import load_dotenv
+
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser

@@ -10,9 +10,11 @@ SQLChatMessageHistory — SQLite DB 에 대화 저장
 """
 
 from dotenv import load_dotenv
+
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
+
 from langchain_community.chat_message_histories import SQLChatMessageHistory
 from sqlalchemy import create_engine
 

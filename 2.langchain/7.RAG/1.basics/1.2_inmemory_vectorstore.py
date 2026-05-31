@@ -8,6 +8,7 @@ InMemoryVectorStore — 메모리 위의 가장 단순한 벡터 검색기.
 """
 
 from dotenv import load_dotenv
+
 from langchain_openai import OpenAIEmbeddings
 from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_core.documents import Document

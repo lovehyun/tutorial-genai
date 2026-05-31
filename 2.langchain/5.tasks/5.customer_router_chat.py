@@ -11,9 +11,11 @@ RunnableBranch 의 실전 활용 예시.
 """
 
 from dotenv import load_dotenv
+
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+
 from langchain_core.runnables import RunnableBranch
 
 load_dotenv()

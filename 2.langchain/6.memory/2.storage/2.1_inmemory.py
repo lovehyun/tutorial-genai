@@ -19,6 +19,7 @@ InMemoryChatMessageHistory — 프로세스 메모리에 대화 저장
 """
 
 from dotenv import load_dotenv
+
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
@@ -43,6 +44,7 @@ def chat(message):
     answer = chain.invoke({
         "input":   message,
         "history": history.messages,    # 현재까지 누적된 메시지를 끼워 넣음
+        # "history": history.messages[-10:]   # 최근 10개만 전달
     })
     print(f"A: {answer}")
     # 호출 후 메시지 누적
