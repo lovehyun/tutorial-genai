@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>RAG REST API #4 — 3단계 (문서 선택)</title>
+    <style>
+        /* 디자인 최소화 — 기본 글꼴 + 약간의 여백만 */
+        body {
+            font-family: sans-serif;
+            max-width: 640px;
+            margin: 40px auto;
+            padding: 0 16px;
+        }
+        section {
+            margin-bottom: 28px;
+        }
+        h2 {
+            font-size: 1.1em;
+        }
+        input[type='text'] {
+            width: 65%;
+            padding: 6px;
+        }
+        button {
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+        #answer {
+            white-space: pre-wrap;
+            margin-top: 12px;
+        }
+        .src {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .status {
+            color: #888;
+            font-size: 0.9em;
+        }
+        #file-list li {
+            margin: 4px 0;
+        }
+        .del {
+            margin-left: 8px;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <h1>RAG 챗봇 (REST API · 3단계 문서 선택)</h1>
+    <p class="status">2단계 + 문서 선택. 체크한 문서 안에서만 검색, 아무것도 안 고르면 전체 검색.</p>
+
+    <section>
+        <h2>1. PDF 업로드</h2>
+        <input type="file" id="file-input" accept=".pdf" />
+        <button id="upload-btn">업로드</button>
+        <p id="upload-status" class="status"></p>
+    </section>
+
+    <section>
+        <h2>2. 업로드된 파일 <span class="status">(체크 = 검색 대상)</span></h2>
+        <ul id="file-list">
+            <li class="status">(로딩 중...)</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>3. 질문</h2>
+        <input type="text" id="question-input" placeholder="질문을 입력하세요" />
+        <button id="ask-btn">질문</button>
+        <p id="scope-info" class="status"></p>
+        <div id="answer"></div>
+        <ul id="sources"></ul>
+    </section>
+
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const uploadBtn = document.getElementById('upload-btn');
+
+        const uploadStatus = document.getElementById('upload-status');
+        const questionInput = document.getElementById('question-input');
+
+        const askBtn = document.getElementById('ask-btn');
+        const answerBox = document.getElementById('answer');
+
+        const sourceList = document.getElementById('sources');
+        const fileList = document.getElementById('file-list');
+        const scopeInfo = document.getElementById('scope-info');
+
+        // 파일 목록 → GET /files
+        async function loadFiles() {
+            const res = await fetch('/files');
+            const { files } = await res.json();
+            fileList.innerHTML =
+                files.length === 0
+                    ? '<li class="status">(업로드된 파일 없음)</li>'
+                    : files.map(
+                        (name) =>
+                            `<li><label><input type="checkbox" class="select" value="${name}"> ${name}</label>` +
+                            `<button class="del" data-file="${name}">삭제</button></li>`,
+                    ).join('');
+        }
+
+        // 선택된 파일명 모으기 (없으면 빈 배열 → 전체 검색)
+        function selectedFiles() {
+            return Array.from(document.querySelectorAll('.select:checked')).map((c) => c.value);
+        }
+
+        // 삭제 → DELETE /files/<name> (이벤트 위임)
+        fileList.addEventListener('click', async (e) => {
+            if (!e.target.classList.contains('del')) return;
+            
+            const name = e.target.dataset.file;
+            
+            if (!confirm(`'${name}' 을 삭제하시겠습니까? (벡터까지 함께)`)) return;
+            
+            const res = await fetch(`/files/${encodeURIComponent(name)}`, { method: 'DELETE' });
+            const data = await res.json();
+            
+            alert(data.message || data.error);
+            loadFiles();
+        });
+
+        // 업로드 → POST /files
+        uploadBtn.onclick = async () => {
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('파일을 선택하세요');
+                return;
+            }
+            
+            const form = new FormData();
+            form.append('file', file);
+            uploadStatus.textContent = '업로드 중...';
+            
+            const res = await fetch('/files', { method: 'POST', body: form });
+            const data = await res.json();
+            uploadStatus.textContent = data.message || data.error;
+            loadFiles();
+        };
+
+        // 질문 → POST /ask
+        askBtn.onclick = async () => {
+            const question = questionInput.value.trim();
+            if (!question) return;
+            
+            const sources = selectedFiles();
+            scopeInfo.textContent =
+                sources.length === 0 ? '검색 범위: 전체 문서' : `검색 범위: ${sources.join(', ')}`;
+            
+                answerBox.textContent = '답변 생성 중...';
+            sourceList.innerHTML = '';
+            
+            const res = await fetch('/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question, sources }),
+            });
+            
+            const data = await res.json();
+            answerBox.textContent = data.answer || data.error || '';
+            (data.sources || []).forEach((s) => {
+                const li = document.createElement('li');
+                li.className = 'src';
+                li.textContent = `${s.file} (p.${s.page}, 유사도 ${s.score}%)`;
+                sourceList.appendChild(li);
+            });
+        };
+
+        loadFiles();
+    </script>
+</body>
+</html>
