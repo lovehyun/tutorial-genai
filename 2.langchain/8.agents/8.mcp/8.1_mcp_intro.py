@@ -65,6 +65,7 @@ print("""
   pip install langchain-mcp-adapters
 
   from langchain_mcp_adapters.client import MultiServerMCPClient
+  from langchain.agents import create_agent
 
   client = MultiServerMCPClient({
       "filesystem": {
@@ -74,5 +75,5 @@ print("""
       },
   })
   tools = await client.get_tools()    # MCP 도구 → LangChain Tool 로 자동 변환
-  agent = create_react_agent(llm, tools)
+  agent = create_agent(llm, tools)
 """)

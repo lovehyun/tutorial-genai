@@ -7,7 +7,7 @@ response_format — 에이전트의 최종 답변을 Pydantic 모델로 강제.
   - 후속 코드가 정확한 필드 (name, score 등) 를 기대할 때
   - 자유 문장 파싱 (regex / json.loads) 의 불안정성을 피하고 싶을 때
 
-create_react_agent(..., response_format=PydanticModel) 한 줄로 끝.
+create_agent(..., response_format=PydanticModel) 한 줄로 끝.
 내부적으로 에이전트가 마지막에 그 스키마를 만족하는 JSON 을 생성하고, dict 로 파싱돼서 옴.
 """
 
@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent   # (구) langgraph.prebuilt.create_react_agent
 
 load_dotenv()
 
@@ -45,7 +45,7 @@ class MovieReview(BaseModel):
 
 # ─── 에이전트 — response_format 지정 ─────────────────────────
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-agent = create_react_agent(
+agent = create_agent(
     llm,
     tools=[lookup_movie],
     response_format=MovieReview,    # ← 최종 답변 스키마 강제

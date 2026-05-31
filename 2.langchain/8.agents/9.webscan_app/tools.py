@@ -10,7 +10,7 @@
   - check_processes       : 주요 서비스 프로세스 실행 여부
   - check_network         : 외부 호스트 연결성 확인
 
-옛 scanapp.py 의 415줄을 ~120줄로 축소 (initialize_agent → create_react_agent + @tool).
+옛 scanapp.py 의 415줄을 ~120줄로 축소 (initialize_agent → create_agent + @tool).
 """
 
 import socket

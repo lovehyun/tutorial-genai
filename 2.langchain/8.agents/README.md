@@ -22,7 +22,8 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 ```
 
 > **방침**
-> - 메인 폴더 (1~9) 는 모두 **현행 API**: `create_react_agent` / `@tool` / `bind_tools`
+> - 메인 폴더 (1~9) 는 모두 **현행 API**: `create_agent` / `@tool` / `bind_tools`
+>   (LangChain 1.0+ — 옛 `langgraph.prebuilt.create_react_agent` 는 `langchain.agents.create_agent` 로 이동·대체)
 > - `0.legacy(initialize_agent)/` 에 옛 `initialize_agent + AgentType.*` 기반 32개 파일 격리
 > - 각 파일 상단 docstring 에 (1) 모듈 한 줄 정의 + (2) 이 예제의 목적 명시
 > - 라이브 코딩 가능한 길이 (~50~120줄)
@@ -30,7 +31,7 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 ## 학습 흐름 — "사용 → 만들기 → 고급 → 응용"
 
 ```
-1.basics            ─ create_react_agent 한 줄로 에이전트 만들기
+1.basics            ─ create_agent 한 줄로 에이전트 만들기
        ↓
 2.custom_tools      ─ @tool 로 내 도구 정의 (+ Pydantic args, structured output)
        ↓
@@ -46,7 +47,7 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
        ↓
 8.mcp               ─ MCP 표준 프로토콜로 외부 서버 도구 사용
        ↓
-9.webscan_app       ─ 실전 풀스택 (Flask + create_react_agent + @tool 모듈화)
+9.webscan_app       ─ 실전 풀스택 (Flask + create_agent + @tool 모듈화)
 ```
 
 ## API 분류표
@@ -55,16 +56,22 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 |-----|------|-------|------|
 | `initialize_agent` + `AgentType.*` | ❌ Deprecated (v0.2+) | 신규 ✗ | `0.legacy/` 만 |
 | `bind_tools()` + 수동 디스패치 | ✅ 저수준 표준 | 1-shot / 내부 이해 | `7.internals/7.1` |
-| `langgraph.prebuilt.create_react_agent` | ✅ **현행 표준** | **신규 권장** | 1~6, 9 |
+| `langchain.agents.create_agent` | ✅ **현행 표준** (LangChain 1.x) | **신규 권장** | 1~6, 9 |
+| `langgraph.prebuilt.create_react_agent` | ⚠️ 구 위치 (deprecated 이동) | → `create_agent` 사용 | `1.basics/1.1(deprecated)` 만 |
 | `MultiServerMCPClient` (MCP) | ✨ 표준 프로토콜 | 외부 도구 재사용 | `8.mcp/` |
+
+> **마이그레이션:** `from langgraph.prebuilt import create_react_agent` → `from langchain.agents import create_agent`,
+> 인자 `prompt=` → `system_prompt=`. 사용법(`invoke`/`stream`/`checkpointer`/`interrupt_before`)은 동일.
+> 그래프 LLM 노드 이름만 `agent` → `model` 로 바뀜(스트리밍 노드명 볼 때만 영향). 변경 상세는 `1.basics/1.2_first_agent.py` 주석 참고.
 
 ## 폴더별 파일 상세
 
 ### `1.basics/` — 첫 에이전트
 | 파일 | 설명 |
 |---|---|
-| `1.1_first_agent.py` | 도구 1개 (계산기) + create_react_agent 한 줄로 |
-| `1.2_multi_tools.py` | 도구 3개 → LLM 이 알아서 라우팅, 도구 없는 질문은 직접 답 |
+| `1.1_first_agent(deprecated).py` | (구 API 보존용) `langgraph.prebuilt.create_react_agent` — 비교 참고만 |
+| `1.2_first_agent.py` | 도구 1개 (계산기) + `create_agent` 한 줄로 — **현행, 변경점 주석 포함** |
+| `1.3_multi_tools.py` | 도구 3개 → LLM 이 알아서 라우팅, 도구 없는 질문은 직접 답 |
 
 ### `2.custom_tools/` — 내 도구 정의
 | 파일 | 설명 |
@@ -102,7 +109,7 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 ### `7.internals/` — 저수준 / 운영
 | 파일 | 설명 |
 |---|---|
-| `7.1_bind_tools.py` | create_react_agent 내부 ReAct 루프를 손으로 짜보기 |
+| `7.1_bind_tools.py` | create_agent 내부 ReAct 루프를 손으로 짜보기 |
 | `7.2_parallel_tool_calls.py` | gpt-4o 의 한 응답에 여러 도구 동시 호출 (LLM 호출 횟수 ↓) |
 | `7.3_safety.py` | `recursion_limit` / try-except / 입력 검증 — 운영 필수 |
 
@@ -116,7 +123,7 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 | 파일 | 설명 |
 |---|---|
 | `tools.py` | `@tool` 로 정의된 시스템 점검 도구 6종 (포트/SSL/웹/리소스/프로세스/네트워크) |
-| `app.py` | Flask + create_react_agent + MemorySaver. JSON API + 멀티턴 |
+| `app.py` | Flask + create_agent + MemorySaver. JSON API + 멀티턴 |
 | `templates/index.html` | 자연어 입력 UI + 사용된 도구 표시 + 예시 버튼 |
 | `static/style.css` | 최소 CSS (시맨틱 HTML 이라 없어도 읽힘) |
 
@@ -144,10 +151,10 @@ agent = initialize_agent(tools, llm, AgentType.ZERO_SHOT_REACT_DESCRIPTION)
 result = agent.run("질문")
 ```
 
-### 현행 (권장)
+### 현행 (권장, LangChain 1.x)
 ```python
-from langgraph.prebuilt import create_react_agent
-agent = create_react_agent(llm, tools)
+from langchain.agents import create_agent
+agent = create_agent(llm, tools)                       # system_prompt= 로 시스템 프롬프트 지정
 result = agent.invoke({"messages": [("user", "질문")]})
 ```
 
@@ -197,7 +204,7 @@ pip install flask psutil requests
 각 폴더에서 실행:
 ```bash
 cd "2.langchain/8.agents/1.basics"
-python 1.1_first_agent.py
+python 1.2_first_agent.py        # 1.1_first_agent(deprecated).py 는 구 API 비교용
 
 cd "../9.webscan_app"
 python app.py   # → http://localhost:5000

@@ -27,7 +27,7 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.wikipedia.tool import WikipediaQueryRun
 from langchain_community.utilities.wikipedia import WikipediaAPIWrapper
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent   # (구) langgraph.prebuilt.create_react_agent
 
 load_dotenv()
 
@@ -59,7 +59,7 @@ system_prompt = """\
 """
 
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-agent = create_react_agent(llm, [wiki_ko, wiki_en], prompt=system_prompt)
+agent = create_agent(llm, [wiki_ko, wiki_en], system_prompt=system_prompt)
 
 
 for q in ["세종대왕은 누구이고 어떤 업적을 남겼어?",

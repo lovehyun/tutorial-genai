@@ -17,7 +17,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langchain_community.tools.wikipedia.tool import WikipediaQueryRun
 from langchain_community.utilities.wikipedia import WikipediaAPIWrapper
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent   # (구) langgraph.prebuilt.create_react_agent
 
 load_dotenv()
 
@@ -57,7 +57,7 @@ system_prompt = """\
 """
 
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-agent = create_react_agent(llm, [calculator, wiki_ko, get_current_time], prompt=system_prompt)
+agent = create_agent(llm, [calculator, wiki_ko, get_current_time], system_prompt=system_prompt)
 
 
 questions = [

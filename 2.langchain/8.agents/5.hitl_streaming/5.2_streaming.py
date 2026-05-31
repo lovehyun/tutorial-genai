@@ -17,7 +17,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent   # (구) langgraph.prebuilt.create_react_agent
 
 load_dotenv()
 
@@ -38,7 +38,7 @@ def get_current_time() -> str:
 
 
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-agent = create_react_agent(llm, [calculator, get_current_time])
+agent = create_agent(llm, [calculator, get_current_time])
 
 question = "지금 몇 시야? 그리고 153 * 24 는?"
 
@@ -48,7 +48,8 @@ print("=" * 60)
 print('(1) stream_mode="updates" — 노드 단위 진행 보기')
 print("=" * 60)
 for chunk in agent.stream({"messages": [("user", question)]}, stream_mode="updates"):
-    # chunk = {"agent": {"messages": [...]}}  또는  {"tools": {"messages": [...]}}
+    # chunk = {"model": {"messages": [...]}}  또는  {"tools": {"messages": [...]}}
+    # (create_agent 의 LLM 노드 이름은 "model" — 옛 create_react_agent 는 "agent" 였음)
     for node, payload in chunk.items():
         last = payload["messages"][-1]
         if hasattr(last, "tool_calls") and last.tool_calls:
@@ -70,7 +71,7 @@ for token, metadata in agent.stream(
     stream_mode="messages",
 ):
     # token 은 AIMessageChunk — 도구 호출 응답이 아닌 최종 텍스트만 잘 출력
-    if token.content and metadata.get("langgraph_node") == "agent":
+    if token.content and metadata.get("langgraph_node") == "model":
         print(token.content, end="", flush=True)
 print()
 

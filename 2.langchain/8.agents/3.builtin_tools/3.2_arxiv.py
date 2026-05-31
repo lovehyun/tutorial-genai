@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.arxiv.tool import ArxivQueryRun
 from langchain_community.utilities.arxiv import ArxivAPIWrapper
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent   # (구) langgraph.prebuilt.create_react_agent
 
 load_dotenv()
 
@@ -51,7 +51,7 @@ system_prompt = """\
 """
 
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-agent = create_react_agent(llm, [arxiv_tool], prompt=system_prompt)
+agent = create_agent(llm, [arxiv_tool], system_prompt=system_prompt)
 
 
 question = "최근 retrieval-augmented generation (RAG) 관련 흥미로운 논문 알려줘."

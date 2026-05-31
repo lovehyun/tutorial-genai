@@ -16,7 +16,7 @@ LLM 의 지식은 cut-off 가 있어서 "오늘 날씨", "환율", "최근 뉴�
 
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent   # (구) langgraph.prebuilt.create_react_agent
 
 load_dotenv()
 
@@ -64,7 +64,7 @@ system_prompt = """\
 """
 
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-agent = create_react_agent(llm, [web_search], prompt=system_prompt)
+agent = create_agent(llm, [web_search], system_prompt=system_prompt)
 
 
 for q in ["오늘 서울 날씨 어때?", "LangChain 의 최신 버전이 뭐야?"]:

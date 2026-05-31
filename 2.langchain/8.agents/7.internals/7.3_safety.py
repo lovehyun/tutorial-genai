@@ -16,7 +16,7 @@
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent   # (구) langgraph.prebuilt.create_react_agent
 
 load_dotenv()
 
@@ -47,7 +47,7 @@ def flaky_api(query: str) -> str:
 
 # ─── recursion_limit — 호출 횟수 상한 ──────────────────────
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-agent = create_react_agent(llm, [calculator, flaky_api])
+agent = create_agent(llm, [calculator, flaky_api])
 
 config = {"recursion_limit": 10}   # ← 무한 루프 방지 (LangGraph 의 노드 호출 상한)
 

@@ -11,7 +11,7 @@ MCP 클라이언트 — MCP 서버의 도구를 LangChain 에이전트로 가져
 흐름:
   1) MultiServerMCPClient 로 MCP 서버 시작 (stdio 통신)
   2) client.get_tools() 로 MCP 도구 → LangChain Tool 변환
-  3) create_react_agent 에 그대로 넣어 사용
+  3) create_agent 에 그대로 넣어 사용
 
   ※ MultiServerMCPClient 는 비동기 — asyncio.run 으로 감싸야 합니다.
 """
@@ -23,7 +23,7 @@ from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent   # (구) langgraph.prebuilt.create_react_agent
 
 load_dotenv()
 
@@ -58,7 +58,7 @@ async def main():
 
     # ─── 에이전트 — 일반 LangChain 도구처럼 사용 ────────────────
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-    agent = create_react_agent(llm, tools)
+    agent = create_agent(llm, tools)
 
     question = f"{work_dir} 디렉토리에 있는 파일 목록 보여주고, hello.txt 내용도 읽어줘."
     print(f"[질문] {question}\n")

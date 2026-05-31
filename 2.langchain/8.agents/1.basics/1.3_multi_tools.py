@@ -13,7 +13,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent   # (구) langgraph.prebuilt.create_react_agent
 
 load_dotenv()
 
@@ -44,7 +44,7 @@ def get_current_time() -> str:
 
 # ─── 에이전트 — 도구 리스트만 넘기면 끝 ─────────────────
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-agent = create_react_agent(llm, [calculator, get_weather, get_current_time])
+agent = create_agent(llm, [calculator, get_weather, get_current_time])
 
 
 # ─── 다양한 질문으로 라우팅 관찰 ───────────────────────

@@ -5,7 +5,7 @@
 지금까지 배운 것의 종합:
   - @tool 로 도구 정의 (2.custom_tools)
   - 빌트인 도구 활용 (3.builtin_tools)
-  - create_react_agent (1.basics)
+  - create_agent (1.basics)
   - MemorySaver + thread_id (4.memory)
   - 다중 도구 라우팅 (6.1)
 
@@ -18,7 +18,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langchain_community.tools.wikipedia.tool import WikipediaQueryRun
 from langchain_community.utilities.wikipedia import WikipediaAPIWrapper
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent   # (구) langgraph.prebuilt.create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
 
 load_dotenv()
@@ -77,10 +77,10 @@ system_prompt = """\
 checkpointer = MemorySaver()
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
 
-agent = create_react_agent(
+agent = create_agent(
     llm,
     [get_weather_forecast, calculator, wiki_ko],
-    prompt=system_prompt,
+    system_prompt=system_prompt,
     checkpointer=checkpointer,
 )
 
