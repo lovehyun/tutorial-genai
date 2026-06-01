@@ -9,7 +9,7 @@ load_dotenv()
 
 # Claude 모델 초기화
 llm = ChatAnthropic(
-    model="claude-sonnet-4-20250514",  # 최신 모델
+    model="claude-sonnet-4-6",  # 최신 모델
     # anthropic_api_key=os.getenv("ANTHROPIC_API_KEY"), # 기본키는 자동 인식
     temperature=0.7,
     max_tokens=1000

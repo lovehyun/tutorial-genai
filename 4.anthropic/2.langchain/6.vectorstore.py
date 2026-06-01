@@ -42,7 +42,7 @@ with open("ai_sample.txt", "w", encoding="utf-8") as f:
 
 # Claude 모델 초기화
 llm = ChatAnthropic(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-4-6",
     anthropic_api_key=anthropic_api_key,
     temperature=0.7,
     max_tokens=1000

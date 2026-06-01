@@ -12,7 +12,7 @@ load_dotenv()
 
 # Claude 모델 초기화
 llm = ChatAnthropic(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-4-6",
     anthropic_api_key=os.getenv("ANTHROPIC_API_KEY"),
     temperature=0.7
 )

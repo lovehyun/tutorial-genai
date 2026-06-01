@@ -9,7 +9,7 @@ api_key = os.getenv("ANTHROPIC_API_KEY")
 client = anthropic.Anthropic(api_key=api_key)
 
 class ConversationManager:
-    def __init__(self, model="claude-sonnet-4-20250514", max_tokens=1000):
+    def __init__(self, model="claude-sonnet-4-6", max_tokens=1000):
         self.client = client
         self.model = model
         self.max_tokens = max_tokens
@@ -52,22 +52,20 @@ class ConversationManager:
         # 사용자 메시지 추가
         self.add_message(conversation_id, "user", user_message)
         
-        # API 요청용 메시지 준비
-        api_messages = []
-        
-        # 시스템 프롬프트가 있으면 추가
-        if system_prompt:
-            api_messages.append({"role": "system", "content": system_prompt})
-        
-        # 이전 대화 내용 추가
-        api_messages.extend(self.get_messages(conversation_id))
-        
+        # API 요청용 메시지 준비 (system 은 messages 에 넣지 않는다)
+        api_messages = list(self.get_messages(conversation_id))
+
         # API 호출
-        response = self.client.messages.create(
-            model=self.model,
-            max_tokens=self.max_tokens,
-            messages=api_messages
-        )
+        # Anthropic API 에서 system 은 messages 의 role 이 아니라 top-level 파라미터.
+        create_kwargs = {
+            "model": self.model,
+            "max_tokens": self.max_tokens,
+            "messages": api_messages,
+        }
+        if system_prompt:
+            create_kwargs["system"] = system_prompt
+
+        response = self.client.messages.create(**create_kwargs)
         
         # 응답 메시지 추가
         assistant_message = response.content[0].text

@@ -12,8 +12,8 @@ class ModelComparison:
     def __init__(self):
         self.client = client
         self.models = [
-            "claude-sonnet-4-20250514",    # 최신 모델
-            "claude-haiku-4-20250514",
+            "claude-sonnet-4-6",    # 최신 모델
+            "claude-haiku-4-5",
         ]
         self.metrics = {
             "response_time": [],

@@ -8,7 +8,7 @@ api_key = os.getenv("ANTHROPIC_API_KEY")
 class PromptTemplate:
     def __init__(self):
         self.client = anthropic.Anthropic(api_key=api_key)
-        self.model = "claude-sonnet-4-20250514"
+        self.model = "claude-sonnet-4-6"
     
     def basic_response(self, query, max_tokens=1000):
         """기본 응답 생성"""

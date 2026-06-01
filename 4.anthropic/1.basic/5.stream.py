@@ -8,7 +8,7 @@ api_key = os.getenv("ANTHROPIC_API_KEY")
 # Anthropic 클라이언트 초기화
 client = anthropic.Anthropic(api_key=api_key)
 
-def stream_response(prompt, model="claude-sonnet-4-20250514"):
+def stream_response(prompt, model="claude-sonnet-4-6"):
     """스트리밍 응답 구현"""
     print("응답 스트리밍 중...")
     
