@@ -48,8 +48,8 @@ retriever = store.as_retriever(search_kwargs={"k": 3})
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 prompt = ChatPromptTemplate.from_messages([
     ("system",
-     "당신은 문서 기반 QA 시스템입니다. 아래 문서만 참고해서 답하세요. "
-     "문서에 없으면 '모르겠습니다'라고 답하세요.\n\n문서:\n{context}"),
+        "당신은 문서 기반 QA 시스템입니다. 아래 문서만 참고해서 답하세요. "
+        "문서에 없으면 '모르겠습니다'라고 답하세요.\n\n문서:\n{context}"),
     ("user", "{question}"),
 ])
 

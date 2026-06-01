@@ -48,8 +48,7 @@ retriever = store.as_retriever(search_kwargs={"k": 3})
 # 1) prompt — {context}, {input} 두 키 필수
 #   ※ create_retrieval_chain 의 입력 키는 "input" (question 아님!)
 prompt = ChatPromptTemplate.from_messages([
-    ("system",
-     "당신은 문서 기반 QA 시스템입니다. 아래 문서만 참고해 답하세요.\n\n문서:\n{context}"),
+    ("system", "당신은 문서 기반 QA 시스템입니다. 아래 문서만 참고해 답하세요.\n\n문서:\n{context}"),
     ("user", "{input}"),
 ])
 

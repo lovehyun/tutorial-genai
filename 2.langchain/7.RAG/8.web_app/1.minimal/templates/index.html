@@ -32,8 +32,8 @@
     </main>
 
     <script>
-        document.getElementById('upload-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        document.getElementById('upload-form').addEventListener('submit', async (ev) => {
+            ev.preventDefault();
             const file = document.getElementById('file-input').files[0];
             if (!file) return;
 
@@ -48,8 +48,8 @@
             status.textContent = d.message || d.error;
         });
 
-        document.getElementById('ask-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        document.getElementById('ask-form').addEventListener('submit', async (ev) => {
+            ev.preventDefault();
             const q = document.getElementById('question-input').value.trim();
             const ansEl = document.getElementById('answer');
             ansEl.textContent = '답변 생성 중...';

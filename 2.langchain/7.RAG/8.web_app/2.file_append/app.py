@@ -26,6 +26,7 @@ from flask import Flask, request, jsonify, render_template
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough, RunnableLambda
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -48,14 +49,28 @@ store = Chroma(
     persist_directory=PERSIST_DIR,
 )
 
-# ─── RAG 체인 ──────────────────────────────────────────
+# ─── RAG 체인 (표준 LCEL: 검색→프롬프트→LLM→파싱을 하나의 파이프라인으로) ───
+retriever = store.as_retriever(search_kwargs={"k": 5})
+
+def format_docs(docs):
+    return "\n\n".join(d.page_content for d in docs)
+
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 prompt = ChatPromptTemplate.from_messages([
-    ("system",
-     "다음 문서만 참고해서 답하세요. 문서에 없으면 '모르겠습니다'.\n\n문서:\n{context}"),
+    ("system", "다음 문서만 참고해서 답하세요. 문서에 없으면 '모르겠습니다'.\n\n문서:\n{context}"),
     ("user", "{question}"),
 ])
-chain = prompt | llm | StrOutputParser()
+
+# 검색 단계(교재 4.2 retrieve_and_split 패턴): {"question"} → docs + 포맷된 context
+def retrieve(inputs):
+    docs = retriever.invoke(inputs["question"])
+    return {"question": inputs["question"], "docs": docs, "context": format_docs(docs)}
+
+# 전체 체인: 검색 → answer 를 assign (검색 docs 도 함께 반환 → 중간 결과 출력에 사용)
+rag_chain = (
+    RunnableLambda(retrieve)
+    | RunnablePassthrough.assign(answer=(prompt | llm | StrOutputParser()))
+)
 
 
 # ─── #2 신규: 문서 목록 ────────────────────────────────
@@ -111,8 +126,10 @@ def add_pdf(file_path: str) -> dict:
 def answer_question(question: str) -> str:
     if store._collection.count() == 0:
         return "먼저 PDF를 업로드해주세요."
-    # 문서 구분 없이 전체 컬렉션에서 통합 검색 (여러 문서를 함께 참조)
-    docs = store.similarity_search(question, k=5)
+    
+    # 검색+LLM 단일 파이프라인 실행 → {question, docs, context, answer}
+    result = rag_chain.invoke({"question": question})
+    docs = result["docs"]
 
     # ── 중간 결과: RAG 검색 결과를 터미널에 출력 ──
     print(f"\n>>> [RAG] 질문: {question}")
@@ -124,8 +141,7 @@ def answer_question(question: str) -> str:
         snippet = d.page_content[:100].replace("\n", " ")
         print(f"    [{i}] {src}{page_str}\n        {snippet}...")
 
-    context = "\n\n".join(d.page_content for d in docs)
-    return chain.invoke({"context": context, "question": question})
+    return result["answer"]
 
 
 # ─── Flask ─────────────────────────────────────────────

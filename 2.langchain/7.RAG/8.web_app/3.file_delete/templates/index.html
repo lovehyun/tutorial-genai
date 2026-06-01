@@ -90,8 +90,9 @@
 
         // ─── 삭제 (이벤트 위임) ─────────────────────────
         document.getElementById('file-list').addEventListener('click', async (e) => {
-            if (!e.target.classList.contains('del')) return;
             const source = e.target.dataset.source;
+            if (!source) return;
+
             if (!confirm(`'${source}' 을(를) 삭제할까요? (벡터 + 원본 파일 함께 삭제)`)) return;
 
             e.target.disabled = true;

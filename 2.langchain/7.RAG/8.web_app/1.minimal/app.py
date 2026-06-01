@@ -18,6 +18,7 @@ from flask import Flask, request, jsonify, render_template
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -39,19 +40,41 @@ store = Chroma(
     persist_directory=PERSIST_DIR,
 )
 
-# ─── RAG 체인 ──────────────────────────────────────────
+# ─── RAG 체인 (표준 LCEL: 검색→프롬프트→LLM→파싱을 하나의 파이프라인으로) ───
+retriever = store.as_retriever(search_kwargs={"k": 5})
+
+def format_docs(docs):
+    return "\n\n".join(d.page_content for d in docs)
+
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 prompt = ChatPromptTemplate.from_messages([
     ("system",
      "다음 문서만 참고해서 답하세요. 문서에 없으면 '모르겠습니다'.\n\n문서:\n{context}"),
     ("user", "{question}"),
 ])
-chain = prompt | llm | StrOutputParser()
+
+# 표준형(교재 4.1): 입력 {"question": ...} 를 보존하며 context 를 assign 으로 추가
+rag_chain = (
+    RunnablePassthrough.assign(context=lambda x: format_docs(retriever.invoke(x["question"])))
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+# rag_chain.invoke({"question": question})
+
+
+# rag_chain = (
+#     {"context": retriever | format_docs, "question": RunnablePassthrough()}
+#     | prompt
+#     | llm
+#     | StrOutputParser()
+# )
+# rag_chain.invoke(question})
 
 
 def add_pdf(file_path: str):
     """PDF 를 청킹해서 벡터 DB 에 추가"""
-    docs   = PyPDFLoader(file_path).load()
+    docs = PyPDFLoader(file_path).load()
     for d in docs:
         d.metadata["source"] = os.path.basename(file_path)
     chunks = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100).split_documents(docs)
@@ -61,9 +84,9 @@ def add_pdf(file_path: str):
 def answer_question(question: str) -> str:
     if store._collection.count() == 0:
         return "먼저 PDF를 업로드해주세요."
-    docs = store.similarity_search(question, k=5)
-    context = "\n\n".join(d.page_content for d in docs)
-    return chain.invoke({"context": context, "question": question})
+    
+    # 검색+LLM 이 하나의 체인 → 입력은 {"question": ...}
+    return rag_chain.invoke({"question": question})
 
 
 # ─── Flask ─────────────────────────────────────────────
@@ -80,8 +103,10 @@ def upload():
     file = request.files.get("file")
     if not file:
         return jsonify({"error": "파일이 없습니다"}), 400
+    
     path = os.path.join(DATA_DIR, file.filename)
     file.save(path)
+    
     add_pdf(path)
     return jsonify({"message": f"'{file.filename}' 업로드 완료"})
 
