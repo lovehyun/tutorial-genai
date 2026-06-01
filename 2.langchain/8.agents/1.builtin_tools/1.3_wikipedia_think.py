@@ -1,8 +1,8 @@
 """
 Wikipedia 에이전트 + Reasoning 모델 — "왜 이 도구를 부르는지" 추론까지 함께 출력.
-이 예제: 3.1 과 동일한 위키 도구 에이전트지만, LLM 을 reasoning 모델로 바꿔 thinking 추출.
+이 예제: 1.2_wikipedia.py 와 동일한 위키 도구 에이전트지만, LLM 을 reasoning 모델로 바꿔 thinking 추출.
 
-3.1 (gpt-4o-mini) 와의 차이:
+1.2 (gpt-4o-mini) 와의 차이:
   - 모델: gpt-4o-mini → gpt-5-mini (또는 Anthropic claude-opus-4-7)
   - reasoning_effort / thinking 옵션 추가
   - 결과 출력 시 thinking 블록도 함께 표시
@@ -18,6 +18,7 @@ Anthropic claude-opus-4-7 의 extended thinking 이 가장 노출이 명확함.
 """
 
 import os
+import wikipedia
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.wikipedia.tool import WikipediaQueryRun
@@ -26,8 +27,15 @@ from langchain.agents import create_agent
 
 load_dotenv()
 
+# Wikipedia 는 2024+ 부터 기본 User-Agent 를 차단 → 일반 브라우저 UA 로 교체해야 동작
+# (안 하면 빈 응답이 와서 JSONDecodeError. Wikimedia User-Agent 정책)
+wikipedia.wikipedia.USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+)
 
-# ─── 도구 (3.1 과 동일) ─────────────────────────────────────
+
+# ─── 도구 (1.2 와 동일) ─────────────────────────────────────
 wiki_ko = WikipediaQueryRun(
     api_wrapper=WikipediaAPIWrapper(lang="ko", top_k_results=3, doc_content_chars_max=2000),
     name="wikipedia_ko",
@@ -144,6 +152,6 @@ for q in [
 # ─────────────────────────────────────────────────────────
 # 실행 비교 팁:
 #   1) USE_CLAUDE=1 환경변수 켜고 다시 돌리면 Claude thinking 이 더 풍부하게 보임
-#   2) 같은 질문을 3.1_wikipedia.py (gpt-4o-mini) 와 이 파일로 각각 돌려서
+#   2) 같은 질문을 1.2_wikipedia.py (gpt-4o-mini) 와 이 파일로 각각 돌려서
 #      "추론 흐름 노출 여부" / "정확도" / "응답 시간" 차이를 체감해보세요
 # ─────────────────────────────────────────────────────────

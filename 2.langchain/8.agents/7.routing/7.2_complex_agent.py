@@ -3,16 +3,17 @@
 이 예제: "여행 계획 어시스턴트" — 날씨 / 계산 / 위키 + thread_id 메모리.
 
 지금까지 배운 것의 종합:
+  - 빌트인 도구 활용 + create_agent (1.builtin_tools)
   - @tool 로 도구 정의 (2.custom_tools)
-  - 빌트인 도구 활용 (3.builtin_tools)
-  - create_agent (1.basics)
-  - MemorySaver + thread_id (4.memory)
-  - 다중 도구 라우팅 (6.1)
+  - 빌트인 + 커스텀 혼합 (3.applied_agents)
+  - MemorySaver + thread_id (5.langgraph_memory)
+  - 다중 도구 라우팅 (7.1)
 
 시나리오: 사용자가 여행 계획을 위해 날씨·관광지·비용 등을 묻고, 에이전트가
 필요한 도구를 골라가며 답한다. 멀티턴이므로 이전 대화 맥락을 기억.
 """
 
+import wikipedia
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
@@ -23,8 +24,15 @@ from langgraph.checkpoint.memory import MemorySaver
 
 load_dotenv()
 
+# Wikipedia 는 2024+ 부터 기본 User-Agent 를 차단 → 일반 브라우저 UA 로 교체해야 동작
+# (안 하면 빈 응답이 와서 JSONDecodeError. Wikimedia User-Agent 정책)
+wikipedia.wikipedia.USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+)
 
-# ─── 도구 1: 가짜 날씨 예보 (실전은 3.3 Tavily 등 실제 API) ───
+
+# ─── 도구 1: 가짜 날씨 예보 (실전은 1.5 Tavily 등 실제 API) ───
 @tool
 def get_weather_forecast(city: str, days_ahead: int = 0) -> str:
     """도시의 날씨 예보를 가져온다.

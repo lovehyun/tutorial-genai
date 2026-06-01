@@ -10,7 +10,7 @@
 세 가지 방어선:
   1) recursion_limit 으로 LLM ↔ 도구 호출 횟수 상한 강제
   2) 도구 함수 자체에 try/except 로 우아한 에러 메시지
-  3) Pydantic args_schema 로 입력 검증 (2.custom_tools/2.2 참고)
+  3) Pydantic args_schema 로 입력 검증 (2.custom_tools/2.3 참고)
 """
 
 from dotenv import load_dotenv
@@ -90,7 +90,7 @@ except Exception as e:
 # 실전 체크리스트:
 #   ✓ recursion_limit 설정 (보통 10~25)
 #   ✓ 도구 함수에 try/except + 의미있는 오류 메시지 반환
-#   ✓ Pydantic args_schema 로 입력 검증 (2.custom_tools/2.2)
-#   ✓ 위험한 도구 (송금/삭제 등) 는 interrupt_before 로 HITL (5.hitl_streaming/5.1)
+#   ✓ Pydantic args_schema 로 입력 검증 (2.custom_tools/2.3)
+#   ✓ 위험한 도구 (송금/삭제 등) 는 interrupt_before 로 HITL (6.hitl_streaming/6.1)
 #   ✓ LangSmith 같은 trace 도구로 운영 모니터링
 # ─────────────────────────────────────────────────────────

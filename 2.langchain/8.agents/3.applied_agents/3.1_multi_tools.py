@@ -56,6 +56,7 @@ questions = [
     "오늘 기분이 좀 그래.",                       # → 도구 없이 직접 답
 ]
 
+
 for q in questions:
     print("\n" + "=" * 60)
     print(f"[질문] {q}")
