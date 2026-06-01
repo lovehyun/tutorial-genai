@@ -18,17 +18,17 @@
 | 시간 | 주제 | 실습 파일 | 설명 |
 |------|------|-----------|------|
 | 09:00-09:30 | 오리엔테이션 | — | 모델 최적화의 필요성, 과정 개요 |
-| 09:30-10:00 | Transformer 모델 로드 | `9.study/1.transformer/1.model_load.py` | Transformer 모델 구조 탐색 |
-| 10:00-10:30 | Transformer 질의 | `9.study/1.transformer/2.model_query.py` | 모델에 질의하며 내부 동작 확인 |
+| 09:30-10:00 | Transformer 모델 로드 | `12.study/1.transformer/1.model_load.py` | Transformer 모델 구조 탐색 |
+| 10:00-10:30 | Transformer 질의 | `12.study/1.transformer/2.model_query.py` | 모델에 질의하며 내부 동작 확인 |
 | 10:45-11:15 | 토큰화 이론 | `3.local/1.transformers/2.1_token.py`, `3.local/1.transformers/2.2_token_dict.py` | 토큰화 과정, 토큰 사전 |
-| 11:15-12:00 | 토크나이저 비교 | `9.study/5.tokenizer/1.tokenizer_compare.py`, `9.study/5.tokenizer/2.korean_tokenizer.py` | 다양한 토크나이저 성능 비교, 한국어 토크나이저 |
+| 11:15-12:00 | 토크나이저 비교 | `12.study/5.tokenizer/1.tokenizer_compare.py`, `12.study/5.tokenizer/2.korean_tokenizer.py` | 다양한 토크나이저 성능 비교, 한국어 토크나이저 |
 | 13:00-13:30 | 어텐션 시각화 | `3.local/1.transformers/3.1_attention.py`, `3.local/1.transformers/3.2_headwise_topk.py` | Self-Attention 메커니즘 시각화 |
-| 13:30-14:00 | 어텐션 심화 시각화 | `9.study/7.attention/1.attention_visualize.py`, `9.study/7.attention/2.qkv_visualize.py` | Q, K, V 벡터 시각화 |
-| 14:00-14:30 | BERT 기초 | `9.study/2.bert/1.intro_bert.py` | BERT 모델 구조 이해 |
-| 14:45-15:15 | BERT 파인튜닝 (감성분석) | `9.study/2.bert/2.finetune_imdb_sentiment.py`, `9.study/2.bert/3.finetune_imdb_load.py` | IMDB 감성분석 파인튜닝 |
-| 15:15-15:45 | BERT 파인튜닝 (뉴스분류) | `9.study/2.bert/2.finetune_agnews_category.py`, `9.study/2.bert/3.finetune_agnews_load.py` | AG News 카테고리 분류 |
-| 15:45-16:15 | BERT REST API | `9.study/2.bert/4.restapi_agnews.py`, `9.study/2.bert/4.restapi_imdb.py` | 파인튜닝 모델 API 서빙 |
-| 16:15-17:00 | 한국어 NLP 기초 | `9.study/4.korean_nlp/1.morpheme.py`, `9.study/4.korean_nlp/2.preprocessing.py` | 형태소 분석, 전처리, Day 1 정리 |
+| 13:30-14:00 | 어텐션 심화 시각화 | `12.study/7.attention/1.attention_visualize.py`, `12.study/7.attention/2.qkv_visualize.py` | Q, K, V 벡터 시각화 |
+| 14:00-14:30 | BERT 기초 | `12.study/2.bert/1.intro_bert.py` | BERT 모델 구조 이해 |
+| 14:45-15:15 | BERT 파인튜닝 (감성분석) | `12.study/2.bert/2.finetune_imdb_sentiment.py`, `12.study/2.bert/3.finetune_imdb_load.py` | IMDB 감성분석 파인튜닝 |
+| 15:15-15:45 | BERT 파인튜닝 (뉴스분류) | `12.study/2.bert/2.finetune_agnews_category.py`, `12.study/2.bert/3.finetune_agnews_load.py` | AG News 카테고리 분류 |
+| 15:45-16:15 | BERT REST API | `12.study/2.bert/4.restapi_agnews.py`, `12.study/2.bert/4.restapi_imdb.py` | 파인튜닝 모델 API 서빙 |
+| 16:15-17:00 | 한국어 NLP 기초 | `12.study/4.korean_nlp/1.morpheme.py`, `12.study/4.korean_nlp/2.preprocessing.py` | 형태소 분석, 전처리, Day 1 정리 |
 
 ### Day 2: 모델 경량화와 배포
 
@@ -65,9 +65,9 @@ pip install transformers torch datasets flask fastapi uvicorn matplotlib
 - `3.local/1.transformers/` — Transformer 기초
 - `3.local/2.mymodel/` — 모델 학습/경량화
 - `3.local/3.huggingface/` — HuggingFace 파이프라인
-- `9.study/1.transformer/` — Transformer 내부 구조
-- `9.study/2.bert/` — BERT 파인튜닝
-- `9.study/4.korean_nlp/` — 한국어 NLP
-- `9.study/5.tokenizer/` — 토크나이저
-- `9.study/6.embedding/` — 임베딩
-- `9.study/7.attention/` — 어텐션 메커니즘
+- `12.study/1.transformer/` — Transformer 내부 구조
+- `12.study/2.bert/` — BERT 파인튜닝
+- `12.study/4.korean_nlp/` — 한국어 NLP
+- `12.study/5.tokenizer/` — 토크나이저
+- `12.study/6.embedding/` — 임베딩
+- `12.study/7.attention/` — 어텐션 메커니즘

@@ -36,13 +36,13 @@ REST API를 처음부터 함수로 잘 추상화해 보여주면 편하지만, "
 | 10:00-10:30 | **REST ②** content + 역할 | `1.openai/1.intro/2.restapi_content.py` | 답변(content) 추출, `system`/`user`/`assistant` 역할 |
 | 10:45-11:15 | **REST ③** 응답 제어 파라미터 | `1.openai/1.intro/3.restapi_params.py` | `temperature`, `max_tokens`, `top_p`, `frequency/presence_penalty` |
 | 11:15-12:00 | **REST ④** 완성형 | `1.openai/1.intro/4.restapi_chat.py` | 함수화, `try/except`, `input()` 대화 루프 — REST 방식의 마무리 |
-| 13:00-13:45 | **SDK ⑤** 구버전(v0.x) | `1.openai/1.intro/5.sdk_old.py` | `openai.ChatCompletion.create()` — 옛 코드 읽기용 (`pip install openai==0.28`) |
-| 13:45-14:15 | **SDK ⑥** 신버전(v1.x) | `1.openai/1.intro/6.sdk_new.py` | `OpenAI()` 클라이언트 + `client.chat.completions.create()` — 현재 표준 |
-| 14:15-14:45 | **SDK ⑦** SDK 방식 파라미터 | `1.openai/1.intro/7.sdk_params.py` | REST의 `json={...}` ↔ SDK의 키워드 인자 비교, 표준/추론 모델 주의점 |
-| 15:00-15:30 | **⑧** 멀티턴 대화 | `1.openai/1.intro/8.multiturn.py` | `messages` 누적으로 대화 맥락 유지 → 이후 `3.chatbot2_history`로 연결 |
-| 15:30-16:00 | **⑨** Vision — 이미지 입력 | `1.openai/1.intro/9.vision.py` | `content`를 리스트로 (`text` + `image_url`) → 이후 `10.multimodal`로 연결 |
-| 16:00-16:30 | Streaming 응답 | `1.openai/8.streaming/1.sse_stream_template.py`, `2.sse_stream_restapi.py` | SSE로 토큰 단위 스트리밍 (SDK 템플릿 → REST 직접 호출) |
-| 16:30-16:50 | Structured Output 맛보기 | `1.openai/9.structured_output/3.json_schema.py`, `5.function_calling_basic.py` | JSON Schema 강제 출력 / Function Calling — 구조화된 응답 |
+| 13:00-13:45 | **SDK ⑤** 구버전(v0.x) | `1.openai/1.intro/10.sdk_old.py` | `openai.ChatCompletion.create()` — 옛 코드 읽기용 (`pip install openai==0.28`) |
+| 13:45-14:15 | **SDK ⑥** 신버전(v1.x) | `1.openai/1.intro/11.sdk_new.py` | `OpenAI()` 클라이언트 + `client.chat.completions.create()` — 현재 표준 |
+| 14:15-14:45 | **SDK ⑦** SDK 방식 파라미터 | `1.openai/1.intro/12.sdk_params.py` | REST의 `json={...}` ↔ SDK의 키워드 인자 비교, 표준/추론 모델 주의점 |
+| 15:00-15:30 | **⑧** 멀티턴 대화 | `1.openai/1.intro/13.chat_multiturn.py` | `messages` 누적으로 대화 맥락 유지 → 이후 `3.chatbot2_history`로 연결 |
+| 15:30-16:00 | **⑨** Vision — 이미지 입력 | `1.openai/1.intro/14.chat_vision.py` | `content`를 리스트로 (`text` + `image_url`) → 이후 `10.multimodal`로 연결 |
+| 16:00-16:30 | Streaming 응답 | `1.openai/8.streaming/1.concept/1.sse_stream_template.py`, `2.sse_stream_restapi.py` | SSE로 토큰 단위 스트리밍 (SDK 템플릿 → REST 직접 호출) |
+| 16:30-16:50 | Structured Output 맛보기 | `1.openai/9.structured_output/3.json_schema.py`, `5.func_calling_basic.py` | JSON Schema 강제 출력 / Function Calling — 구조화된 응답 |
 | 16:50-17:00 | Gemini로 같은 호출 비교 | `7.google/1.basic/1.intro.py`, `2.chat.py` | 다른 프로바이더의 인터페이스 차이를 빠르게 살펴보기 |
 
 ## 환경 설정

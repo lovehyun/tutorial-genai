@@ -100,5 +100,5 @@ API 호출과 기본 체이닝에 익숙한 학습자가 RAG, 에이전트, Lang
 | `3.local/` | 57 | Transformers, HuggingFace, Ollama, GPT4All, 한국어 LLM |
 | `4.anthropic/` | 58 | Claude API, LangChain 통합, MCP 프로토콜 |
 | `7.google/` | 10 | Gemini API, 멀티모달, LangChain 통합 |
-| `9.study/` | 23 | Transformer 내부, BERT, 토크나이저, 임베딩, 어텐션 |
+| `12.study/` | 23 | Transformer 내부, BERT, 토크나이저, 임베딩, 어텐션 |
 | `10.project/` | 82 | Flask 앱 프로젝트 (챗봇, 영어학습, 코드리뷰, 시험채점 등) |
