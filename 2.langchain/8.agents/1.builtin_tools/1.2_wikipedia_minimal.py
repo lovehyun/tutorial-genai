@@ -4,7 +4,7 @@
 
 여기서 배우는 건 딱 하나: "에이전트 = LLM + 도구 리스트" 라는 골격.
   - @tool 함수 정의 X     → 그건 2.custom_tools 에서
-  - system_prompt·메시지 순회·안전장치 X → 그건 1.2_wikipedia.py 부터 빌드업
+  - system_prompt·메시지 순회·안전장치 X → 그건 1.3_wikipedia.py 부터 빌드업
 
   ※ pip install wikipedia
 

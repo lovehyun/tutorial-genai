@@ -80,4 +80,3 @@ for q in queries:
     for call in response.tool_calls:
         print(f"  → {call['name']}({call['args']})")
 
-# 다음: 2.3_pydantic_args.py — Pydantic 모델로 인자 스키마 더 강하게 명세
