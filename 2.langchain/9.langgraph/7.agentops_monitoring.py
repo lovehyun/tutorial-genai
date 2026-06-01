@@ -10,6 +10,13 @@ LangSmith 연동 설정 방법을 안내합니다.
 - 토큰 사용량 및 예상 비용 계산
 - 호출별 레이턴시 측정
 - LangSmith 환경변수 설정 가이드
+
+구조 (※ 이 파일은 StateGraph 예제가 아니라 '관측성(콜백)' 예제):
+    prompt ──▶ llm ──▶ parser        ← 모니터링 대상 (LCEL 체인)
+                │
+                └─ callbacks=[AgentOpsCallback]
+                   on_llm_start / on_llm_end 훅으로 토큰·비용·레이턴시 수집
+    그래프 노드 연결이 핵심이 아니라, 위 호출들을 콜백으로 감싸 메트릭을 모으는 것이 핵심.
 """
 
 import time

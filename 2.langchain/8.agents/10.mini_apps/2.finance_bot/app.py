@@ -32,6 +32,7 @@ def ask(q: str):
     result = agent.invoke({"messages": [("user", q)]})
     used = [c["name"] for m in result["messages"]
             if getattr(m, "tool_calls", None) for c in m.tool_calls]
+
     print(f"[사용 도구] {used or '(없음 — 직접 답변)'}")
     print(f"[답변] {result['messages'][-1].content}\n")
 
@@ -48,6 +49,8 @@ if __name__ == "__main__":
             q = input("질문> ").strip()
         except EOFError:
             break
+        
         if not q or q.lower() in ("quit", "exit"):
             break
+        
         ask(q)

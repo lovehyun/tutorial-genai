@@ -30,4 +30,5 @@ def send_email(subject: str, body: str):
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as s:
         s.login(user, pw)
         s.sendmail(user, [to], msg.as_string())
+    
     print(f"[이메일 발송됨] → {to}  (제목: {subject})")

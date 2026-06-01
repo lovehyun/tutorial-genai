@@ -21,15 +21,18 @@ def get_news(query: str) -> str:
     cid, secret = os.getenv("NAVER_CLIENT_ID"), os.getenv("NAVER_CLIENT_SECRET")
     if not (cid and secret):
         return "네이버 뉴스 키(NAVER_CLIENT_ID/SECRET) 미설정 — 뉴스 검색 불가"
+    
     r = requests.get(
         "https://openapi.naver.com/v1/search/news.json",
         params={"query": query, "display": 5, "sort": "date"},
         headers={"X-Naver-Client-Id": cid, "X-Naver-Client-Secret": secret},
         timeout=10,
     )
+    
     items = r.json().get("items", [])
     if not items:
         return f"'{query}' 관련 뉴스 없음"
+    
     return "\n".join(f"- {re.sub(r'<[^>]+>', '', it['title'])} ({it['link']})" for it in items)
 
 
@@ -39,19 +42,23 @@ def get_company_info(company: str) -> str:
     key = os.getenv("SERPER_API_KEY")
     if not key:
         return "SERPER_API_KEY 미설정 — 기업 정보 검색 불가"
+    
     r = requests.post(
         "https://google.serper.dev/search",
         json={"q": f"{company} 기업 정보", "gl": "kr", "hl": "ko"},
         headers={"X-API-KEY": key, "Content-Type": "application/json"},
         timeout=10,
     )
+    
     data = r.json()
     parts = []
     kg = data.get("knowledgeGraph")
     if kg:
         parts.append(f"{kg.get('title', '')} — {kg.get('description', '')}")
+    
     for o in data.get("organic", [])[:3]:
         parts.append(f"- {o.get('title')}: {o.get('snippet', '')}")
+    
     return "\n".join(parts) or "정보 없음"
 
 
@@ -62,6 +69,7 @@ def get_exchange_rate(base: str = "USD", target: str = "KRW") -> str:
     rate = r.json().get("rates", {}).get(target.upper())
     if rate is None:
         return f"{base}->{target} 환율 조회 실패"
+    
     return f"1 {base.upper()} = {rate} {target.upper()}"
 
 
@@ -73,6 +81,7 @@ def get_stock_price(ticker: str) -> str:
     data = yf.Ticker(ticker).history(period="1d")
     if data.empty:
         return f"'{ticker}' 시세 조회 실패 (티커 확인 — 한국 주식은 '005930.KS' 형식)"
+
     return f"{ticker} 현재가: {round(float(data['Close'].iloc[-1]), 2)}"
 
 

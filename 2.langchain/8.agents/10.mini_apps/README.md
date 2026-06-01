@@ -34,6 +34,14 @@ pip install flask apscheduler requests yfinance python-dotenv
 cd 3.trading_bot && python app.py   # → http://localhost:5001
 ```
 
+**데모 시세 서버** (`demo_market_server.py`) — 실제 API 대신 **매초 랜덤 변동**하는 가짜 환율/주가:
+```bash
+python demo_market_server.py        # → http://localhost:5002 (브라우저로 시세 변동 확인)
+# 다른 터미널: .env 에 DEMO_MARKET_URL=http://localhost:5002 설정 후 봇 실행
+#   → market.py 가 실제 API 대신 데모 서버 조회 (조건이 매초 바뀌어 HITL 플로우 빠르게 시연)
+```
+> 실제 API 경로(open.er-api / yfinance)는 그대로 유지 — `DEMO_MARKET_URL` 유무로 분기.
+
 동작:
 1. **APScheduler(cron 잡)** 가 30초마다 환율/주가 조회
 2. 조건 충족(환율 ≤ 임계 / 주가 ≤ 매수가) → **대기 주문 생성 + 승인 요청 이메일**

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>데모 시세 서버</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  body { font-family: sans-serif; max-width: 720px; margin: 32px auto; padding: 0 16px; }
+  .row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #eee; font-size:17px; }
+  .up { color:#c0392b; } .down { color:#2980b9; }
+  h3 { margin: 24px 0 6px; }
+  small, code { color:#888; } code{ background:#f4f4f4; padding:1px 4px; }
+  canvas { border:1px solid #eee; border-radius:6px; }
+</style>
+</head>
+<body>
+  <h2>📈 데모 시세 서버 <small>(가짜 데이터, 매초 변동)</small></h2>
+  <div id="board">로딩...</div>
+
+  <h3>환율 (USD/KRW)</h3>
+  <canvas id="fxChart" height="110"></canvas>
+
+  <h3>주가 <small>(기준=100, 시작 대비 변동률 — 종목별 가격 차이 보정)</small></h3>
+  <canvas id="stockChart" height="110"></canvas>
+
+  <p><small>봇이 호출하는 API: <code>/api/exchange?base=USD&amp;target=KRW</code>, <code>/api/stock/&lt;ticker&gt;</code></small></p>
+
+<script>
+const tickers = ["AAPL", "MSFT", "NVDA", "005930.KS"];
+const MAX = 60;                       // 최근 60초만 표시 (롤링 윈도우)
+const colors = { AAPL:"#e74c3c", MSFT:"#2980b9", NVDA:"#27ae60", "005930.KS":"#8e44ad" };
+
+let prev = {}, labels = [], fxData = [], stockBase = {}, stockData = {};
+tickers.forEach(t => stockData[t] = []);
+
+const baseOpts = { animation:false, responsive:true, interaction:{intersect:false}, elements:{point:{radius:0}} };
+
+const fxChart = new Chart(document.getElementById("fxChart"), {
+  type:"line",
+  data:{ labels, datasets:[{ label:"USD/KRW", data:fxData, borderColor:"#e67e22", tension:0.3 }] },
+  options:{ ...baseOpts, scales:{ y:{ beginAtZero:false } } }
+});
+
+const stockChart = new Chart(document.getElementById("stockChart"), {
+  type:"line",
+  data:{ labels, datasets: tickers.map(t => ({ label:t, data:stockData[t], borderColor:colors[t], tension:0.3 })) },
+  options: baseOpts
+});
+
+function row(name, val) {
+  const c = prev[name] === undefined ? "" : (val >= prev[name] ? "up" : "down");
+  const a = prev[name] === undefined ? "" : (val >= prev[name] ? "▲" : "▼");
+  prev[name] = val;
+  return `<div class="row"><span>${name}</span><span class="${c}">${val} ${a}</span></div>`;
+}
+
+async function tick() {
+  const t = new Date().toLocaleTimeString();
+  const rows = [];
+
+  const ex = await (await fetch("/api/exchange?base=USD&target=KRW")).json();
+  rows.push(row("USD/KRW", ex.rate));
+  labels.push(t);
+  fxData.push(ex.rate);
+
+  for (const tk of tickers) {
+    const s = await (await fetch("/api/stock/" + encodeURIComponent(tk))).json();
+    rows.push(row(tk, s.price));
+    if (stockBase[tk] === undefined) stockBase[tk] = s.price;          // 시작값 = 100 기준
+    stockData[tk].push(+(s.price / stockBase[tk] * 100).toFixed(2));
+  }
+
+  if (labels.length > MAX) {                                            // 오래된 데이터 제거
+    labels.shift(); fxData.shift();
+    tickers.forEach(tk => stockData[tk].shift());
+  }
+
+  document.getElementById("board").innerHTML = rows.join("");
+  fxChart.update();
+  stockChart.update();
+}
+
+setInterval(tick, 1000);
+tick();
+</script>
+</body>
+</html>

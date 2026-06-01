@@ -2,6 +2,12 @@
 1_basic_graph.py - LangGraph 기본 그래프 구조
 
 이 파일은 LangGraph의 가장 기본적인 그래프 구조를 생성하고 실행하는 방법을 보여줍니다.
+
+그래프 구조:
+    ┌───────┐      ┌─────────┐      ┌─────┐
+    │ START │ ──▶ │  model  │ ──▶ │ END │
+    └───────┘      └─────────┘      └─────┘
+                  call_model = LLM 1회 호출 (가장 단순한 선형 그래프)
 """
 
 from dotenv import load_dotenv

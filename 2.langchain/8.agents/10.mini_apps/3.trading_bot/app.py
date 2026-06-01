@@ -61,6 +61,7 @@ def monitor():
     # 조건 2) 감시 주식이 매수가 이하 → 매수 승인 요청 (USD 보유 시)
     price = market.stock_price(STOCK_TICKER)
     print(f"[모니터] {STOCK_TICKER}={price} (매수 임계 ≤ {STOCK_BUY_BELOW})")
+   
     if price and price <= STOCK_BUY_BELOW and wallet.load()["USD"] >= price and not _has_pending("buy"):
         _request_approval(
             {"type": "buy", "ticker": STOCK_TICKER, "qty": 1, "price": price},
@@ -95,10 +96,12 @@ def approve(token):
     order = pending.pop(token, None)
     if not order:
         return "만료되었거나 존재하지 않는 주문입니다."
+    
     if order["type"] == "exchange":
         ok, msg = wallet.exchange_krw_to_usd(order["amount_krw"], order["rate"])
     else:  # buy
         ok, msg = wallet.buy_stock(order["ticker"], order["qty"], order["price"])
+    
     return f"[{'승인 처리' if ok else '실패'}] {msg}<br>지갑: {wallet.load()}"
 
 

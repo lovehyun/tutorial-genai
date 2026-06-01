@@ -14,6 +14,7 @@ def load() -> dict:
     if os.path.exists(WALLET_FILE):
         with open(WALLET_FILE, encoding="utf-8") as f:
             return json.load(f)
+
     return dict(DEFAULT)
 
 
@@ -27,9 +28,11 @@ def exchange_krw_to_usd(amount_krw: float, rate: float):
     w = load()
     if w["KRW"] < amount_krw:
         return False, "KRW 잔액 부족"
+    
     w["KRW"] -= amount_krw
     w["USD"] = round(w["USD"] + amount_krw / rate, 2)
     save(w)
+    
     return True, f"환전 완료: {amount_krw:,.0f} KRW → {round(amount_krw / rate, 2)} USD"
 
 
@@ -39,6 +42,7 @@ def buy_stock(ticker: str, qty: int, price: float):
     cost = qty * price
     if w["USD"] < cost:
         return False, f"USD 잔액 부족 (필요 {cost}, 보유 {w['USD']})"
+
     w["USD"] = round(w["USD"] - cost, 2)
     w["stocks"][ticker] = w["stocks"].get(ticker, 0) + qty
     save(w)

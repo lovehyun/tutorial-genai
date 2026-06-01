@@ -1,4 +1,23 @@
-# pip install langgraph langchain_openai python-dotenv
+"""
+10_customtools1_addmultiply_langgraph.py - 커스텀 도구 ReAct 에이전트
+
+create_react_agent 로 덧셈/곱셈 도구를 가진 ReAct 에이전트를 만든다.
+
+그래프 구조 (4.tools_cyclic_graph 와 동일한 ReAct 순환 그래프):
+    ┌───────┐     ┌──────────┐   tool_calls 있음    ┌──────────────────────┐
+    │ START │──▶ │  agent   │ ──────────────────▶ │ tools                │
+    └───────┘     │  (LLM)   │ ◀────────────────── │ add_two / multiply_two│
+                  └──────────┘    도구 결과 되먹임   └──────────────────────┘
+                      │ tool_calls 없음 = 최종 답변
+                      ▼
+                   ┌─────┐
+                   │ END │
+                   └─────┘
+    예: "3과 4를 곱하고, 그 결과에 10을 더해줘" → multiply_two → add_two → 최종 답변
+
+  ※ pip install langgraph langchain_openai python-dotenv
+"""
+
 from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
