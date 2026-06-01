@@ -122,7 +122,7 @@ Gemini는 Google DeepMind가 개발한 멀티모달 AI 모델 패밀리입니다
 Gemini의 가장 큰 차별점 중 하나는 **100만 토큰 컨텍스트 윈도우**입니다.
 이는 약 700,000단어, 일반 도서 8~10권에 해당하는 분량입니다.
 
-| 비교 항목 | Gemini 2.5 | GPT-4o | Claude 3.5 Sonnet |
+| 비교 항목 | Gemini 2.5 | GPT-4.1 | Claude Sonnet 4.5 |
 |-----------|-----------|--------|-------------------|
 | **최대 컨텍스트** | 1,000,000 토큰 | 128,000 토큰 | 200,000 토큰 |
 | **대략적 분량** | 도서 8~10권 | 도서 1권 | 도서 1.5권 |
@@ -131,7 +131,7 @@ Gemini의 가장 큰 차별점 중 하나는 **100만 토큰 컨텍스트 윈도
 ### Thinking 모드 (추론 강화)
 
 Gemini 2.5 Pro와 Flash는 **Thinking 모드**를 지원합니다.
-이는 OpenAI의 o1/o3, Anthropic의 Extended Thinking과 유사한 개념으로,
+이는 OpenAI의 o-series, Anthropic의 Extended Thinking과 유사한 개념으로,
 모델이 답변 전에 내부적으로 추론 과정을 거치게 합니다.
 
 ```python
@@ -942,8 +942,8 @@ async def chat_stream(request: ChatRequest):
 
 | 비교 항목 | OpenAI (GPT) | Anthropic (Claude) | Google (Gemini) |
 |-----------|-------------|-------------------|-----------------|
-| **최신 플래그십** | GPT-4o / o3 | Claude 4 Sonnet | Gemini 2.5 Pro |
-| **경량 모델** | GPT-4o mini | Claude 4 Haiku | Gemini 2.5 Flash |
+| **최신 플래그십** | GPT-4.1 / o-series | Claude Sonnet 4.5 / Opus 4.x | Gemini 2.5 Pro |
+| **경량 모델** | GPT-4.1 mini | Claude Haiku 4.5 | Gemini 2.5 Flash |
 | **최대 컨텍스트** | 128K~200K 토큰 | 200K 토큰 | 1,000,000 토큰 |
 | **Python SDK** | `openai` | `anthropic` | `google-genai` |
 | **클라이언트 초기화** | `OpenAI(api_key=)` | `Anthropic(api_key=)` | `genai.Client(api_key=)` |
@@ -956,10 +956,10 @@ async def chat_stream(request: ChatRequest):
 | **멀티모달 입력** | 이미지, 오디오 | 이미지, PDF | 이미지, 오디오, 비디오, PDF |
 | **비디오 입력** | 미지원 (프레임 추출 필요) | 미지원 | 네이티브 지원 |
 | **웹 검색 통합** | `web_search` 도구 | 미지원 (외부 도구 필요) | Google 검색 그라운딩 |
-| **Thinking 모드** | o1/o3 시리즈 | Extended Thinking | thinking_config |
+| **Thinking 모드** | o-series | Extended Thinking | thinking_config |
 | **엔터프라이즈** | Azure OpenAI | AWS Bedrock | Vertex AI |
-| **입력 가격 (1M)** | $2.50 (4o) | $3.00 (Sonnet) | $1.25 (2.5 Pro) |
-| **출력 가격 (1M)** | $10.00 (4o) | $15.00 (Sonnet) | $10.00 (2.5 Pro) |
+| **입력 가격 (1M)** | $2.00 (GPT-4.1) | $3.00 (Sonnet 4.5) | $1.25 (2.5 Pro) |
+| **출력 가격 (1M)** | $8.00 (GPT-4.1) | $15.00 (Sonnet 4.5) | $10.00 (2.5 Pro) |
 | **무료 티어** | 제한적 | 제한적 | AI Studio 무료 |
 
 ### 어떤 API를 선택해야 할까?
@@ -973,12 +973,12 @@ flowchart LR
     Q2 -->|"아니오"| Q3{"코딩 중심?"}
     Q3 -->|"예"| Q4{"복잡한 추론?"}
     Q3 -->|"아니오"| Q5{"안전성 중시?"}
-    Q4 -->|"예"| O3["OpenAI o3"]
-    Q4 -->|"아니오"| CLAUDE["Claude 4"]
+    Q4 -->|"예"| O3["OpenAI o-series"]
+    Q4 -->|"아니오"| CLAUDE["Claude Sonnet 4.5"]
     Q5 -->|"예"| CLAUDE
     Q5 -->|"아니오"| Q6{"비용 최적화?"}
     Q6 -->|"예"| FLASH["Gemini Flash"]
-    Q6 -->|"아니오"| GPT["GPT-4o"]
+    Q6 -->|"아니오"| GPT["GPT-4.1"]
 
     style START fill:#6c5ce7,stroke:#a29bfe,color:#fff
     style Q1 fill:#fdcb6e,stroke:#f39c12,color:#2d3436

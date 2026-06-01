@@ -23,16 +23,16 @@
 
 ### 모델별 멀티모달 지원 매트릭스
 
-| 기능 | GPT-4o | Claude 3.5 Sonnet | Gemini 1.5 Pro |
+| 기능 | GPT-4o | Claude Sonnet 4.5 | Gemini 2.5 Pro |
 |------|--------|-------------------|----------------|
 | 텍스트 입력 | O | O | O |
 | 텍스트 출력 | O | O | O |
 | 이미지 이해 | O | O | O |
 | 이미지 생성 | O (gpt-image-1) | X | O (Imagen 3) |
-| 음성 입력 (STT) | O (whisper-1) | X | O (내장) |
-| 음성 출력 (TTS) | O (tts-1) | X | O (내장) |
+| 음성 입력 (STT) | O (gpt-4o-transcribe) | X | O (내장) |
+| 음성 출력 (TTS) | O (gpt-4o-mini-tts) | X | O (내장) |
 | 영상 이해 | O (프레임 추출) | X | O (네이티브) |
-| PDF 직접 입력 | X (이미지 변환) | O (베타) | O (네이티브) |
+| PDF 직접 입력 | X (이미지 변환) | O | O (네이티브) |
 
 ### 멀티모달 입출력 모델 매트릭스
 
@@ -45,12 +45,12 @@ flowchart TB
 
     subgraph Models["멀티모달 AI 모델"]
         direction LR
-        GPT4O["GPT-4o<br/>텍스트/이미지/음성"] ~~~ CLAUDE["Claude 3.5<br/>텍스트/이미지"] ~~~ GEMINI["Gemini 1.5 Pro<br/>텍스트/이미지/음성/영상"]
+        GPT4O["GPT-4o<br/>텍스트/이미지/음성"] ~~~ CLAUDE["Claude Sonnet 4.5<br/>텍스트/이미지"] ~~~ GEMINI["Gemini 2.5 Pro<br/>텍스트/이미지/음성/영상"]
     end
 
     subgraph Outputs["출력 (생성)"]
         direction LR
-        O_TEXT["텍스트"] ~~~ O_IMAGE["이미지 생성<br/>gpt-image-1"] ~~~ O_AUDIO["음성 합성<br/>tts-1"] ~~~ O_TRANS["번역/요약"]
+        O_TEXT["텍스트"] ~~~ O_IMAGE["이미지 생성<br/>gpt-image-1"] ~~~ O_AUDIO["음성 합성<br/>gpt-4o-mini-tts"] ~~~ O_TRANS["번역/요약"]
     end
 
     Inputs --> Models --> Outputs
@@ -72,7 +72,7 @@ flowchart TB
     style Outputs fill:#dfe6e9,stroke:#b2bec3,color:#2d3436
 ```
 
-> **핵심 포인트:** 멀티모달 AI는 "입력을 이해하는 능력"과 "출력을 생성하는 능력"으로 나뉩니다. 현재 GPT-4o가 가장 넓은 멀티모달 커버리지를 제공하며, Gemini는 영상 이해에서, Claude는 문서 분석에서 각각 강점을 보입니다.
+> **핵심 포인트:** 멀티모달 AI는 "입력을 이해하는 능력"과 "출력을 생성하는 능력"으로 나뉩니다. 현재 GPT-4o가 가장 넓은 멀티모달 커버리지를 제공하며, Gemini(2.5)는 영상 이해에서, Claude(Sonnet 4.5)는 문서 분석에서 각각 강점을 보입니다.
 
 ---
 
@@ -100,11 +100,11 @@ Anthropic의 Claude는 `image` 타입의 content block을 사용합니다. base6
 
 ### Gemini Vision: Part.from_bytes
 
-Google의 Gemini는 `Part.from_bytes()` 또는 `Part.from_uri()`를 사용합니다. Gemini 1.5 Pro는 최대 3,600개의 이미지를 단일 프롬프트에 포함할 수 있는 압도적인 컨텍스트 윈도우를 제공합니다.
+Google의 Gemini는 `Part.from_bytes()` 또는 `Part.from_uri()`를 사용합니다. Gemini 2.5 Pro는 최대 수천 개의 이미지를 단일 프롬프트에 포함할 수 있는 압도적인 컨텍스트 윈도우를 제공합니다.
 
 ### 해상도/토큰/비용 비교
 
-| 항목 | GPT-4o | Claude 3.5 Sonnet | Gemini 1.5 Pro |
+| 항목 | GPT-4o | Claude Sonnet 4.5 | Gemini 2.5 Pro |
 |------|--------|-------------------|----------------|
 | 최대 이미지 크기 | 20MB | 5MB (base64) | 20MB |
 | 지원 형식 | PNG, JPEG, GIF, WebP | PNG, JPEG, GIF, WebP | PNG, JPEG, GIF, WebP, PDF |
@@ -122,7 +122,8 @@ Google의 Gemini는 `Part.from_bytes()` 또는 `Part.from_uri()`를 사용합니
 import base64
 from openai import OpenAI
 import anthropic
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 # --- 공통: 이미지 로드 및 base64 인코딩 ---
 image_path = "sample_chart.png"
@@ -153,7 +154,7 @@ def analyze_with_gpt4o():
                 ]
             }
         ],
-        max_tokens=1000
+        max_completion_tokens=1000
     )
     return response.choices[0].message.content
 
@@ -162,7 +163,7 @@ def analyze_with_gpt4o():
 def analyze_with_claude():
     client = anthropic.Anthropic()
     response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=1000,
         messages=[
             {
@@ -189,14 +190,17 @@ def analyze_with_claude():
 
 # --- 3. Gemini Vision ---
 def analyze_with_gemini():
-    genai.configure(api_key="YOUR_GEMINI_API_KEY")
-    model = genai.GenerativeModel("gemini-1.5-pro")
+    # API 키는 GEMINI_API_KEY 환경변수에서 자동으로 읽어옵니다.
+    client = genai.Client()
 
-    image_part = genai.types.Part.from_bytes(
+    image_part = types.Part.from_bytes(
         data=image_bytes,
         mime_type="image/png"
     )
-    response = model.generate_content([prompt, image_part])
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=[prompt, image_part]
+    )
     return response.text
 
 
@@ -246,7 +250,7 @@ flowchart TB
 
 ### gpt-image-1 개요
 
-**gpt-image-1**은 DALL-E 3의 후속 모델로, 텍스트 프롬프트 기반 고품질 이미지를 생성합니다. 텍스트 렌더링, 일관된 캐릭터, 사실적인 디테일에서 크게 향상되었습니다.
+**gpt-image-1**은 OpenAI의 최신 이미지 생성 모델로, DALL-E 3 계열의 뒤를 잇습니다. 텍스트 프롬프트 기반 고품질 이미지를 생성하며, 텍스트 렌더링, 일관된 캐릭터, 사실적인 디테일에서 크게 향상되었습니다.
 
 | 항목 | gpt-image-1 |
 |------|-------------|
@@ -358,31 +362,30 @@ if __name__ == "__main__":
 
 ## 4. 음성 처리
 
-### STT: Whisper v3 API (whisper-1)
+### STT: gpt-4o-transcribe (레거시: whisper-1)
 
-**whisper-1**은 OpenAI의 STT 모델로, Whisper v3 아키텍처 기반으로 한국어를 포함한 100개 이상의 언어를 지원합니다.
+**gpt-4o-transcribe**는 OpenAI의 현행 STT 모델로, 한국어를 포함한 100개 이상의 언어를 지원하며 기존 `whisper-1` 대비 정확도가 향상되었습니다. 기존 코드 호환을 위해 레거시 모델 `whisper-1`도 계속 사용할 수 있습니다.
 
 | 항목 | 상세 |
 |------|------|
-| 모델 ID | whisper-1 |
+| 모델 ID | gpt-4o-transcribe (레거시: whisper-1) |
 | 지원 형식 | mp3, mp4, mpeg, mpga, m4a, wav, webm |
 | 최대 파일 크기 | 25MB |
 | 지원 언어 | 100+ (한국어 포함) |
-| 비용 | $0.006 / 분 |
-| 타임스탬프 | 단어 단위, 세그먼트 단위 지원 |
-| 출력 형식 | json, text, srt, verbose_json, vtt |
+| 타임스탬프 | 세그먼트 단위 지원 |
+| 출력 형식 | json, text (verbose_json/srt/vtt는 whisper-1 전용) |
 
-### TTS: tts-1과 tts-1-hd
+### TTS: gpt-4o-mini-tts (레거시: tts-1 / tts-1-hd)
 
-OpenAI의 TTS API는 텍스트를 자연스러운 음성으로 변환하며, 두 가지 품질 모델과 6가지 음성을 제공합니다.
+OpenAI의 TTS API는 텍스트를 자연스러운 음성으로 변환합니다. 현행 모델은 **gpt-4o-mini-tts**로, 음성의 톤/감정/스타일을 지시(instructions)로 제어할 수 있습니다. 기존 코드 호환을 위해 레거시 모델 `tts-1`(실시간 스트리밍용) / `tts-1-hd`(고품질용)도 계속 사용할 수 있습니다.
 
-| 항목 | tts-1 | tts-1-hd |
-|------|-------|----------|
-| 용도 | 실시간 스트리밍 | 고품질 오디오 |
-| 지연 시간 | 낮음 | 높음 |
-| 음질 | 양호 | 매우 우수 |
-| 비용 | $15.00 / 1M 문자 | $30.00 / 1M 문자 |
-| 최대 입력 | 4,096 문자 | 4,096 문자 |
+| 항목 | gpt-4o-mini-tts | tts-1 (레거시) | tts-1-hd (레거시) |
+|------|-----------------|----------------|-------------------|
+| 용도 | 현행 권장 (스타일 제어) | 실시간 스트리밍 | 고품질 오디오 |
+| 지연 시간 | 낮음 | 낮음 | 높음 |
+| 음질 | 매우 우수 | 양호 | 매우 우수 |
+| 스타일 지시 | O (instructions) | X | X |
+| 최대 입력 | 4,096 문자 | 4,096 문자 | 4,096 문자 |
 
 **6가지 음성 옵션:**
 
@@ -410,10 +413,10 @@ def speech_to_text(audio_path: str, language: str = "ko") -> str:
     """오디오 파일을 텍스트로 변환합니다."""
     with open(audio_path, "rb") as audio_file:
         transcript = client.audio.transcriptions.create(
-            model="whisper-1",
+            model="gpt-4o-transcribe",  # 레거시: whisper-1
             file=audio_file,
             language=language,       # 언어 힌트 (정확도 향상)
-            response_format="text"   # json, text, srt, verbose_json, vtt
+            response_format="text"   # json, text (srt/verbose_json/vtt는 whisper-1 전용)
         )
     return transcript
 
@@ -429,7 +432,7 @@ def get_gpt_response(user_text: str, system_prompt: str = None) -> str:
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=messages,
-        max_tokens=500,
+        max_completion_tokens=500,
         temperature=0.7
     )
     return response.choices[0].message.content
@@ -440,18 +443,18 @@ def text_to_speech(
     text: str,
     output_path: str = "response.mp3",
     voice: str = "nova",
-    model: str = "tts-1"
+    model: str = "gpt-4o-mini-tts"
 ) -> str:
     """텍스트를 음성 파일로 변환합니다."""
-    response = client.audio.speech.create(
-        model=model,       # tts-1 또는 tts-1-hd
+    # 스트리밍 응답을 파일로 저장하는 현행 패턴
+    with client.audio.speech.with_streaming_response.create(
+        model=model,       # gpt-4o-mini-tts (레거시: tts-1 / tts-1-hd)
         voice=voice,       # alloy, echo, fable, onyx, nova, shimmer
         input=text,
         speed=1.0          # 0.25 ~ 4.0 배속
-    )
+    ) as response:
+        response.stream_to_file(output_path)
 
-    # 바이너리 응답을 파일로 저장
-    response.stream_to_file(output_path)
     print(f"음성 파일 저장: {output_path}")
     return output_path
 
@@ -476,7 +479,7 @@ if __name__ == "__main__":
         gpt_response,
         output_path="ai_response.mp3",
         voice="nova",
-        model="tts-1-hd"
+        model="gpt-4o-mini-tts"
     )
     print(f"[파이프라인 완료] {output_audio}")
 ```
@@ -487,11 +490,11 @@ if __name__ == "__main__":
 flowchart TB
     USER["사용자\n음성 입력"]
     MIC["마이크 녹음\nmp3/wav 파일"]
-    STT["Whisper API\n(whisper-1)\n음성→텍스트"]
+    STT["STT API\n(gpt-4o-transcribe)\n음성→텍스트"]
     TEXT_IN["변환된 텍스트\n사용자 질문"]
     LLM["GPT-4o\nLLM 응답 생성"]
     TEXT_OUT["응답 텍스트\nAI 답변"]
-    TTS["TTS API\n(tts-1 / tts-1-hd)\n텍스트→음성"]
+    TTS["TTS API\n(gpt-4o-mini-tts)\n텍스트→음성"]
     SPEAKER["스피커 출력\n음성 재생"]
 
     USER --> MIC
@@ -512,7 +515,7 @@ flowchart TB
     style SPEAKER fill:#6c5ce7,stroke:#a29bfe,color:#fff
 ```
 
-> **핵심 포인트:** 음성 AI 파이프라인은 STT(whisper-1) → LLM(gpt-4o) → TTS(tts-1)의 세 단계로 구성됩니다. 실시간성이 중요하면 tts-1을, 음질이 중요하면 tts-1-hd를 선택하고, 한국어 STT 정확도를 위해 `language="ko"`를 반드시 지정하십시오.
+> **핵심 포인트:** 음성 AI 파이프라인은 STT(gpt-4o-transcribe) → LLM(gpt-4o) → TTS(gpt-4o-mini-tts)의 세 단계로 구성됩니다. 현행 모델은 정확도와 음질이 향상되었으며 레거시(whisper-1, tts-1/tts-1-hd)도 호환됩니다. 한국어 STT 정확도를 위해 `language="ko"`를 반드시 지정하십시오.
 
 ---
 
@@ -608,7 +611,7 @@ def analyze_page(page_data: dict, question: str = None) -> str:
                 ]
             }
         ],
-        max_tokens=2000
+        max_completion_tokens=2000
     )
     return response.choices[0].message.content
 
@@ -637,7 +640,7 @@ def analyze_pdf(pdf_path: str, question: str = None) -> str:
     summary_response = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": summary_prompt}],
-        max_tokens=2000
+        max_completion_tokens=2000
     )
 
     return summary_response.choices[0].message.content
@@ -831,7 +834,7 @@ def multimodal_rag_query(query: str, n_results: int = 3) -> str:
     response = openai_client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": messages_content}],
-        max_tokens=1000
+        max_completion_tokens=1000
     )
     return response.choices[0].message.content
 
@@ -905,11 +908,11 @@ flowchart TB
 
 | 기능 | 사용 모델/API | 입력 | 출력 | 주요 활용 |
 |------|-------------|------|------|-----------|
-| 이미지 이해 (Vision) | gpt-4o, claude-3.5-sonnet, gemini-1.5-pro | 이미지 (base64/URL) | 텍스트 (설명/분석) | OCR, 차트 분석, UI 리뷰 |
+| 이미지 이해 (Vision) | gpt-4o, claude-sonnet-4-6, gemini-2.5-pro | 이미지 (base64/URL) | 텍스트 (설명/분석) | OCR, 차트 분석, UI 리뷰 |
 | 이미지 생성 | gpt-image-1 | 텍스트 프롬프트 | 이미지 (PNG/JPEG) | 디자인, 컨셉 아트, 마케팅 |
 | 이미지 편집 | gpt-image-1 (edit) | 이미지 + 마스크 + 프롬프트 | 편집된 이미지 | 부분 수정, 배경 교체 |
-| 음성 인식 (STT) | whisper-1 | 오디오 파일 (mp3/wav) | 텍스트 | 회의록, 자막, 음성 검색 |
-| 음성 합성 (TTS) | tts-1, tts-1-hd | 텍스트 | 오디오 파일 (mp3) | 오디오북, 안내 음성, 접근성 |
+| 음성 인식 (STT) | gpt-4o-transcribe (레거시: whisper-1) | 오디오 파일 (mp3/wav) | 텍스트 | 회의록, 자막, 음성 검색 |
+| 음성 합성 (TTS) | gpt-4o-mini-tts (레거시: tts-1/tts-1-hd) | 텍스트 | 오디오 파일 (mp3) | 오디오북, 안내 음성, 접근성 |
 | 문서 분석 | gpt-4o + PyMuPDF | PDF (이미지 변환) | 텍스트 (분석/추출) | 보고서 분석, 표 추출 |
 | 멀티모달 RAG | CLIP + ChromaDB + gpt-4o | 텍스트/이미지 쿼리 | 텍스트 답변 | 지식 검색, 고객 지원 |
 
@@ -928,7 +931,7 @@ flowchart TB
 
 ### 다음 강의 안내
 
-이번 강의에서는 Vision API, gpt-image-1, Whisper/TTS, CLIP 기반 멀티모달 RAG까지 **멀티모달 AI**의 핵심 개념과 실전 기법을 학습했습니다.
+이번 강의에서는 Vision API, gpt-image-1, STT/TTS(gpt-4o-transcribe / gpt-4o-mini-tts), CLIP 기반 멀티모달 RAG까지 **멀티모달 AI**의 핵심 개념과 실전 기법을 학습했습니다.
 
 다음 강의에서는 **AI 에이전트의 개념과 동작 원리**를 학습합니다. Agent Software와 Agentic Software의 차이, ReAct/Plan-and-Execute 패턴, 실전 워크플로 예제(웹 서비스 점검, 최저가 검색, 장애 대응 자동화 등)를 다룹니다.
 

@@ -105,19 +105,20 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 ## 폴더별 파일 상세
 
 ### `1.builtin_tools/` — 가져다 쓰기 (도구별 최소 → 빌드업)
-> `1.0` 은 카탈로그(LLM 호출 없음). 이후 **도구 유형별로 묶고** 각 그룹 안에서 최소 → 완전 순:
-> wikipedia(`1.1~1.3`) · web_search(`1.4~1.5`) · arxiv(`1.6~1.7`).
+> `1.0` 카탈로그(LLM 호출 없음), `1.1` llm-math(가장 기초). 이후 **도구 유형별로 묶고** 각 그룹 안에서 최소 → 완전 순:
+> wikipedia(`1.2~1.4`) · web_search(`1.5~1.6`) · arxiv(`1.7~1.8`).
 
 | 파일 | 설명 |
 |---|---|
 | `1.0_list_all_tools.py` | `load_tools` 로 가져올 수 있는 빌트인 카탈로그 (시작점, 에이전트 X) |
-| `1.1_wikipedia_minimal.py` | `load_tools(["wikipedia"]) + create_agent` 한 줄 — 도구 안 만들고 첫 에이전트 |
-| `1.2_wikipedia.py` | (빌드업) 한국어 + 영어 위키 동시 + system_prompt + recursion_limit |
-| `1.3_wikipedia_think.py` | 동일 에이전트를 **reasoning 모델** (gpt-5-mini / Claude thinking) 로 — thinking 함께 출력 |
-| `1.4_web_search_minimal.py` | Tavily 검색 도구 1개 (최소) |
-| `1.5_web_search.py` | (빌드업) Tavily (권장) / Serper / Google CSE 비교 |
-| `1.6_arxiv_minimal.py` | 같은 골격, 도구만 arxiv 로 교체 (최소) |
-| `1.7_arxiv.py` | (빌드업) 학술 논문 검색 + 한국어 요약/번역 |
+| `1.1_llm_math.py` | `load_tools(["llm-math"]) + create_agent` — 가장 기초 도구(Calculator), 자연어 수식 계산 |
+| `1.2_wikipedia_minimal.py` | `load_tools(["wikipedia"]) + create_agent` 한 줄 — 도구 안 만들고 첫 에이전트 |
+| `1.3_wikipedia.py` | (빌드업) 한국어 + 영어 위키 동시 + system_prompt + recursion_limit |
+| `1.4_wikipedia_think.py` | 동일 에이전트를 **reasoning 모델** (gpt-5-mini / Claude thinking) 로 — thinking 함께 출력 |
+| `1.5_web_search_minimal.py` | Tavily 검색 도구 1개 (최소) |
+| `1.6_web_search.py` | (빌드업) Tavily (권장) / Serper / Google CSE 비교 |
+| `1.7_arxiv_minimal.py` | 같은 골격, 도구만 arxiv 로 교체 (최소) |
+| `1.8_arxiv.py` | (빌드업) 학술 논문 검색 + 한국어 요약/번역 |
 
 ### `2.custom_tools/` — 내 도구 정의
 | 파일 | 설명 |
@@ -267,7 +268,7 @@ pip install flask psutil requests yfinance apscheduler   # webscan / finance / t
 각 폴더에서 실행:
 ```bash
 cd "2.langchain/8.agents/1.builtin_tools"
-python 1.1_wikipedia_minimal.py  # 도구 안 만들고 첫 에이전트 (가장 단순)
+python 1.1_llm_math.py           # llm-math(Calculator) — 가장 기초 도구 에이전트
 
 cd "../10.mini_apps/1.webscan_app"
 python app.py   # → http://localhost:5000

@@ -135,11 +135,11 @@ flowchart LR
 
 ### 코드 패턴
 
-아래 코드는 `2.langchain/9.agentic_patterns/1.prompt_chaining.py`를 기반으로 한 Prompt Chaining 구현입니다. 주제 리서치 -> 게이트 검증 -> 분석 -> 보고서 생성의 4단계 파이프라인을 구성합니다.
+아래 코드는 `2.langchain/8.agents/9.agentic_patterns/9.1_prompt_chaining.py`를 기반으로 한 Prompt Chaining 구현입니다. 주제 리서치 -> 게이트 검증 -> 분석 -> 보고서 생성의 4단계 파이프라인을 구성합니다.
 
 ```python
 # prompt_chaining.py -- 4단계 순차 파이프라인
-# 참조: 2.langchain/9.agentic_patterns/1.prompt_chaining.py
+# 참조: 2.langchain/8.agents/9.agentic_patterns/9.1_prompt_chaining.py
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -300,11 +300,11 @@ flowchart LR
 
 ### 코드 패턴
 
-아래 코드는 `2.langchain/9.agentic_patterns/2.routing.py`를 기반으로 한 Routing 구현입니다. 고객 문의를 3가지 카테고리로 분류하고 전문 체인으로 분기합니다.
+아래 코드는 `2.langchain/8.agents/9.agentic_patterns/9.2_routing.py`를 기반으로 한 Routing 구현입니다. 고객 문의를 3가지 카테고리로 분류하고 전문 체인으로 분기합니다.
 
 ```python
 # routing.py -- 고객 문의 라우팅 시스템
-# 참조: 2.langchain/9.agentic_patterns/2.routing.py
+# 참조: 2.langchain/8.agents/9.agentic_patterns/9.2_routing.py
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -491,11 +491,11 @@ flowchart LR
 
 ### 코드 패턴: 팬아웃/팬인
 
-아래 코드는 `2.langchain/9.agentic_patterns/3.parallelization.py`를 기반으로 한 팬아웃/팬인 구현입니다. 제품 리뷰를 3가지 관점에서 동시에 분석합니다.
+아래 코드는 `2.langchain/8.agents/9.agentic_patterns/9.3_parallelization.py`를 기반으로 한 팬아웃/팬인 구현입니다. 제품 리뷰를 3가지 관점에서 동시에 분석합니다.
 
 ```python
 # parallelization_fanout.py -- 팬아웃/팬인: 다관점 동시 분석
-# 참조: 2.langchain/9.agentic_patterns/3.parallelization.py
+# 참조: 2.langchain/8.agents/9.agentic_patterns/9.3_parallelization.py
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -546,7 +546,7 @@ final_report = synthesis_chain.invoke(analysis_results)           # 팬인
 
 ```python
 # parallelization_voting.py -- 투표 패턴: 다수결 의사결정
-# 참조: 2.langchain/9.agentic_patterns/3.parallelization.py
+# 참조: 2.langchain/8.agents/9.agentic_patterns/9.3_parallelization.py
 vote_prompt = ChatPromptTemplate.from_template(
     """번역 품질을 평가하세요.
 원문: {original}
@@ -651,11 +651,11 @@ flowchart TB
 
 ### 코드 패턴
 
-아래 코드는 `2.langchain/9.agentic_patterns/4.orchestrator_worker.py`를 기반으로 한 Orchestrator-Worker 구현입니다. LangGraph의 `StateGraph`로 상태를 관리합니다.
+아래 코드는 `2.langchain/8.agents/9.agentic_patterns/9.4_orchestrator_worker.py`를 기반으로 한 Orchestrator-Worker 구현입니다. LangGraph의 `StateGraph`로 상태를 관리합니다.
 
 ```python
 # orchestrator_worker.py -- 동적 작업 분해 + 워커 위임 + 종합
-# 참조: 2.langchain/9.agentic_patterns/4.orchestrator_worker.py
+# 참조: 2.langchain/8.agents/9.agentic_patterns/9.4_orchestrator_worker.py
 import json
 from typing import TypedDict, List
 from langchain_openai import ChatOpenAI
@@ -858,11 +858,11 @@ flowchart TB
 
 ### 코드 패턴
 
-아래 코드는 `2.langchain/9.agentic_patterns/5.evaluator_optimizer.py`를 기반으로 한 구현입니다. LangGraph의 순환 그래프(conditional_edges)로 반복 루프를 구성합니다.
+아래 코드는 `2.langchain/8.agents/9.agentic_patterns/9.5_evaluator_optimizer.py`를 기반으로 한 구현입니다. LangGraph의 순환 그래프(conditional_edges)로 반복 루프를 구성합니다.
 
 ```python
 # evaluator_optimizer.py -- 생성->평가->개선 순환 루프
-# 참조: 2.langchain/9.agentic_patterns/5.evaluator_optimizer.py
+# 참조: 2.langchain/8.agents/9.agentic_patterns/9.5_evaluator_optimizer.py
 from typing import TypedDict, List
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -1362,11 +1362,11 @@ class CostTracker:
 
 | 파일 | 패턴 | 설명 |
 |------|------|------|
-| `2.langchain/9.agentic_patterns/1.prompt_chaining.py` | Prompt Chaining | 리서치 -> 게이트 -> 분석 -> 보고서 |
-| `2.langchain/9.agentic_patterns/2.routing.py` | Routing | 고객 문의 분류 -> 전문 체인 분기 |
-| `2.langchain/9.agentic_patterns/3.parallelization.py` | Parallelization | 다관점 분석 + 투표 패턴 |
-| `2.langchain/9.agentic_patterns/4.orchestrator_worker.py` | Orchestrator-Worker | 동적 작업 분해 + LangGraph |
-| `2.langchain/9.agentic_patterns/5.evaluator_optimizer.py` | Evaluator-Optimizer | 생성-평가 순환 루프 + LangGraph |
+| `2.langchain/8.agents/9.agentic_patterns/9.1_prompt_chaining.py` | Prompt Chaining | 리서치 -> 게이트 -> 분석 -> 보고서 |
+| `2.langchain/8.agents/9.agentic_patterns/9.2_routing.py` | Routing | 고객 문의 분류 -> 전문 체인 분기 |
+| `2.langchain/8.agents/9.agentic_patterns/9.3_parallelization.py` | Parallelization | 다관점 분석 + 투표 패턴 |
+| `2.langchain/8.agents/9.agentic_patterns/9.4_orchestrator_worker.py` | Orchestrator-Worker | 동적 작업 분해 + LangGraph |
+| `2.langchain/8.agents/9.agentic_patterns/9.5_evaluator_optimizer.py` | Evaluator-Optimizer | 생성-평가 순환 루프 + LangGraph |
 
 > **핵심 포인트:** 5가지 패턴은 독립적으로 사용할 수도 있고, 레고 블록처럼 조합할 수도 있습니다. 항상 가장 단순한 패턴부터 시작하고, 문제의 복잡도가 요구할 때만 패턴을 추가하세요. 프로덕션에서는 반드시 재귀 제한, 타임아웃, 비용 추적 등의 안전장치를 설정하세요.
 

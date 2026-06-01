@@ -167,7 +167,7 @@ flowchart TB
 
 | 구성 요소 | 역할 | 구현 기술 |
 |-----------|------|-----------|
-| **LLM (두뇌)** | 상황을 이해하고 다음 행동을 결정 | GPT-4o, Claude 3.5 Sonnet, Gemini |
+| **LLM (두뇌)** | 상황을 이해하고 다음 행동을 결정 | GPT-4.1/o-series, Claude Sonnet 4.5, Gemini 2.5 |
 | **Planning (계획)** | 복잡한 목표를 하위 작업으로 분해 | ReAct, Plan-and-Execute, Tree of Thought |
 | **Tools (도구)** | 외부 API, 데이터베이스, 코드 실행 | Function Calling, MCP, Tool Use |
 | **Memory (기억)** | 대화 히스토리, 작업 결과, 장기 지식 | 벡터 DB, 체크포인팅, 세션 스토어 |
@@ -216,7 +216,7 @@ Thought → Action → Observation → Thought → Action → Observation → ..
 
 ```
 Thought 1: 날씨 정보를 얻으려면 날씨 API를 호출해야 합니다.
-Action 1:  weather_api.get(location="서울", date="2025-03-15")
+Action 1:  weather_api.get(location="서울", date="2026-06-03")
 Observation 1: {"condition": "맑음", "temp_high": 24, "temp_low": 11, "humidity": 45}
 Thought 2: 날씨 정보를 확인했습니다. 사용자에게 전달하겠습니다.
 Final Answer: "서울 내일 날씨는 맑음, 최고 24°C / 최저 11°C, 습도 45%입니다."
@@ -240,7 +240,7 @@ tools = [{"type": "function", "function": {
 messages = [{"role": "user", "content": "서울 내일 날씨 알려줘"}]
 
 while True:  # ReAct 루프: LLM 호출 → 도구 실행 → 다시 LLM 호출 → ...
-    response = client.chat.completions.create(model="gpt-4o", messages=messages, tools=tools)
+    response = client.chat.completions.create(model="gpt-4.1", messages=messages, tools=tools)
     msg = response.choices[0].message
 
     if msg.tool_calls:  # Action: 도구 호출이 필요한 경우
@@ -275,7 +275,7 @@ while True:  # ReAct 루프: LLM 호출 → 도구 실행 → 다시 LLM 호출 
   1. 팀원 수와 선호 음식 확인  →  database.query("SELECT preference FROM team_members")
   2. 회사 근처 식당 검색      →  search_api.search("강남역 근처 한식 단체석")
   3. 가격/리뷰/수용인원 비교   →  compare_restaurants(results)
-  4. 예약 가능 여부 확인       →  check_availability(top3, date="2025-03-21")
+  4. 예약 가능 여부 확인       →  check_availability(top3, date="2026-06-09")
   5. 최종 추천 + 예약 링크     →  generate_recommendation(available)
 ```
 
@@ -887,8 +887,10 @@ class AgentCostGuard:
 | **LangGraph** | LangChain | 그래프 기반 상태 머신 | 유연한 흐름 제어, 체크포인팅 | 학습 곡선 높음 |
 | **CrewAI** | CrewAI | 역할 기반 멀티 에이전트 | 직관적 API, 빠른 프로토타이핑 | 세밀한 제어 어려움 |
 | **AutoGen** | Microsoft | 대화형 멀티 에이전트 | 에이전트 간 자연어 소통 | 비용 관리 어려움 |
-| **OpenAI Assistants** | OpenAI | 클라우드 호스팅 에이전트 | 간편한 설정, 내장 도구 | OpenAI 종속, 제한된 커스터마이징 |
+| **OpenAI Assistants / Responses** | OpenAI | 클라우드 호스팅 에이전트 | 간편한 설정, 내장 도구 | OpenAI 종속, 제한된 커스터마이징 |
 | **Claude Computer Use** | Anthropic | 화면 조작 에이전트 | 모든 GUI 앱 제어 가능 | 실행 속도 느림, 비용 높음 |
+
+> **참고:** OpenAI는 기존 **Assistants API**를 차세대 **Responses API**로 이행 중입니다(Assistants API는 추후 지원 종료 예정). 신규 프로젝트는 Responses API 기준으로 설계하는 것을 권장합니다.
 
 #### 프레임워크 선택 기준
 
@@ -901,7 +903,7 @@ flowchart TB
 
     LG["LangGraph<br/>추천"]
     CR["CrewAI<br/>추천"]
-    OA["OpenAI Assistants<br/>추천"]
+    OA["OpenAI Responses API<br/>추천"]
 
     START --> Q1
     Q1 -->|"예"| LG
@@ -958,7 +960,7 @@ class WeatherMCPServer:
 
 ### 에이전트의 현재와 미래
 
-#### 현재 (2024-2025): 특정 도메인에서 실용적 성과
+#### 현재 (2025-2026): 특정 도메인에서 실용적 성과
 
 | 도메인 | 현재 수준 | 대표 서비스 |
 |--------|-----------|------------|

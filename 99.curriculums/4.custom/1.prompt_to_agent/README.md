@@ -80,7 +80,7 @@
 | 09:00-09:30 | Day 2 복습 | — | RAG/보안 핵심 요약 |
 | 09:30-10:30 | AI 에이전트 개요 | `0.docs/05_genai_advanced/09_ai_agent_overview.md` | 챗봇 vs 파이프라인 vs 에이전트, 에이전트의 관찰-사고-행동 루프 |
 | | | `2.langchain/8.agents/1.builtin_tools/1.0_list_all_tools.py` | [실습] 에이전트 기본 역량 탐색 |
-| 10:45-11:15 | Single & Tool-using Agent | `2.langchain/8.agents/0.legacy(initialize_agent)/1.wikipedia/2.3_wikipedia2_math.py` | [실습] 수학 도구 에이전트 <!-- TODO: 경로 확인 필요 (구 7.agents/1.1_llmmath.py 직접 대응 없음) --> |
+| 10:45-11:15 | Single & Tool-using Agent | `2.langchain/8.agents/1.builtin_tools/1.1_llm_math.py` | [실습] llm-math(Calculator) 도구 에이전트 (현행 create_agent) |
 | | | `2.langchain/8.agents/0.legacy(initialize_agent)/1.wikipedia/2.1_wikipedia1.py` | [실습] Wikipedia 검색 에이전트 |
 | | | `2.langchain/8.agents/0.legacy(initialize_agent)/3.custom_tools/4.1_customtools1_add.py` | [실습] @tool 데코레이터로 커스텀 도구 생성 |
 | 11:15-12:00 | ReAct 패턴 | `2.langchain/8.agents/0.legacy(initialize_agent)/3.custom_tools/4.3_customtools1_addmultiply2_final.py` | [실습] 도구 자동 선택 ReAct 에이전트 |

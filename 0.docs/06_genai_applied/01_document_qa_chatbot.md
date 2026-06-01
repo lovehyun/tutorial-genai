@@ -472,7 +472,7 @@ def rewrite_question(
         for msg in chat_history[-6:]  # 최근 3턴
     )
     response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=200,
         system=REWRITE_SYSTEM_PROMPT,
         messages=[{
@@ -544,7 +544,7 @@ async def conversational_rag(
 
     # 4단계: LLM 답변 생성
     response = llm_client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=1024,
         system=RAG_SYSTEM_PROMPT,
         messages=[
@@ -952,7 +952,7 @@ def build_access_filter(user: dict) -> dict:
 | 임베딩 | OpenAI `text-embedding-3-small` | 비용 대비 성능 우수 |
 | 검색 | 하이브리드 (RRF) + Reranker | 최적 검색 품질 |
 | 벡터 DB | ChromaDB (소규모) / Qdrant (대규모) | 규모에 따른 선택 |
-| LLM | Claude Sonnet (범용) / GPT-4o (대안) | 비용 대비 품질 |
+| LLM | Claude Sonnet 4.5 (범용) / GPT-4o · GPT-4.1 등 (대안) | 비용 대비 품질 |
 | 캐시 | Redis + 시맨틱 캐싱 | 비용 절감 + 응답 속도 |
 | 대화 관리 | 최근 3턴 + 질문 재작성 | 단순하고 효과적 |
 

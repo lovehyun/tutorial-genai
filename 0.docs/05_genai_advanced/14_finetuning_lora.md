@@ -491,21 +491,27 @@ def apply_chat_template(example, tokenizer):
 `trl` (Transformer Reinforcement Learning) 라이브러리의 `SFTTrainer`는
 지도 학습 기반 파인튜닝(Supervised Fine-Tuning)을 위한 고수준 API입니다.
 
-`trl 0.9+`에서는 기존 `SFTTrainer`가 더욱 개선되어 다음과 같은 기능을 제공합니다:
+`trl 0.12+`에서는 `SFTTrainer`의 학습 관련 설정(`max_seq_length`, `packing`, `dataset_text_field` 등)이
+`TrainingArguments`/생성자 인자가 아니라 `SFTConfig`로 통합되었습니다. `SFTConfig`는 `TrainingArguments`를
+상속하므로 학습 하이퍼파라미터와 SFT 전용 설정을 한곳에서 지정합니다. 주요 기능은 다음과 같습니다:
 
 - ChatML/Alpaca 포맷 자동 처리
 - Packing(여러 샘플을 하나의 시퀀스로 결합) 지원
 - LoRA/QLoRA와의 원활한 통합
 - NEFTune(노이즈 임베딩) 지원
 
-### TrainingArguments 핵심 파라미터
+### SFTConfig 핵심 파라미터
+
+`trl 0.12+`에서는 `TrainingArguments` 대신 `SFTConfig`를 사용합니다.
+`SFTConfig`는 `TrainingArguments`의 모든 인자에 더해 `max_seq_length`, `packing`, `dataset_text_field` 등
+SFT 전용 인자를 포함합니다.
 
 ```python
 # training_args.py -- 학습 하이퍼파라미터 설정
 
-from transformers import TrainingArguments
+from trl import SFTConfig
 
-training_args = TrainingArguments(
+training_args = SFTConfig(
     # === 기본 설정 ===
     output_dir="./results",                 # 체크포인트 저장 경로
     num_train_epochs=3,                     # 전체 에폭 수
@@ -520,6 +526,10 @@ training_args = TrainingArguments(
     learning_rate=2e-4,                     # 초기 학습률
     lr_scheduler_type="cosine",             # 스케줄러 (cosine 권장)
     warmup_ratio=0.03,                      # 워밍업 비율
+
+    # === SFT 전용 설정 (SFTConfig) ===
+    max_seq_length=1024,                    # 최대 시퀀스 길이
+    packing=True,                           # 짧은 샘플 결합 (효율적)
 
     # === 메모리 최적화 ===
     gradient_checkpointing=True,            # 그래디언트 체크포인팅
@@ -549,8 +559,8 @@ training_args = TrainingArguments(
 | `gradient_accumulation_steps` | 그래디언트 누적 횟수 | 4 ~ 16 |
 | `gradient_checkpointing` | 메모리 절감을 위한 체크포인팅 | True |
 | `optim` | 옵티마이저 종류 | paged_adamw_8bit |
-| `max_seq_length` | 최대 시퀀스 길이 | 512 ~ 2048 |
-| `packing` | 짧은 샘플 결합 | True (효율적) |
+| `max_seq_length` | 최대 시퀀스 길이 (SFTConfig 전용) | 512 ~ 2048 |
+| `packing` | 짧은 샘플 결합 (SFTConfig 전용) | True (효율적) |
 
 ### 학습 파이프라인
 
@@ -589,10 +599,9 @@ from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     BitsAndBytesConfig,
-    TrainingArguments,
 )
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
-from trl import SFTTrainer
+from trl import SFTConfig, SFTTrainer
 
 # ============================================================
 # 1. 학습 데이터 준비
@@ -679,9 +688,9 @@ model = get_peft_model(model, lora_config)
 model.print_trainable_parameters()
 
 # ============================================================
-# 4. TrainingArguments 설정
+# 4. SFTConfig 설정 (trl 0.12+: max_seq_length/packing 포함)
 # ============================================================
-training_args = TrainingArguments(
+training_args = SFTConfig(
     output_dir="./qlora-qwen-output",
     num_train_epochs=1,
     max_steps=50,                     # CPU 실습용: 50스텝만 학습
@@ -701,6 +710,9 @@ training_args = TrainingArguments(
     seed=42,
     gradient_checkpointing=torch.cuda.is_available(),
     remove_unused_columns=False,
+    # === SFT 전용 설정 (trl 0.12+에서 SFTConfig로 이동) ===
+    max_seq_length=512,
+    packing=False,                    # 짧은 데이터라 packing 비활성화
 )
 
 # ============================================================
@@ -711,8 +723,6 @@ trainer = SFTTrainer(
     args=training_args,
     train_dataset=dataset,
     processing_class=tokenizer,
-    packing=False,                    # 짧은 데이터라 packing 비활성화
-    max_seq_length=512,
 )
 
 # 학습 시작
@@ -857,14 +867,19 @@ tokenizer.push_to_hub("your-username/my-merged-model")
 git clone https://github.com/ggerganov/llama.cpp
 cd llama.cpp
 pip install -r requirements.txt
+# K-quant용 llama-quantize 바이너리 빌드
+cmake -B build && cmake --build build --config Release -j
 
-# 2. HuggingFace 모델을 GGUF로 변환
+# 2. HuggingFace 모델을 GGUF로 변환 (convert_hf_to_gguf.py는 f16/bf16/q8_0만 지원)
 python convert_hf_to_gguf.py \
     ../my-merged-model \
-    --outfile my-model.gguf \
-    --outtype q4_k_m
+    --outfile my-model-f16.gguf \
+    --outtype f16
 
-# 3. Ollama용 Modelfile 생성
+# 3. K-quant(q4_k_m 등)는 llama-quantize로 별도 단계에서 양자화
+./build/bin/llama-quantize my-model-f16.gguf my-model.gguf q4_k_m
+
+# 4. Ollama용 Modelfile 생성
 cat > Modelfile << 'MODELFILE_EOF'
 FROM ./my-model.gguf
 
@@ -875,10 +890,10 @@ PARAMETER num_ctx 2048
 SYSTEM """당신은 친절한 한국어 AI 어시스턴트입니다."""
 MODELFILE_EOF
 
-# 4. Ollama에 모델 등록
+# 5. Ollama에 모델 등록
 ollama create my-finetuned-model -f Modelfile
 
-# 5. 테스트
+# 6. 테스트
 ollama run my-finetuned-model "파이썬의 장점을 알려주세요."
 ```
 
@@ -1009,7 +1024,7 @@ for key in base_rouge:
 
 - [ ] 베이스 모델을 선택했는가? (Qwen, Llama, Gemma 등)
 - [ ] LoRA 하이퍼파라미터를 설정했는가? (r, alpha, target_modules)
-- [ ] TrainingArguments를 설정했는가? (lr, batch_size, epochs)
+- [ ] SFTConfig를 설정했는가? (lr, batch_size, epochs, max_seq_length, packing)
 - [ ] 메모리 최적화를 적용했는가? (QLoRA, gradient checkpointing)
 
 **학습 및 평가:**
@@ -1030,13 +1045,13 @@ for key in base_rouge:
 
 | 라이브러리 | 권장 버전 | 용도 |
 |---|---|---|
-| `transformers` | 4.46+ | 모델 로드, 토크나이저 |
-| `peft` | 0.12+ | LoRA 설정 및 관리 |
-| `trl` | 0.9+ | SFTTrainer |
-| `bitsandbytes` | 0.43+ | 양자화 (QLoRA) |
-| `datasets` | 2.20+ | 데이터셋 관리 |
-| `accelerate` | 0.33+ | 분산 학습, device_map |
-| `torch` | 2.1+ | 딥러닝 프레임워크 |
+| `transformers` | 4.49+ | 모델 로드, 토크나이저 |
+| `peft` | 0.14+ | LoRA 설정 및 관리 |
+| `trl` | 0.13+ | SFTTrainer / SFTConfig |
+| `bitsandbytes` | 0.45+ | 양자화 (QLoRA) |
+| `datasets` | 3.x | 데이터셋 관리 |
+| `accelerate` | 1.x | 분산 학습, device_map |
+| `torch` | 2.4+ | 딥러닝 프레임워크 |
 
 ### 요약
 

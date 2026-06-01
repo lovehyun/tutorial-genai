@@ -20,7 +20,7 @@
 |------|------|-----------|------|
 | 09:00-09:30 | 오리엔테이션 | — | 에이전트 아키텍처 개요, ReAct 패턴 |
 | 09:30-10:00 | 에이전트 기본 역량 | `2.langchain/8.agents/1.builtin_tools/1.0_list_all_tools.py` | 에이전트가 쓸 수 있는 빌트인 도구 카탈로그 탐색 |
-| 10:00-10:30 | 수학 도구 에이전트 | `2.langchain/7.agents/1.1_llmmath.py` <!-- TODO: 경로 확인 필요 --> | LLMMath 도구 기반 에이전트 |
+| 10:00-10:30 | 수학 도구 에이전트 | `2.langchain/8.agents/1.builtin_tools/1.1_llm_math.py` | llm-math(Calculator) 도구 기반 에이전트 (현행 create_agent) |
 | 10:45-11:15 | Wikipedia 에이전트 | `2.langchain/8.agents/0.legacy(initialize_agent)/1.wikipedia/2.1_wikipedia1.py`, `2.langchain/8.agents/0.legacy(initialize_agent)/1.wikipedia/2.2_wikipedia1_ko.py` | Wikipedia 검색 (영어/한국어) |
 | 11:15-12:00 | Wikipedia + Math 복합 | `2.langchain/8.agents/0.legacy(initialize_agent)/1.wikipedia/2.3_wikipedia2_math.py`, `2.langchain/8.agents/0.legacy(initialize_agent)/1.wikipedia/2.5_wikipedia3_structured_output.py` | 다중 도구 결합, Structured Output |
 | 13:00-13:45 | ArXiv 논문 검색 | `2.langchain/8.agents/0.legacy(initialize_agent)/2.arxiv/3.1_arxiv_thesis.py`, `2.langchain/8.agents/0.legacy(initialize_agent)/2.arxiv/3.2_arxiv_thesis2_detail.py` | ArXiv API로 논문 검색 |

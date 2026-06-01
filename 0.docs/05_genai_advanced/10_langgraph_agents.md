@@ -1,6 +1,6 @@
 # LangGraph 에이전트
 
-> 선형 체인을 넘어 순환(Cycle)과 조건 분기가 가능한 그래프 기반 에이전트를 설계합니다 — StateGraph, 체크포인팅, ReAct 패턴, 멀티 에이전트 아키텍처까지, LangGraph 0.2+로 구현하는 자율형 AI 에이전트의 모든 것
+> 선형 체인을 넘어 순환(Cycle)과 조건 분기가 가능한 그래프 기반 에이전트를 설계합니다 — StateGraph, 체크포인팅, ReAct 패턴, 멀티 에이전트 아키텍처까지, LangGraph 1.x로 구현하는 자율형 AI 에이전트의 모든 것
 
 ---
 
@@ -51,7 +51,7 @@ result = chain.invoke({"question": "파이썬이란?"})
 
 ### LangGraph 소개
 
-**LangGraph**는 LangChain 팀이 개발한 에이전트 오케스트레이션 프레임워크입니다. 핵심 아이디어는 **상태 머신(State Machine)** 을 그래프로 표현하는 것입니다. langgraph 0.2+ 버전부터 API가 안정화되었으며, `langsmith`와 통합하여 에이전트의 실행 과정을 추적하고 디버깅할 수 있습니다.
+**LangGraph**는 LangChain 팀이 개발한 에이전트 오케스트레이션 프레임워크입니다. 핵심 아이디어는 **상태 머신(State Machine)** 을 그래프로 표현하는 것입니다. langgraph 0.2+ 버전부터 API가 안정화되었고 1.0에서 정식 안정화되었으므로 최신 1.x 사용을 권장하며, `langsmith`와 통합하여 에이전트의 실행 과정을 추적하고 디버깅할 수 있습니다.
 
 ```bash
 # 설치
@@ -311,21 +311,18 @@ print(result2["messages"][-1].content)
 ```python
 # sqlite_saver_example.py -- SqliteSaver를 사용한 영속 체크포인팅
 from langgraph.checkpoint.sqlite import SqliteSaver
-import sqlite3
 
-# SQLite 데이터베이스 연결
-conn = sqlite3.connect("checkpoints.db", check_same_thread=False)
-saver = SqliteSaver(conn)
+# from_conn_string 컨텍스트 매니저로 연결 (PostgresSaver와 동일한 패턴)
+with SqliteSaver.from_conn_string("checkpoints.db") as saver:
+    # 그래프 컴파일
+    app = graph.compile(checkpointer=saver)
 
-# 그래프 컴파일
-app = graph.compile(checkpointer=saver)
-
-# 서버 재시작 후에도 대화 이력이 유지됩니다
-config = {"configurable": {"thread_id": "session-abc"}}
-result = app.invoke(
-    {"messages": [HumanMessage(content="지난번에 이야기하던 것 계속하자")]},
-    config=config
-)
+    # 서버 재시작 후에도 대화 이력이 유지됩니다
+    config = {"configurable": {"thread_id": "session-abc"}}
+    result = app.invoke(
+        {"messages": [HumanMessage(content="지난번에 이야기하던 것 계속하자")]},
+        config=config
+    )
 ```
 
 PostgreSQL을 사용하는 프로덕션 환경에서는 `PostgresSaver`를 사용합니다.
@@ -850,9 +847,10 @@ asyncio.run(stream_with_events())
 LangSmith에서 추적을 활성화하려면 환경 변수를 설정합니다.
 
 ```bash
-export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_API_KEY="ls__your_api_key"
-export LANGCHAIN_PROJECT="my-langgraph-agent"
+# 현행 LANGSMITH_* 변수 사용 (구 LANGCHAIN_TRACING_V2/LANGCHAIN_API_KEY/LANGCHAIN_PROJECT 도 하위 호환됨)
+export LANGSMITH_TRACING=true
+export LANGSMITH_API_KEY="ls__your_api_key"
+export LANGSMITH_PROJECT="my-langgraph-agent"
 ```
 
 ### 코드 예제: FastAPI + LangGraph 스트리밍
@@ -1115,7 +1113,7 @@ def agent_with_limit(state):
 
 ```bash
 # 핵심 패키지
-pip install langgraph>=0.2.0        # LangGraph 코어
+pip install "langgraph>=1.0"        # LangGraph 코어 (최신 1.x 권장)
 pip install langchain-openai         # OpenAI 통합
 pip install langsmith                # 추적 및 디버깅
 

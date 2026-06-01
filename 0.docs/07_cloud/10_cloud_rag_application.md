@@ -206,7 +206,7 @@ flowchart TB
 
 ```python
 import io
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pypdf import PdfReader
 
 async def process_document(document_id: int):

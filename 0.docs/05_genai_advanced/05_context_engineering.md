@@ -82,14 +82,16 @@ print(f"토큰 목록 (o200k): {tokens_o200k}")
 
 ### 2.2 모델별 컨텍스트 한도
 
+> 가격/모델 라인업은 변동되므로 아래 표는 **2026-06 기준**입니다. 최신 값은 [OpenAI Pricing](https://openai.com/api/pricing/) 페이지에서 확인하세요.
+
 | 모델 | 인코딩 | 컨텍스트 윈도우 | 입력 비용 (1M tokens) | 출력 비용 (1M tokens) |
 |---|---|---|---|---|
+| gpt-4.1 | o200k_base | 1,000,000 | $2.00 | $8.00 |
+| gpt-4.1-mini | o200k_base | 1,000,000 | $0.40 | $1.60 |
 | gpt-4o | o200k_base | 128,000 | $2.50 | $10.00 |
 | gpt-4o-mini | o200k_base | 128,000 | $0.15 | $0.60 |
-| gpt-4-turbo | cl100k_base | 128,000 | $10.00 | $30.00 |
-| gpt-3.5-turbo | cl100k_base | 16,385 | $0.50 | $1.50 |
-| o1 | o200k_base | 200,000 | $15.00 | $60.00 |
-| o3-mini | o200k_base | 200,000 | $1.10 | $4.40 |
+| o3 | o200k_base | 200,000 | $2.00 | $8.00 |
+| o4-mini | o200k_base | 200,000 | $1.10 | $4.40 |
 
 ### 2.3 Chat 메시지의 토큰 계산
 
@@ -104,8 +106,13 @@ def count_chat_tokens(
     messages: list[dict],
     model: str = "gpt-4o"
 ) -> int:
-    """Chat 메시지 배열의 토큰 수를 계산합니다."""
-    if model.startswith("gpt-4o") or model.startswith("o1") or model.startswith("o3"):
+    """Chat 메시지 배열의 토큰 수를 계산합니다.
+
+    주의: 메시지당 오버헤드(3토큰 등)는 모델/포맷에 따라 달라지므로
+    이 값은 정확한 청구 토큰이 아니라 **근사치**입니다.
+    """
+    # gpt-4o / gpt-4.1 / o-series 등 최신 모델은 o200k_base
+    if model.startswith(("gpt-4o", "gpt-4.1", "o1", "o3", "o4")):
         encoding = tiktoken.get_encoding("o200k_base")
     else:
         encoding = tiktoken.get_encoding("cl100k_base")
@@ -118,6 +125,9 @@ def count_chat_tokens(
     for message in messages:
         num_tokens += tokens_per_message
         for key, value in message.items():
+            # content가 None이거나 문자열이 아닌 경우(tool_calls 등) 방어
+            if value is None or not isinstance(value, str):
+                continue
             num_tokens += len(encoding.encode(value))
             if key == "name":
                 num_tokens += tokens_per_name
@@ -146,12 +156,14 @@ import tiktoken
 from dataclasses import dataclass
 
 
+# 가격/한도는 변동될 수 있습니다 (2026-06 기준). 최신 값은 OpenAI Pricing 페이지 참고.
 MODEL_CONFIGS = {
+    "gpt-4.1":       {"encoding": "o200k_base", "max_tokens": 1_000_000, "input_cost_per_m": 2.00, "output_cost_per_m": 8.00},
+    "gpt-4.1-mini":  {"encoding": "o200k_base", "max_tokens": 1_000_000, "input_cost_per_m": 0.40, "output_cost_per_m": 1.60},
     "gpt-4o":        {"encoding": "o200k_base", "max_tokens": 128_000, "input_cost_per_m": 2.50, "output_cost_per_m": 10.00},
     "gpt-4o-mini":   {"encoding": "o200k_base", "max_tokens": 128_000, "input_cost_per_m": 0.15, "output_cost_per_m": 0.60},
-    "gpt-4-turbo":   {"encoding": "cl100k_base", "max_tokens": 128_000, "input_cost_per_m": 10.00, "output_cost_per_m": 30.00},
-    "o1":            {"encoding": "o200k_base", "max_tokens": 200_000, "input_cost_per_m": 15.00, "output_cost_per_m": 60.00},
-    "o3-mini":       {"encoding": "o200k_base", "max_tokens": 200_000, "input_cost_per_m": 1.10, "output_cost_per_m": 4.40},
+    "o3":            {"encoding": "o200k_base", "max_tokens": 200_000, "input_cost_per_m": 2.00, "output_cost_per_m": 8.00},
+    "o4-mini":       {"encoding": "o200k_base", "max_tokens": 200_000, "input_cost_per_m": 1.10, "output_cost_per_m": 4.40},
 }
 
 
@@ -533,7 +545,7 @@ class ConversationMemory:
         response = self._client.chat.completions.create(
             model="gpt-4o-mini",  # 요약에는 저렴한 모델 사용
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=300,
+            max_completion_tokens=300,  # Chat Completions는 max_completion_tokens 권장 (구 max_tokens는 노후 표기)
         )
         return response.choices[0].message.content
 

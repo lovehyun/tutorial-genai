@@ -457,8 +457,8 @@ class NewsAnalysis(BaseModel):
     category: Literal["경제", "정치", "사회", "기술", "문화", "스포츠"]
     confidence_score: float
 
-# client.beta.chat.completions.parse()로 직접 파싱
-completion = client.beta.chat.completions.parse(
+# client.chat.completions.parse()로 직접 파싱 (구 client.beta.chat.completions.parse 는 GA 승격으로 beta 제거됨)
+completion = client.chat.completions.parse(
     model="gpt-4o",
     messages=[
         {"role": "system", "content": "뉴스 기사를 분석하세요."},
@@ -520,7 +520,7 @@ articles_text = """
 3. 카카오, 개인정보 유출 사고로 과징금 150억 부과
 """
 
-completion = client.beta.chat.completions.parse(
+completion = client.chat.completions.parse(
     model="gpt-4o",
     messages=[
         {"role": "system", "content": "뉴스 기사들을 분석하여 구조화된 결과를 제공하세요."},
@@ -571,7 +571,7 @@ flowchart LR
 
 ### 모델 비교: gpt-4o vs o3-mini vs o4-mini
 
-OpenAI는 용도에 따라 다양한 모델을 제공합니다. 올바른 모델 선택은 비용과 품질 모두에 큰 영향을 미칩니다.
+OpenAI는 용도에 따라 다양한 모델을 제공합니다. 올바른 모델 선택은 비용과 품질 모두에 큰 영향을 미칩니다. 아래 표는 대표적인 모델을 비교한 것이며, 최신 플래그십으로는 **gpt-4.1**(범용)과 **o-series(o3/o4-mini 등)**(추론 특화)가 함께 제공됩니다. 실제 사용 가능한 모델/가격은 변동되므로 [OpenAI 모델 문서](https://platform.openai.com/docs/models)에서 기준일 기준으로 확인하세요.
 
 | 항목 | gpt-4o | o3-mini | o4-mini |
 |------|--------|---------|---------|
@@ -650,11 +650,12 @@ from openai import OpenAI
 
 client = OpenAI()
 
-# gpt-4o 계열: max_tokens 사용 (생성된 텍스트의 최대 토큰 수)
+# gpt-4o 계열: max_completion_tokens 사용 (출력 텍스트의 최대 토큰 수)
+# 구 max_tokens 파라미터는 Chat Completions 에서 deprecated 되었으므로 max_completion_tokens 권장
 response = client.chat.completions.create(
     model="gpt-4o",
     messages=[{"role": "user", "content": "Python 역사를 설명하세요."}],
-    max_tokens=500  # 출력 최대 500 토큰
+    max_completion_tokens=500  # 출력 최대 500 토큰
 )
 
 # o-series 모델: max_completion_tokens 사용 (추론 토큰 + 출력 토큰 합산)
@@ -673,8 +674,8 @@ print(f"총 토큰: {usage.total_tokens}")
 
 | 파라미터 | 적용 모델 | 포함 범위 |
 |---------|----------|----------|
-| `max_tokens` | gpt-4o, gpt-4o-mini 등 | 생성된 텍스트 토큰만 |
-| `max_completion_tokens` | o3-mini, o4-mini 등 | 추론(thinking) 토큰 + 출력 토큰 합산 |
+| `max_tokens` (deprecated) | gpt-4o, gpt-4o-mini 등 | 생성된 텍스트 토큰만 (현재는 `max_completion_tokens` 권장) |
+| `max_completion_tokens` | gpt-4o, o3-mini, o4-mini 등 전 모델 | 출력 토큰(o-series 는 추론(thinking) 토큰 + 출력 토큰 합산) |
 
 > **핵심 포인트:** 모델 선택은 **"가장 좋은 모델"이 아니라 "작업에 가장 적합한 모델"**을 고르는 것이 핵심입니다. 간단한 분류 작업에 gpt-4o를 쓰면 비용 낭비이고, 복잡한 추론 작업에 gpt-4o-mini를 쓰면 품질이 부족합니다. 작업 특성을 분석하고 적절한 모델과 파라미터를 조합하는 것이 프로덕션 최적화의 시작입니다.
 
@@ -727,7 +728,7 @@ for i, sentence in enumerate(sentences):
                 {"role": "system", "content": "Translate the following Korean text to English accurately."},
                 {"role": "user", "content": sentence}
             ],
-            "max_tokens": 200
+            "max_completion_tokens": 200
         }
     })
 
@@ -798,7 +799,7 @@ class EmailClassification(BaseModel):
 async def classify_email(email_id: int, email_content: str) -> dict:
     """단일 이메일을 비동기로 분류"""
     try:
-        completion = await aclient.beta.chat.completions.parse(
+        completion = await aclient.chat.completions.parse(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "이메일을 분류하세요."},

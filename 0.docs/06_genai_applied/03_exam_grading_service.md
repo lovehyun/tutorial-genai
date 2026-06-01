@@ -235,9 +235,9 @@ def inject_examples(prompt: str, examples: dict) -> str:
 
 | 채점자 | 모델 | 역할 | Temperature |
 |---|---|---|---|
-| Grader A | GPT-4o | 기준 충족 여부 엄격 판단 | 0.0 |
-| Grader B | Claude 3.5 Sonnet | 논리 흐름과 표현력 중심 | 0.1 |
-| Grader C | Gemini 1.5 Pro | 핵심 개념 포함 여부 중심 | 0.0 |
+| Grader A | GPT-4.1 | 기준 충족 여부 엄격 판단 | 0.0 |
+| Grader B | Claude Sonnet 4.5 | 논리 흐름과 표현력 중심 | 0.1 |
+| Grader C | Gemini 2.5 Pro | 핵심 개념 포함 여부 중심 | 0.0 |
 
 > **핵심 포인트:** 앙상블의 핵심은 **독립성**입니다. 각 채점자가 다른 채점자의 결과를 참조해서는 안 됩니다. 또한 서로 다른 모델을 사용하여 모델 고유의 편향을 상쇄합니다.
 
@@ -322,9 +322,9 @@ def ensemble_grade(grading_results: list[dict], weights: list[float]) -> dict:
 ```mermaid
 flowchart TB
     A["학생 답안 + 루브릭"] --> B["프롬프트 생성"]
-    B --> C["Grader A\nGPT-4o"]
-    B --> D["Grader B\nClaude 3.5"]
-    B --> E["Grader C\nGemini 1.5"]
+    B --> C["Grader A\nGPT-4.1"]
+    B --> D["Grader B\nClaude Sonnet 4.5"]
+    B --> E["Grader C\nGemini 2.5 Pro"]
     C --> F["점수 수집"]
     D --> F
     E --> F
@@ -570,7 +570,7 @@ class AppealRequest:
 
 | 변경 요소 | 원래 채점 | 재채점 | 이유 |
 |---|---|---|---|
-| 모델 | GPT-4o 앙상블 | Claude 3.5 + Gemini | 모델 편향 제거 |
+| 모델 | GPT-4.1 앙상블 | Claude Sonnet 4.5 + Gemini 2.5 Pro | 모델 편향 제거 |
 | 프롬프트 | 표준 프롬프트 | 강화된 부분점수 안내 | 부분 점수 민감도 향상 |
 | Temperature | 0.0 | 0.0 (동일) | 재현성 유지 |
 | 예시 답안 | 포함 | 추가 예시 포함 | 판단 기준 보강 |
@@ -578,7 +578,7 @@ class AppealRequest:
 ```python
 # regrading_strategy.py -- 재채점 전략 설정
 REGRADE_CONFIG = {
-    "models": ["claude-3-5-sonnet", "gemini-1.5-pro"],
+    "models": ["claude-sonnet-4-6", "gemini-2.5-pro"],
     "prompt_modifier": (
         "이 답안은 이의제기가 접수된 답안입니다. "
         "부분 점수를 특히 신중하게 판정하세요. "
