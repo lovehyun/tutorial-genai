@@ -1,5 +1,5 @@
 """
-4_orchestrator_worker.py - Orchestrator-Worker 패턴
+9.4_orchestrator_worker.py - Orchestrator-Worker 패턴
 
 이 파일은 Anthropic의 Agentic 디자인 패턴 중 'Orchestrator-Worker'를 구현합니다.
 오케스트레이터 LLM이 작업을 동적으로 분해하고, 각 하위 작업을 워커에게 위임한 후,

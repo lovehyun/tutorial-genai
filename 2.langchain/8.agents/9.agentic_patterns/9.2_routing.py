@@ -1,5 +1,5 @@
 """
-2_routing.py - Routing 패턴
+9.2_routing.py - Routing 패턴
 
 이 파일은 Anthropic의 Agentic 디자인 패턴 중 'Routing'을 구현합니다.
 LLM이 입력을 분류하고, 분류 결과에 따라 전문화된 체인으로 분기합니다.

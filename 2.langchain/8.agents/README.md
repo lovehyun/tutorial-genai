@@ -17,7 +17,8 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 ├── 6.hitl_streaming/             ← 사람 승인 / 스트리밍 UX
 ├── 7.routing/                    ← 다중 도구 라우팅 + 복합 시나리오
 ├── 8.mcp/                        ← MCP (Model Context Protocol) — 표준 도구 프로토콜
-├── 9.webscan_app/                ← 실전 풀스택 (Flask + 에이전트)
+├── 9.agentic_patterns/           ← Anthropic 5대 워크플로우 패턴 (체이닝/라우팅/병렬/오케스트레이터/평가자)
+├── 10.mini_apps/                 ← 실전 미니 앱 모음 (webscan · 금융조회 · 가상트레이딩+HITL)
 └── README.md
 ```
 
@@ -47,7 +48,9 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
        ↓
 8.mcp               ─ MCP 표준 프로토콜로 외부 서버 도구 사용
        ↓
-9.webscan_app       ─ 실전 풀스택 (Flask + create_agent + @tool 모듈화)
+9.agentic_patterns  ─ Anthropic 5대 워크플로우 패턴 (체이닝/라우팅/병렬/오케스트레이터/평가자)
+       ↓
+10.mini_apps        ─ 실전 미니 앱 (webscan / 금융조회 / 가상트레이딩 + 이메일 HITL)
 ```
 
 ## API 분류표
@@ -56,7 +59,7 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 |-----|------|-------|------|
 | `initialize_agent` + `AgentType.*` | ❌ Deprecated (v0.2+) | 신규 ✗ | `0.legacy/` 만 |
 | `bind_tools()` + 수동 디스패치 | ✅ 저수준 표준 | 1-shot / 내부 이해 | `4.internals/4.1` |
-| `langchain.agents.create_agent` | ✅ **현행 표준** (LangChain 1.x) | **신규 권장** | 1~3, 5~7, 9 |
+| `langchain.agents.create_agent` | ✅ **현행 표준** (LangChain 1.x) | **신규 권장** | 1~3, 5~7, 10 |
 | `langgraph.prebuilt.create_react_agent` | ⚠️ 구 위치 (deprecated 이동) | → `create_agent` 사용 | `2.custom_tools/2.1` 주석의 마이그레이션 노트 |
 | `MultiServerMCPClient` (MCP) | ✨ 표준 프로토콜 | 외부 도구 재사용 | `8.mcp/` |
 
@@ -164,13 +167,28 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 | `8.2_mcp_client.py` | `langchain-mcp-adapters` 로 filesystem MCP 서버 도구를 에이전트에 |
 | `8.3_mcp_plus_local.py` | MCP 서버 도구 + 로컬 `@tool` 을 **한 에이전트에 혼합** (실무 패턴) |
 
-### `9.webscan_app/` — 실전 풀스택
-| 파일 | 설명 |
-|---|---|
-| `tools.py` | `@tool` 로 정의된 시스템 점검 도구 6종 (포트/SSL/웹/리소스/프로세스/네트워크) |
-| `app.py` | Flask + create_agent + MemorySaver. JSON API + 멀티턴 |
-| `templates/index.html` | 자연어 입력 UI + 사용된 도구 표시 + 예시 버튼 |
-| `static/style.css` | 최소 CSS (시맨틱 HTML 이라 없어도 읽힘) |
+### `9.agentic_patterns/` — Anthropic 워크플로우 패턴
+> [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) 의 5대 패턴. 상세는 `9.agentic_patterns/README.md`.
+
+| 파일 | 패턴 | 주요 기술 |
+|---|---|---|
+| `9.1_prompt_chaining.py` | Prompt Chaining (순차 파이프라인) | LCEL 체인 |
+| `9.2_routing.py` | Routing (분류 → 전문 체인 분기) | RunnableLambda |
+| `9.3_parallelization.py` | Parallelization (다관점 + 투표) | RunnableParallel |
+| `9.4_orchestrator_worker.py` | Orchestrator-Worker (동적 작업 분해) | LangGraph StateGraph |
+| `9.5_evaluator_optimizer.py` | Evaluator-Optimizer (생성→평가→개선 루프) | LangGraph 순환 그래프 |
+
+### `10.mini_apps/` — 실전 미니 앱 모음
+> 앞 패턴들을 **돌아가는 앱**으로 조립한 POC. 상세는 `10.mini_apps/README.md`.
+
+| 앱 | 설명 | 핵심 패턴 |
+|---|---|---|
+| `1.webscan_app/` | 시스템 점검 어시스턴트 (Flask + `@tool` 6종 + MemorySaver) | 도구 모듈화 + 메모리 |
+| `2.finance_bot/` | 뉴스/기업정보/환율/주가 조회 봇 (CLI) | 멀티툴 라우팅 |
+| `3.trading_bot/` | 조건 충족 시 **이메일 승인(HITL)** 후 가상 거래 ⚠️샌드박스 | cron 잡 + out-of-band HITL |
+
+> `3.trading_bot` 은 `6.hitl_streaming` 의 인프로세스 `interrupt_before` 와 대비되는
+> **비동기(out-of-band) HITL** — 에이전트가 주기적으로 돌다 위험 액션 직전 이메일로 승인 요청.
 
 ### `0.legacy(initialize_agent)/` — Deprecated 격리
 
@@ -242,8 +260,8 @@ pip install wikipedia arxiv langchain-tavily
 pip install langchain-mcp-adapters
 # + Node.js (MCP 서버 실행용)
 
-# 9.webscan_app
-pip install flask psutil requests
+# 10.mini_apps
+pip install flask psutil requests yfinance apscheduler   # webscan / finance / trading
 ```
 
 각 폴더에서 실행:
@@ -251,6 +269,9 @@ pip install flask psutil requests
 cd "2.langchain/8.agents/1.builtin_tools"
 python 1.1_wikipedia_minimal.py  # 도구 안 만들고 첫 에이전트 (가장 단순)
 
-cd "../9.webscan_app"
+cd "../10.mini_apps/1.webscan_app"
 python app.py   # → http://localhost:5000
+
+cd "../2.finance_bot" && python app.py        # 금융 조회 봇 (CLI)
+cd "../3.trading_bot" && python app.py        # 가상 트레이딩 + 이메일 HITL → http://localhost:5001
 ```

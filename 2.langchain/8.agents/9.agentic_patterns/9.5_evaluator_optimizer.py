@@ -1,5 +1,5 @@
 """
-5_evaluator_optimizer.py - Evaluator-Optimizer 패턴
+9.5_evaluator_optimizer.py - Evaluator-Optimizer 패턴
 
 이 파일은 Anthropic의 Agentic 디자인 패턴 중 'Evaluator-Optimizer'를 구현합니다.
 생성자(Generator)가 출력을 만들고, 평가자(Evaluator)가 품질을 평가하여

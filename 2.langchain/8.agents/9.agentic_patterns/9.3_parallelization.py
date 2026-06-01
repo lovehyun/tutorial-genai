@@ -1,5 +1,5 @@
 """
-3_parallelization.py - Parallelization 패턴
+9.3_parallelization.py - Parallelization 패턴
 
 이 파일은 Anthropic의 Agentic 디자인 패턴 중 'Parallelization'을 구현합니다.
 하나의 입력을 여러 LLM 호출로 동시에 처리(팬아웃)하고 결과를 종합(팬인)합니다.

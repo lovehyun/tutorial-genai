@@ -1,5 +1,5 @@
 """
-1_prompt_chaining.py - Prompt Chaining 패턴
+9.1_prompt_chaining.py - Prompt Chaining 패턴
 
 이 파일은 Anthropic의 Agentic 디자인 패턴 중 'Prompt Chaining'을 구현합니다.
 여러 LLM 호출을 순차적으로 연결하여 복잡한 작업을 단계별로 처리합니다.
