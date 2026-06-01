@@ -64,11 +64,32 @@ def build():
 store = Chroma(collection_name=COLLECTION_NAME, embedding_function=embeddings, persist_directory=PERSIST_DIR)
 if store._collection.count() == 0:
     store = build()
+
 print(f"'{COLLECTION_NAME}' 컬렉션: {store._collection.count()} 청크 (여러 파일 통합)\n")
+
 
 # 검색 한 번이 모든 파일을 후보로 봄 — 결과의 source 가 제각각인 것 확인
 for d in store.similarity_search("저장장치 인터페이스 속도", k=4):
-    print(f"  [{d.metadata.get('source')}] {d.page_content[:55]}...")
+    print(f"  [{d.metadata.get('source')}] {d.page_content[:50]}...")
+
+
+# 특정 문서에만 질문
+results = store.similarity_search(
+    "저장장치 인터페이스 속도", k=2,
+    filter={"source": "nvme.txt"}
+)
+
+for d in results:
+    print(d.page_content)
+
+
+results = store.similarity_search(
+    "논문 제출 일정", k=2,
+    filter={
+        "source": "하계학술대회(CISC-S'24) CFP v2.pdf"
+    }
+)
+
 
 # 포인트:
 #   - 종류(txt/pdf) 상관없이 한 컬렉션 → 검색 한 번에 통합

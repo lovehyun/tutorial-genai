@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>RAG #3 — 문서 삭제</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    <header>
+        <h1>RAG 챗봇 #3</h1>
+        <p>여러 PDF 누적 + 목록 + 삭제 (문서 다루기 완성)</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>1. PDF 업로드</h2>
+            <form id="upload-form">
+                <input type="file" id="file-input" accept=".pdf" multiple required />
+                <button type="submit">업로드</button>
+            </form>
+            <p id="upload-status"></p>
+        </section>
+
+        <section>
+            <h2>2. 업로드된 문서
+                <button id="reset-btn" type="button" class="reset">DB 초기화</button>
+            </h2>
+            <!-- 페이지 로드 시 GET /files 로 채움 (부팅 후 기존 문서도 표시) -->
+            <ul id="file-list"><li class="empty">불러오는 중...</li></ul>
+        </section>
+
+        <section>
+            <h2>3. 질문하기</h2>
+            <form id="ask-form">
+                <input type="text" id="question-input" placeholder="질문을 입력하세요" required />
+                <button type="submit">질문</button>
+            </form>
+            <div id="answer"></div>
+        </section>
+    </main>
+
+    <script>
+        // ─── 문서 목록 렌더링 (각 항목에 삭제 버튼) ──────
+        function renderFiles(files) {
+            const ul = document.getElementById('file-list');
+            ul.innerHTML = '';
+            if (!files || files.length === 0) {
+                ul.innerHTML = '<li class="empty">아직 업로드된 문서가 없습니다.</li>';
+                return;
+            }
+            for (const f of files) {
+                const li = document.createElement('li');
+
+                const label = document.createElement('span');
+                label.textContent = `${f.source} (청크 ${f.chunks}개)`;
+
+                const btn = document.createElement('button');
+                btn.textContent = '삭제';
+                btn.className = 'del';
+                btn.dataset.source = f.source;   // 어떤 문서인지 표시
+
+                li.appendChild(label);
+                li.appendChild(btn);
+                ul.appendChild(li);
+            }
+        }
+
+        async function loadFiles() {
+            try {
+                const r = await fetch('/files');
+                const d = await r.json();
+                renderFiles(d.files);
+            } catch (e) {
+                document.getElementById('file-list').innerHTML =
+                    '<li class="empty">목록을 불러오지 못했습니다.</li>';
+            }
+        }
+
+        // 페이지 진입 시 기존 문서 목록 로드 (부팅 후 persist 된 DB 내용 표시)
+        loadFiles();
+
+        // ─── DB 초기화 (전체 삭제) ──────────────────────
+        document.getElementById('reset-btn').addEventListener('click', async () => {
+            if (!confirm('벡터 DB 의 모든 문서를 삭제하고 초기화할까요?')) return;
+            const r = await fetch('/reset', { method: 'POST' });
+            const d = await r.json();
+            document.getElementById('upload-status').textContent = d.message || d.error;
+            if (d.files) renderFiles(d.files);
+        });
+
+        // ─── 삭제 (이벤트 위임) ─────────────────────────
+        document.getElementById('file-list').addEventListener('click', async (e) => {
+            if (!e.target.classList.contains('del')) return;
+            const source = e.target.dataset.source;
+            if (!confirm(`'${source}' 을(를) 삭제할까요? (벡터 + 원본 파일 함께 삭제)`)) return;
+
+            e.target.disabled = true;
+            const r = await fetch('/files/' + encodeURIComponent(source), { method: 'DELETE' });
+            const d = await r.json();
+            document.getElementById('upload-status').textContent = d.message || d.error;
+            if (d.files) renderFiles(d.files);   // 서버가 준 갱신 목록으로 갱신
+        });
+
+        // ─── 업로드 ─────────────────────────────────────
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('file-input');
+            const filesSel = input.files;
+            if (!filesSel.length) return;
+
+            const status = document.getElementById('upload-status');
+            status.textContent = '업로드 중...';
+
+            const fd = new FormData();
+            for (const f of filesSel) fd.append('file', f);
+
+            const r = await fetch('/upload', { method: 'POST', body: fd });
+            const d = await r.json();
+            status.textContent = d.message || d.error;
+
+            if (d.files) renderFiles(d.files);
+            input.value = '';
+        });
+
+        // ─── 질문 ───────────────────────────────────────
+        document.getElementById('ask-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const q = document.getElementById('question-input').value.trim();
+            const ansEl = document.getElementById('answer');
+            ansEl.textContent = '답변 생성 중...';
+
+            const r = await fetch('/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: q }),
+            });
+
+            const d = await r.json();
+            ansEl.textContent = d.answer || d.error;
+        });
+    </script>
+</body>
+</html>

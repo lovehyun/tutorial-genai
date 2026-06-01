@@ -55,6 +55,12 @@
 |---|---|---|
 | [3.10_faiss_compare.py](3.10_faiss_compare.py) | FAISS 로 같은 흐름 + Chroma 와 비교 | 영속화/메타필터/삭제에서 **손이 더 감** → 학습·일반 실무는 Chroma 가 매끄러움. FAISS 는 대규모/GPU 가 핵심일 때 |
 
+### 메타데이터
+
+| 파일 | 목적 | 관전 포인트 |
+|---|---|---|
+| [3.11_metadata_filter.py](3.11_metadata_filter.py) | 삽입 시 metadata 부여 + 그걸로 필터 검색 | `Document(metadata={...})` 로 넣고 `similarity_search(filter=...)` 의 `where` 연산자: `$eq`(동등)/`$in`(목록)/`$gte`(숫자)/`$and`(복합). **벡터 유사도 + 정형 조건**을 함께 거는 게 실무 기본 |
+
 ## 분리 vs 통합 vs 혼합 — 한 장 요약
 
 ```

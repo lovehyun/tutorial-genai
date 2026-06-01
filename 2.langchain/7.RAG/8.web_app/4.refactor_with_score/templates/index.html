@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>RAG #4 — 구조화 + 점수/출처</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    <header>
+        <h1>RAG 챗봇 #4</h1>
+        <p>services/ 구조화 + 출처/유사도 점수 표시 (기능은 #3 동일)</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>1. PDF 업로드</h2>
+            <form id="upload-form">
+                <input type="file" id="file-input" accept=".pdf" multiple required />
+                <button type="submit">업로드</button>
+            </form>
+            <p id="upload-status"></p>
+        </section>
+
+        <section>
+            <h2>2. 업로드된 문서</h2>
+            <ul id="file-list"><li class="empty">불러오는 중...</li></ul>
+        </section>
+
+        <section>
+            <h2>3. 질문하기</h2>
+            <form id="ask-form">
+                <input type="text" id="question-input" placeholder="질문을 입력하세요" required />
+                <button type="submit">질문</button>
+            </form>
+            <div id="result">
+                <div id="answer"></div>
+                <ul id="sources"></ul>
+            </div>
+        </section>
+    </main>
+
+    <!-- 로딩 오버레이 -->
+    <div id="overlay">
+        <div id="spinner"></div>
+        <div id="loading-text">처리 중입니다...</div>
+    </div>
+
+    <script>
+        const overlay = document.getElementById('overlay');
+        const loadingText = document.getElementById('loading-text');
+        function showOverlay(msg) { loadingText.textContent = msg; overlay.style.display = 'flex'; }
+        function hideOverlay() { overlay.style.display = 'none'; }
+
+        // ─── 문서 목록 (삭제 버튼 포함) ─────────────────
+        function renderFiles(files) {
+            const ul = document.getElementById('file-list');
+            ul.innerHTML = '';
+            if (!files || files.length === 0) {
+                ul.innerHTML = '<li class="empty">아직 업로드된 문서가 없습니다.</li>';
+                return;
+            }
+            for (const f of files) {
+                const li = document.createElement('li');
+                const label = document.createElement('span');
+                label.textContent = `${f.source} (청크 ${f.chunks}개)`;
+                const btn = document.createElement('button');
+                btn.textContent = '삭제';
+                btn.className = 'del';
+                btn.dataset.source = f.source;
+                li.appendChild(label);
+                li.appendChild(btn);
+                ul.appendChild(li);
+            }
+        }
+
+        async function loadFiles() {
+            try {
+                const r = await fetch('/files');
+                const d = await r.json();
+                renderFiles(d.files);
+            } catch (e) {
+                document.getElementById('file-list').innerHTML =
+                    '<li class="empty">목록을 불러오지 못했습니다.</li>';
+            }
+        }
+
+        loadFiles();   // 페이지 진입 시 기존 문서 표시 (부팅 후 persist DB)
+
+        // 삭제 (이벤트 위임)
+        document.getElementById('file-list').addEventListener('click', async (e) => {
+            if (!e.target.classList.contains('del')) return;
+            const source = e.target.dataset.source;
+            if (!confirm(`'${source}' 을(를) 삭제할까요? (벡터 + 원본 파일 함께 삭제)`)) return;
+            showOverlay('삭제 중...');
+            const r = await fetch('/files/' + encodeURIComponent(source), { method: 'DELETE' });
+            hideOverlay();
+            const d = await r.json();
+            document.getElementById('upload-status').textContent = d.message || d.error;
+            if (d.files) renderFiles(d.files);
+        });
+
+        // ─── 업로드 (여러 파일) ─────────────────────────
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('file-input');
+            if (!input.files.length) return;
+            const fd = new FormData();
+            for (const f of input.files) fd.append('file', f);
+
+            showOverlay('PDF 처리 중...');
+            const r = await fetch('/upload', { method: 'POST', body: fd });
+            hideOverlay();
+            const d = await r.json();
+            document.getElementById('upload-status').textContent = d.message || d.error;
+            if (d.files) renderFiles(d.files);
+            input.value = '';
+        });
+
+        // ─── 질문 (출처/점수 표시) ──────────────────────
+        document.getElementById('ask-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const q = document.getElementById('question-input').value.trim();
+            showOverlay('답변 생성 중...');
+            const r = await fetch('/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: q }),
+            });
+            hideOverlay();
+            const d = await r.json();
+
+            document.getElementById('answer').textContent = d.answer || d.error || '';
+
+            const ul = document.getElementById('sources');
+            ul.innerHTML = '';
+            (d.sources || []).forEach(s => {
+                const li = document.createElement('li');
+                li.textContent = `${s.file} (p.${s.page}, 유사도 ${s.score}%)`;
+                ul.appendChild(li);
+            });
+        });
+    </script>
+</body>
+</html>

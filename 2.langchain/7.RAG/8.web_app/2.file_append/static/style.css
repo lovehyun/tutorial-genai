@@ -1,0 +1,47 @@
+/* 최소 CSS — 시맨틱 HTML 이라 없어도 읽힘 */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 0 20px;
+  color: #222;
+  line-height: 1.5;
+}
+
+header h1 { margin-bottom: 4px; }
+header p  { color: #666; margin-top: 0; }
+
+section { margin-top: 24px; }
+section h2 { font-size: 1.1em; }
+
+form { display: flex; gap: 8px; }
+input[type="text"], input[type="file"] {
+  flex: 1; padding: 8px 10px; font-size: 1em;
+  border: 1px solid #ccc; border-radius: 4px;
+}
+button {
+  padding: 8px 16px; font-size: 1em; cursor: pointer;
+  border: 1px solid #0a58ca; background: #0a58ca; color: white; border-radius: 4px;
+}
+button:hover { opacity: 0.9; }
+
+#upload-status { color: #666; }
+
+/* 문서 목록 */
+#file-list {
+  list-style: none; padding: 0; margin: 8px 0 0;
+  border: 1px solid #ddd; border-radius: 6px; overflow: hidden;
+}
+#file-list li {
+  padding: 8px 12px; border-bottom: 1px solid #eee;
+  font-size: 0.95em;
+}
+#file-list li:last-child { border-bottom: none; }
+#file-list li.empty { color: #999; }
+
+#answer {
+  margin-top: 12px; padding: 12px;
+  border: 1px solid #ddd; border-radius: 6px; background: #fafafa;
+  white-space: pre-wrap;
+  min-height: 40px;
+}

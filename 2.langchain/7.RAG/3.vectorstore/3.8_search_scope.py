@@ -22,6 +22,7 @@
 
 import os
 from dotenv import load_dotenv
+
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
@@ -70,6 +71,7 @@ print("\n(1-b) 같은 컬렉션이지만 filter 로 nvme.txt 만")
 for d in unified.similarity_search(query, k=K, filter={"source": "nvme.txt"}):
     print(f"  [{d.metadata.get('source')}] {d.page_content[:55]}...")
 
+
 # ── 전략 2) 분리: 파일마다 별도 컬렉션 ──────────────────
 nvme = get_or_build("scope_nvme", ["../DATA/nvme.txt"])
 ssd  = get_or_build("scope_ssd",  ["../DATA/ssd.txt"])
@@ -99,6 +101,7 @@ for name, store in {"nvme": nvme, "ssd": ssd}.items():
 pool.sort(key=lambda x: x[0])               # Chroma 점수 = 거리, 작을수록 가까움 → 오름차순
 for score, doc in pool[:K]:                 # 합친 뒤 상위 K 개만
     print(f"  [{doc.metadata['collection']}] 거리 {score:.3f}  {doc.page_content[:45]}...")
+
 
 # 정리:
 #   같이(1)  = 한 컬렉션 → 한 번의 검색이 곧 전역 top-k. 가장 단순.

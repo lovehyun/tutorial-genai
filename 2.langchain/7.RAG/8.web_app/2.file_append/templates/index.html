@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>RAG #2 — 문서 누적 + 목록</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    <header>
+        <h1>RAG 챗봇 #2</h1>
+        <p>여러 PDF 누적 업로드 + 문서 목록 표시</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>1. PDF 업로드</h2>
+            <form id="upload-form">
+                <!-- multiple: 한 번에 여러 파일 선택 가능 -->
+                <input type="file" id="file-input" accept=".pdf" multiple required />
+                <button type="submit">업로드</button>
+            </form>
+            <p id="upload-status"></p>
+        </section>
+
+        <section>
+            <h2>2. 업로드된 문서</h2>
+            <!-- 페이지 로드 시 GET /files 로 채움 (부팅 후 기존 문서도 표시) -->
+            <ul id="file-list"><li class="empty">불러오는 중...</li></ul>
+        </section>
+
+        <section>
+            <h2>3. 질문하기</h2>
+            <form id="ask-form">
+                <input type="text" id="question-input" placeholder="질문을 입력하세요" required />
+                <button type="submit">질문</button>
+            </form>
+            <div id="answer"></div>
+        </section>
+    </main>
+
+    <script>
+        // ─── 문서 목록 렌더링 ───────────────────────────
+        function renderFiles(files) {
+            const ul = document.getElementById('file-list');
+            ul.innerHTML = '';
+            if (!files || files.length === 0) {
+                ul.innerHTML = '<li class="empty">아직 업로드된 문서가 없습니다.</li>';
+                return;
+            }
+            for (const f of files) {
+                const li = document.createElement('li');
+                li.textContent = `${f.source} (청크 ${f.chunks}개)`;
+                ul.appendChild(li);
+            }
+        }
+
+        async function loadFiles() {
+            try {
+                const r = await fetch('/files');
+                const d = await r.json();
+                renderFiles(d.files);
+            } catch (e) {
+                document.getElementById('file-list').innerHTML =
+                    '<li class="empty">목록을 불러오지 못했습니다.</li>';
+            }
+        }
+
+        // 페이지 진입 시 기존 문서 목록 로드 (부팅 후 persist 된 DB 내용 표시)
+        loadFiles();
+
+        // ─── 업로드 ─────────────────────────────────────
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('file-input');
+            const filesSel = input.files;
+            if (!filesSel.length) return;
+
+            const status = document.getElementById('upload-status');
+            status.textContent = '업로드 중...';
+
+            const fd = new FormData();
+            for (const f of filesSel) fd.append('file', f);
+
+            const r = await fetch('/upload', { method: 'POST', body: fd });
+            const d = await r.json();
+            status.textContent = d.message || d.error;
+
+            if (d.files) renderFiles(d.files);   // 서버가 준 갱신 목록으로 갱신
+            input.value = '';                    // 선택 초기화
+        });
+
+        // ─── 질문 ───────────────────────────────────────
+        document.getElementById('ask-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const q = document.getElementById('question-input').value.trim();
+            const ansEl = document.getElementById('answer');
+            ansEl.textContent = '답변 생성 중...';
+
+            const r = await fetch('/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: q }),
+            });
+
+            const d = await r.json();
+            ansEl.textContent = d.answer || d.error;
+        });
+    </script>
+</body>
+</html>

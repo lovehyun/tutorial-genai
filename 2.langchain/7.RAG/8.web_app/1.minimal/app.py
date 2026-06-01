@@ -25,8 +25,8 @@ from langchain_chroma import Chroma
 
 load_dotenv()
 
-DATA_DIR        = "./DATA"
-PERSIST_DIR     = "./chroma_db"
+DATA_DIR        = "../DATA"         # 1~5 공유 (= 8.web_app/DATA)
+PERSIST_DIR     = "../chroma_db"    # 벡터 DB 도 8.web_app 안에서 공유
 COLLECTION_NAME = "rag_web"
 
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -95,4 +95,22 @@ def ask():
 
 
 if __name__ == "__main__":
+    # app.run(debug=True, use_reloader=False, port=5001)
     app.run(debug=True, port=5001)
+
+
+# 기능	            use_reloader=True	use_reloader=False
+# 디버그 페이지	            O	            O
+# 예외 스택트레이스	        O           	O
+# 코드 수정 시 자동 재시작	O	            X
+# 시작 시 두 번 실행	    O	            X
+# 무거운 초기화 두 번 수행	O	            X
+
+
+# 프로세스 #1
+# ↓
+# 소스 파일 감시자(Watcher) 시작
+# ↓
+# 프로세스 #2 재실행
+# ↓
+# 실제 서버 동작
