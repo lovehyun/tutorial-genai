@@ -53,7 +53,7 @@
 | 11:15-12:00 | 복합 에이전트 | `2.langchain/8.agents/0.legacy(initialize_agent)/7.complex/8.1_complex.py` | 다중 도구 복합 에이전트 설계 |
 | 13:00-13:30 | 스마트 에이전트 | `2.langchain/8.agents/0.legacy(initialize_agent)/5.routing/9.1_smartagent.py` | 자율 판단 스마트 에이전트 |
 | 13:30-14:00 | 스마트 라우터 | `2.langchain/8.agents/0.legacy(initialize_agent)/5.routing/9.2_smartagent_router.py`, `2.langchain/8.agents/0.legacy(initialize_agent)/5.routing/9.3_smartagent_router2_moretools.py` | 도구별 라우팅 시스템 |
-| 14:00-14:30 | 웹 스캔 에이전트 | `2.langchain/8.agents/10.mini_apps/1.webscan_app/app.py` | 웹 스캐닝 에이전트 앱 |
+| 14:00-14:30 | 웹 스캔 에이전트 | `2.langchain/8.agents/10.mini_apps/2.webscan_app_web/app.py` | 웹 스캐닝 에이전트 앱 |
 | 14:45-15:30 | AI 에이전트 프로젝트 | `10.project/10.ai_agent/app.py`, `10.project/10.ai_agent/app2_history.py`, `10.project/10.ai_agent/app3_metadata.py` | 프로젝트 수준 에이전트 분석 |
 | 15:30-16:15 | 멀티 에이전트 | `10.project/10.ai_agent/app6_multi_agent.py`, `10.project/10.ai_agent/app8_multi_agent3_final.py` | 멀티 에이전트 시스템 분석 |
 | 16:15-17:00 | 종합 프로젝트 & 발표 | — | 나만의 복합 에이전트 구축, 결과 공유 |

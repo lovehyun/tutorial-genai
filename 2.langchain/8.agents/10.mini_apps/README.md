@@ -5,34 +5,43 @@
 
 | 앱 | 한 줄 | 핵심 패턴 |
 |---|---|---|
-| `1.webscan_app/` | 시스템 점검 어시스턴트 (Flask) | `@tool` 6종 + create_agent + 메모리 |
-| `2.finance_bot/` | 뉴스/기업정보/환율/주가 조회 봇 (CLI) | 멀티툴 라우팅 |
-| `3.trading_bot/` | 조건 충족 시 **이메일 승인(HITL)** 후 가상 거래 | cron 잡 + out-of-band HITL |
-| `4.trading_bot_web/` | **챗봇**으로 잔고·시세 묻고 예약/매매 → 충족 시 **알림/승인(예·아니오)** 후 가상 거래 | 대화형 에이전트(도구 5종) + 웹 HITL |
+| `1.webscan_cli/` | 시스템 점검 어시스턴트 (**CLI**) | `@tool` 6종 + create_agent + 메모리 |
+| `2.webscan_app_web/` | 같은 점검 에이전트의 **웹(Flask)** 버전 | `@tool` 6종 + create_agent + 메모리 |
+| `3.finance_bot/` | 뉴스/기업정보/환율/주가 조회 봇 (CLI) | 멀티툴 라우팅 |
+| `4.trading_bot/` | 조건 충족 시 **이메일 승인(HITL)** 후 가상 거래 | cron 잡 + out-of-band HITL |
+| `5.trading_bot_web/` | **챗봇**으로 잔고·시세 묻고 예약/매매 → 충족 시 **알림/승인(예·아니오)** 후 가상 거래 | 대화형 에이전트(도구 7종) + 웹 HITL |
 
 ---
 
-## 1.webscan_app — 시스템 점검 (기존)
-Flask + create_agent + `@tool` 6종(포트/SSL/웹/리소스/프로세스/네트워크) + MemorySaver.
+## 1.webscan_cli — 시스템 점검 (CLI)
+`2.webscan_app_web` 과 같은 도구(`tools.py`)·에이전트를, 터미널 입력 루프로.
+자연어 요청 → 알맞은 점검 도구 자동 호출. **질문마다 선택된 도구·인자도 함께 출력**한다.
 ```bash
-cd 1.webscan_app && python app.py   # → http://localhost:5000
+pip install langchain langchain-openai psutil requests python-dotenv
+cd 1.webscan_cli && python app.py    # 'exit' / '종료' 로 종료
 ```
 
-## 2.finance_bot — 금융 조회 봇 (CLI)
+## 2.webscan_app_web — 시스템 점검 (웹/Flask)
+Flask + create_agent + `@tool` 6종(포트/SSL/웹/리소스/프로세스/네트워크) + MemorySaver.
+```bash
+cd 2.webscan_app_web && python app.py   # → http://localhost:5000
+```
+
+## 3.finance_bot — 금융 조회 봇 (CLI)
 자연어로 물으면 LLM 이 알맞은 도구를 골라 답한다.
 - `get_news`(네이버) · `get_company_info`(구글/Serper) · `get_exchange_rate`(open.er-api, 키X) · `get_stock_price`(yfinance, 키X)
 ```bash
 pip install langchain langchain-openai requests yfinance python-dotenv
-cd 2.finance_bot && python app.py
+cd 3.finance_bot && python app.py
 # 데모 질문 자동 실행 후 대화형. 키 없는 환율/주가는 바로 동작.
 ```
 
-## 3.trading_bot — 가상 트레이딩 + 이메일 HITL  ⚠️ 가상머니 샌드박스
+## 4.trading_bot — 가상 트레이딩 + 이메일 HITL  ⚠️ 가상머니 샌드박스
 **실제 거래/환전 없음.** 가상 머니 1천만원으로 시작하는 개념 시연용.
 
 ```bash
 pip install flask apscheduler requests yfinance python-dotenv
-cd 3.trading_bot && python app.py   # → http://localhost:5001
+cd 4.trading_bot && python app.py   # → http://localhost:5001
 ```
 
 **데모 시세 서버** (`demo_market_server.py`) — 실제 API 대신 **매초 랜덤 변동**하는 가짜 환율/주가:
@@ -52,7 +61,7 @@ python demo_market_server.py        # → http://localhost:5002 (브라우저로
 
 > ### 왜 이게 중요한가 — 두 가지 HITL
 > - `6.hitl_streaming/6.1` = **인프로세스** HITL: 같은 실행 안에서 즉시 멈춰 승인받음
-> - 여기 `3.trading_bot` = **out-of-band(비동기)** HITL: 에이전트가 혼자 주기적으로 돌다가,
+> - 여기 `4.trading_bot` = **out-of-band(비동기)** HITL: 에이전트가 혼자 주기적으로 돌다가,
 >   위험 액션 직전 멈추고 **이메일로 승인 요청** → 사람이 나중에 URL 로 승인/거부
 >
 > 실무의 "이메일/슬랙 승인 버튼" 워크플로우가 바로 이 패턴입니다.
@@ -61,13 +70,13 @@ python demo_market_server.py        # → http://localhost:5002 (브라우저로
 
 ---
 
-## 4.trading_bot_web — 챗봇 가상 트레이딩 (대화형 에이전트)  ⚠️ 가상머니 샌드박스
-**실제 거래/환전 없음.** 3.trading_bot 의 웹 버전 — **챗봇과 대화**하며 잔고·시세·환율을 묻고,
+## 5.trading_bot_web — 챗봇 가상 트레이딩 (대화형 에이전트)  ⚠️ 가상머니 샌드박스
+**실제 거래/환전 없음.** 4.trading_bot 의 웹 버전 — **챗봇과 대화**하며 잔고·시세·환율을 묻고,
 예약/알림/매매를 요청한다. 외부 시세 서버 없이 **단독 실행**.
 
 ```bash
 pip install flask apscheduler langchain langchain-openai python-dotenv
-cd 4.trading_bot_web && python app.py   # → http://localhost:5003
+cd 5.trading_bot_web && python app.py   # → http://localhost:5003
 ```
 
 **화면 구성**
@@ -76,10 +85,11 @@ cd 4.trading_bot_web && python app.py   # → http://localhost:5003
 - 우측: **챗봇** — 자연어로 묻고 답 (잔고·환율·주가), 예약·매매 요청
 
 **핵심 — 대화형 에이전트 + 도구**
-- 우측 챗봇 = `create_agent` + 도구 5종 (`MemorySaver` 로 대화 기억):
+- 우측 챗봇 = `create_agent` + 도구 7종 (`MemorySaver` 로 대화 기억):
   - `get_balance` / `get_price` / `get_rate` — 잔고·주가·환율 질의응답
   - `schedule(action, comparator, threshold, ticker, amount)` — 조건부 **예약** (alert/buy/sell/exchange)
   - `trade_now(action, amount, ticker)` — **즉시** 매매/환전을 승인 대기로
+  - `list_schedules` / `cancel_schedule` — 예약 **조회·취소** (말로 "환율 알림 취소해줘")
 - 대화 중 도구가 동작하면 → **좌측 상태에 등록**된다.
 
 **알림 vs 매매 (구분)**

@@ -190,11 +190,13 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 
 | 앱 | 설명 | 핵심 패턴 |
 |---|---|---|
-| `1.webscan_app/` | 시스템 점검 어시스턴트 (Flask + `@tool` 6종 + MemorySaver) | 도구 모듈화 + 메모리 |
-| `2.finance_bot/` | 뉴스/기업정보/환율/주가 조회 봇 (CLI) | 멀티툴 라우팅 |
-| `3.trading_bot/` | 조건 충족 시 **이메일 승인(HITL)** 후 가상 거래 ⚠️샌드박스 | cron 잡 + out-of-band HITL |
+| `1.webscan_cli/` | 시스템 점검 어시스턴트 (**CLI**) | 도구 모듈화 + 메모리 |
+| `2.webscan_app_web/` | 같은 점검 에이전트의 **웹(Flask)** 버전 (`@tool` 6종 + MemorySaver) | 도구 모듈화 + 메모리 |
+| `3.finance_bot/` | 뉴스/기업정보/환율/주가 조회 봇 (CLI) | 멀티툴 라우팅 |
+| `4.trading_bot/` | 조건 충족 시 **이메일 승인(HITL)** 후 가상 거래 ⚠️샌드박스 | cron 잡 + out-of-band HITL |
+| `5.trading_bot_web/` | **챗봇**으로 잔고·시세 묻고 예약/매매 → **알림/승인** 후 가상 거래 ⚠️샌드박스 | 대화형 에이전트 + 웹 HITL |
 
-> `3.trading_bot` 은 `6.hitl_streaming` 의 인프로세스 `interrupt_before` 와 대비되는
+> `4.trading_bot` 은 `6.hitl_streaming` 의 인프로세스 `interrupt_before` 와 대비되는
 > **비동기(out-of-band) HITL** — 에이전트가 주기적으로 돌다 위험 액션 직전 이메일로 승인 요청.
 
 ### `0.legacy(initialize_agent)/` — Deprecated 격리
@@ -276,9 +278,11 @@ pip install flask psutil requests yfinance apscheduler   # webscan / finance / t
 cd "2.langchain/8.agents/1.builtin_tools"
 python 1.1_llm_math.py           # llm-math(Calculator) — 가장 기초 도구 에이전트
 
-cd "../10.mini_apps/1.webscan_app"
-python app.py   # → http://localhost:5000
+cd "../10.mini_apps/1.webscan_cli"
+python app.py                                 # 시스템 점검 (CLI)
 
-cd "../2.finance_bot" && python app.py        # 금융 조회 봇 (CLI)
-cd "../3.trading_bot" && python app.py        # 가상 트레이딩 + 이메일 HITL → http://localhost:5001
+cd "../2.webscan_app_web" && python app.py    # 같은 점검 에이전트 웹판 → http://localhost:5000
+cd "../3.finance_bot" && python app.py        # 금융 조회 봇 (CLI)
+cd "../4.trading_bot" && python app.py        # 가상 트레이딩 + 이메일 HITL → http://localhost:5001
+cd "../5.trading_bot_web" && python app.py    # 챗봇 가상 트레이딩 → http://localhost:5003
 ```
