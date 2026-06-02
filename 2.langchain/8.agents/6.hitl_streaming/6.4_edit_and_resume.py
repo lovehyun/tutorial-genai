@@ -1,6 +1,6 @@
 """
 HITL 심화 — 도구 인자를 사람이 '수정'한 뒤 재개.
-6.1 은 승인/거부였다면, 여기선 에이전트가 정한 인자를 사람이 고쳐서 실행합니다.
+6.2 는 승인/거부였다면, 여기선 에이전트가 정한 인자를 사람이 고쳐서 실행합니다.
 이 예제: 송금액을 에이전트가 100000 으로 잡았는데, 사람이 50000 으로 낮춰 실행.
 
 흐름:
@@ -11,6 +11,7 @@ HITL 심화 — 도구 인자를 사람이 '수정'한 뒤 재개.
 """
 
 from dotenv import load_dotenv
+
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langchain_core.messages import AIMessage
@@ -52,6 +53,6 @@ result = agent.invoke(None, config=config)
 print(f"[최종] {result['messages'][-1].content}")
 
 # 정리:
-#   - 승인/거부(6.1) 를 넘어 '인자 교정' 까지 = 가장 강력한 HITL 패턴
+#   - 승인/거부(6.2) 를 넘어 '인자 교정' 까지 = 가장 강력한 HITL 패턴
 #   - 핵심은 update_state 에 '같은 id' AIMessage 를 넣어 기존 tool_calls 를 덮어쓰는 것
 #   - 실전: 금액/수신자/쿼리 등 위험 인자를 사람이 검토·교정 후 실행

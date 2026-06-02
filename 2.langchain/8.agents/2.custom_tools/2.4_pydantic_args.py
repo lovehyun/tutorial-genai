@@ -13,8 +13,10 @@ LLM 이 자주 헷갈리는 인자에 description 을 명시하면 정확도 ↑
 
 import json
 from typing import Literal
-from dotenv import load_dotenv
 from pydantic import BaseModel, Field
+
+from dotenv import load_dotenv
+
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 
@@ -86,6 +88,11 @@ for q in queries:
     response = llm_with_tools.invoke(q)
     for call in response.tool_calls:
         print(f"  → {call['name']}({call['args']})")
+
+        # 실제 호출·결과를 보려면 아래 주석 해제 (@tool 은 .invoke(args) 로 실행)
+        # name2tool = {t.name: t for t in [send_email, search]}
+        # result = name2tool[call["name"]].invoke(call["args"])
+        # print(f"     = {result}")
 
 # 핵심:
 #   - "긴급해" → priority="high"        (Literal enum 인식)

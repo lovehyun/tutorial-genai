@@ -80,3 +80,7 @@ for q in queries:
     for call in response.tool_calls:
         print(f"  → {call['name']}({call['args']})")
 
+        # 실제 호출·결과를 보려면 아래 주석 해제 (@tool 은 .invoke(args) 로 실행)
+        # name2tool = {t.name: t for t in tools}
+        # result = name2tool[call["name"]].invoke(call["args"])
+        # print(f"     = {result}")

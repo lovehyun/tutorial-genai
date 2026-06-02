@@ -98,8 +98,8 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 |---|---|---|
 | `MemorySaver()` | in-memory 체크포인터(메모리). 영속화는 `SqliteSaver`/`PostgresSaver` 로 교체 | 5.langgraph_memory |
 | `config={"configurable":{"thread_id":...}}` | 세션 구분 키 (+ `recursion_limit` 등 실행 옵션) | 5.langgraph_memory, 4.3 |
-| `interrupt_before=["tools"]` | 도구 실행 **직전 정지** (사람 승인/수정) | 6.1, 6.3 |
-| `response_format=Pydantic` | 최종 답을 구조화 → `result["structured_response"]` | 2.4 |
+| `interrupt_before=["tools"]` | 도구 실행 **직전 정지** (사람 승인/수정) | 6.1, 6.2, 6.4, 6.5 |
+| `response_format=Pydantic` | 최종 답을 구조화 → `result["structured_response"]` | 2.6 |
 | `MultiServerMCPClient` | MCP 서버 도구 → LangChain 도구로 자동 변환 | 8.mcp |
 
 ## 폴더별 파일 상세
@@ -119,14 +119,18 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 | `1.6_web_search.py` | (빌드업) Tavily (권장) / Serper / Google CSE 비교 |
 | `1.7_arxiv_minimal.py` | 같은 골격, 도구만 arxiv 로 교체 (최소) |
 | `1.8_arxiv.py` | (빌드업) 학술 논문 검색 + 한국어 요약/번역 |
+| `1.9_human.py` | `load_tools(["human"])` — 모르는 정보를 사용자에게 직접 되묻기 (가장 단순한 HITL) |
 
 ### `2.custom_tools/` — 내 도구 정의
 | 파일 | 설명 |
 |---|---|
 | `2.1_first_agent.py` | 도구 1개 (계산기) 를 직접 만들어 `create_agent` 에 — **현행** (옛 `create_react_agent` → `create_agent` 마이그레이션 주석 포함) |
 | `2.2_at_tool_basic.py` | `@tool` 데코레이터 — 함수 → 도구. docstring + 타입힌트가 LLM 명세 |
-| `2.3_pydantic_args.py` | `args_schema=PydanticModel` — Field description / Literal enum / 검증 |
-| `2.4_structured_output.py` | `response_format=Pydantic` — 에이전트 최종 답변을 구조화된 dict 로 |
+| `2.3_at_tool_basic2_exec.py` | 2.2 확장 — 시스템 프롬프트 + 빈 `tool_calls` 처리로 적합한 도구 없으면 "없다"고 답하게 |
+| `2.4_pydantic_args.py` | `args_schema=PydanticModel` — Field description / Literal enum / 검증 |
+| `2.5_pydantic_args2_exec.py` | 2.4 확장 — 도구 vs 직접답변 LLM 이 선택 + 고른 도구를 `@tool.invoke` 로 **실제 실행**까지 |
+| `2.6_structured_output.py` | `response_format=Pydantic` — 에이전트 최종 답변을 구조화된 dict 로 |
+| `2.7_sql_tool.py` | SQLite 스키마 → 자연어 질문 → SQL 생성·**실제 실행**·결과 (text-to-SQL, create_agent) |
 
 ### `3.applied_agents/` — 응용 (빌트인 + 커스텀 혼합)
 | 파일 | 설명 |
@@ -151,9 +155,11 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 ### `6.hitl_streaming/` — 사용자 제어 / UX
 | 파일 | 설명 |
 |---|---|
-| `6.1_interrupt.py` | `interrupt_before=["tools"]` — 위험한 도구 호출 전 사람 승인 |
-| `6.2_streaming.py` | `agent.stream()` — 노드 단위 / 토큰 단위 두 모드 비교 |
-| `6.3_edit_and_resume.py` | 정지 후 도구 인자를 사람이 **수정**하고 재개 (`update_state` 로 tool_calls 교정) |
+| `6.1_ask_once.py` | 가장 단순한 HITL — 도구 실행 전 y/n **한 번** 묻고 진행 (y 실행·결과 / n 중단) |
+| `6.2_interrupt.py` | `interrupt_before=["tools"]` — 도구를 여러 번 부를 때 호출마다 반복 승인 (+ 특정 도구 전에만 멈추는 법) |
+| `6.3_streaming.py` | `agent.stream()` — 노드 단위 / 토큰 단위 두 모드 비교 |
+| `6.4_edit_and_resume.py` | 정지 후 도구 인자를 코드로 **수정**하고 재개 (`update_state` 로 tool_calls 교정) |
+| `6.5_ask_or_edit.py` | 진행/취소/**수정** 메뉴 — 사람이 실행 중 금액을 직접 입력해 송금, 남은 잔고 출력 |
 
 ### `7.routing/` — 다중 도구
 | 파일 | 설명 |
