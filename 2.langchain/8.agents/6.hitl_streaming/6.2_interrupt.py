@@ -33,7 +33,7 @@ def send_payment(recipient: str, amount: int) -> str:
 @tool
 def get_balance(account: str) -> int:
     """계좌 잔액 조회 (안전한 작업)."""
-    return {"alice": 1000000, "bob": 500000}.get(account, 0)
+    return {"alice": 1_000_000, "bob": 500_000}.get(account, 0)
 
 
 # ─── interrupt_before=["tools"] 로 도구 호출 전 정지 ──────

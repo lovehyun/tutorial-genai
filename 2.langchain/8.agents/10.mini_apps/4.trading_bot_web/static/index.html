@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trading Bot — 챗봇 가상 트레이딩</title>
+<style>
+  *{box-sizing:border-box}
+  body{font-family:system-ui,'Segoe UI',sans-serif;margin:0;color:#1f2430;background:#f4f6fa}
+  header{padding:10px 16px;background:#1f2430;color:#fff;display:flex;align-items:center;gap:10px}
+  header b{font-size:16px} .warn{font-size:11px;color:#ffd27a}
+
+  /* 상단 흐르는 시세 티커 */
+  .ticker{overflow:hidden;white-space:nowrap;background:#11151c;color:#7fe3a3;font-size:13px;
+          font-family:'Consolas',monospace;border-bottom:1px solid #333}
+  .ticker span{display:inline-block;padding:6px 0;animation:scroll 22s linear infinite}
+  @keyframes scroll{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+
+  /* 잔고 바 */
+  .balance{display:flex;gap:14px;flex-wrap:wrap;align-items:center;padding:10px 16px;
+           background:#fff;border-bottom:1px solid #e3e7ee;font-size:14px}
+  .balance .big{font-size:16px;font-weight:700}
+  .pill{display:inline-block;background:#eef2ff;color:#3651b5;border-radius:12px;padding:2px 9px;margin:2px;font-size:12px}
+
+  .main{display:flex;gap:14px;padding:14px;align-items:flex-start}
+  .left{flex:1;min-width:0} .right{width:360px;flex-shrink:0}
+  @media(max-width:760px){.main{flex-direction:column}.right{width:100%}}
+
+  h2{font-size:13px;color:#667;margin:14px 0 6px;text-transform:none}
+  .card{background:#fff;border:1px solid #e3e7ee;border-radius:8px;padding:10px;margin:6px 0;font-size:13px}
+  .alert{border:2px solid #2faa55;background:#f1fff5}
+  .muted{color:#99a;font-size:12px}
+  .row{display:flex;gap:6px;align-items:center}
+  button{padding:6px 11px;border:0;border-radius:6px;cursor:pointer;background:#2d6cdf;color:#fff;font-size:12px}
+  button.gray{background:#8a93a6} button.red{background:#d9534f} button.green{background:#2faa55}
+  ul{list-style:none;padding:0;margin:0}
+
+  /* 우측 챗봇 */
+  .chat{background:#fff;border:1px solid #e3e7ee;border-radius:8px;display:flex;flex-direction:column;height:72vh}
+  .msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+  .bub{max-width:80%;padding:8px 11px;border-radius:12px;font-size:13px;line-height:1.45;white-space:pre-wrap}
+  .me{align-self:flex-end;background:#2d6cdf;color:#fff;border-bottom-right-radius:3px}
+  .bot{align-self:flex-start;background:#eef1f6;color:#222;border-bottom-left-radius:3px}
+  .chat .inp{display:flex;gap:6px;padding:10px;border-top:1px solid #e3e7ee}
+  .chat input{flex:1;padding:9px;border:1px solid #ccd;border-radius:6px;font-size:14px}
+  pre{background:#f7f8fb;padding:8px;border-radius:6px;font-size:11px;white-space:pre-wrap;margin:0;min-height:1em}
+</style>
+</head>
+<body>
+  <header>
+    <b>🤖 Trading Bot</b>
+    <span class="warn">⚠️ 가상 머니 샌드박스 — 실제 거래 없음</span>
+  </header>
+
+  <!-- 상단: 흐르는 시세 티커 -->
+  <div class="ticker"><span id="ticker">시세 불러오는 중…</span></div>
+
+  <!-- 잔고 바 -->
+  <div class="balance" id="balance"></div>
+
+  <div class="main">
+    <!-- 좌측: 내 상태 -->
+    <div class="left">
+      <h2>📝 예약된 조건</h2>
+      <ul id="rules"></ul>
+
+      <h2>🔔 알림 <span class="muted">(목표가 도달 — 거래 없이 알림만)</span></h2>
+      <div id="alerts"></div>
+
+      <h2>❓ 승인 요청 <span class="muted">(예 누르면 실제 가상 체결)</span></h2>
+      <div id="pending"></div>
+
+      <h2>🧾 로그</h2>
+      <pre id="log"></pre>
+    </div>
+
+    <!-- 우측: 챗봇 -->
+    <div class="right">
+      <h2>💬 챗봇 <span class="muted">(잔고·시세·환율을 묻거나, 예약·매매를 요청)</span></h2>
+      <div class="chat">
+        <div class="msgs" id="msgs"></div>
+        <div class="inp">
+          <input id="text" type="text" placeholder="예: 지금 환율 얼마야? / AAPL 150 이하면 1주 사줘"
+                 onkeydown="if(event.key==='Enter')send()">
+          <button onclick="send()">전송</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const TID = (crypto.randomUUID ? crypto.randomUUID() : "web-" + Math.floor(Math.random()*1e9));
+
+async function api(url, body){
+  const r = await fetch(url, {method:"POST", headers:{"Content-Type":"application/json"},
+                              body: body ? JSON.stringify(body) : undefined});
+  return r.json();
+}
+
+// ── 챗봇 ──
+function bubble(text, who){
+  const d = document.createElement("div");
+  d.className = "bub " + who;
+  d.textContent = text;
+  document.getElementById("msgs").appendChild(d);
+  document.getElementById("msgs").scrollTop = 1e9;
+  return d;
+}
+async function send(){
+  const el = document.getElementById("text");
+  const t = el.value.trim(); if(!t) return;
+  el.value = "";
+  bubble(t, "me");
+  const wait = bubble("…", "bot");
+  const r = await api("/chat", {message:t, thread_id:TID});
+  wait.textContent = r.reply || "(응답 없음)";
+  refresh();                       // 도구가 좌측 상태를 바꿨을 수 있으니 갱신
+}
+
+// ── 좌측 상태 + 상단 ──
+async function del(id){ await api("/delete/"+id); refresh(); }
+async function approve(tok){ const r = await api("/approve/"+tok); alert(r.msg); refresh(); }
+async function autoApprove(tok){ const r = await api("/auto/"+tok); alert(r.msg); refresh(); }
+async function autoOff(){ await api("/auto_off"); refresh(); }
+async function reject(tok){ await api("/reject/"+tok); refresh(); }
+async function dismiss(id){ await api("/dismiss/"+id); refresh(); }
+
+async function refresh(){
+  const s = await (await fetch("/state")).json();
+
+  // 상단 티커 (텍스트만 갱신, 애니메이션 유지)
+  document.getElementById("ticker").textContent =
+    "   " + Object.entries(s.prices).map(([k,v]) => `${k} ${v}`).join("   •   ") + "   ";
+
+  // 잔고
+  const w = s.wallet;
+  const held = Object.entries(w.stocks||{}).map(([k,v]) => `<span class="pill">${k} ${v}주</span>`).join("")
+             || "<span class='muted'>보유 주식 없음</span>";
+  document.getElementById("balance").innerHTML =
+    `<span class="big">💰 ${w.KRW.toLocaleString()} KRW</span>`
+    + `<span class="big">$ ${w.USD}</span>` + held;
+
+  // 예약
+  document.getElementById("rules").innerHTML = s.rules.length
+    ? s.rules.map(r => `<li class="card"><div class="row">
+        <div style="flex:1">${r.desc}</div>
+        <button class="red" onclick="del('${r.id}')">삭제</button></div></li>`).join("")
+    : "<li class='muted'>예약 없음</li>";
+
+  // 알림 (확인만)
+  document.getElementById("alerts").innerHTML = s.alerts.length
+    ? s.alerts.map(a => `<div class="card"><div class="row">
+        <div style="flex:1">🔔 ${a.desc} <span class="muted">(현재값 ${a.value})</span></div>
+        <button class="gray" onclick="dismiss('${a.id}')">확인</button></div></div>`).join("")
+    : "<span class='muted'>알림 없음</span>";
+
+  // 자동 승인 배너
+  const autoBar = s.auto
+    ? `<div class="card" style="background:#fff7e6;border-color:#f0c000">
+         🔁 자동 승인 <b>ON</b> — 조건 충족 매매가 묻지 않고 바로 체결됩니다
+         <button class="gray" onclick="autoOff()">끄기</button></div>`
+    : "";
+
+  // 승인 요청 (예 / 자동(예) / 아니오)
+  const cards = s.pending.length
+    ? s.pending.map(p => `<div class="card alert">
+        <b>❓ ${p.desc}</b> <span class="muted">(현재값 ${p.value})</span>
+        <div class="row" style="margin-top:6px">
+          <button class="green" onclick="approve('${p.token}')">예 (실행)</button>
+          <button onclick="autoApprove('${p.token}')">자동 (예)</button>
+          <button class="gray" onclick="reject('${p.token}')">아니오</button></div></div>`).join("")
+    : "<span class='muted'>대기 중인 승인 없음</span>";
+  document.getElementById("pending").innerHTML = autoBar + cards;
+
+  document.getElementById("log").textContent = (s.log||[]).join("\n");
+}
+
+bubble("안녕하세요! 가상 트레이딩 비서입니다. 잔고·시세·환율을 묻거나 매매를 요청해 보세요. (실제 거래는 없습니다)", "bot");
+refresh();
+setInterval(refresh, 2000);
+</script>
+</body>
+</html>

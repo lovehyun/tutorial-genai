@@ -14,9 +14,9 @@ from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
-from langchain_core.messages import AIMessage
 from langchain.agents import create_agent
 from langgraph.checkpoint.memory import MemorySaver
+from langchain_core.messages import AIMessage
 
 load_dotenv()
 
@@ -50,7 +50,10 @@ print(f"[사람이 수정]   amount → 50000")
 
 # 3) 재개 — 수정된 인자로 실행
 result = agent.invoke(None, config=config)
-print(f"[최종] {result['messages'][-1].content}")
+# 도구 실행 직후 모델이 요약을 낼 때도/안 낼 때도 있어, 마지막 메시지 content 가 빌 수 있다.
+# 비면 바로 앞 도구 실행 결과(ToolMessage) 를 대신 보여준다.
+final = result["messages"][-1].content or result["messages"][-2].content
+print(f"[최종] {final}")
 
 # 정리:
 #   - 승인/거부(6.2) 를 넘어 '인자 교정' 까지 = 가장 강력한 HITL 패턴
