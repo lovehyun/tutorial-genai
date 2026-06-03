@@ -1,9 +1,15 @@
 """
-MCP + 로컬 도구 혼합 — 외부(MCP) 도구와 내 @tool 을 한 에이전트에 함께.
-이 예제: filesystem MCP 도구 + 로컬 계산 도구(word_count) 를 같이 등록.
-실무에선 "외부 표준 도구(MCP) + 우리 도메인 도구(@tool)" 를 섞는 게 일반적입니다.
+MCP 6단계: 외부 MCP 도구 + 내 로컬 @tool 을 한 에이전트에 혼합.
+이 예제: 공식 filesystem MCP 도구 + 로컬 계산 도구(word_count) 를 함께 등록.
+실무에선 "외부 표준 도구(MCP) + 우리 도메인 도구(@tool)" 를 섞는 게 일반적이다.
 
-준비: pip install langchain-mcp-adapters  /  Node.js (npx) 필요
+핵심:
+  - MCP 도구도 로컬 @tool 도 결국 같은 BaseTool 인터페이스 → 리스트로 합치기만 하면 된다.
+  - 파일 읽기(MCP) → 단어 수 세기(로컬) 처럼 두 출처의 도구가 한 흐름에서 협력한다.
+
+준비:
+  pip install mcp langchain-mcp-adapters langchain-openai langgraph
+  Node.js (npx) / .env 에 OPENAI_API_KEY
 """
 
 import asyncio
@@ -32,7 +38,7 @@ async def main():
     with open(os.path.join(work_dir, "note.txt"), "w", encoding="utf-8") as f:
         f.write("MCP 와 로컬 도구를 함께 쓰는 예제 입니다")
 
-    # ─── MCP filesystem 서버의 도구 가져오기 ──────────────────
+    # ─── 외부 MCP filesystem 서버의 도구 가져오기 ─────────────
     client = MultiServerMCPClient({
         "filesystem": {
             "command": "npx",
@@ -62,5 +68,5 @@ if __name__ == "__main__":
     asyncio.run(main())
 
 # 정리:
-#   - mcp_tools + [내 @tool] 처럼 리스트만 합치면 끝 (둘 다 같은 BaseTool 인터페이스)
-#   - 외부 표준(MCP) 과 내부 도메인 도구(@tool) 를 자연스럽게 한 에이전트로
+#   - mcp_tools + [내 @tool] 처럼 리스트만 합치면 끝 (둘 다 같은 BaseTool 인터페이스).
+#   - 외부 표준(MCP) 과 내부 도메인 도구(@tool) 를 자연스럽게 한 에이전트로.

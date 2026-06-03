@@ -1,0 +1,20 @@
+{
+  "allowed_directories": [
+    "C:\\WORK",
+    "C:\\Users\\%USERNAME%\\Documents",
+    "C:\\Users\\%USERNAME%\\Downloads",
+    "C:\\src",
+    "D:\\MyFiles"
+  ],
+  "default_directory": "C:\\Temp",
+  "security": {
+    "enable_directory_restriction": true,
+    "enable_file_extension_filter": true,
+    "allowed_extensions": [".hwp", ".docx", ".txt", ".pdf", ".xlsx"]
+  },
+  "ui": {
+    "language": "ko",
+    "show_file_icons": true,
+    "max_files_display": 50
+  }
+}

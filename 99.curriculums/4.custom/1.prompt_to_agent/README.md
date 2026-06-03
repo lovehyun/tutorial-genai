@@ -115,11 +115,11 @@
 | | | `1.openai/9.structured_output/5.func_calling_basic.py` | [실습] OpenAI Function Calling |
 | | | `2.langchain/8.agents/0.legacy(initialize_agent)/3.custom_tools/4.4_customtools2_getinfo.py` | [실습] 정보 조회 도구 |
 | 13:45-14:30 | MCP 프로토콜 연동 | `0.docs/05_genai_advanced/12_mcp_model_context_protocol.md` | MCP 아키텍처, 서버/클라이언트, 전송 계층 |
-| | | `4.anthropic/3.mcp/1.intro/simple_server.py` | [실습] MCP 서버 구현 |
-| | | `4.anthropic/3.mcp/1.intro/5.simple_client.py` | [실습] MCP 클라이언트 연결 |
-| 14:45-15:30 | MCP 에이전트 연동 | `4.anthropic/3.mcp/2.agents/1.agent_tool/server.py` | [실습] 에이전트용 MCP 서버 |
-| | | `4.anthropic/3.mcp/2.agents/1.agent_tool/3.client_gpt.py` | [실습] GPT 기반 MCP 에이전트 |
-| | | `4.anthropic/3.mcp/4.langchain_bridge/mcp_bridge.py` | [실습] MCP → LangChain 브릿지 |
+| | | `8.mcp/1.common/1.intro/simple_server.py` | [실습] MCP 서버 구현 |
+| | | `8.mcp/1.common/1.intro/5.simple_client.py` | [실습] MCP 클라이언트 연결 |
+| 14:45-15:30 | MCP 에이전트 연동 | `8.mcp/2.openai/1.agent_tool/server.py` | [실습] 에이전트용 MCP 서버 |
+| | | `8.mcp/2.openai/1.agent_tool/3.client_gpt.py` | [실습] GPT 기반 MCP 에이전트 |
+| | | `8.mcp/4.langchain/2.langchain_bridge/mcp_bridge.py` | [실습] MCP → LangChain 브릿지 |
 | 15:30-16:15 | Self-Correction Loop | `2.langchain/9.langgraph/6.self_correction_loop.py` | [실습] 출력 검증 → 자동 수정 반복 패턴 |
 | | | `2.langchain/9.langgraph/5.state_debugging.py` | [실습] 그래프 상태 디버깅 |
 | 16:15-17:00 | 종합 실습 | `2.langchain/9.langgraph/10.customtools1_addmultiply_langgraph.py` | [실습] 패턴 + 도구 + Self-Correction 결합, Day 4 정리 |
@@ -143,8 +143,8 @@
 | 11:30-12:00 | LangGraph 메모리 통합 | `2.langchain/6.memory/6.langgraph/6.1_memory_saver.py` | [실습] LangGraph 기반 메모리 |
 | | | `2.langchain/6.memory/6.langgraph/6.2_with_summary.py` | [실습] LangGraph 요약 메모리 |
 | 13:00-13:45 | Safety & 보안 심화 | `0.docs/05_genai_advanced/16_evaluation_safety.md` | 가드레일 구현, 콘텐츠 필터링, LLM-as-Judge |
-| | | `4.anthropic/3.mcp/5.langchain_tools_safety/server.py` | [실습] 도구 안전성 서버 |
-| | | `4.anthropic/3.mcp/5.langchain_tools_safety/2.client2_restrict.py` | [실습] 도구 접근 제한 |
+| | | `8.mcp/4.langchain/3.tools_safety/server.py` | [실습] 도구 안전성 서버 |
+| | | `8.mcp/4.langchain/3.tools_safety/2.client2_restrict.py` | [실습] 도구 접근 제한 |
 | 13:45-14:30 | Evaluation | `0.docs/05_genai_advanced/16_evaluation_safety.md` | 참조 기반/참조 없는/LLM-as-Judge 평가 프레임워크 |
 | | | `0.docs/06_genai_applied/07_ai_agent_service.md` | 에이전트 서비스 평가 기준, 신뢰성 설계 |
 | 14:45-15:15 | AgentOps & 모니터링 | `2.langchain/9.langgraph/7.agentops_monitoring.py` | [실습] 에이전트 실행 모니터링, 비용/지연/성공률 추적 |
@@ -168,7 +168,7 @@
 
 | 확장 Day | 내용 | 추가 자료 |
 |----------|------|-----------|
-| Day 6 | MCP 심화 — 멀티 도구 서버, LangGraph 브릿지, Claude Desktop 연동 | `4.anthropic/3.mcp/2.agents/2.multi_tools/`, `4.anthropic/3.mcp/20.claude_desktop/` |
+| Day 6 | MCP 심화 — 멀티 도구 서버, LangGraph 브릿지, Claude Desktop 연동 | `8.mcp/2.openai/2.multi_tools/`, `8.mcp/3.anthropic/1.claude_desktop/` |
 | Day 7 | 캡스톤 프로젝트 — 5일간 학습을 결합한 자유 주제 개발 + 발표 | `10.project/` 전체 참조 |
 
 ## 환경 설정
@@ -203,6 +203,6 @@ pip install openai anthropic google-generativeai langchain langchain-openai lang
 - `2.langchain/8.agents/` — 에이전트
 - `2.langchain/9.langgraph/` — LangGraph
 - `2.langchain/8.agents/9.agentic_patterns/` — 5대 Agentic 패턴
-- `4.anthropic/3.mcp/` — MCP 프로토콜
+- `8.mcp/` — MCP 프로토콜
 - `12.study/6.embedding/` — 임베딩 시각화
 - `10.project/10.ai_agent/` — 멀티에이전트 프로젝트

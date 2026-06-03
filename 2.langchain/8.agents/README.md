@@ -16,7 +16,7 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 ├── 5.langgraph_memory/           ← 멀티턴 대화 (MemorySaver + thread_id)
 ├── 6.hitl_streaming/             ← 사람 승인 / 스트리밍 UX
 ├── 7.routing/                    ← 다중 도구 라우팅 + 복합 시나리오
-├── 8.mcp/                        ← MCP (Model Context Protocol) — 표준 도구 프로토콜
+├── 8.mcp/                        ← (포인터) MCP 는 최상위 /8.mcp 로 이전
 ├── 9.agentic_patterns/           ← Anthropic 5대 워크플로우 패턴 (체이닝/라우팅/병렬/오케스트레이터/평가자)
 ├── 10.mini_apps/                 ← 실전 미니 앱 모음 (webscan · 금융조회 · 가상트레이딩+HITL)
 └── README.md
@@ -167,12 +167,12 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 | `7.1_basic_routing.py` | 도구 여러 개 등록만 하면 LLM 이 알아서 선택. 별도 라우터 불필요 |
 | `7.2_complex_agent.py` | 여행 플래너 — 날씨/계산/위키 + 메모리 + 멀티턴 종합 |
 
-### `8.mcp/` — Model Context Protocol
-| 파일 | 설명 |
-|---|---|
-| `8.1_mcp_intro.py` | MCP 가 뭐고 왜 표준이 되어가는지 (개념 정리) |
-| `8.2_mcp_client.py` | `langchain-mcp-adapters` 로 filesystem MCP 서버 도구를 에이전트에 |
-| `8.3_mcp_plus_local.py` | MCP 서버 도구 + 로컬 `@tool` 을 **한 에이전트에 혼합** (실무 패턴) |
+### `8.mcp/` — Model Context Protocol → 최상위 [`/8.mcp`](../../8.mcp/) 로 이전됨
+> MCP 는 provider/framework 중립 주제라 분량이 커서 **레포 최상위 [`8.mcp/`](../../8.mcp/)** 로 승격했습니다.
+> 공통(서버 만들기·프로토콜) / openai / anthropic / langchain / vscode / projects 로 분류되어 있습니다.
+>
+> LangChain 에이전트에서 MCP 를 쓰는 부분만 보려면 → [`/8.mcp/4.langchain/`](../../8.mcp/4.langchain/)
+> (`0.quickstart` = adapters 빠른 시작, `1.langchain_agent` · `2.langchain_bridge` · `3.tools_safety` = 심화)
 
 ### `9.agentic_patterns/` — Anthropic 워크플로우 패턴
 > [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) 의 5대 패턴. 상세는 `9.agentic_patterns/README.md`.
@@ -265,9 +265,8 @@ pip install langchain langchain-openai langchain-community langgraph python-dote
 # 1.builtin_tools
 pip install wikipedia arxiv langchain-tavily
 
-# 8.mcp
-pip install langchain-mcp-adapters
-# + Node.js (MCP 서버 실행용)
+# 8.mcp 는 최상위 /8.mcp 로 이전됨 — 설치/실행은 8.mcp/README.md 참고
+pip install mcp langchain-mcp-adapters          # LangChain↔MCP 연동 (+ 공식 서버는 Node.js 18+)
 
 # 10.mini_apps
 pip install flask psutil requests yfinance apscheduler   # webscan / finance / trading

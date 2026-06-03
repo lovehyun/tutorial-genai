@@ -47,12 +47,12 @@
 | 시간 | 주제 | 실습 파일 | 설명 |
 |------|------|-----------|------|
 | 09:00-09:30 | Day 2 복습 | — | Agentic 패턴 복습 |
-| 09:30-10:00 | MCP 서버/클라이언트 복습 | `4.anthropic/3.mcp/1.intro/simple_server.py`, `4.anthropic/3.mcp/1.intro/5.simple_client.py` | MCP 기본 구조 재확인 |
-| 10:00-10:30 | MCP 에이전트 도구 | `4.anthropic/3.mcp/2.agents/1.agent_tool/server.py`, `4.anthropic/3.mcp/2.agents/1.agent_tool/3.client_gpt.py` | MCP 기반 에이전트 도구 |
-| 10:45-11:15 | MCP 멀티 도구 | `4.anthropic/3.mcp/2.agents/2.multi_tools/math_server.py`, `4.anthropic/3.mcp/2.agents/2.multi_tools/2.smart_client_gpt.py` | 다중 MCP 서버 통합 |
-| 11:15-12:00 | LangChain 브릿지 | `4.anthropic/3.mcp/4.langchain_bridge/mcp_bridge.py`, `4.anthropic/3.mcp/4.langchain_bridge/3.langgraph_agent_demo.py` | MCP ↔ LangGraph 브릿지 |
-| 13:00-13:30 | 도구 안전성 | `4.anthropic/3.mcp/5.langchain_tools_safety/server.py`, `4.anthropic/3.mcp/5.langchain_tools_safety/2.client2_restrict.py` | 도구 접근 제한 설계 |
-| 13:30-14:00 | 파일시스템 에이전트 | `4.anthropic/3.mcp/10.project_local/2.filesystem_client/3.fs_mcp_client3_gpt.py` | 파일 시스템 조작 에이전트 |
+| 09:30-10:00 | MCP 서버/클라이언트 복습 | `8.mcp/1.common/1.intro/simple_server.py`, `8.mcp/1.common/1.intro/5.simple_client.py` | MCP 기본 구조 재확인 |
+| 10:00-10:30 | MCP 에이전트 도구 | `8.mcp/2.openai/1.agent_tool/server.py`, `8.mcp/2.openai/1.agent_tool/3.client_gpt.py` | MCP 기반 에이전트 도구 |
+| 10:45-11:15 | MCP 멀티 도구 | `8.mcp/2.openai/2.multi_tools/math_server.py`, `8.mcp/2.openai/2.multi_tools/2.smart_client_gpt.py` | 다중 MCP 서버 통합 |
+| 11:15-12:00 | LangChain 브릿지 | `8.mcp/4.langchain/2.langchain_bridge/mcp_bridge.py`, `8.mcp/4.langchain/2.langchain_bridge/3.langgraph_agent_demo.py` | MCP ↔ LangGraph 브릿지 |
+| 13:00-13:30 | 도구 안전성 | `8.mcp/4.langchain/3.tools_safety/server.py`, `8.mcp/4.langchain/3.tools_safety/2.client2_restrict.py` | 도구 접근 제한 설계 |
+| 13:30-14:00 | 파일시스템 에이전트 | `8.mcp/9.projects/1.local/2.filesystem_client/3.fs_mcp_client3_gpt.py` | 파일 시스템 조작 에이전트 |
 | 14:00-14:30 | 웹 스캔 에이전트 | `2.langchain/8.agents/10.mini_apps/2.webscan_app_web/app.py` | 웹 스캔 에이전트 |
 | 14:45-15:30 | 스마트 에이전트 라우터 | `2.langchain/8.agents/0.legacy(initialize_agent)/5.routing/9.2_smartagent_router.py`, `2.langchain/8.agents/0.legacy(initialize_agent)/5.routing/9.3_smartagent_router2_moretools.py` | 지능형 도구 라우팅 시스템 |
 | 15:30-17:00 | 실습: MCP 기반 에이전트 설계 | — | 커스텀 MCP 서버 + LangGraph 에이전트 구축 |
@@ -101,6 +101,6 @@ pip install langchain langchain-openai langchain-anthropic langgraph anthropic m
 - `2.langchain/9.langgraph/` — LangGraph 전체
 - `2.langchain/8.agents/9.agentic_patterns/` — 5대 Agentic 패턴
 - `2.langchain/8.agents/` — LangChain 에이전트
-- `4.anthropic/3.mcp/` — MCP 프로토콜 전체
+- `8.mcp/` — MCP 프로토콜 전체
 - `10.project/10.ai_agent/` — AI 에이전트 프로젝트
 - `10.project/1.chatbot_gui_agents/` — 에이전트 챗봇
