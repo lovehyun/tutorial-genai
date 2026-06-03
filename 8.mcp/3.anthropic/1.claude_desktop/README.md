@@ -142,6 +142,26 @@ Claude Desktop이 MCP 서버를 **자동 실행/연결**하도록 설정 파일(
 1. Claude Desktop **완전 종료** 후 다시 실행합니다.
 2. 입력창 우측/하단의 **툴 아이콘** 또는 **Search & tools** 패널에서 `hello` 서버(툴)가 보이면 성공입니다.
 
+### 5.4 이 레포의 여러 서버를 한 번에 등록 (재사용 샘플)
+
+같은 폴더의 **[`claude_desktop_config.sample.json`](claude_desktop_config.sample.json)** 은 이 레포의
+세 서버를 한꺼번에 등록하는 예시입니다 — `hello`, `dev-helper`([`5.vscode`](../../5.vscode/)),
+**`codebase-qa`**(문서 QA RAG, [`9.projects/3.codebase_qa`](../../9.projects/3.codebase_qa/)).
+
+이 내용을 `claude_desktop_config.json`(5.1 경로)에 붙여넣고 다음을 바꾸세요:
+
+| 바꿀 것 | 설명 |
+|---------|------|
+| `C:/ABSOLUTE/PATH/TO/tutorial-genai/...` | 각 `server.py` 의 **절대경로** (Windows 도 `/` 사용 권장) |
+| `"command": "python"` | venv 를 쓰면 venv python 절대경로 (예: `.../.venv/Scripts/python.exe`) |
+| `codebase-qa` 의 `env.OPENAI_API_KEY` | RAG 서버는 임베딩에 키가 필요 — **Claude Desktop 은 셸 환경변수를 안 물려주므로 `env` 로 직접 전달** |
+
+> 주의(공통): `stdio` 서버는 **stdout 에 `print()` 금지**(프로토콜 깨짐). 로그는 `logging` 으로 stderr 에.
+> `codebase-qa` 는 첫 호출 시 코퍼스를 임베딩하므로 잠깐 느릴 수 있습니다.
+
+적용 후 Claude Desktop 을 완전 종료→재실행하면, 대화에서 `search`/`answer`(codebase-qa) 같은 도구를
+자연어로 호출할 수 있습니다. 예: *"codebase-qa 로 RAG 가 할루시네이션을 줄이는 원리를 찾아줘."*
+
 ---
 
 ## 6) 사용법 (Claude 대화에서 호출)

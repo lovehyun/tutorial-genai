@@ -1,0 +1,2 @@
+# server_docs.py 가 만드는 Chroma 영속 인덱스 (재생성 가능)
+chroma_db/
