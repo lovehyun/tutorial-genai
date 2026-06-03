@@ -30,7 +30,7 @@
 - **2.openai** — `1.agent_tool/`, `2.multi_tools/` (각 폴더: 공통 서버 + manual 클라이언트 → GPT 클라이언트 빌드업)
 - **3.anthropic** — `1.claude_desktop/` (Hello, 네트워크 서버, 파일 컨버터 등 Claude Desktop 등록용)
 - **4.langchain** — `0.quickstart/`(adapters 빠른 시작) · `1.langchain_agent/` · `2.langchain_bridge/` · `3.tools_safety/`
-- **5.vscode** — `server.py` + `.vscode/mcp.json` → VSCode Copilot Agent Mode 에서 내 도구 호출
+- **5.vscode** — `server.py` + `.vscode/mcp.json` → VSCode 에서 내 도구 호출 (Copilot Agent Mode, 또는 Copilot 없이 Cline/Continue/Inspector)
 - **9.projects** — `1.local/`(filesystem 서버·클라이언트) · `2.remote/`(원격) · `3.codebase_qa/`(**RAG 를 MCP 서버로 노출**, 멀티 클라이언트)
 
 ## 학습 순서 (추천)

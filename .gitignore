@@ -45,5 +45,8 @@ TEMP/
 # Claude Code 자동 메모리/상태
 .claude/
 
-# VS Code 설정 파일
-.vscode/
+# .vscode: 개인 설정은 무시하되, 공유할 설정만 예외로 추적
+#   (디렉토리(.vscode/)가 아니라 내용(.vscode/*)을 무시해야 ! 예외가 동작함)
+**/.vscode/*
+!**/.vscode/mcp.json
+!**/.vscode/settings.json
