@@ -1,7 +1,7 @@
-# 10.gpt_image — 이미지 생성 기초
+# 6.gpt_image — 이미지 생성 기초
 
 **이미지 생성 = 텍스트를 입력으로 받아 이미지를 만드는 것** (텍스트 → 이미지).
-앱(`11.gpt_image_app*`) 이전의 **단독 기본 스크립트**다. 이미지 *이해*(이미지 → 텍스트)는 [`../4.vision/`](../4.vision/).
+앱(`7.gpt_image_app*`) 이전의 **단독 기본 스크립트**다. 이미지 *이해*(이미지 → 텍스트)는 [`../4.vision/`](../4.vision/).
 
 ## 핵심
 - `images.generate(model, prompt, size, quality)` 호출
@@ -18,7 +18,7 @@
 
 ## 실행
 ```bash
-cd 1.openai/10.multimodal/10.gpt_image
+cd 1.openai/10.multimodal/6.gpt_image
 pip install openai python-dotenv
 # 1.openai/.env 에 OPENAI_API_KEY
 
@@ -26,7 +26,7 @@ python 1.image_generate.py    # output.png
 python 2.image_params.py      # robot_low.png, robot_medium.png, robot_wide.png
 python 3.image_transparent.py # apple.png
 ```
-> 생성된 `*.png` 는 `.gitignore` 처리됨. 이미지 모델/가격 비교는 [`../11.gpt_image_app/README.md`](../11.gpt_image_app/README.md).
+> 생성된 `*.png` 는 `.gitignore` 처리됨. 이미지 모델/가격 비교는 [`../7.gpt_image_app/README.md`](../7.gpt_image_app/README.md).
 
 ## 다음
-- 웹앱 + 편집/인페인팅/일관성 → [`../11.gpt_image_app/`](../11.gpt_image_app/) (단계별)
+- 웹앱 + 편집/인페인팅/일관성 → [`../7.gpt_image_app/`](../7.gpt_image_app/) (단계별)

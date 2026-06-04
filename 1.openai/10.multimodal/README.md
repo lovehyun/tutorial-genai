@@ -8,11 +8,13 @@ OpenAI의 멀티모달 API(비전·이미지 생성·음성)를 활용한 예제
 | 모달리티 | 방향 | 기본 | 앱 |
 |----------|------|------|----|
 | 비전(이미지 이해) | 이미지 → 텍스트 | `4.vision/` | `5.vision_app*` |
-| 음성 인식(STT) | 오디오 → 텍스트 | `6.whisper_stt/` | `7.whisper_app/` |
-| 음성 생성(TTS) | 텍스트 → 오디오 | `8.tts/` | — |
-| 실시간 음성 | 오디오 ↔ 오디오 | — | `9.webrtc_app/` |
-| 이미지 생성 | 텍스트 → 이미지 | `10.gpt_image/` | `11.gpt_image_app*` |
+| 이미지 생성 | 텍스트 → 이미지 | `6.gpt_image/` | `7.gpt_image_app*` |
+| 음성 인식(STT) | 오디오 → 텍스트 | `8.whisper_stt/` | `9.whisper_app/` |
+| 음성 생성(TTS) | 텍스트 → 오디오 | `10.tts/` | — |
+| 실시간 음성 | 오디오 ↔ 오디오 | — | `11.webrtc_app/` |
 
+> 비전(이미지 이해)과 이미지 생성을 나란히 두었습니다. 음성(인식·생성·실시간)은 뒤에 모았습니다.
+>
 > ⚠️ **음악 생성은 OpenAI 미제공**입니다. 음악은 별도 [`6.musicgen`](../../6.musicgen/)(Meta MusicGen, 로컬)을 참고하세요.
 
 ---
@@ -20,7 +22,7 @@ OpenAI의 멀티모달 API(비전·이미지 생성·음성)를 활용한 예제
 ## 이미지 생성 (DALL-E) — deprecated
 
 > 🛑 `dall-e-2`·`dall-e-3`는 2026-05-12자로 API에서 제거되었습니다(개념 학습용 보존).
-> 현행 이미지 생성은 `10.gpt_image/`(기본) · `11.gpt_image_app/`(앱)을 참고하세요.
+> 현행 이미지 생성은 `6.gpt_image/`(기본) · `7.gpt_image_app/`(앱)을 참고하세요.
 
 | 디렉토리 | 설명 |
 |----------|------|
@@ -54,58 +56,60 @@ OpenAI의 멀티모달 API(비전·이미지 생성·음성)를 활용한 예제
 | 6 | `5.vision_app6_micrealtime/` | **실시간 음성 대화** — 요청-응답 → **스트리밍**. Flask 대신 **Quart(비동기)** 사용 |
 
 > 4~6단계의 음성 입력은 브라우저 `SpeechRecognition`(클라이언트 STT)입니다.
-> 서버에서 Whisper로 인식하는 방식은 아래 `6.whisper_stt/`에서 다룹니다.
+> 서버에서 Whisper로 인식하는 방식은 아래 `8.whisper_stt/`에서 다룹니다.
+
+---
+
+## 이미지 생성 (gpt-image)
+
+텍스트를 입력으로 받아 **이미지를 생성**합니다. (비전과 짝 — 한쪽은 읽기, 한쪽은 그리기)
+
+### 기본 — `6.gpt_image/`
+| 파일 | 내용 |
+|------|------|
+| `1.image_generate.py` | 프롬프트 → 생성 → PNG 저장 (`images.generate`, **base64 응답**). gpt-image-1.5 vs 2 비교 주석 포함 |
+| `2.image_params.py` | `size` / `quality` 비교 |
+| `3.image_transparent.py` | **투명 배경** PNG (아이콘/스티커) — gpt-image-1.5 전용 기능 |
+
+### 앱 — `7.gpt_image_app*` (단계별 진화)
+`gpt-image-1.5`의 세 기능을 단계별로. 각 단계가 더하는 것:
+
+| 단계 | 디렉토리 | 핵심 |
+|------|----------|------|
+| 1 | `7.gpt_image_app/` | **생성** — 프롬프트 → 이미지 (`images.generate`) |
+| 2 | `7.gpt_image_app2_inpaint/` | **부분 편집(인페인팅)** — 영역 선택 → 그 부분만 재생성 (`images.edit` + **마스크**, 투명영역=편집대상) |
+| 3 | `7.gpt_image_app3_consistency/` | **일관성 유지** — 기준 이미지 참고 → **같은 피사체**로 새 장면 (`images.edit`, **마스크 없음**) |
+
+모델/가격 비교, 마스크·일관성 개념 상세는 [`7.gpt_image_app/README.md`](7.gpt_image_app/README.md) 참고.
 
 ---
 
 ## 음성 — 인식(STT) · 생성(TTS) · 실시간
 
-### 음성 인식(STT) 기본 — `6.whisper_stt/`
+### 음성 인식(STT) 기본 — `8.whisper_stt/`
 | 파일 | 내용 |
 |------|------|
 | `1.audio2text.py` | **오디오 파일** → 텍스트 (`audio.transcriptions`, `whisper-1`) |
 | `2.mic2text.py` | **마이크로 N초 녹음**(sounddevice) → WAV → 받아쓰기 |
 | `3.subtitle_app.py` | **Gradio** UI로 오디오 업로드 → 자막 생성 (이 폴더에서 유일하게 Gradio) |
 
-### 음성 인식 앱 — `7.whisper_app/`
+### 음성 인식 앱 — `9.whisper_app/`
 오디오 파일 업로드 → Whisper API → 텍스트(JSON) 반환하는 **Flask 웹앱**.
-`6.whisper_stt/`(스크립트)를 웹앱으로 감싼 것. `/transcribe` 라우트, `secure_filename`, 한국어(`language="ko"`), 처리 후 임시파일 삭제.
+`8.whisper_stt/`(스크립트)를 웹앱으로 감싼 것. `/transcribe` 라우트, `secure_filename`, 한국어(`language="ko"`), 처리 후 임시파일 삭제.
 
-### 음성 생성(TTS) 기본 — `8.tts/`
+### 음성 생성(TTS) 기본 — `10.tts/`
 | 파일 | 내용 |
 |------|------|
 | `1.tts_basic.py` | 텍스트 → **mp3** (`audio.speech.create`) |
 | `2.tts_voices.py` | 여러 **voice**(alloy/nova/onyx…) 비교 저장 |
 | `3.tts_style_format.py` | `instructions`로 **말투/감정** 지정 + `response_format`(mp3/wav…) |
 
-### 실시간 음성 앱 — `9.webrtc_app/`
+> ⚠️ STT(받아쓰기)는 **Whisper**, TTS(음성 생성)는 **별개 모델**(`gpt-4o-mini-tts`)입니다 — 같은 "음성"이라도 서로 다른 API.
+
+### 실시간 음성 앱 — `11.webrtc_app/`
 **실시간 자막 + 다자간 회의록 + AI 요약** 앱 (Flask + **Flask-SocketIO**).
 마이크 음성 조각 → STT → 자막을 **WebSocket으로 전체 방송** → 회의록 누적 → 버튼으로 GPT 요약.
 `whisper_utils.py`로 STT 모드 선택(`WHISPER_MODE`): `openai_whisper`(API) / `local_wav` / `local_webp`(faster-whisper).
-
----
-
-## 이미지 생성 (gpt-image)
-
-텍스트를 입력으로 받아 **이미지를 생성**합니다.
-
-### 기본 — `10.gpt_image/`
-| 파일 | 내용 |
-|------|------|
-| `1.image_generate.py` | 프롬프트 → 생성 → PNG 저장 (`images.generate`, **base64 응답**) |
-| `2.image_params.py` | `size` / `quality` 비교 |
-| `3.image_transparent.py` | **투명 배경** PNG (아이콘/스티커) |
-
-### 앱 — `11.gpt_image_app*` (단계별 진화)
-`gpt-image-1.5`의 세 기능을 단계별로. 각 단계가 더하는 것:
-
-| 단계 | 디렉토리 | 핵심 |
-|------|----------|------|
-| 1 | `11.gpt_image_app/` | **생성** — 프롬프트 → 이미지 (`images.generate`) |
-| 2 | `11.gpt_image_app2_inpaint/` | **부분 편집(인페인팅)** — 영역 선택 → 그 부분만 재생성 (`images.edit` + **마스크**, 투명영역=편집대상) |
-| 3 | `11.gpt_image_app3_consistency/` | **일관성 유지** — 기준 이미지 참고 → **같은 피사체**로 새 장면 (`images.edit`, **마스크 없음**) |
-
-모델/가격 비교, 마스크·일관성 개념 상세는 [`11.gpt_image_app/README.md`](11.gpt_image_app/README.md) 참고.
 
 ---
 

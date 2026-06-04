@@ -1,7 +1,7 @@
-# 8.tts — 음성 생성 기초 (Text-To-Speech)
+# 10.tts — 음성 생성 기초 (Text-To-Speech)
 
 **TTS = 텍스트를 입력으로 받아 음성을 생성하는 것** (텍스트 → 오디오).
-반대 방향인 **음성 인식(STT, 오디오 → 텍스트)** 은 [`../6.whisper_stt/`](../6.whisper_stt/) 참고.
+반대 방향인 **음성 인식(STT, 오디오 → 텍스트)** 은 [`../8.whisper_stt/`](../8.whisper_stt/) 참고.
 
 ## 핵심
 - `audio.speech.create(model, voice, input)` → 오디오 응답
@@ -19,7 +19,7 @@
 
 ## 실행
 ```bash
-cd 1.openai/10.multimodal/8.tts
+cd 1.openai/10.multimodal/10.tts
 pip install openai python-dotenv
 # 1.openai/.env 에 OPENAI_API_KEY
 
@@ -30,4 +30,4 @@ python 3.tts_style_format.py # cheerful.mp3, output.wav
 > 생성된 오디오 파일(`*.mp3`/`*.wav`)은 `.gitignore` 처리됨.
 
 ## 참고
-- 음성 인식(STT): [`../6.whisper_stt/`](../6.whisper_stt/) · 실시간 음성 앱: [`../9.webrtc_app/`](../9.webrtc_app/)
+- 음성 인식(STT): [`../8.whisper_stt/`](../8.whisper_stt/) · 실시간 음성 앱: [`../11.webrtc_app/`](../11.webrtc_app/)

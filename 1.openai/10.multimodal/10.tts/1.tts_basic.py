@@ -2,7 +2,7 @@
 # pip install openai python-dotenv
 #
 # TTS(Text-To-Speech) = 텍스트를 '입력'으로 받아 음성을 '생성'하는 것 (텍스트 → 오디오).
-#   ↔ 음성을 텍스트로 받아쓰는 STT(음성 인식)는 6.whisper_stt/ 참고.
+#   ↔ 음성을 텍스트로 받아쓰는 STT(음성 인식)는 8.whisper_stt/ 참고.
 
 import os
 from openai import OpenAI

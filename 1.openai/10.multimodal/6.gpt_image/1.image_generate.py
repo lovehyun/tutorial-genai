@@ -2,7 +2,7 @@
 # pip install openai python-dotenv
 #
 # 이미지 '생성'(텍스트 → 이미지). 이미지 '이해'(이미지 → 텍스트)는 4.vision/ 참고.
-# 앱(11.gpt_image_app*) 이전의 단독 기본 스크립트다.
+# 앱(7.gpt_image_app*) 이전의 단독 기본 스크립트다.
 
 import os
 import base64
@@ -22,7 +22,7 @@ prompt = '노을 지는 해변, 잔잔한 파도, 수채화 스타일'
 #   · 품질     1.5: 우수                     | 2: 최고(현 flagship)
 #   · 비용(1024², 2026-05): Low → 1.5 ~$0.01 / 2 ~$0.005,  High → 1.5 ~$0.133 / 2 ~$0.211
 #   → 최고 품질·고해상도·정확한 텍스트면 gpt-image-2, 투명배경·속도·저렴한 High면 gpt-image-1.5.
-#     (더 저렴한 경량판: gpt-image-1-mini. 상세 표는 ../11.gpt_image_app/README.md)
+#     (더 저렴한 경량판: gpt-image-1-mini. 상세 표는 ../7.gpt_image_app/README.md)
 result = client.images.generate(
     model='gpt-image-1.5',     # 현행 기본값 (위 비교 참고; gpt-image-2 로 바꾸려면 이 값만 변경)
     prompt=prompt,
