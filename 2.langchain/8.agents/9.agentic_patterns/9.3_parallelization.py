@@ -7,6 +7,12 @@
 
 예제 1: 제품 리뷰를 3가지 관점에서 동시 분석 → 종합
 예제 2: 번역 품질 평가 — 3명의 평가자가 독립 투표
+
+- Self-Consistency — 같은 프롬프트, N번 샘플링, 다수결. 수학·정답형처럼 "답이 정확히 일치"하는 경우. ← 질문하신 그것
+- Universal Self-Consistency (USC) — 자유 서술처럼 다수결로 못 셀 때, LLM이 "가장 일관된 답"을 직접 고르게 함
+- LLM-as-a-Judge — 후보들을 LLM 심판이 채점/선택 (Best-of-N과 결합)
+- Mixture-of-Agents (MoA) — 서로 다른 여러 모델이 답을 내고 aggregator가 종합
+- (넓게는 그냥 ensemble / majority voting)
 """
 
 from dotenv import load_dotenv

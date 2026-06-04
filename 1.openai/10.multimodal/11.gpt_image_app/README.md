@@ -6,9 +6,9 @@ OpenAI 이미지 모델 `gpt-image-1.5`의 세 가지 기능을 단계별로 확
 
 | 폴더 | 기능 | 핵심 |
 |------|------|------|
-| `8.gpt_image_app/` | 1단계 — 이미지 생성 | 프롬프트 → 이미지 (`images.generate`) |
-| `8.gpt_image_app2_inpaint/` | 2단계 — 특정 영역만 편집 | 영역 선택 → 그 부분만 재생성 (`images.edit` + 마스크) |
-| `8.gpt_image_app3_consistency/` | 3단계 — 주인공 유지 변형 | 기준 이미지 참고 → 같은 피사체로 새 장면 (`images.edit`, 마스크 없음) |
+| `11.gpt_image_app/` | 1단계 — 이미지 생성 | 프롬프트 → 이미지 (`images.generate`) |
+| `11.gpt_image_app2_inpaint/` | 2단계 — 특정 영역만 편집 | 영역 선택 → 그 부분만 재생성 (`images.edit` + 마스크) |
+| `11.gpt_image_app3_consistency/` | 3단계 — 주인공 유지 변형 | 기준 이미지 참고 → 같은 피사체로 새 장면 (`images.edit`, 마스크 없음) |
 
 ## 핵심 개념
 
@@ -69,7 +69,7 @@ gpt-image 계열은 세 버전이 있습니다. 이 예제는 `gpt-image-1.5`를
 
 ```bash
 pip install flask openai pillow python-dotenv
-cd 8.gpt_image_app          # 또는 8.gpt_image_app2_inpaint, 8.gpt_image_app3_consistency
+cd 11.gpt_image_app          # 또는 11.gpt_image_app2_inpaint, 11.gpt_image_app3_consistency
 python app.py
 # 브라우저에서 http://localhost:5000 접속
 ```

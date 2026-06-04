@@ -1,7 +1,7 @@
 # Whisper 자막 생성 앱
 # pip install gradio openai python-dotenv
 #
-# 참고: 이 폴더의 다른 예제와 6.whisper-app은 Flask를 쓰지만, 이 파일만 Gradio를 쓴다.
+# 참고: 이 폴더의 다른 예제와 7.whisper_app은 Flask를 쓰지만, 이 파일만 Gradio를 쓴다.
 #       Gradio는 입출력 UI를 코드 몇 줄로 자동 생성해 주는 머신러닝 데모용 프레임워크다
 #       (Flask처럼 HTML/JS를 직접 작성할 필요가 없다).
 

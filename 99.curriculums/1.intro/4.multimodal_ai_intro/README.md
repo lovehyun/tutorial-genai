@@ -22,11 +22,11 @@
 | 10:00-10:30 | DALL-E 다중 생성 & 편집 | `1.openai/10.multimodal/1.dall-e(deprecated)/3.image_batch.py`, `1.openai/10.multimodal/1.dall-e(deprecated)/5.image_edit.py` | 다중 이미지, 이미지 편집 |
 | 10:45-11:15 | DALL-E 마스크 & 고급 | `1.openai/10.multimodal/1.dall-e(deprecated)/4.image_mask.py`, `1.openai/10.multimodal/1.dall-e(deprecated)/2.image_models.py` | 마스크 편집, 모델 비교 |
 | 11:15-12:00 | 이미지 편집 앱 | `1.openai/10.multimodal/2.dall-e-app-edit(deprecated)/app.py`, `1.openai/10.multimodal/3.dall-e-app-gallery(deprecated)/app.py` | Gradio 기반 이미지 편집/갤러리 앱 |
-| 13:00-13:45 | Whisper 음성→텍스트 | `1.openai/10.multimodal/5.whisper/1.audio2text.py`, `1.openai/10.multimodal/5.whisper/2.mic2text.py` | 파일/마이크 음성 인식 |
-| 13:45-14:30 | 자막 & 음성 앱 | `1.openai/10.multimodal/5.whisper/3.subtitle_app.py`, `1.openai/10.multimodal/6.whisper-app/app.py` | 자막 생성 앱, Whisper 웹 앱 |
-| 14:45-15:30 | 이미지+음성 통합 앱 | `1.openai/10.multimodal/4.vision_app/app.py`, `1.openai/10.multimodal/4.vision_app2_design/app.py` | 이미지 생성 + 음성 입력 통합 |
-| 15:30-16:15 | 마이크 입출력 앱 | `1.openai/10.multimodal/4.vision_app4_micinput/app.py`, `1.openai/10.multimodal/4.vision_app5_micinputoutput/app.py` | 마이크 입력 → 이미지 생성 → 음성 출력 |
-| 16:15-17:00 | WebRTC 실시간 처리 | `1.openai/10.multimodal/7.webrtc-app/app.py` | WebRTC 기반 실시간 음성 처리 앱, 종합 Q&A |
+| 13:00-13:45 | Whisper 음성→텍스트 | `1.openai/10.multimodal/6.whisper_stt/1.audio2text.py`, `1.openai/10.multimodal/6.whisper_stt/2.mic2text.py` | 파일/마이크 음성 인식 |
+| 13:45-14:30 | 자막 & 음성 앱 | `1.openai/10.multimodal/6.whisper_stt/3.subtitle_app.py`, `1.openai/10.multimodal/7.whisper_app/app.py` | 자막 생성 앱, Whisper 웹 앱 |
+| 14:45-15:30 | 이미지+음성 통합 앱 | `1.openai/10.multimodal/5.vision_app/app.py`, `1.openai/10.multimodal/5.vision_app2_design/app.py` | 이미지 생성 + 음성 입력 통합 |
+| 15:30-16:15 | 마이크 입출력 앱 | `1.openai/10.multimodal/5.vision_app4_micinput/app.py`, `1.openai/10.multimodal/5.vision_app5_micinputoutput/app.py` | 마이크 입력 → 이미지 생성 → 음성 출력 |
+| 16:15-17:00 | WebRTC 실시간 처리 | `1.openai/10.multimodal/9.webrtc_app/app.py` | WebRTC 기반 실시간 음성 처리 앱, 종합 Q&A |
 
 ## 환경 설정
 
@@ -44,7 +44,7 @@ pip install openai gradio pydub pyaudio
 - `1.openai/10.multimodal/1.dall-e(deprecated)/` — DALL-E 이미지 생성
 - `1.openai/10.multimodal/2.dall-e-app-edit(deprecated)/` — 이미지 편집 앱
 - `1.openai/10.multimodal/3.dall-e-app-gallery(deprecated)/` — 갤러리 앱
-- `1.openai/10.multimodal/4.vision_app*/` — 이미지+음성 통합 앱 시리즈
-- `1.openai/10.multimodal/5.whisper/` — 음성 인식
-- `1.openai/10.multimodal/6.whisper-app/` — Whisper 웹 앱
-- `1.openai/10.multimodal/7.webrtc-app/` — WebRTC 실시간 앱
+- `1.openai/10.multimodal/5.vision_app*/` — 이미지+음성 통합 앱 시리즈
+- `1.openai/10.multimodal/6.whisper_stt/` — 음성 인식
+- `1.openai/10.multimodal/7.whisper_app/` — Whisper 웹 앱
+- `1.openai/10.multimodal/9.webrtc_app/` — WebRTC 실시간 앱

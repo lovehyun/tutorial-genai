@@ -1,7 +1,7 @@
 # 이미지 분석(Vision) 앱 - 1단계: 기본 — 이미지 업로드 → GPT-4o 설명
 # pip install flask openai python-dotenv
 #
-# 이 폴더(4.vision_app*)는 '이미지를 생성'하는 게 아니라,
+# 이 폴더(5.vision_app*)는 '이미지를 생성'하는 게 아니라,
 # 업로드한 이미지를 GPT-4o가 보고 '설명·분석'하는 Vision 앱이다.
 #
 # 1단계: 가장 단순한 형태 — HTML 폼으로 이미지를 올리면 결과를 같은 페이지에 표시한다.
