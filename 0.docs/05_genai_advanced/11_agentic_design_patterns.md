@@ -491,11 +491,11 @@ flowchart LR
 
 ### 코드 패턴: 팬아웃/팬인
 
-아래 코드는 `2.langchain/8.agents/9.agentic_patterns/9.3_parallelization.py`를 기반으로 한 팬아웃/팬인 구현입니다. 제품 리뷰를 3가지 관점에서 동시에 분석합니다.
+아래 코드는 `2.langchain/8.agents/9.agentic_patterns/9.3_parallelization_eg1.py`를 기반으로 한 팬아웃/팬인 구현입니다. 제품 리뷰를 3가지 관점에서 동시에 분석합니다.
 
 ```python
 # parallelization_fanout.py -- 팬아웃/팬인: 다관점 동시 분석
-# 참조: 2.langchain/8.agents/9.agentic_patterns/9.3_parallelization.py
+# 참조: 2.langchain/8.agents/9.agentic_patterns/9.3_parallelization_eg1.py
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -546,7 +546,7 @@ final_report = synthesis_chain.invoke(analysis_results)           # 팬인
 
 ```python
 # parallelization_voting.py -- 투표 패턴: 다수결 의사결정
-# 참조: 2.langchain/8.agents/9.agentic_patterns/9.3_parallelization.py
+# 참조: 2.langchain/8.agents/9.agentic_patterns/9.3_parallelization_eg2.py
 vote_prompt = ChatPromptTemplate.from_template(
     """번역 품질을 평가하세요.
 원문: {original}
@@ -1364,7 +1364,8 @@ class CostTracker:
 |------|------|------|
 | `2.langchain/8.agents/9.agentic_patterns/9.1_prompt_chaining.py` | Prompt Chaining | 리서치 -> 게이트 -> 분석 -> 보고서 |
 | `2.langchain/8.agents/9.agentic_patterns/9.2_routing.py` | Routing | 고객 문의 분류 -> 전문 체인 분기 |
-| `2.langchain/8.agents/9.agentic_patterns/9.3_parallelization.py` | Parallelization | 다관점 분석 + 투표 패턴 |
+| `2.langchain/8.agents/9.agentic_patterns/9.3_parallelization_eg1.py` | Parallelization (팬아웃/팬인) | 다관점 분석 → 종합 |
+| `2.langchain/8.agents/9.agentic_patterns/9.3_parallelization_eg2.py` | Parallelization (LLM-as-judge) | 후보 점수 평가 → 최고 선택 |
 | `2.langchain/8.agents/9.agentic_patterns/9.4_orchestrator_worker.py` | Orchestrator-Worker | 동적 작업 분해 + LangGraph |
 | `2.langchain/8.agents/9.agentic_patterns/9.5_evaluator_optimizer.py` | Evaluator-Optimizer | 생성-평가 순환 루프 + LangGraph |
 

@@ -181,7 +181,9 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 |---|---|---|
 | `9.1_prompt_chaining.py` | Prompt Chaining (순차 파이프라인) | LCEL 체인 |
 | `9.2_routing.py` | Routing (분류 → 전문 체인 분기) | RunnableLambda |
-| `9.3_parallelization.py` | Parallelization (다관점 + 투표) | RunnableParallel |
+| `9.3_parallelization_eg1.py` | Parallelization 팬아웃/팬인 (다관점) | RunnableParallel |
+| `9.3_parallelization_eg2.py` | Parallelization LLM-as-judge 단일점수 (후보→선택) | batch / 구조화 출력 |
+| `9.3_parallelization_eg3.py` | Parallelization LLM-as-judge 쌍대비교 토너먼트 | batch / 구조화 출력 |
 | `9.4_orchestrator_worker.py` | Orchestrator-Worker (동적 작업 분해) | LangGraph StateGraph |
 | `9.5_evaluator_optimizer.py` | Evaluator-Optimizer (생성→평가→개선 루프) | LangGraph 순환 그래프 |
 

@@ -35,7 +35,7 @@
 | 09:00-09:30 | Day 1 복습 | — | LangGraph 핵심 복습 |
 | 09:30-10:30 | 패턴 1: Prompt Chaining | `2.langchain/8.agents/9.agentic_patterns/9.1_prompt_chaining.py` | 프롬프트를 순차적으로 연결하는 패턴 |
 | 10:45-11:30 | 패턴 2: Routing | `2.langchain/8.agents/9.agentic_patterns/9.2_routing.py` | 입력에 따라 다른 경로로 분기하는 패턴 |
-| 11:30-12:00 | 패턴 3: Parallelization | `2.langchain/8.agents/9.agentic_patterns/9.3_parallelization.py` | 독립 작업을 병렬로 실행하는 패턴 |
+| 11:30-12:00 | 패턴 3: Parallelization | `2.langchain/8.agents/9.agentic_patterns/9.3_parallelization_eg1.py` | 독립 작업을 병렬로 실행하는 패턴 |
 | 13:00-13:45 | 패턴 4: Orchestrator-Worker | `2.langchain/8.agents/9.agentic_patterns/9.4_orchestrator_worker.py` | 오케스트레이터가 워커에게 작업을 분배하는 패턴 |
 | 13:45-14:30 | 패턴 5: Evaluator-Optimizer | `2.langchain/8.agents/9.agentic_patterns/9.5_evaluator_optimizer.py` | 평가자가 결과를 평가하고 최적화하는 패턴 |
 | 14:45-15:30 | 패턴 비교 분석 | — | 5대 패턴의 적용 시나리오 비교, 선택 가이드 |

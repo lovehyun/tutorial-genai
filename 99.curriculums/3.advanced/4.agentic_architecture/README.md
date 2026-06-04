@@ -36,7 +36,7 @@
 | 09:00-09:30 | Day 1 복습 | — | LangGraph 심화 복습 |
 | 09:30-10:30 | Prompt Chaining 실전 | `2.langchain/8.agents/9.agentic_patterns/9.1_prompt_chaining.py` | 실전 시나리오: 문서 분석 → 요약 → 번역 체이닝 |
 | 10:45-11:30 | Routing 실전 | `2.langchain/8.agents/9.agentic_patterns/9.2_routing.py` | 실전 시나리오: 질문 유형별 전문가 에이전트 라우팅 |
-| 11:30-12:00 | Parallelization 실전 | `2.langchain/8.agents/9.agentic_patterns/9.3_parallelization.py` | 실전 시나리오: 다중 소스 동시 분석 |
+| 11:30-12:00 | Parallelization 실전 | `2.langchain/8.agents/9.agentic_patterns/9.3_parallelization_eg1.py` | 실전 시나리오: 다중 소스 동시 분석 |
 | 13:00-13:45 | Orchestrator-Worker 실전 | `2.langchain/8.agents/9.agentic_patterns/9.4_orchestrator_worker.py` | 실전 시나리오: 복합 작업 분배 시스템 |
 | 13:45-14:30 | Evaluator-Optimizer 실전 | `2.langchain/8.agents/9.agentic_patterns/9.5_evaluator_optimizer.py` | 실전 시나리오: 코드 생성 → 테스트 → 수정 반복 |
 | 14:45-15:30 | 패턴 조합 설계 | — | 2개 이상 패턴을 결합한 아키텍처 설계 워크숍 |

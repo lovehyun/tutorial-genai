@@ -108,7 +108,7 @@
 | 09:00-09:30 | Day 3 복습 | — | Agentic Workflow 핵심 요약 |
 | 09:30-10:00 | 패턴 1: Prompt Chaining | `2.langchain/8.agents/9.agentic_patterns/9.1_prompt_chaining.py` | [실습] 프롬프트 순차 연결 패턴 |
 | 10:00-10:30 | 패턴 2: Routing | `2.langchain/8.agents/9.agentic_patterns/9.2_routing.py` | [실습] 입력 기반 동적 분기 패턴 |
-| 10:45-11:15 | 패턴 3: Parallelization | `2.langchain/8.agents/9.agentic_patterns/9.3_parallelization.py` | [실습] 독립 작업 병렬 실행 패턴 |
+| 10:45-11:15 | 패턴 3: Parallelization | `2.langchain/8.agents/9.agentic_patterns/9.3_parallelization_eg1.py` | [실습] 독립 작업 병렬 실행 패턴 |
 | 11:15-11:45 | 패턴 4: Orchestrator-Worker | `2.langchain/8.agents/9.agentic_patterns/9.4_orchestrator_worker.py` | [실습] 오케스트레이터의 작업 분배 패턴 |
 | 11:45-12:00 | 패턴 5: Evaluator-Optimizer | `2.langchain/8.agents/9.agentic_patterns/9.5_evaluator_optimizer.py` | [실습] 평가 → 최적화 반복 패턴 |
 | 13:00-13:45 | Tool Calling | `0.docs/05_genai_advanced/01_openai_advanced.md` | Function Calling, tool_calls, JSON Schema |
