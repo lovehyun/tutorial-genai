@@ -18,13 +18,13 @@
 | 시간 | 주제 | 실습 파일 | 설명 |
 |------|------|-----------|------|
 | 09:00-09:30 | 오리엔테이션 | — | 멀티 프로바이더 전략, 각 프로바이더 특성 비교 |
-| 09:30-10:00 | Claude API 기초 | `4.anthropic/1.basic/1.intro.py`, `4.anthropic/1.basic/0.apikey.py` | Anthropic API 키 설정, 기본 호출 |
-| 10:00-10:30 | Claude 파라미터 & 모델 | `4.anthropic/1.basic/3.params.py`, `4.anthropic/1.basic/4.models.py` | 온도, 모델 선택, 파라미터 최적화 |
-| 10:45-11:15 | Claude 스트리밍 & 대화 | `4.anthropic/1.basic/5.stream.py`, `4.anthropic/1.basic/6.conversation.py` | 스트리밍 응답, 멀티턴 대화 |
-| 11:15-12:00 | Claude + LangChain | `4.anthropic/2.langchain/1.intro.py`, `4.anthropic/2.langchain/2.prompttemplate.py` | LangChain에서 Claude 사용 |
-| 13:00-13:30 | Claude 체이닝 & 대화 | `4.anthropic/2.langchain/3.chaining.py`, `4.anthropic/2.langchain/4.conversation.py` | LCEL 체이닝, 대화 메모리 |
-| 13:30-14:00 | Claude 텍스트/벡터 | `4.anthropic/2.langchain/5.textloader.py`, `4.anthropic/2.langchain/6.vectorstore.py` | 텍스트 로더, 벡터스토어 연동 |
-| 14:00-14:30 | Claude 복합 체인 | `4.anthropic/2.langchain/9.complex.py` | 복합 체인 예제 |
+| 09:30-10:00 | Claude API 기초 | `4.anthropic/1.basic/1.hello.py`, `4.anthropic/1.basic/0.apikey.py` | Anthropic API 키 설정, 기본 호출 |
+| 10:00-10:30 | Claude 파라미터 & 모델 | `4.anthropic/1.basic/5.params.py`, `4.anthropic/1.basic/6.models.py` | 온도, 모델 선택, 파라미터 최적화 |
+| 10:45-11:15 | Claude 스트리밍 & 대화 | `4.anthropic/1.basic/4.streaming.py`, `4.anthropic/1.basic/3.multiturn.py` | 스트리밍 응답, 멀티턴 대화 |
+| 11:15-12:00 | Claude + LangChain | `4.anthropic/4.langchain/1.intro.py`, `4.anthropic/4.langchain/2.prompttemplate.py` | LangChain에서 Claude 사용 |
+| 13:00-13:30 | Claude 체이닝 & 대화 | `4.anthropic/4.langchain/3.chaining.py`, `4.anthropic/4.langchain/4.conversation.py` | LCEL 체이닝, 대화 메모리 |
+| 13:30-14:00 | Claude 텍스트/벡터 | `4.anthropic/4.langchain/5.textloader.py`, `4.anthropic/4.langchain/6.vectorstore.py` | 텍스트 로더, 벡터스토어 연동 |
+| 14:00-14:30 | Claude 복합 체인 | `4.anthropic/4.langchain/9.complex.py` | 복합 체인 예제 |
 | 14:45-15:15 | Gemini 기초 & 채팅 | `7.google/1.basic/1.intro.py`, `7.google/1.basic/2.chat.py`, `7.google/1.basic/3.params.py` | Gemini API 기초 |
 | 15:15-15:45 | Gemini 멀티모달 | `7.google/2.multimodal/1.vision.py`, `7.google/2.multimodal/2.image_gen.py` | Gemini Vision, 이미지 생성 |
 | 15:45-16:15 | Gemini + LangChain | `7.google/3.langchain/1.intro.py`, `7.google/3.langchain/2.chain.py` | LangChain에서 Gemini 사용 |
@@ -61,6 +61,6 @@ pip install langchain langchain-openai langchain-anthropic langchain-google-gena
 
 ## 참고 자료
 - `4.anthropic/1.basic/` — Claude API 기초
-- `4.anthropic/2.langchain/` — Claude + LangChain
+- `4.anthropic/4.langchain/` — Claude + LangChain
 - `7.google/` — Gemini API 전체
 - `10.project/6.code_review_app/` — 코드리뷰 앱 프로젝트
