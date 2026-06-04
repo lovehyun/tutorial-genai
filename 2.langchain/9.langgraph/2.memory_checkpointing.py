@@ -49,6 +49,7 @@ def call_model(state: MessagesState):
 # 4. 그래프 생성 및 노드/엣지 추가
 graph = StateGraph(state_schema=MessagesState)
 graph.add_node("model", call_model)
+
 graph.add_edge(START, "model")
 graph.add_edge("model", END)
 
@@ -117,6 +118,7 @@ print("\n전체 대화 내용:")
 all_messages = result4["messages"]
 for i, message in enumerate(all_messages):
     print(f"{message.type}: {message.content}")
+
 
 print("\n메모리 체크포인팅 테스트 완료")
 print("\n설명:")

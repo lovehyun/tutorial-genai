@@ -4,9 +4,9 @@
 이 파일은 LangGraph에서 도구를 사용하는 ReAct 에이전트와 순환 그래프를 구현하는 방법을 보여줍니다.
 도구 사용과 순환 처리를 통해 더 복잡하고 지능적인 에이전트를 구현할 수 있습니다.
 
-그래프 구조 (create_react_agent 가 자동 생성하는 순환 그래프):
+그래프 구조 (create_agent 가 자동 생성하는 순환 그래프):
     ┌───────┐     ┌──────────┐   tool_calls 있음    ┌─────────┐
-    │ START │──▶ │  agent   │ ──────────────────▶ │  tools  │
+    │ START │──▶ │  model   │ ──────────────────▶ │  tools  │
     └───────┘     │  (LLM)   │ ◀────────────────── │         │
                   └──────────┘    도구 결과 되먹임   └─────────┘
                       │
@@ -27,7 +27,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, AIMessage
 
 from langchain_core.tools import tool
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent      # (구) langgraph.prebuilt.create_react_agent — LangChain 1.x 현행
 from langgraph.checkpoint.memory import MemorySaver
 
 load_dotenv()
@@ -93,10 +93,10 @@ memory = MemorySaver()
 tools = [search_tool, calculator, get_current_time]
 
 # 5. ReAct 에이전트 생성
-react_agent = create_react_agent(
+react_agent = create_agent(
     llm,
     tools,
-    prompt="""당신은 도구를 사용할 수 있는 지능적인 AI 비서입니다. 
+    system_prompt="""당신은 도구를 사용할 수 있는 지능적인 AI 비서입니다. 
 사용자의 질문에 답하기 위해 필요한 경우 도구를 사용하세요.
 계산이 필요한 경우 calculator 도구를 사용하세요.
 정보 검색이 필요한 경우 search_tool 도구를 사용하세요.
@@ -159,9 +159,9 @@ while True:
                 steps += 1
                 print(f"\n--- 스텝 {steps} ---")
                 
-                # 에이전트 생각 단계
-                if 'agent' in step:
-                    messages = step['agent'].get('messages', [])
+                # 에이전트 생각 단계 (create_agent 의 노드 이름은 'model')
+                if 'model' in step:
+                    messages = step['model'].get('messages', [])
                     if messages:
                         content = messages[0].content
                         if content:
@@ -193,7 +193,7 @@ while True:
 
 print("\nReAct 에이전트 테스트 완료")
 print("\n설명:")
-print("1. create_react_agent 함수를 사용해 도구를 활용할 수 있는 ReAct 에이전트를 생성했습니다.")
+print("1. create_agent 함수를 사용해 도구를 활용할 수 있는 ReAct 에이전트를 생성했습니다.")
 print("2. 에이전트는 사용자 질문에 답하기 위해 필요한 경우 도구를 호출합니다.")
 print("3. 도구 호출 결과를 바탕으로 추가 도구 호출이나 최종 응답을 생성하는 순환 과정을 거칩니다.")
 print("4. 스트리밍 모드에서는 에이전트의 생각 과정과 도구 사용을 단계별로 확인할 수 있습니다.")

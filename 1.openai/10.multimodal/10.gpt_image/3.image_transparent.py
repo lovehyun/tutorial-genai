@@ -13,6 +13,7 @@ load_dotenv(dotenv_path='../../.env')
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 result = client.images.generate(
+    # ⚠️ 투명 배경은 gpt-image-1.5 전용 기능 — gpt-image-2 는 투명 배경 미지원. 그래서 1.5 고정.
     model='gpt-image-1.5',
     prompt='빨간 사과 아이콘, 단순한 플랫 디자인',
     size='1024x1024',

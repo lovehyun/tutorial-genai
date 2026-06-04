@@ -6,7 +6,7 @@
 
 그래프 구조 (4.tools_cyclic_graph 와 동일한 ReAct 순환 그래프):
     ┌───────┐     ┌──────────┐   tool_calls 있음    ┌─────────┐
-    │ START │──▶ │  agent   │ ──────────────────▶ │  tools  │
+    │ START │──▶ │  model   │ ──────────────────▶ │  tools  │
     └───────┘     │  (LLM)   │ ◀────────────────── │         │
                   └──────────┘                      └─────────┘
                       │ 최종 답변
@@ -29,7 +29,7 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, Tool
 
 from langchain_core.tools import tool
 from langgraph.checkpoint.memory import MemorySaver
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent      # (구) langgraph.prebuilt.create_react_agent — LangChain 1.x 현행
 
 load_dotenv()
 
@@ -85,10 +85,10 @@ tools = [search_tool, calculator]
 memory = MemorySaver()
 
 # 4. ReAct 에이전트 생성
-react_agent = create_react_agent(
+react_agent = create_agent(
     llm,
     tools,
-    prompt="""당신은 도구를 사용할 수 있는 지능적인 AI 비서입니다. 
+    system_prompt="""당신은 도구를 사용할 수 있는 지능적인 AI 비서입니다. 
 사용자의 질문에 답하기 위해 필요한 경우 도구를 사용하세요.
 계산이 필요한 경우 calculator 도구를 사용하세요.
 정보 검색이 필요한 경우 search_tool 도구를 사용하세요.""",
@@ -143,11 +143,11 @@ def log_step(step_num: int, step_data: Dict[str, Any], detail_level: int = 1):
     print(f"스텝 {step_num}")
     print("=" * 30)
     
-    # 에이전트 단계
-    if 'agent' in step_data:
+    # 에이전트 단계 (create_agent 의 노드 이름은 'model')
+    if 'model' in step_data:
         print("에이전트 상태 업데이트:")
-        if 'messages' in step_data['agent']:
-            messages = step_data['agent']['messages']
+        if 'messages' in step_data['model']:
+            messages = step_data['model']['messages']
             if messages:
                 last_message = messages[0]
                 

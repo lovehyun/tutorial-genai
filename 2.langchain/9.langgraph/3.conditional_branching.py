@@ -171,6 +171,7 @@ while True:
     else:
         print("실행 경로: START -> router -> chat -> END")
 
+
 print("\n조건부 브랜칭 테스트 완료")
 print("\n설명:")
 print("1. 사용자 의도(날씨, 뉴스, 일반 대화)에 따라 다른 경로로 분기하는 라우터 노드를 구현했습니다.")

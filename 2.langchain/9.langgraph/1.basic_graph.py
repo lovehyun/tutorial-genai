@@ -43,6 +43,7 @@ def call_model(state: MessagesState):
 
 # 4. 노드와 엣지 추가
 graph.add_node("model", call_model)
+
 graph.add_edge(START, "model")
 graph.add_edge("model", END)
 
@@ -64,6 +65,7 @@ result = app.invoke({"messages": [HumanMessage(content=user_input)]})
 print("\n결과:")
 for i, message in enumerate(result["messages"]):
     print(f"메시지 {i}: {message.type} - {message.content}")
+
 
 print("\n기본 그래프 실행 완료")
 print("\n설명:")
