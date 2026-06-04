@@ -12,6 +12,7 @@ OpenAI의 멀티모달 API(비전·이미지 생성·음성)를 활용한 예제
 | 음성 인식(STT) | 오디오 → 텍스트 | `8.whisper_stt/` | `9.whisper_app/` |
 | 음성 생성(TTS) | 텍스트 → 오디오 | `10.tts/` | — |
 | 실시간 음성 | 오디오 ↔ 오디오 | — | `11.webrtc_app/` |
+| 음성 대화(오디오 chat) | 오디오 ↔ 오디오 | `12.audio_chat/` | — |
 
 > 비전(이미지 이해)과 이미지 생성을 나란히 두었습니다. 음성(인식·생성·실시간)은 뒤에 모았습니다.
 >
@@ -110,6 +111,11 @@ OpenAI의 멀티모달 API(비전·이미지 생성·음성)를 활용한 예제
 **실시간 자막 + 다자간 회의록 + AI 요약** 앱 (Flask + **Flask-SocketIO**).
 마이크 음성 조각 → STT → 자막을 **WebSocket으로 전체 방송** → 회의록 누적 → 버튼으로 GPT 요약.
 `whisper_utils.py`로 STT 모드 선택(`WHISPER_MODE`): `openai_whisper`(API) / `local_wav` / `local_webp`(faster-whisper).
+
+### 음성 대화 — `12.audio_chat/` (gpt-4o-audio)
+**오디오 입력 → 오디오 출력을 모델 하나로** (STT+TTS 2단계가 아니라 단일 멀티모달 모델).
+`1.audio_output`(텍스트→음성) · `2.audio_input`(오디오→이해·요약) · `3.voice_chat`(음성→음성 한 턴) · `4.voice_chat_loop`(**연속 대화** — 자동 재생+맥락 유지).
+> STT(`8.whisper_stt`)는 받아쓰기만, TTS(`10.tts`)는 읽어주기만 — `12.audio_chat`은 한 모델이 **이해하고 답까지**.
 
 ---
 
