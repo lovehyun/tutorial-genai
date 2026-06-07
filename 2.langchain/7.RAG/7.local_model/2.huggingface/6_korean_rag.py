@@ -1,6 +1,6 @@
 """
 한국어 특화 RAG — 한국어 데이터에 최적화된 HF 모델 조합.
-이 예제: 한국어 임베딩 + 한국어 LLM 으로 한국어 PDF RAG.
+이 예제: 5_full_rag 에서 모델 조합만 한국어 특화로 교체 (구조는 동일).
 
 조합:
   - 임베딩: jhgan/ko-sroberta-multitask (한국어 특화, 가장 인기)
@@ -8,14 +8,14 @@
             또는 Qwen/Qwen2.5-3B-Instruct (다국어, 한국어 능숙)
 
 준비:
-  pip install langchain-huggingface sentence-transformers transformers torch
+  pip install langchain-huggingface sentence-transformers transformers torch accelerate
   EXAONE 은 HF 에서 라이센스 동의 필요할 수 있음 — 안 되면 Qwen 으로 대체.
 
-데이터: ../../DATA/nvme.txt (한국어 텍스트)
+데이터: ../../DATA/nvme.txt + ssd.txt (한국어 텍스트)
 """
 
 import os
-from langchain_huggingface import HuggingFacePipeline, HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFacePipeline, HuggingFaceEmbeddings, ChatHuggingFace
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
@@ -52,6 +52,7 @@ LLM_ID = "LGAI-EXAONE/EXAONE-3.5-2.4B-Instruct"
 llm = HuggingFacePipeline.from_model_id(
     model_id=LLM_ID,
     task="text-generation",
+    device_map="auto",                          # GPU 있으면 GPU, 없으면 CPU
     pipeline_kwargs={
         "max_new_tokens": 300,
         "do_sample": False,
@@ -59,6 +60,7 @@ llm = HuggingFacePipeline.from_model_id(
     },
     model_kwargs={"trust_remote_code": True},   # EXAONE/Qwen 필요
 )
+chat = ChatHuggingFace(llm=llm)                 # 한국어 instruct 모델의 chat template 적용
 
 
 # 3) RAG 체인 — 한국어 프롬프트
@@ -74,7 +76,7 @@ def format_docs(docs):
 
 chain = (
     RunnablePassthrough.assign(context=lambda x: format_docs(retriever.invoke(x["question"])))
-    | prompt | llm | StrOutputParser()
+    | prompt | chat | StrOutputParser()
 )
 
 print(chain.invoke({"question": "NVMe 와 SATA SSD 의 속도 차이를 설명해줘."}))

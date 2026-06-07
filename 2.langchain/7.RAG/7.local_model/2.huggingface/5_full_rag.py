@@ -1,6 +1,8 @@
 """
 HuggingFace 풀 RAG — LLM 과 임베딩 모두 HF 로 (완전 오프라인).
-이 예제: HF 임베딩 + HF LLM 으로 RAG 전체 파이프라인 구축.
+이 예제: 4_rag_llm_only 에서 마지막 남은 OpenAI(임베딩)까지 HF 로 교체 → API 호출 0회.
+
+  핵심 diff (4_rag_llm_only 대비): OpenAIEmbeddings → HuggingFaceEmbeddings 한 줄.
 
   - 임베딩: BAAI/bge-m3 (다국어 SOTA — 한국어 텍스트도 잘 잡음)
   - LLM:    microsoft/Phi-3.5-mini-instruct
@@ -8,7 +10,7 @@ HuggingFace 풀 RAG — LLM 과 임베딩 모두 HF 로 (완전 오프라인).
 """
 
 import os
-from langchain_huggingface import HuggingFacePipeline, HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFacePipeline, HuggingFaceEmbeddings, ChatHuggingFace
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
@@ -37,12 +39,14 @@ if store._collection.count() == 0:
 retriever = store.as_retriever(search_kwargs={"k": 3})
 
 
-# 3) LLM — HuggingFacePipeline
+# 3) LLM — HuggingFacePipeline (+ ChatHuggingFace 로 chat template 적용, device_map 으로 GPU 자동)
 llm = HuggingFacePipeline.from_model_id(
     model_id="microsoft/Phi-3.5-mini-instruct",
     task="text-generation",
+    device_map="auto",
     pipeline_kwargs={"max_new_tokens": 256, "do_sample": False, "return_full_text": False},
 )
+chat = ChatHuggingFace(llm=llm)
 
 
 # 4) RAG 체인 — 구조는 OpenAI 버전과 100% 동일
@@ -56,7 +60,7 @@ def format_docs(docs):
 
 chain = (
     RunnablePassthrough.assign(context=lambda x: format_docs(retriever.invoke(x["question"])))
-    | prompt | llm | StrOutputParser()
+    | prompt | chat | StrOutputParser()
 )
 
 print(chain.invoke({"question": "What's the difference between NVMe and SATA SSD?"}))

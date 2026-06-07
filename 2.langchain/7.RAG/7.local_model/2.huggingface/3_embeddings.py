@@ -17,6 +17,8 @@ HuggingFaceEmbeddings — sentence-transformers 임베딩 모델 로컬 사용.
 준비:
   pip install langchain-huggingface sentence-transformers
   ※ 첫 사용 시 모델 다운로드.
+  ※ 임베딩(sentence-transformers)은 GPU 가 있으면 자동으로 GPU 를 쓴다 (별도 설정 불필요).
+    강제 지정하려면: HuggingFaceEmbeddings(model_name=..., model_kwargs={"device": "cuda"})
 """
 
 import numpy as np

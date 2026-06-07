@@ -42,7 +42,7 @@
 | 13:45-14:30 | PDF 저장/로드 & 검색 | `2.langchain/7.RAG/3.vectorstore/3.2_persist_pdf.py`, `2.langchain/7.RAG/3.vectorstore/3.4_search_modes.py` | PDF → ChromaDB 저장, 유사도 검색 |
 | 14:45-15:15 | ChromaDB 검색 범위 | `2.langchain/7.RAG/3.vectorstore/3.8_search_scope.py` | 통합/분리 컬렉션 검색 범위 |
 | 15:15-15:45 | 멀티소스 로더 | `2.langchain/7.RAG/3.vectorstore/3.7_txtpdf_mixed_sources.py` | 여러 소스(텍스트, PDF 등) 통합 로드 |
-| 15:45-16:15 | 로컬 모델 RAG | `2.langchain/7.RAG/7.local_model/1.ollama/2_rag.py`, `2.langchain/7.RAG/7.local_model/2.huggingface/3_full_rag.py` | 로컬 LLM 기반 RAG (Ollama / HuggingFace) |
+| 15:45-16:15 | 로컬 모델 RAG | `2.langchain/7.RAG/7.local_model/1.ollama/2_rag.py`, `2.langchain/7.RAG/7.local_model/2.huggingface/5_full_rag.py` | 로컬 LLM 기반 RAG (Ollama / HuggingFace) |
 | 16:15-17:00 | Day 2 정리 & Q&A | — | ChromaDB, RAG 파이프라인 정리 |
 
 ### Day 3: RAG 웹 앱과 Agentic RAG
