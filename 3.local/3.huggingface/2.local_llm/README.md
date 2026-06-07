@@ -24,20 +24,20 @@
 ## 주요 오픈 LLM 계보 (누가 / 무엇 기반으로 만들었나)
 
 대부분 **트랜스포머 '디코더'** 구조를 공유하고, 차이는 학습 데이터·크기·라이선스·튜닝에 있습니다.
-(이 레포 곳곳에서 쓰는 모델들 — `4.mistral`, `5.llama`, `8.korean_llm`, `2.langchain/.../local_model` 참고)
+(이 레포 곳곳에서 쓰는 모델들 — `4.mistral`, `5.llama`, `8.ollama_qwen`, `9.ollama_exaone`, `2.langchain/.../local_model` 참고)
 
 | 모델 패밀리 | 만든 곳 | 구조/베이스 · 특징 | 라이선스 | 레포 내 예제 |
 |---|---|---|---|---|
 | **Llama 2 / 3 / 3.1 / 3.2** | Meta | 디코더, 오픈 가중치의 사실상 표준·생태계 최대 | 커뮤니티(제약) · gated | `5.llama` |
 | **Mistral 7B / Mixtral 8x7B** | Mistral AI (프랑스) | Mixtral은 **MoE**(전문가 혼합), 효율↑ | Apache-2.0 | `4.mistral` |
 | **Gemma / Gemma 2** | Google DeepMind | Gemini 기술 기반 경량 오픈모델(`-it`) | Gemma 라이선스 · gated | (언급만) |
-| **Qwen 2.5 / Qwen3** | Alibaba (중국) | 다국어(한국어 포함) 강함 | Apache-2.0 | `8.korean_llm`, `2.langchain` |
+| **Qwen 2.5 / Qwen3** | Alibaba (중국) | 다국어(한국어 포함) 강함 | Apache-2.0 | `8.ollama_qwen`, `2.langchain` |
 | **Phi-2 / Phi-3 / Phi-3.5** | Microsoft | 소형 고품질("SLM"), 영어 강함 | MIT | `2.langchain` |
 | **GPT-Neo / GPT-J / GPT-NeoX** | EleutherAI | GPT-3 오픈 재현(초기 오픈 LLM) | 오픈 | **이 폴더 2.x** |
 | **DeepSeek V2/V3 / R1** | DeepSeek (중국) | MoE, **R1은 추론(reasoning) 특화** | 오픈(MIT 등) | (없음 — 추가 후보) |
 | **Falcon 7B / 40B** | TII (UAE) | 한때 상위권 오픈모델 | Apache-2.0 | (옛 README 언급) |
 | **Command R / R+** | Cohere | RAG·도구사용 특화 | 연구용 | (없음) |
-| **EXAONE 3.5** | LG AI Research (한국) | 한국어 강함 | 비상업 · gated | `8.korean_llm` |
+| **EXAONE 3.5** | LG AI Research (한국) | 한국어 강함 (tool calling 미지원) | 비상업 · gated | `9.ollama_exaone` |
 | **GPT-2 / BERT / DistilBERT** | OpenAI / Google / HuggingFace | (생성/이해 기초 모델) | 오픈 | `1.pipelines`, `1.transformers` |
 
 > **well-known 중 레포에 빠진 것**: **DeepSeek**(2025~2026 화제, 특히 R1 추론), **Gemma**(언급만 있고 예제 없음),

@@ -1,8 +1,8 @@
-# 6.ollama_langchain — Ollama + LangChain
+# 6.ollama3_langchain — Ollama + LangChain (가장 높은 추상화)
 
-`6.ollama` 는 raw `ollama` 라이브러리/REST 로 로컬 LLM을 직접 호출한다.
-여기서는 같은 로컬 모델을 **LangChain** 으로 감싸 LCEL 체인·메모리·구조화출력·도구·RAG 까지 단계별로 다룬다.
-외부 API 키 불필요 — 전부 로컬에서 돈다.
+추상화 순서의 마지막 단계: **[REST](../6.ollama1_restapi) → [SDK](../6.ollama2_sdk) → LangChain(여기)**.
+앞 두 폴더가 `ollama` 를 REST/SDK 로 '직접' 호출했다면, 여기서는 같은 로컬 모델을 **LangChain** 으로 감싸
+LCEL 체인·메모리·구조화출력·도구·RAG 까지 단계별로 다룬다. 외부 API 키 불필요 — 전부 로컬에서 돈다.
 
 ## 준비
 ```bash
