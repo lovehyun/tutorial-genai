@@ -74,7 +74,7 @@ HuggingFace 생태계로 **세 가지 영역**의 모델을 다룹니다. 영역
 - **다운로드/캐시**: `from_pretrained` 가 처음 호출 시 `~/.cache/huggingface` 에 자동 저장.
   재실행은 캐시 사용(오프라인은 `local_files_only=True`). 특정 버전은 `revision="..."`.
 - **NER/QA 등은 '파인튜닝된' 모델을 써야 한다** — 분류 헤드 없는 base 모델은 결과가 무의미
-  (이 폴더 `1.pipelines/1.3_ner.py` 가 그 예: 전용 NER 모델 사용).
+  (이 폴더 `1.pipelines/1.4_ext_ner.py` 가 그 예: 전용 NER 모델 사용).
 
 ## HuggingFace 유료 / 무료 정책
 
