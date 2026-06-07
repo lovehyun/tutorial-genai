@@ -1,0 +1,3 @@
+[submodule "99.curriculums/10.mini_books"]
+	path = 99.curriculums/10.mini_books
+	url = git@github.com:lovehyun/book-genaidev2026-minibook1-rag3day.git
