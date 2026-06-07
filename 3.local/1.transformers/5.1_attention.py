@@ -1,4 +1,5 @@
-# filename: attention_numbers.py
+# (5단계) 어텐션 들여다보기 — 특정 토큰이 '어디를 보는지' 시각화
+# 트랜스포머가 문맥을 잡는 핵심 메커니즘. 토큰 간 attention 가중치를 꺼내 본다.
 import re
 import torch
 from transformers import AutoTokenizer, AutoModel, AutoModelForCausalLM

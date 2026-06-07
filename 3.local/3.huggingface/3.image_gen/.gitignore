@@ -1,0 +1,6 @@
+# Stable Diffusion 생성 이미지 — 커밋 제외
+*.png
+*.jpg
+*.jpeg
+outputs/
+generated_images/

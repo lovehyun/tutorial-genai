@@ -1,0 +1,15 @@
+# 2.mymodel 에서 생성되는 산출물 (학습 결과 / 경량화 결과) — 커밋 제외
+# 1.finetune
+my_local_model/
+my_local_model_kr/
+results/
+results_kr/
+
+# 2.compression
+quantized_model/
+reduced_model/
+pruned_model/
+security_tokenizer/
+
+# 구버전 학습 산출물 폴더명
+my_model/
