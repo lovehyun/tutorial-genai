@@ -46,7 +46,7 @@ API 키는 상위 폴더의 `.env`(`../.env`)에 설정합니다: `OPENAI_API_KE
 | 메타데이터 필터 | 없음 | `where` 절 지원 |
 | 학습 측면 | 원리가 다 드러남 | 원리는 감춰지고 앱 개발이 쉬움 |
 
-> ChromaDB(고수준, 프레임워크 연동)는 `2.langchain/6.RAG`에서 다룹니다.
+> ChromaDB(고수준, 프레임워크 연동)는 `2.langchain/7.RAG`에서 다룹니다.
 > 더 많은 벡터 DB 비교는 [vectordb.md](vectordb.md) 참고.
 
 ## 핵심 개념: L2 vs 코사인 유사도 (4단계)

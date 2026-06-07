@@ -10,7 +10,7 @@
 
 ```
 [기초·영속화]      3.1 txt → 3.2 pdf → 3.3 들여다보기
-[검색 모드]        3.4 similarity / with_score / MMR
+[검색 모드]        3.4 similarity / with_score / MMR → 3.4-2 MMR 심화(다양성·lambda_mult)
 [배치 전략] ★핵심  3.5 분리(sep) → 3.6 통합(unified) → 3.7 혼합(mixed)
 [검색 동작]        3.8 통합 vs 분리 검색 차이 → 3.9 정답이 두 문서에 쪼개진 경우
 [부록]            3.10 FAISS 와 비교
@@ -31,6 +31,7 @@
 | 파일 | 목적 | 관전 포인트 |
 |---|---|---|
 | [3.4_search_modes.py](3.4_search_modes.py) | 세 가지 검색 방식 비교 | `similarity`(기본) / `with_score`(점수=거리, **작을수록 가까움**) / `MMR`(관련성+**다양성**, 중복 청크 회피) |
+| [3.4_search_modes2_mmr.py](3.4_search_modes2_mmr.py) | MMR 만 깊게 — 다양성이 실제로 작동하는 모습 | '거의 중복' 청크를 넣고 `similarity`(중복 독식) vs `MMR`(다양) 비교. **`lambda_mult` 스윕**(1=관련성→0=다양성)·`fetch_k` 역할·`as_retriever(search_type='mmr')` |
 
 ### 배치 전략 ★ 이 폴더의 핵심
 
