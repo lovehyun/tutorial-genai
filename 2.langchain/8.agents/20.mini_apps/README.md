@@ -1,4 +1,4 @@
-# 10.mini_apps — 에이전트 실전 미니 앱
+# 20.mini_apps — 에이전트 실전 미니 앱
 
 `1~9` 에서 배운 패턴(@tool · 빌트인 · 메모리 · HITL · 라우팅)을 **돌아가는 앱**으로 조립한 POC 모음.
 모든 코드는 "최소한의 컨셉 시연" 을 목표로 하며, **키가 없어도** 안내 메시지/콘솔 폴백으로 흐름을 볼 수 있게 만들었습니다.
@@ -10,6 +10,7 @@
 | `3.finance_bot/` | 뉴스/기업정보/환율/주가 조회 봇 (CLI) | 멀티툴 라우팅 |
 | `4.trading_bot/` | 조건 충족 시 **이메일 승인(HITL)** 후 가상 거래 | cron 잡 + out-of-band HITL |
 | `5.trading_bot_web/` | **챗봇**으로 잔고·시세 묻고 예약/매매 → 충족 시 **알림/승인(예·아니오)** 후 가상 거래 | 대화형 에이전트(도구 7종) + 웹 HITL |
+| `6.cardview_news/` | **주제 → 뉴스 수집 → 요약 → 카드뉴스 이미지** 생성 (`app2_lcel.py` = 같은 흐름의 LCEL 버전) | 도구 + 이미지 생성(멀티모달) · LCEL |
 
 ---
 
@@ -107,6 +108,18 @@ cd 5.trading_bot_web && python app.py   # → http://localhost:5003
 > 예시 대화: "내 잔고 알려줘" · "지금 환율 얼마야?" · "AAPL 150달러 이하로 떨어지면 1주 사줘"
 > · "환율 1500원 넘으면 알려줘" · "지금 100만원 환전해줘" · "환율 알림 취소해줘" · "내 예약 뭐 있어?"
 > 매수는 USD 가 있어야 하므로, 먼저 환전으로 USD 를 만든 뒤 매수하는 흐름을 시연할 수 있습니다.
+
+---
+
+## 6.cardview_news — 주제 → 카드뉴스 이미지
+주제 문장을 받아 **뉴스 수집 → 요약 → 카드뉴스 이미지 생성**까지 한 번에. 멀티모달(텍스트+이미지) 시연.
+- `app.py` — `create_agent` + 뉴스 수집 도구 + 이미지 생성
+- `app2_lcel.py` — 같은 흐름을 **LCEL 파이프라인**(`RunnableLambda` / `RunnablePassthrough.assign`)으로 재작성
+```bash
+pip install langchain langchain-openai openai requests beautifulsoup4 python-dotenv
+cd 6.cardview_news && python app.py "주제 문장"   # 인자 없으면 기본 예시 주제
+```
+> 이미지 생성에 OpenAI 이미지 API 사용 → `OPENAI_API_KEY` 필요.
 
 ---
 

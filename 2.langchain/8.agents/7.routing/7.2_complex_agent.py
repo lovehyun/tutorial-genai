@@ -13,9 +13,11 @@
 필요한 도구를 골라가며 답한다. 멀티턴이므로 이전 대화 맥락을 기억.
 """
 
-import wikipedia
 from dotenv import load_dotenv
+
 from langchain_openai import ChatOpenAI
+
+import wikipedia
 from langchain_core.tools import tool
 from langchain_community.tools.wikipedia.tool import WikipediaQueryRun
 from langchain_community.utilities.wikipedia import WikipediaAPIWrapper

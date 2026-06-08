@@ -18,12 +18,16 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 ├── 7.routing/                    ← 다중 도구 라우팅 + 복합 시나리오
 ├── 8.mcp/                        ← (포인터) MCP 는 최상위 /8.mcp 로 이전
 ├── 9.agentic_patterns/           ← Anthropic 5대 워크플로우 패턴 (체이닝/라우팅/병렬/오케스트레이터/평가자)
-├── 10.mini_apps/                 ← 실전 미니 앱 모음 (webscan · 금융조회 · 가상트레이딩+HITL)
+├── 10.multi_agent/               ← 멀티 에이전트 (에이전트를 도구로 / 슈퍼바이저)
+├── 11.evaluation/                ← 에이전트 평가 (도구 선택 정확도 등 자동 검증)
+│
+├── 20.mini_apps/                 ← 실전 미니 앱 모음 (webscan · 금융조회 · 가상트레이딩+HITL · 카드뉴스)
+│                                    ← 학습 토픽이 아니라 '통합 앱' POC. 필요한 시점에 조립.
 └── README.md
 ```
 
 > **방침**
-> - 메인 폴더 (1~9) 는 모두 **현행 API**: `create_agent` / `@tool` / `bind_tools`
+> - 메인 폴더 (1~11) 는 모두 **현행 API**: `create_agent` / `@tool` / `bind_tools`
 >   (LangChain 1.0+ — 옛 `langgraph.prebuilt.create_react_agent` 는 `langchain.agents.create_agent` 로 이동·대체)
 > - `0.legacy(initialize_agent)/` 에 옛 `initialize_agent + AgentType.*` 기반 32개 파일 격리
 > - 각 파일 상단 docstring 에 (1) 모듈 한 줄 정의 + (2) 이 예제의 목적 명시
@@ -50,7 +54,12 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
        ↓
 9.agentic_patterns  ─ Anthropic 5대 워크플로우 패턴 (체이닝/라우팅/병렬/오케스트레이터/평가자)
        ↓
-10.mini_apps        ─ 실전 미니 앱 (webscan / 금융조회 / 가상트레이딩 + 이메일 HITL)
+10.multi_agent      ─ 멀티 에이전트 (에이전트를 도구로 / 슈퍼바이저)
+       ↓
+11.evaluation       ─ 에이전트 평가 (도구 선택 정확도 자동 검증)
+       ┊
+20.mini_apps        ─ (학습 흐름과 별개) 위 패턴들을 '통합 앱' 으로 조립한 POC
+                       webscan / 금융조회 / 가상트레이딩 + 이메일 HITL / 카드뉴스
 ```
 
 ## API 분류표
@@ -97,6 +106,7 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 | 이름 | 하는 일 | 배우는 곳 |
 |---|---|---|
 | `MemorySaver()` | in-memory 체크포인터(메모리). 영속화는 `SqliteSaver`/`PostgresSaver` 로 교체 | 5.langgraph_memory |
+| `InMemoryStore()` | thread 를 넘어 유지되는 **장기 메모리**. `put`/`search`/`get`. 영속화는 `PostgresStore` | 5.4 |
 | `config={"configurable":{"thread_id":...}}` | 세션 구분 키 (+ `recursion_limit` 등 실행 옵션) | 5.langgraph_memory, 4.3 |
 | `interrupt_before=["tools"]` | 도구 실행 **직전 정지** (사람 승인/수정) | 6.1, 6.2, 6.4, 6.5 |
 | `response_format=Pydantic` | 최종 답을 구조화 → `result["structured_response"]` | 2.6 |
@@ -151,6 +161,7 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 | `5.1_with_memory.py` | `MemorySaver` + `thread_id` 별 격리. 같은 thread 안 맥락 유지 |
 | `5.2_multi_session.py` | 같은 에이전트, `thread_id` 다르면 기억 안 섞임 (멀티유저 격리) |
 | `5.3_inspect_state.py` | `get_state` / `get_state_history` 로 저장된 메모리 직접 들여다보기 |
+| `5.4_long_term_store.py` | **장기 메모리** — `Store` 로 thread(세션) 를 넘어 유지되는 기억 (checkpointer=단기와 대비) |
 
 ### `6.hitl_streaming/` — 사용자 제어 / UX
 | 파일 | 설명 |
@@ -187,8 +198,27 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 | `9.4_orchestrator_worker.py` | Orchestrator-Worker (동적 작업 분해) | LangGraph StateGraph |
 | `9.5_evaluator_optimizer.py` | Evaluator-Optimizer (생성→평가→개선 루프) | LangGraph 순환 그래프 |
 
-### `10.mini_apps/` — 실전 미니 앱 모음
-> 앞 패턴들을 **돌아가는 앱**으로 조립한 POC. 상세는 `10.mini_apps/README.md`.
+### `10.multi_agent/` — 멀티 에이전트
+> 전문 에이전트로 나누고 서로 위임. `10.1` 은 `create_agent`(내장 그래프 자동 구성) 재사용, `10.2`/`10.3` 은 `StateGraph` 를 직접 구성. 상세는 `10.multi_agent/README.md`.
+
+| 파일 | 패턴 | 그래프 | 설명 |
+|---|---|---|---|
+| `10.1_agent_as_tool.py` | Agent-as-Tool | 내장(자동) | 전문 에이전트를 `@tool` 로 포장해 호출 (가장 단순) |
+| `10.2_supervisor.py` | Supervisor | **StateGraph** | `START`/`END` + 조건부 엣지로 '관리자 ↔ worker' 루프 직접 구성 |
+| `10.3_finance_analyst.py` | 병렬 분석가 | **StateGraph** | 주가(yfinance)·뉴스 worker 를 **병렬**(fan-out)로 돌려 합류(fan-in) 후 종합 |
+
+> **`create_agent` 가 이미 LangGraph 그래프**(`START→model→tools→END`)라, **단일 에이전트면 START/END 를 직접 안 짜도 됩니다**(`10.1`).
+> 병렬·조건분기·루프 등 **고정 ReAct 모양으로 안 되는 흐름**일 때만 `StateGraph` 로 직접 구성(`10.2`/`10.3`).
+
+### `11.evaluation/` — 에이전트 평가
+> 비결정적 에이전트의 회귀를 잡으려면 자동 평가가 필요. 상세는 `11.evaluation/README.md`.
+
+| 파일 | 설명 |
+|---|---|
+| `11.1_tool_call_eval.py` | **도구 선택 정확도** 자동 채점 — 불러야 할 때 부르고/아닐 때 안 부르는가 (외부 의존성 없음) |
+
+### `20.mini_apps/` — 실전 미니 앱 모음
+> 학습 토픽이 아니라, 앞 패턴들을 **돌아가는 통합 앱**으로 조립한 POC. 상세는 `20.mini_apps/README.md`.
 
 | 앱 | 설명 | 핵심 패턴 |
 |---|---|---|
@@ -197,6 +227,7 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 | `3.finance_bot/` | 뉴스/기업정보/환율/주가 조회 봇 (CLI) | 멀티툴 라우팅 |
 | `4.trading_bot/` | 조건 충족 시 **이메일 승인(HITL)** 후 가상 거래 ⚠️샌드박스 | cron 잡 + out-of-band HITL |
 | `5.trading_bot_web/` | **챗봇**으로 잔고·시세 묻고 예약/매매 → **알림/승인** 후 가상 거래 ⚠️샌드박스 | 대화형 에이전트 + 웹 HITL |
+| `6.cardview_news/` | **주제 → 뉴스 → 요약 → 카드뉴스 이미지** 생성 (`app2_lcel.py` = LCEL 버전) | 도구 + 이미지 생성(멀티모달) · LCEL |
 
 > `4.trading_bot` 은 `6.hitl_streaming` 의 인프로세스 `interrupt_before` 와 대비되는
 > **비동기(out-of-band) HITL** — 에이전트가 주기적으로 돌다 위험 액션 직전 이메일로 승인 요청.
@@ -270,8 +301,11 @@ pip install wikipedia arxiv langchain-tavily
 # 8.mcp 는 최상위 /8.mcp 로 이전됨 — 설치/실행은 8.mcp/README.md 참고
 pip install mcp langchain-mcp-adapters          # LangChain↔MCP 연동 (+ 공식 서버는 Node.js 18+)
 
-# 10.mini_apps
-pip install flask psutil requests yfinance apscheduler   # webscan / finance / trading
+# 10.multi_agent (10.3_finance_analyst 는 주가/뉴스 조회)
+pip install yfinance requests
+
+# 20.mini_apps
+pip install flask psutil requests yfinance apscheduler bs4   # webscan / finance / trading / cardnews
 ```
 
 각 폴더에서 실행:
@@ -279,7 +313,12 @@ pip install flask psutil requests yfinance apscheduler   # webscan / finance / t
 cd "2.langchain/8.agents/1.builtin_tools"
 python 1.1_llm_math.py           # llm-math(Calculator) — 가장 기초 도구 에이전트
 
-cd "../10.mini_apps/1.webscan_cli"
+cd "../10.multi_agent" && python 10.1_agent_as_tool.py   # 에이전트를 도구로 위임 (prebuilt 그래프)
+python 10.2_supervisor.py                                # StateGraph 슈퍼바이저 (START/END 직접)
+python 10.3_finance_analyst.py                           # StateGraph 병렬 분석 (주가+뉴스 종합)
+cd "../11.evaluation" && python 11.1_tool_call_eval.py   # 도구 선택 정확도 평가
+
+cd "../20.mini_apps/1.webscan_cli"
 python app.py                                 # 시스템 점검 (CLI)
 
 cd "../2.webscan_app_web" && python app.py    # 같은 점검 에이전트 웹판 → http://localhost:5000

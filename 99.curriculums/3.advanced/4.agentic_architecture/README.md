@@ -53,7 +53,7 @@
 | 11:15-12:00 | LangChain 브릿지 | `8.mcp/4.langchain/2.langchain_bridge/mcp_bridge.py`, `8.mcp/4.langchain/2.langchain_bridge/3.langgraph_agent_demo.py` | MCP ↔ LangGraph 브릿지 |
 | 13:00-13:30 | 도구 안전성 | `8.mcp/4.langchain/3.tools_safety/server.py`, `8.mcp/4.langchain/3.tools_safety/2.client2_restrict.py` | 도구 접근 제한 설계 |
 | 13:30-14:00 | 파일시스템 에이전트 | `8.mcp/9.projects/1.local/2.filesystem_client/3.fs_mcp_client3_gpt.py` | 파일 시스템 조작 에이전트 |
-| 14:00-14:30 | 웹 스캔 에이전트 | `2.langchain/8.agents/10.mini_apps/2.webscan_app_web/app.py` | 웹 스캔 에이전트 |
+| 14:00-14:30 | 웹 스캔 에이전트 | `2.langchain/8.agents/20.mini_apps/2.webscan_app_web/app.py` | 웹 스캔 에이전트 |
 | 14:45-15:30 | 스마트 에이전트 라우터 | `2.langchain/8.agents/0.legacy(initialize_agent)/5.routing/9.2_smartagent_router.py`, `2.langchain/8.agents/0.legacy(initialize_agent)/5.routing/9.3_smartagent_router2_moretools.py` | 지능형 도구 라우팅 시스템 |
 | 15:30-17:00 | 실습: MCP 기반 에이전트 설계 | — | 커스텀 MCP 서버 + LangGraph 에이전트 구축 |
 

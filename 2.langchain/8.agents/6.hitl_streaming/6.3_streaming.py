@@ -15,7 +15,9 @@ agent.stream() — 에이전트의 동작을 실시간 스트리밍.
 
 from datetime import datetime
 from dotenv import load_dotenv
+
 from langchain_openai import ChatOpenAI
+
 from langchain_core.tools import tool
 from langchain.agents import create_agent
 

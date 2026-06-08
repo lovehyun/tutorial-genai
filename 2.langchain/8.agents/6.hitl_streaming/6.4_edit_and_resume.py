@@ -13,10 +13,11 @@ HITL 심화 — 도구 인자를 사람이 '수정'한 뒤 재개.
 from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
+from langchain_core.messages import AIMessage
+
 from langchain_core.tools import tool
 from langchain.agents import create_agent
 from langgraph.checkpoint.memory import MemorySaver
-from langchain_core.messages import AIMessage
 
 load_dotenv()
 

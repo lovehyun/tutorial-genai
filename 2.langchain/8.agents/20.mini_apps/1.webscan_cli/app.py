@@ -13,6 +13,7 @@
 import uuid
 
 from dotenv import load_dotenv
+
 from langchain_openai import ChatOpenAI
 from langchain.agents import create_agent
 from langgraph.checkpoint.memory import MemorySaver
@@ -71,6 +72,7 @@ if __name__ == "__main__":
         except (EOFError, KeyboardInterrupt):
             print()
             break
+            
         if q.lower() in ("exit", "quit", "종료"):
             break
         if q:
