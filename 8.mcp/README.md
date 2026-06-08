@@ -29,7 +29,7 @@
   - `3.transports/` — stdio vs HTTP 전송
 - **2.openai** — `1.agent_tool/`, `2.multi_tools/` (각 폴더: 공통 서버 + manual 클라이언트 → GPT 클라이언트 빌드업)
 - **3.anthropic** — `1.claude_desktop/` (Hello, 네트워크 서버, 파일 컨버터 등 Claude Desktop 등록용)
-- **4.langchain** — `0.quickstart/`(adapters 빠른 시작) · `1.langchain_agent/` · `2.langchain_bridge/` · `3.tools_safety/`
+- **4.langchain** — `1.quickstart/`(adapters 빠른 시작) · `2.langchain_agent/` · `3.langchain_bridge/` · `4.tools_safety/`
 - **5.vscode** — `server.py` + `.vscode/mcp.json` → VSCode 에서 내 도구 호출 (Copilot Agent Mode, 또는 Copilot 없이 Cline/Continue/Inspector)
 - **9.projects** — `1.local/`(filesystem 서버·클라이언트) · `2.remote/`(원격) · `3.codebase_qa/`(**RAG 를 MCP 서버로 노출**, 멀티 클라이언트)
 
@@ -39,7 +39,7 @@
 1.common/2.server_quickstart   내 서버가 동작 → 순수 클라이언트로 호출 → 도구 확장
         │  (프로토콜 원리: initialize → list_tools → call_tool 를 눈으로)
         ▼
-4.langchain/0.quickstart       langchain-mcp-adapters 로 에이전트가 자동 호출
+4.langchain/1.quickstart       langchain-mcp-adapters 로 에이전트가 자동 호출
         │  또는 2.openai (GPT 직접) / 3.anthropic (Claude Desktop)
         ▼
 1.common/3.transports          stdio → HTTP 전송 차이
@@ -59,7 +59,7 @@
 | `2.client_raw.py` | MCP 의 3동작 **`initialize → list_tools → call_tool`**. 클라이언트가 서버를 자식 프로세스로 띄움. 결과는 content 블록 리스트. (아직 LLM 없음 — 손으로 호출) |
 | `3.server_tools_resource.py` | **함수만 추가하면 도구가 늘어난다**(서버만 바뀌고 사용처는 그대로). **tool(실행) vs resource(읽기 전용 데이터)** 차이 |
 
-`4.langchain/0.quickstart` 관전 포인트:
+`4.langchain/1.quickstart` 관전 포인트:
 | 파일 | 관전 포인트 |
 |------|------------|
 | `1.agent.py` | 같은 서버인데 **LLM 이 어떤 도구를 어떤 인자로 부를지 자동 결정**. `get_tools()` 가 2.client_raw 의 수동 과정을 대신해준다 |

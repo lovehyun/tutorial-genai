@@ -161,8 +161,8 @@ class MCPBridge:
                 logger.debug("MCP 서버 응답 수신")
                 
                 if result.content and len(result.content) > 0:
+                    content = result.content[0].text          # 먼저 할당 후 로깅 (NameError 방지)
                     logger.debug(f"응답 내용: {content}")
-                    content = result.content[0].text
                     
                     # JSON 파싱 시도
                     try:

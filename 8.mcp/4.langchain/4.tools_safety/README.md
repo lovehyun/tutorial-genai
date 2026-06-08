@@ -1,4 +1,4 @@
-# 4.langchain/3.tools_safety — 에이전트 도구 범위 제한(안전 가드레일)
+# 4.langchain/4.tools_safety — 에이전트 도구 범위 제한(안전 가드레일)
 
 에이전트가 **정해진 도구만** 쓰고, 범위를 벗어난 요청은 깔끔히 거절하도록 프롬프트로 가드레일을 건다.
 
@@ -9,7 +9,7 @@
 
 ## 실행
 ```bash
-cd 8.mcp/4.langchain/3.tools_safety
+cd 8.mcp/4.langchain/4.tools_safety
 pip install mcp langchain langchain-openai langchain-core python-dotenv
 # .env 에 OPENAI_API_KEY
 

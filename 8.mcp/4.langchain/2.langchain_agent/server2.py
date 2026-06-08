@@ -1,4 +1,5 @@
 # server2.py - MCP 서버 (개선된 버전)
+import sys
 from mcp.server.fastmcp import FastMCP
 from datetime import datetime
 
@@ -75,14 +76,10 @@ def get_day_of_week() -> str:
 
 # 서버 실행
 if __name__ == "__main__":
-    print("MCP 서버 시작 (STDIO 모드)")
-    print("사용 가능한 도구:")
-    print("- say_hello: 인사말 생성")
-    print("- add: 덧셈 계산")
-    print("- multiply: 곱셈 계산") 
-    print("- now: 현재 시간")
-    print("- get_day_of_week: 요일 정보")
-    print("-" * 30)
-    
+    # ⚠️ stdio 서버는 stdout 이 JSON-RPC 채널이므로 print() 금지! (프로토콜 깨짐)
+    #    안내 로그는 반드시 stderr 로 보낸다.
+    print("MCP 서버 시작 (STDIO 모드) — 도구: say_hello/add/multiply/now/get_day_of_week",
+          file=sys.stderr)
+
     # STDIO 모드로 실행 (LangChain과 통신용)
     mcp.run(transport="stdio")

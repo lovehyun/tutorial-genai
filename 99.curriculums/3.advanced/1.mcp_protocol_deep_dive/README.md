@@ -40,11 +40,11 @@
 | 11:15-12:00 | 멀티 도구 서버 | `8.mcp/2.openai/2.multi_tools/math_server.py`, `8.mcp/2.openai/2.multi_tools/utility_server.py` | 수학/유틸리티 다중 MCP 서버 |
 | 13:00-13:30 | 멀티 도구 클라이언트 | `8.mcp/2.openai/2.multi_tools/1.smart_client_manual.py`, `8.mcp/2.openai/2.multi_tools/2.smart_client_gpt.py` | 다중 서버 연결 스마트 클라이언트 |
 | 13:30-14:00 | HTTP 네트워크 도구 | `8.mcp/1.common/3.transports/server_http.py`, `8.mcp/1.common/3.transports/1.client_http.py` | HTTP 기반 MCP 통신 |
-| 14:00-14:30 | LangChain 에이전트 (Pydantic) | `8.mcp/4.langchain/1.langchain_agent/server.py`, `8.mcp/4.langchain/1.langchain_agent/1.1_client1_pydantic.py` | LangChain + MCP Pydantic 통합 |
-| 14:45-15:15 | LangChain 멀티 도구 | `8.mcp/4.langchain/1.langchain_agent/1.4_client1_multi_tools.py`, `8.mcp/4.langchain/1.langchain_agent/1.5_client1_multi_tools2_exception.py` | LangChain 멀티 도구 에이전트 |
-| 15:15-15:45 | LangChain 브릿지 | `8.mcp/4.langchain/2.langchain_bridge/mcp_bridge.py`, `8.mcp/4.langchain/2.langchain_bridge/1.langchain_agent_demo.py` | MCP → LangChain 브릿지 모듈 |
-| 15:45-16:15 | LangGraph 브릿지 | `8.mcp/4.langchain/2.langchain_bridge/3.langgraph_agent_demo.py`, `8.mcp/4.langchain/2.langchain_bridge/4.langgraph_agent2_demo_except.py` | MCP → LangGraph 브릿지 |
-| 16:15-17:00 | 도구 안전성 | `8.mcp/4.langchain/3.tools_safety/server.py`, `8.mcp/4.langchain/3.tools_safety/1.client.py`, `8.mcp/4.langchain/3.tools_safety/2.client2_restrict.py` | 도구 접근 제한, 안전한 에이전트 |
+| 14:00-14:30 | LangChain 에이전트 (Pydantic) | `8.mcp/4.langchain/2.langchain_agent/server.py`, `8.mcp/4.langchain/2.langchain_agent/1.1_client1_pydantic.py` | LangChain + MCP Pydantic 통합 |
+| 14:45-15:15 | LangChain 멀티 도구 | `8.mcp/4.langchain/2.langchain_agent/1.4_client1_multi_tools.py`, `8.mcp/4.langchain/2.langchain_agent/1.5_client1_multi_tools2_exception.py` | LangChain 멀티 도구 에이전트 |
+| 15:15-15:45 | LangChain 브릿지 | `8.mcp/4.langchain/3.langchain_bridge/mcp_bridge.py`, `8.mcp/4.langchain/3.langchain_bridge/2.langchain_agent_demo.py` | MCP → LangChain 브릿지 모듈 |
+| 15:45-16:15 | LangGraph 브릿지 | `8.mcp/4.langchain/3.langchain_bridge/3.langgraph_agent_demo.py`, `8.mcp/4.langchain/3.langchain_bridge/4.langgraph_agent2_demo_except.py` | MCP → LangGraph 브릿지 |
+| 16:15-17:00 | 도구 안전성 | `8.mcp/4.langchain/4.tools_safety/server.py`, `8.mcp/4.langchain/4.tools_safety/1.client.py`, `8.mcp/4.langchain/4.tools_safety/2.client2_restrict.py` | 도구 접근 제한, 안전한 에이전트 |
 
 ### Day 3: MCP 프로젝트와 Claude Desktop
 
@@ -78,9 +78,9 @@ pip install anthropic mcp langchain langchain-anthropic langgraph
 ## 참고 자료
 - `8.mcp/1.common/1.intro/` — MCP 기초
 - `8.mcp/2.openai/` — MCP 에이전트
-- `8.mcp/4.langchain/1.langchain_agent/` — LangChain + MCP
-- `8.mcp/4.langchain/2.langchain_bridge/` — LangChain/LangGraph 브릿지
-- `8.mcp/4.langchain/3.tools_safety/` — 도구 안전성
+- `8.mcp/4.langchain/2.langchain_agent/` — LangChain + MCP
+- `8.mcp/4.langchain/3.langchain_bridge/` — LangChain/LangGraph 브릿지
+- `8.mcp/4.langchain/4.tools_safety/` — 도구 안전성
 - `8.mcp/9.projects/1.local/` — 로컬 MCP 프로젝트
 - `8.mcp/9.projects/2.remote/` — 리모트 MCP 프로젝트
 - `8.mcp/3.anthropic/1.claude_desktop/` — Claude Desktop 연동

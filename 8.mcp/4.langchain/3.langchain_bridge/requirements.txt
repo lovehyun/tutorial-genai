@@ -1,9 +1,7 @@
-asyncio
 python-dotenv
 openai
 mcp
 langchain
 langchain-openai
 langchain-core
-langchainhub
 langgraph

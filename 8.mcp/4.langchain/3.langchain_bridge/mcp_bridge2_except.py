@@ -65,9 +65,9 @@ class MCPBridge:
         
         # 스키마에서 파라미터 정보 가져오기
         tool_schema = None
-        for tool in self._tools:
+        for tool in self._discovered_tools:            # (수정) self._tools → self._discovered_tools
             if tool['name'] == tool_name:
-                tool_schema = tool['schema']
+                tool_schema = tool['input_schema']     # (수정) 'schema' → 'input_schema'
                 break
         
         if not tool_schema or 'properties' not in tool_schema:
@@ -149,19 +149,19 @@ class MCPBridge:
     def _create_tool_caller(self, tool_name: str) -> Callable:
         """도구 호출 함수 생성"""
         def tool_caller(input_str: str = "") -> str:
-            params = self._parse_input(tool_name, input_str)
+            params = self._parse_input_from_schema(tool_name, input_str)   # (수정) _parse_input → _parse_input_from_schema
             logger.debug(f"{tool_name} 호출: {params}")
-            
+
             try:
                 # 이벤트 루프 확인 후 실행
                 try:
                     loop = asyncio.get_running_loop()
                     import concurrent.futures
                     with concurrent.futures.ThreadPoolExecutor() as executor:
-                        future = executor.submit(asyncio.run, self._call_tool(tool_name, params))
+                        future = executor.submit(asyncio.run, self._call_mcp_tool(tool_name, params))  # (수정) _call_tool → _call_mcp_tool
                         return future.result(timeout=10)
                 except RuntimeError:
-                    return asyncio.run(self._call_tool(tool_name, params))
+                    return asyncio.run(self._call_mcp_tool(tool_name, params))   # (수정) _call_tool → _call_mcp_tool
             except Exception as e:
                 logger.error(f"{tool_name} 호출 오류: {e}")
                 return f"오류: {str(e)}"
@@ -183,7 +183,7 @@ class MCPBridge:
             description = tool_info['description']
             input_schema = tool_info['input_schema']
             
-            caller = self._create_mcp_caller(tool_name, input_schema)
+            caller = self._create_tool_caller(tool_name)   # (수정) _create_mcp_caller(2인자) → _create_tool_caller(1인자)
             
             langchain_tool = Tool(
                 name=tool_name,

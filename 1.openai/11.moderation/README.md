@@ -52,4 +52,4 @@ python 6.policy_in_prompt.py     # 정책을 답변 프롬프트에 내장 (1-ca
 
 ## 참고
 - 입력 가드 + 출력 가드(생성된 답변도 검사)로 양방향 적용하면 더 안전합니다.
-- 더 정교한 안전/권한 제어는 에이전트 도구 제한([`2.langchain/8.agents` 또는 `8.mcp/4.langchain/3.tools_safety`])과 함께 쓰세요.
+- 더 정교한 안전/권한 제어는 에이전트 도구 제한([`2.langchain/8.agents` 또는 `8.mcp/4.langchain/4.tools_safety`])과 함께 쓰세요.

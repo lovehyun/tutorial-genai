@@ -1,25 +1,9 @@
 {
   "mcpServers": {
-    "hello": {
-      "command": "python",
-      "args": [
-        "C:/ABSOLUTE/PATH/TO/tutorial-genai/8.mcp/3.anthropic/1.claude_desktop/1.mcp_hello/hello_server.py"
-      ]
-    },
-    "dev-helper": {
-      "command": "python",
-      "args": [
-        "C:/ABSOLUTE/PATH/TO/tutorial-genai/8.mcp/5.vscode/server.py"
-      ]
-    },
-    "codebase-qa": {
-      "command": "python",
-      "args": [
-        "C:/ABSOLUTE/PATH/TO/tutorial-genai/8.mcp/9.projects/3.codebase_qa/server.py"
-      ],
-      "env": {
-        "OPENAI_API_KEY": "sk-여기에-키"
-      }
+    "hello":       {"command": "python", "args": ["C:/ABSOLUTE/PATH/TO/tutorial-genai/8.mcp/3.anthropic/1.claude_desktop/1.mcp_hello/hello_server.py"]},
+    "dev-helper":  {"command": "python", "args": ["C:/ABSOLUTE/PATH/TO/tutorial-genai/8.mcp/5.vscode/server.py"]},
+    "codebase-qa": {"command": "python", "args": ["C:/ABSOLUTE/PATH/TO/tutorial-genai/8.mcp/9.projects/3.codebase_qa/server.py"],
+      "env": {"OPENAI_API_KEY": "sk-여기에-키"}
     }
   }
 }

@@ -11,7 +11,7 @@ MCP 3단계: 내 서버를 확장한다 — 도구 여러 개 + resource.
 
 실행:
   - 단독 실행하면 stdio 서버로 대기한다(정상).
-  - 4.langchain/0.quickstart/1.agent 가 이 서버를 자식 프로세스로 띄워 도구를 사용한다.
+  - 4.langchain/1.quickstart/1.agent 가 이 서버를 자식 프로세스로 띄워 도구를 사용한다.
 """
 
 from mcp.server.fastmcp import FastMCP

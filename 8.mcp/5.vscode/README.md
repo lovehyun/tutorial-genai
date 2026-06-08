@@ -54,7 +54,7 @@ cd 8.mcp/5.vscode
 pip install "mcp[cli]"
 mcp dev server.py     # 브라우저 Inspector 에서 도구 클릭 호출 (add / word_count / to_snake_case)
 ```
-LLM 에이전트로 붙이려면 `4.langchain/0.quickstart/1.agent.py` 의 `SERVER` 를 이 폴더 `server.py` 로
+LLM 에이전트로 붙이려면 `4.langchain/1.quickstart/1.agent.py` 의 `SERVER` 를 이 폴더 `server.py` 로
 바꿔 실행하면 된다(터미널에서). → Copilot 불필요.
 
 ### 2) Cline 확장 (BYO API 키, 무료)
@@ -87,7 +87,7 @@ mcpServers:
 
 ## 동작 원리 (관전 포인트)
 - VSCode 가 `mcp.json` 의 `command/args` 로 **server.py 를 자식 프로세스(stdio)로 띄운다** —
-  `4.langchain/0.quickstart/1.agent.py` 가 `MultiServerMCPClient` 로 하던 것과 같은 일을 VSCode 가 한다.
+  `4.langchain/1.quickstart/1.agent.py` 가 `MultiServerMCPClient` 로 하던 것과 같은 일을 VSCode 가 한다.
 - 즉 **서버 코드는 그대로**, 클라이언트만 (raw → LangChain → VSCode) 바뀐다. 이것이 MCP 의 핵심 가치.
 
 ## 참고

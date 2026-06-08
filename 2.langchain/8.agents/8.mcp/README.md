@@ -17,11 +17,11 @@ MCP(Model Context Protocol)는 특정 프레임워크에 묶이지 않는 **prov
 ## LangChain 학습자라면
 
 이 폴더(`2.langchain/8.agents`)에서 에이전트를 익힌 뒤, MCP 연동은 곧장
-**[`/8.mcp/4.langchain/0.quickstart/`](../../../8.mcp/4.langchain/0.quickstart/)** 로 가세요.
+**[`/8.mcp/4.langchain/1.quickstart/`](../../../8.mcp/4.langchain/1.quickstart/)** 로 가세요.
 `langchain-mcp-adapters` 로 MCP 서버 도구를 에이전트에 붙이는 빠른 시작이 거기에 있습니다.
 
 ```python
-# 핵심 패턴 (자세한 실행 코드는 /8.mcp/4.langchain/0.quickstart/1.agent.py)
+# 핵심 패턴 (자세한 실행 코드는 /8.mcp/4.langchain/1.quickstart/1.agent.py)
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain.agents import create_agent
 

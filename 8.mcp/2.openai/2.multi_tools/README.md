@@ -24,7 +24,7 @@ python 2.smart_client_gpt.py      # math + utility 동시, GPT 라우팅
 
 ## 관전 포인트
 - **멀티 서버**: 도구를 서버 단위로 쪼개고 클라이언트가 합쳐 쓴다 →
-  `4.langchain/0.quickstart/4.multi_server` 와 같은 그림을 langchain 없이.
+  `4.langchain/1.quickstart/4.multi_server` 와 같은 그림을 langchain 없이.
 - 단독 test → 키워드 라우팅(manual) → LLM 라우팅(gpt) 으로 고도화.
 - `2.smart_client_gpt` 는 도구 스키마를 보고 **인자까지 파싱** — function calling 의 실전 형태.
 
