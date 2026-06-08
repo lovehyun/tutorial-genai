@@ -1,3 +1,8 @@
+# server.py — 파일시스템 MCP '간단' 서버 (4툴)
+# list_files / read_file / rename_file / copy_file 을 제공한다.
+# 모든 작업은 WORK_DIR(./workspace) 안에서만 — 클라이언트(client.py)가 stdio 로 띄운다.
+# (고급판 9툴: server2.py)
+
 import shutil
 from pathlib import Path
 

@@ -1,9 +1,7 @@
 # 4.langchain/2.langchain_agent — MCP 도구를 LangChain 도구로 감싸기 (수동 변환)
 
-MCP 도구를 LangChain `Tool`/`BaseTool` 로 **직접 감싸** ReAct 에이전트가 쓰게 한다.
+MCP 도구를 LangChain `Tool`/`@tool` 로 **직접 감싸** `create_agent` 가 쓰게 한다.
 `1.quickstart` 는 `langchain-mcp-adapters` 가 이 변환을 자동으로 해주는데, 여기선 손으로 해보며 원리를 본다.
-
-> 같은 폴더에 `README.test.md`(원저자 테스트 메모)도 있음.
 
 ## 파일
 - `server.py` — say_hello 1개 / `server2.py` — say_hello·add·now·multiply·get_day_of_week

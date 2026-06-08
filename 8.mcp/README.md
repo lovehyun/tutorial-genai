@@ -66,50 +66,14 @@
 > **빠른 길**: 코드보다 결과를 먼저 보고 싶으면 1단계 → 5단계(Claude Desktop/VSCode 설정) 로 건너뛰어도 된다.
 > 같은 서버를 어디에 붙이든 동작하는 게 MCP 의 핵심이기 때문.
 
-## 빠른 시작 관전 포인트 (`1.common`)
+## 빠른 시작
 
-전체 관통 축: **수동→자동**(직접 호출 → LLM 자동), **내 서버→공식 서버**, **단일→혼합→멀티**.
-
-| 파일 | 관전 포인트 |
-|------|------------|
-| `1.intro/3.hello_server.py` | `@mcp.tool()` 하나로 함수가 도구가 된다. **타입힌트+docstring 이 곧 LLM 이 읽는 명세**. stdio 단독 실행 시 입력 대기(정상) |
-| `1.intro/4.hello_client.py` | MCP 핵심 동작 **`initialize → call_tool`** 을 손으로. 클라이언트가 서버를 자식 프로세스로 띄움 (아직 LLM 없음) |
-| `2.protocol_deep/4.simple_client3_getinfo.py` | **`list_tools / list_resources / get_prompt`** — 서버가 가진 걸 전부 발견 |
-| `2.protocol_deep/5.server_tools_resource.py` | **함수만 추가하면 도구가 늘어난다**. **tool(실행) vs resource(읽기 전용 데이터)** 차이 |
-
-`4.langchain/1.quickstart` 관전 포인트:
-| 파일 | 관전 포인트 |
-|------|------------|
-| `1.agent.py` | 같은 서버인데 **LLM 이 어떤 도구를 어떤 인자로 부를지 자동 결정**. `get_tools()` 가 손으로 하던 list_tools/call_tool 을 대신해준다 |
-| `2.official_server.py` | **코드가 1.agent 와 거의 동일, `command` 가 python→npx 로 바뀐 것뿐** → "한 번 만든 서버는 어디서든 재사용" |
-| `3.mcp_plus_local.py` | `mcp_tools + [내 @tool]` — 리스트만 합치면 끝 (둘 다 같은 BaseTool) |
-| `4.multi_server.py` | 딕셔너리에 항목만 늘리면 멀티 서버 — `get_tools()` 가 모든 서버 도구를 합쳐준다 |
-
-## 내 서버 테스트 방법
-
-stdio 서버는 단독 실행하면 입력 대기로 멈춘다(고장 아님 — Ctrl+C). 클라이언트를 붙여서 테스트한다.
-
-### A. 클라이언트로 호출 (간단, Node 불필요) ⭐
 ```bash
 pip install mcp
-cd "8.mcp/1.common/1.intro"
-python 4.hello_client.py          # 기대: "Hello, John!" (3.hello_server 자동 실행)
-# 더 깊게: cd ../2.protocol_deep && python 4.simple_client3_getinfo.py  (tools/resources/prompts 발견)
+cd 8.mcp/1.common/1.intro && python 4.hello_client.py    # 첫 왕복 (LLM 불필요)
 ```
-
-### B. MCP Inspector 로 클릭 테스트 (브라우저 UI, Node 필요)
-```bash
-pip install "mcp[cli]"                       # mcp CLI
-cd "8.mcp/1.common/2.protocol_deep"
-mcp dev 5.server_tools_resource.py           # 내부적으로 npx @modelcontextprotocol/inspector 실행 (Node 18+)
-```
-1. 터미널에 뜨는 **토큰이 포함된 URL** 을 그대로 브라우저에 연다(토큰 없이 열면 unauthorized).
-2. **Connect** → 상태 Connected.
-3. **Tools 탭 → List Tools → 도구 선택(예: `multiply`) → 인자 입력 → Run** → 결과 확인.
-4. (resource 도 있으니) **Resources 탭 → List → `info://server`** 확인.
-5. 끝낼 땐 터미널 **Ctrl+C**.
-
-> 대안(설치 없이): `npx @modelcontextprotocol/inspector python 5.server_tools_resource.py`
+- **폴더별 상세·관전 포인트는 각 폴더 README** 참고. 특히 [`1.common/README`](1.common/) 에 **tool / resource / prompt** 개념 정리.
+- 브라우저 클릭 테스트: `pip install "mcp[cli]"` → `mcp dev 1.common/2.protocol_deep/5.server_tools_resource.py` (Node 18+ Inspector).
 
 ## 환경 설정
 

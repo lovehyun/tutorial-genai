@@ -9,8 +9,8 @@ from datetime import datetime
 from mcp.server.fastmcp import FastMCP
 
 # 작업 디렉토리 설정 (보안을 위해 특정 폴더로 제한)
-WORKING_DIR = Path("./workspace")  # 현재 디렉토리의 workspace 폴더
-WORKING_DIR.mkdir(exist_ok=True)   # 폴더가 없으면 생성
+WORKING_DIR = Path("./workspace").resolve()  # 절대경로로 (relative_to 계산이 맞도록)
+WORKING_DIR.mkdir(exist_ok=True)             # 폴더가 없으면 생성
 
 mcp = FastMCP("FileSystemServer")
 
@@ -30,7 +30,7 @@ def get_safe_path(relative_path: str) -> Path:
         raise ValueError(f"잘못된 경로입니다: {e}")
 
 @mcp.tool()
-def list_files(directory: str = ".") -> List[Dict[str, Any]]:
+def list_files(directory: str = "."):
     """디렉토리의 파일 목록을 조회합니다."""
     try:
         target_dir = get_safe_path(directory)
@@ -290,7 +290,7 @@ def move_file(source_path: str, destination_path: str, overwrite: bool = False) 
         return {"error": str(e)}
 
 @mcp.tool()
-def search_files(pattern: str, directory: str = ".", file_type: str = "all") -> List[Dict[str, Any]]:
+def search_files(pattern: str, directory: str = ".", file_type: str = "all"):
     """파일을 검색합니다."""
     try:
         target_dir = get_safe_path(directory)
