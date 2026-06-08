@@ -2,8 +2,12 @@
 # 1.finetune
 my_local_model/
 my_local_model_kr/
+my_nsmc_model/
+my_ynat_model/
 results/
 results_kr/
+results_nsmc/
+results_ynat/
 
 # 2.compression
 quantized_model/

@@ -22,3 +22,9 @@ result = sentiment_analyzer("I love using Hugging Face!")[0]
 
 # 결과 출력
 print(result)  # {'label': 'POSITIVE', 'score': 0.9998}
+
+
+# 다중 입력
+# result = sentiment_analyzer(["I'm happy", "i'm unhappy"])
+# print(result)
+# [{'label': 'POSITIVE', 'score': 0.9998793601989746}, {'label': 'NEGATIVE', 'score': 0.9997771382331848}]

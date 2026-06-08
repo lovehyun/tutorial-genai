@@ -28,12 +28,14 @@ eval_data = {
 model_name = "distilbert-base-uncased"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
+
 # 2) 토큰화 (1.transformers 에서 배운 그 토큰화)
 def tokenize(batch):
     return tokenizer(batch["text"], padding="max_length", truncation=True)
 
 train_ds = Dataset.from_dict(train_data).map(tokenize, batched=True)
 eval_ds  = Dataset.from_dict(eval_data).map(tokenize, batched=True)
+
 
 # 3) 모델 = 사전학습 본체 + 새 분류 헤드(2클래스)
 #    id2label 로 숫자 라벨에 사람이 읽을 이름을 붙인다 (예측 결과가 NEGATIVE/POSITIVE 로 나옴)
@@ -43,11 +45,13 @@ model = AutoModelForSequenceClassification.from_pretrained(
     label2id={"NEGATIVE": 0, "POSITIVE": 1},
 )
 
+
 # 4) 평가지표 — 정확도
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
     preds = np.argmax(logits, axis=-1)
     return {"accuracy": float((preds == labels).mean())}
+
 
 # 5) 학습 설정 — 매 에포크 평가, 3 에포크
 args = TrainingArguments(

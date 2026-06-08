@@ -47,6 +47,13 @@ def call_model(state: MessagesState):
     return {"messages": response}
 
 # 4. 그래프 생성 및 노드/엣지 추가
+# MessagesState = langgraph 프리빌트 TypedDict (= dict 형태의 State).
+#   단일 필드 messages 만 가지며, 타입은 Annotated[list[AnyMessage], add_messages]:
+#     · list[AnyMessage] : 메시지 '객체'들의 리스트 (Human/AI/System/Tool…)
+#     · add_messages     : 리듀서 — 노드가 반환한 메시지를 기존 리스트에 자동 append
+#
+#   (그래서 call_model 이 새 메시지만 반환해도 기존 대화에 누적된다. topic 같은 추가 필드가
+#    필요하면 MessagesState 를 상속해 늘리거나 커스텀 TypedDict 를 쓴다 — 3번 참고)
 graph = StateGraph(state_schema=MessagesState)
 graph.add_node("model", call_model)
 
