@@ -109,16 +109,19 @@ def echo(message: str) -> str:
     return f"Echo: {message}"
 
 if __name__ == "__main__":
-    # 명령행 인자로 모드 선택
-    if len(sys.argv) > 1:
-        mode = sys.argv[1]
-        if mode == "--stdio":
-            print("STDIO 서버 시작")
-            mcp.run(transport="stdio")
-        elif mode == "--http":
-            print("HTTP 서버 시작")
-            mcp.run(transport="streamable-http")
-    else:
+    # 명령행 인자로 모드 선택 (기본: HTTP — 이 폴더는 '원격' 데모)
+    mode = sys.argv[1] if len(sys.argv) > 1 else "--http"
+    if mode in ("-h", "--help"):
         print("사용법:")
-        print("  python server.py --stdio  # STDIO 서버")
-        print("  python server.py --http   # HTTP 서버")
+        print("  python server.py            # 기본: HTTP 서버 (원격)")
+        print("  python server.py --http     # HTTP 서버 (streamable-http)")
+        print("  python server.py --stdio    # STDIO 서버")
+    elif mode == "--stdio":
+        # ⚠️ stdio 는 stdout 이 프로토콜 채널 → 안내는 stderr 로
+        print("STDIO 서버 시작", file=sys.stderr)
+        mcp.run(transport="stdio")
+    elif mode == "--http":
+        print("HTTP 서버 시작 → http://127.0.0.1:8000/mcp  (Ctrl+C 종료)")
+        mcp.run(transport="streamable-http")
+    else:
+        print(f"알 수 없는 옵션: {mode}  (--http / --stdio / --help)")

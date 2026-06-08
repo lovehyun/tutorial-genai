@@ -303,13 +303,7 @@ def calculate_age(birth_year: int) -> str:
 
 # ===== 서버 실행 =====
 if __name__ == "__main__":
-    # 표준 입출력(stdin/stdout)을 통해 MCP 프로토콜 서버 시작
-    # 클라이언트와의 JSON-RPC 통신을 처리함
-    print("MultiToolServer 시작됨 - 사용 가능한 도구들:")
-    print("- 인사말: hello")
-    print("- 계산기: add, multiply, subtract, divide, power, square_root") 
-    print("- 시간: now")
-    print("- 랜덤: random_number, flip_coin, roll_dice")
-    print("- 텍스트: count_words, reverse_text, to_upper_lower")
-    print("- 정보: system_info, calculate_age")
+    import sys
+    # ⚠️ stdio 서버는 stdout 이 JSON-RPC 채널 → print() 금지! 안내는 stderr 로.
+    print("MultiToolServer 시작됨 (hello/add/multiply/now/random/text/info ...)", file=sys.stderr)
     mcp.run()

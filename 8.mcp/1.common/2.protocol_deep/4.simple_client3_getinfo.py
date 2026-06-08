@@ -12,8 +12,8 @@ async def main():
     # 프록시를 통해 서버에 연결
     server_params = StdioServerParameters(
         command="python", 
-        # args=["simple_server2.py"]
-        args=["debug_proxy.py", "simple_server2.py"],
+        # args=["3.simple_server2.py"]
+        args=["debug_proxy.py", "3.simple_server2.py"],
         env={  # 한글 이슈
             "PYTHONIOENCODING": "utf-8",
             "PYTHONUNBUFFERED": "1"
@@ -73,19 +73,13 @@ async def main():
                 "target_lang": "English"
             }
             
-            # 5-1) 최신 스타일 우선 시도
-            if hasattr(session, "prompts") and hasattr(session.prompts, "get"):
-                prompt_text = await session.prompts.get("translate", prompt_args)
-
-            # 5-2) 구버전 API 시도
-            elif hasattr(session, "get_prompt"):
-                prompt_text = await session.get_prompt("translate", prompt_args)
-
-            else:
-                raise RuntimeError("이 MCP 클라이언트에는 prompt get API가 없어 프롬프트를 가져올 수 없습니다.")
-
+            # get_prompt 가 현행 API. (session.prompts 속성은 1.9.1 에 없음)
+            # 반환값은 GetPromptResult — .messages 안의 텍스트를 꺼내야 한다.
+            prompt_resp = await session.get_prompt("translate", prompt_args)
             print("\n=== 생성된 프롬프트(LLM에 보낼 지시문) ===")
-            print(prompt_text)
+            for msg in prompt_resp.messages:
+                text = getattr(msg.content, "text", str(msg.content))
+                print(f"[{msg.role}] {text}")
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -16,24 +16,20 @@ pip install mcp python-dotenv
 
 ## 서버 실행 방법
 
-### 1. 기본 실행 (STDIO 모드)
+### 1. 기본 실행 (HTTP 모드 — 이 폴더는 '원격' 데모)
 ```bash
 python server.py
 ```
 
 출력:
 ```
-기본 서버 시작 (STDIO 모드)
+HTTP 서버 시작 → http://127.0.0.1:8000/mcp  (Ctrl+C 종료)
 ```
+> 클라이언트(`client.py`)가 `http://localhost:8000/mcp` 로 붙으므로 기본이 HTTP 다.
 
-### 2. HTTP 모드 실행
+### 2. HTTP 모드 명시
 ```bash
 python server.py --http
-```
-
-출력:
-```
-HTTP 서버 시작
 ```
 
 ### 3. STDIO 모드 실행
@@ -49,10 +45,9 @@ python server.py --help
 출력:
 ```
 사용법:
-  python server.py          # 기본 STDIO 서버
-  python server.py --stdio  # STDIO 서버
-  python server.py --http   # HTTP 서버
-  python server.py --help   # 도움말
+  python server.py            # 기본: HTTP 서버 (원격)
+  python server.py --http     # HTTP 서버 (streamable-http)
+  python server.py --stdio    # STDIO 서버
 ```
 
 ---
@@ -226,17 +221,15 @@ export MCP_SERVER_URL=http://localhost:8000/mcp
 
 ## STDIO vs HTTP 모드
 
-### STDIO 모드 (기본)
-- 표준 입출력 통신
-- 로컬 전용
-- 네트워크 설정 불필요
-- 더 안정적
-
-### HTTP 모드
-- HTTP 통신
-- 원격 접근 가능
+### HTTP 모드 (이 폴더 기본)
+- HTTP(streamable-http) 통신
+- 원격 접근 가능 — 웹 서비스 백엔드에서 호출 가능
 - 네트워크 설정 필요
-- 웹 기반 클라이언트 지원
+
+### STDIO 모드 (`--stdio`)
+- 표준 입출력 통신
+- 로컬 전용 (클라이언트가 서버를 자식 프로세스로 실행)
+- 네트워크 설정 불필요
 
 ---
 

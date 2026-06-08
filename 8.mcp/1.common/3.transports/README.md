@@ -22,7 +22,7 @@ python 1.client_http.py      # 실행 중인 서버에 HTTP 로 접속
 
 ## 관전 포인트
 - **stdio vs HTTP 의 본질 차이**:
-  - stdio = 클라이언트가 서버를 띄움(자동, 1:1, 로컬). 2.server_quickstart 가 이것.
+  - stdio = 클라이언트가 서버를 띄움(자동, 1:1, 로컬). 2.protocol_deep 가 이것.
   - HTTP = 서버가 독립 실행(수동 선실행) → **여러 클라이언트 / 원격 접속** 가능.
 - 클라이언트 코드 차이는 접속부 한 줄뿐: `stdio_client(...)` → `streamablehttp_client(url)`.
   나머지(`initialize` / `list_tools` / `call_tool`)는 **완전히 동일**.

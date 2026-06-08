@@ -396,18 +396,8 @@ def get_file_info(file_path: str) -> Dict[str, Any]:
         return {"error": str(e)}
 
 if __name__ == "__main__":
-    print(f"파일 시스템 MCP 서버 시작...")
-    print(f"작업 디렉토리: {WORKING_DIR.absolute()}")
-    print(f"사용 가능한 도구:")
-    print(f"  - list_files: 디렉토리 내용 조회")
-    print(f"  - read_file: 파일 읽기")
-    print(f"  - write_file: 파일 쓰기")
-    print(f"  - create_directory: 디렉토리 생성")
-    print(f"  - delete_file: 파일/디렉토리 삭제")
-    print(f"  - copy_file: 파일/디렉토리 복사")
-    print(f"  - move_file: 파일/디렉토리 이동")
-    print(f"  - search_files: 파일 검색")
-    print(f"  - get_file_info: 파일 정보 조회")
-    
+    import sys
+    # ⚠️ stdio 서버는 stdout 이 JSON-RPC 채널 → print() 금지! 안내는 stderr 로.
+    print(f"파일시스템 MCP 서버 시작 (작업 디렉토리: {WORKING_DIR.absolute()})", file=sys.stderr)
     mcp.run()
     

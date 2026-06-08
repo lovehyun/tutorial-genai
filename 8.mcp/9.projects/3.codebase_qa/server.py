@@ -10,7 +10,7 @@
   → 이 폴더의 1.client_raw.py / 2.client_langchain.py 가 그 예시.
 
 준비:
-  pip install mcp langchain-openai langchain-community langchain-text-splitters python-dotenv
+  pip install mcp langchain-openai langchain-text-splitters python-dotenv
   .env 에 OPENAI_API_KEY  (서버 시작 시 임베딩을 만든다)
 
 단독 점검:
@@ -27,7 +27,7 @@ from mcp.server.fastmcp import FastMCP
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_community.document_loaders import TextLoader
+from langchain_core.documents import Document       # (구) langchain_community.TextLoader 대신 — sunset 의존성 제거
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 load_dotenv()
@@ -42,10 +42,8 @@ mcp = FastMCP("codebase-qa")
 def _build_index():
     docs = []
     for path in sorted(glob.glob(os.path.join(DATA_DIR, "*.md"))):
-        loaded = TextLoader(path, encoding="utf-8").load()
-        for d in loaded:
-            d.metadata["source"] = os.path.basename(path)
-        docs += loaded
+        text = open(path, encoding="utf-8").read()
+        docs.append(Document(page_content=text, metadata={"source": os.path.basename(path)}))
     chunks = RecursiveCharacterTextSplitter(
         chunk_size=500, chunk_overlap=100
     ).split_documents(docs)

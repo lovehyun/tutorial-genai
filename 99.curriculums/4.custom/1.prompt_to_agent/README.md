@@ -115,8 +115,8 @@
 | | | `1.openai/9.structured_output/5.func_calling_basic.py` | [실습] OpenAI Function Calling |
 | | | `2.langchain/8.agents/0.legacy(initialize_agent)/3.custom_tools/4.4_customtools2_getinfo.py` | [실습] 정보 조회 도구 |
 | 13:45-14:30 | MCP 프로토콜 연동 | `0.docs/05_genai_advanced/12_mcp_model_context_protocol.md` | MCP 아키텍처, 서버/클라이언트, 전송 계층 |
-| | | `8.mcp/1.common/1.intro/simple_server.py` | [실습] MCP 서버 구현 |
-| | | `8.mcp/1.common/1.intro/5.simple_client.py` | [실습] MCP 클라이언트 연결 |
+| | | `8.mcp/1.common/2.protocol_deep/1.simple_server.py` | [실습] MCP 서버 구현 |
+| | | `8.mcp/1.common/2.protocol_deep/2.simple_client.py` | [실습] MCP 클라이언트 연결 |
 | 14:45-15:30 | MCP 에이전트 연동 | `8.mcp/2.openai/1.agent_tool/server.py` | [실습] 에이전트용 MCP 서버 |
 | | | `8.mcp/2.openai/1.agent_tool/3.client_gpt.py` | [실습] GPT 기반 MCP 에이전트 |
 | | | `8.mcp/4.langchain/3.langchain_bridge/mcp_bridge.py` | [실습] MCP → LangChain 브릿지 |

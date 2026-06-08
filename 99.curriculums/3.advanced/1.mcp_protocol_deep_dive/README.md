@@ -20,11 +20,11 @@
 |------|------|-----------|------|
 | 09:00-09:30 | 오리엔테이션 | — | MCP 프로토콜 아키텍처, 환경 설정 |
 | 09:30-10:00 | MCP 버전 & 문서 | `8.mcp/1.common/1.intro/1.mcp_version.py`, `8.mcp/1.common/1.intro/2.mcp_docs.py` | MCP 버전 확인, 공식 문서 접근 |
-| 10:00-10:30 | Hello MCP | `8.mcp/1.common/1.intro/hello_server.py`, `8.mcp/1.common/1.intro/3.hello_client.py` | 최소 MCP 서버/클라이언트 구현 |
-| 10:45-11:15 | Simple 서버 | `8.mcp/1.common/1.intro/simple_server.py`, `8.mcp/1.common/1.intro/simple_server2.py` | 도구를 제공하는 MCP 서버 |
-| 11:15-12:00 | Simple 클라이언트 | `8.mcp/1.common/1.intro/5.simple_client.py`, `8.mcp/1.common/1.intro/5.simple_client2_tryexcept.py` | MCP 클라이언트 기본 + 예외 처리 |
-| 13:00-13:30 | 클라이언트 정보 조회 | `8.mcp/1.common/1.intro/6.simple_client3_getinfo.py`, `8.mcp/1.common/1.intro/6.simple_client3_getinfo2_tryexcept.py` | 서버 정보 조회, 디버깅 |
-| 13:30-14:00 | 디버그 프록시 | `8.mcp/1.common/1.intro/debug_proxy.py` | MCP 통신 디버깅 프록시 |
+| 10:00-10:30 | Hello MCP | `8.mcp/1.common/1.intro/3.hello_server.py`, `8.mcp/1.common/1.intro/4.hello_client.py` | 최소 MCP 서버/클라이언트 구현 |
+| 10:45-11:15 | Simple 서버 | `8.mcp/1.common/2.protocol_deep/1.simple_server.py`, `8.mcp/1.common/2.protocol_deep/3.simple_server2.py` | 도구를 제공하는 MCP 서버 |
+| 11:15-12:00 | Simple 클라이언트 | `8.mcp/1.common/2.protocol_deep/2.simple_client.py`, `8.mcp/1.common/2.protocol_deep/2.simple_client2_tryexcept.py` | MCP 클라이언트 기본 + 예외 처리 |
+| 13:00-13:30 | 클라이언트 정보 조회 | `8.mcp/1.common/2.protocol_deep/4.simple_client3_getinfo.py`, `8.mcp/1.common/2.protocol_deep/4.simple_client3_getinfo2_tryexcept.py` | 서버 정보 조회, 디버깅 |
+| 13:30-14:00 | 디버그 프록시 | `8.mcp/1.common/2.protocol_deep/debug_proxy.py` | MCP 통신 디버깅 프록시 |
 | 14:00-14:30 | asyncio 이벤트 루프 | `8.mcp/1.common/1.intro/0.asyncio_eventloop/1.asyncio_sep_eventloop_test.py`, `8.mcp/1.common/1.intro/0.asyncio_eventloop/2.asyncio_reuse_eventloop_test.py` | MCP의 비동기 기반 이해 |
 | 14:45-15:15 | asyncio 심화 | `8.mcp/1.common/1.intro/0.asyncio_eventloop/3.asyncio_eventloop_test.py`, `8.mcp/1.common/1.intro/0.asyncio_eventloop/4.asyncio_eventloop_test2_stats.py` | 이벤트 루프 재사용, 성능 측정 |
 | 15:15-17:00 | 실습: 나만의 MCP 서버/클라이언트 | — | 직접 MCP 서버 설계 및 클라이언트 연결 |

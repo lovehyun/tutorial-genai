@@ -59,14 +59,14 @@ if __name__ == "__main__":
     mcp.run(transport="streamable-http")
 
 
-# 1. SSE (Server-Sent Events) 방식
-# MCP 버전: 2024-11-05 프로토콜 버전에서 사용된 구식 방식
-# 현재 상태: 2025-03-26 MCP 명세 버전부터 deprecated(폐지 예정)
-# mcp.run(transport="sse", host="127.0.0.1", port=8000)
-
-# 2. Streamable HTTP 방식
-# MCP 버전: 2025-03-26 프로토콜 버전에서 도입된 새로운 방식
-# mcp.run(transport="streamable-http", host="127.0.0.1", port=8000)
-# 또는
-# mcp.run(transport="http", host="127.0.0.1", port=8000, path="/mcp")
-# (결과는 동일) http -> streamable-http 의 별칭일뿐 둘다 결론은 streamable-http임
+# ─── 전송 방식 메모 (mcp 1.9.1 기준) ───────────────────────────
+# ※ host/port 는 run() 이 아니라 FastMCP 생성자에서 지정한다:
+#       mcp = FastMCP("HTTPMultiToolServer", host="127.0.0.1", port=8000)
+#   run() 은 transport 만 받는다.  유효 리터럴: "stdio" / "sse" / "streamable-http"
+#
+# 1) SSE — 구식(2024-11-05). 2025-03-26 명세부터 deprecated → 신규엔 쓰지 말 것.
+#       mcp.run(transport="sse")
+# 2) Streamable HTTP — 현행 표준(2025-03-26 도입).
+#       mcp.run(transport="streamable-http")
+#   ⚠️ transport="http" 는 유효하지 않다 → ValueError: Unknown transport: http
+#      (별칭이 아님. 반드시 "streamable-http" 사용)

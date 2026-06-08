@@ -1,85 +1,40 @@
+# 1.client_http.py — HTTP(streamable-http) 전송으로 MCP 서버에 붙는 클라이언트
+#
+# ── 연동 방식 ────────────────────────────────────────────────
+#   stdio 와 딱 한 줄만 다르다:
+#     stdio : stdio_client(StdioServerParameters(...))  → 서버를 '자식 프로세스'로 실행
+#     http  : streamablehttp_client(url)                → 이미 떠 있는 '원격 서버'에 접속
+#   세션을 연 뒤 흐름(initialize → list_tools → call_tool)은 stdio 와 완전히 동일하다.
+#   ※ 먼저 다른 터미널에서 서버 실행:  python server_http.py  (http://localhost:8000/mcp)
+
 import asyncio
 from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 
+URL = "http://localhost:8000/mcp"
+
+
 async def main():
-    print("=" * 50)
-    print("HTTP MCP 클라이언트 시작")
-    print("=" * 50)
-    print("서버 연결 중: http://localhost:8000/mcp")
-    
-    try:
-        # Streamable HTTP로 연결
-        async with streamablehttp_client("http://localhost:8000/mcp") as (read, write, _):
-            async with ClientSession(read, write) as session:
-                
-                # 서버와 핸드셰이크 수행
-                await session.initialize()
-                print("서버 연결 성공!")
-                
-                # 서버 정보 조회 및 출력
-                print(f"\nMCP 서버 정보")
-                print(f"연결 상태: {'연결됨' if session else '연결 실패'}")
-                
-                # 사용 가능한 도구 목록 조회
-                print(f"\n사용 가능한 도구:")
-                try:
-                    tools_response = await session.list_tools()
-                    if tools_response and hasattr(tools_response, 'tools') and tools_response.tools:
-                        for i, tool in enumerate(tools_response.tools, 1):
-                            print(f"   {i}. {tool.name}")
-                            if hasattr(tool, 'description'):
-                                print(f"      설명: {tool.description}")
-                            
-                            # 매개변수 정보 출력
-                            if hasattr(tool, 'inputSchema') and tool.inputSchema:
-                                schema = tool.inputSchema
-                                if isinstance(schema, dict) and 'properties' in schema:
-                                    print(f"      매개변수:")
-                                    for param_name, param_info in schema['properties'].items():
-                                        param_type = param_info.get('type', 'unknown')
-                                        param_desc = param_info.get('description', '설명 없음')
-                                        required = param_name in schema.get('required', [])
-                                        required_mark = " (필수)" if required else " (선택)"
-                                        print(f"         - {param_name} ({param_type}){required_mark}: {param_desc}")
-                            print()
-                    else:
-                        print("   사용 가능한 도구가 없습니다.")
-                except Exception as e:
-                    print(f"   도구 목록 조회 실패: {e}")
-                
-                # 도구 실행 데모
-                print(f"\n도구 실행 데모:")
-                
-                # 도구 1: hello 도구 호출
-                print("1. hello 도구 호출 중...")
-                res1 = await session.call_tool("hello", {"name": "Alice"})
-                print(f"   결과: {res1.content[0].text}")
+    # streamablehttp_client 는 (read, write, _) 세 값을 준다 (stdio 는 두 값)
+    async with streamablehttp_client(URL) as (read, write, _):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
 
-                # 도구 2: add 도구 호출
-                print("2. add 도구 호출 중...")
-                res2 = await session.call_tool("add", {"a": 15, "b": 25})
-                print(f"   결과: {res2.content[0].text}")
+            # 도구 목록 = 이 한 줄. (각 도구의 inputSchema 로 매개변수 상세도 볼 수 있음)
+            tools = (await session.list_tools()).tools
+            print("도구:", [t.name for t in tools])
 
-                # 도구 3: now 도구 호출
-                print("3. now 도구 호출 중...")
-                res3 = await session.call_tool("now")
-                print(f"   결과: {res3.content[0].text}")
-                
-                print(f"\n모든 도구 실행 완료!")
-                
-    except Exception as e:
-        print(f"연결 실패: {e}")
-        print("서버가 실행 중인지 확인하세요: python server_http.py")
-        
-        # 에러 상세 정보
-        import traceback
-        print(f"\n에러 상세:")
-        print(traceback.format_exc())
+            # 도구 호출 — 전송이 HTTP 라는 점만 다르고 사용법은 stdio 와 같다
+            print("hello:", (await session.call_tool("hello", {"name": "Alice"})).content[0].text)
+            print("add  :", (await session.call_tool("add", {"a": 15, "b": 25})).content[0].text)
+            print("now  :", (await session.call_tool("now")).content[0].text)
+
 
 if __name__ == "__main__":
-    print("HTTP MCP 클라이언트를 시작합니다...")
-    print("서버가 실행 중이어야 합니다: python server_http.py")
-    print("-" * 50)
-    
     asyncio.run(main())
+
+# ── 실행 결과 (예) ───────────────────────────────────────────
+#   도구: ['hello', 'add', 'now']
+#   hello: Hello, Alice!
+#   add  : 40
+#   now  : 지금 시간은 2026-06-09 ... 입니다.

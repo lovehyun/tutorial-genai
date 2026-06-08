@@ -1,20 +1,9 @@
 {
-  "allowed_directories": [
-    "C:\\WORK",
-    "C:\\Users\\%USERNAME%\\Documents",
-    "C:\\Users\\%USERNAME%\\Downloads",
-    "C:\\src",
-    "D:\\MyFiles"
-  ],
-  "default_directory": "C:\\Temp",
-  "security": {
-    "enable_directory_restriction": true,
-    "enable_file_extension_filter": true,
-    "allowed_extensions": [".hwp", ".docx", ".txt", ".pdf", ".xlsx"]
-  },
-  "ui": {
-    "language": "ko",
-    "show_file_icons": true,
-    "max_files_display": 50
-  }
+  "server_path": "../1.filesystem/server/server.py",
+  "server_cwd": "../1.filesystem",
+  "demo_questions": [
+    "workspace 에 어떤 파일들이 있어?",
+    "test.txt 내용을 읽어줘",
+    "hello.txt 를 copy.txt 로 복사해줘"
+  ]
 }

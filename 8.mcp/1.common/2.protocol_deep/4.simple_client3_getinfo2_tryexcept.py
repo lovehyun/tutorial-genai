@@ -12,8 +12,8 @@ async def main():
     # 프록시를 통해 서버에 연결
     server_params = StdioServerParameters(
         command="python", 
-        # args=["simple_server2.py"]
-        args=["debug_proxy.py", "simple_server2.py"],
+        # args=["3.simple_server2.py"]
+        args=["debug_proxy.py", "3.simple_server2.py"],
         env={  # 한글 이슈
             "PYTHONIOENCODING": "utf-8",
             "PYTHONUNBUFFERED": "1"

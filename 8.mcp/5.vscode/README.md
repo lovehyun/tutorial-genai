@@ -85,6 +85,45 @@ mcpServers:
 > Cline/Continue 설정은 확장의 **전역 저장소**(워크스페이스 밖)에 저장되어 레포에는 커밋되지 않는다.
 > 그래서 이 폴더의 `.vscode/mcp.json`(Copilot용)과 달리, 위 설정은 각자 환경에 직접 넣는다.
 
+## 우리 MCP 모듈로 "코드 질의 · 스니펫" 에이전트 만들기 (Copilot 없이)
+
+VSCode 에서 **본인 LLM(Cline/Continue + OpenAI·Anthropic 키)** 으로 *"이 레포가 어떻게 동작하지?"*,
+*"그 함수 본문 보여줘"* 같은 걸 묻는 에이전트를 만든다. 두 종류의 MCP 서버를 붙이면 된다:
+
+| 목적 | 붙일 MCP 서버 | 제공 도구 |
+|------|--------------|----------|
+| **코드/문서 의미 검색·QA** | [`9.projects/3.codebase_qa/server_docs.py`](../9.projects/3.codebase_qa/) | `search`, `answer` (레포 `0.docs` RAG) |
+| **실파일 읽기·스니펫 추출** | 공식 `@modelcontextprotocol/server-filesystem` 또는 [`9.projects/1.local/1.filesystem/server/server.py`](../9.projects/1.local/1.filesystem/) | `read_file`, `list_dir` 등 |
+
+### Cline 설정 (`cline_mcp_settings.json`)
+```json
+{
+  "mcpServers": {
+    "codebase-qa": {
+      "command": "python",
+      "args": ["C:/ABSOLUTE/PATH/tutorial-genai/8.mcp/9.projects/3.codebase_qa/server_docs.py"],
+      "env": { "OPENAI_API_KEY": "sk-..." }
+    },
+    "repo-files": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "C:/ABSOLUTE/PATH/tutorial-genai"]
+    }
+  }
+}
+```
+> Continue 는 `config.yaml` 의 `mcpServers:` 에 같은 `command/args/env` 를 YAML 로 적으면 된다(위 dev-helper 예시와 동일 형식).
+> ⚠️ `codebase-qa` 는 **임베딩 키 필요** — MCP 는 셸 환경변수를 서버에 안 넘기므로 **`env` 로 직접** 주거나
+> 서버 폴더에 `.env` 를 둔다. (`server.py` = `data/` 자체 코퍼스 / `server_docs.py` = 레포 `0.docs` 인덱싱)
+
+### 써보기 (에이전트 채팅에서)
+- *"codebase-qa 로 **RAG 가 할루시네이션을 줄이는 원리** 를 찾아줘."* → `answer` 호출 → 문서 근거 답변
+- *"**코사인 유사도** 가 뭔지 우리 문서에서 검색해줘."* → `search` 호출 → 출처 청크
+- *"repo-files 로 `8.mcp/5.vscode/server.py` 를 읽고 **to_snake_case 함수 본문** 만 보여줘."* → `read_file` → 스니펫
+- *"이 레포에서 create_agent 를 쓰는 파일들을 찾아 요약해줘."* → 파일 탐색 + 요약
+
+> 핵심: **에이전트가 "검색이 필요한지/파일을 읽을지" 스스로 판단**해 우리 MCP 도구를 호출한다.
+> 서버 코드는 그대로, 클라이언트만 VSCode(Cline/Continue)로 바뀐 것 — MCP 재사용성.
+
 ## 동작 원리 (관전 포인트)
 - VSCode 가 `mcp.json` 의 `command/args` 로 **server.py 를 자식 프로세스(stdio)로 띄운다** —
   `4.langchain/1.quickstart/1.agent.py` 가 `MultiServerMCPClient` 로 하던 것과 같은 일을 VSCode 가 한다.

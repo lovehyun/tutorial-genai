@@ -1,7 +1,13 @@
+# client.py — 파일시스템 MCP '간단' 클라이언트 (메뉴형 대화)
+# server/server.py(4툴: list_files/read_file/rename_file/copy_file)에 붙어
+# 번호 메뉴로 파일 작업을 한다. (고급판: client2.py = 9툴 + 셸)
+#   ※ 1.filesystem 폴더에서 실행:  python client/client.py
+
 import asyncio
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 import json
+
 
 async def main():
     # MCP 서버 연결
@@ -22,8 +28,11 @@ async def main():
                 print("4. 파일 복사")
                 print("5. 종료")
                 
-                choice = input("\n선택: ").strip()
-                
+                try:
+                    choice = input("\n선택: ").strip()
+                except EOFError:        # 입력이 끊기면(파이프/비대화) 안전 종료
+                    break
+
                 if choice == "1":
                     # 파일 목록
                     result = await session.call_tool("list_files")

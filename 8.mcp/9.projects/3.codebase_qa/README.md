@@ -30,9 +30,14 @@
 
 ## 준비
 ```bash
-pip install mcp langchain-mcp-adapters langchain-openai langchain-community langchain-text-splitters langgraph python-dotenv
+pip install mcp langchain-mcp-adapters langchain-openai langchain-text-splitters langgraph python-dotenv
 # .env 에 OPENAI_API_KEY  (서버 시작 시 임베딩 생성)
 ```
+
+> ⚠️ **키는 반드시 이 폴더의 `.env` 로**: MCP 클라이언트는 서버를 자식 프로세스로 띄울 때
+> 셸 환경변수를 그대로 넘기지 않는다(SDK 가 환경을 최소화). 그래서 `export OPENAI_API_KEY` 만
+> 해두면 **서버가 키를 못 받아 임베딩에 실패하고 조용히 멈춘다**. 이 폴더에 `.env` 를 두면
+> 서버의 `load_dotenv()` 가 읽는다. (Claude Desktop 등록 시엔 설정의 `env` 로 전달 — `3.anthropic` 참고)
 
 ## 실행
 

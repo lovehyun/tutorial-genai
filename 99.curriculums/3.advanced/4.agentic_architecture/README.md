@@ -47,7 +47,7 @@
 | 시간 | 주제 | 실습 파일 | 설명 |
 |------|------|-----------|------|
 | 09:00-09:30 | Day 2 복습 | — | Agentic 패턴 복습 |
-| 09:30-10:00 | MCP 서버/클라이언트 복습 | `8.mcp/1.common/1.intro/simple_server.py`, `8.mcp/1.common/1.intro/5.simple_client.py` | MCP 기본 구조 재확인 |
+| 09:30-10:00 | MCP 서버/클라이언트 복습 | `8.mcp/1.common/2.protocol_deep/1.simple_server.py`, `8.mcp/1.common/2.protocol_deep/2.simple_client.py` | MCP 기본 구조 재확인 |
 | 10:00-10:30 | MCP 에이전트 도구 | `8.mcp/2.openai/1.agent_tool/server.py`, `8.mcp/2.openai/1.agent_tool/3.client_gpt.py` | MCP 기반 에이전트 도구 |
 | 10:45-11:15 | MCP 멀티 도구 | `8.mcp/2.openai/2.multi_tools/math_server.py`, `8.mcp/2.openai/2.multi_tools/2.smart_client_gpt.py` | 다중 MCP 서버 통합 |
 | 11:15-12:00 | LangChain 브릿지 | `8.mcp/4.langchain/3.langchain_bridge/mcp_bridge.py`, `8.mcp/4.langchain/3.langchain_bridge/3.langgraph_agent_demo.py` | MCP ↔ LangGraph 브릿지 |

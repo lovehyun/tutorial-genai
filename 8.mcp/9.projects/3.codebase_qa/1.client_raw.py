@@ -2,7 +2,7 @@
 codebase-QA 클라이언트 #1 — 순수 MCP 클라이언트 (LangChain 없음).
 이 예제: server.py 를 띄우고 search / answer 도구를 직접 호출한다.
 
-1.common/2.server_quickstart/2.client_raw.py 와 같은 패턴 — 서버만 'RAG 서버' 로 바뀐 것.
+1.common/1.intro/4.hello_client.py 와 같은 패턴 — 서버만 'RAG 서버' 로 바뀐 것.
 
 준비:
   pip install mcp langchain-openai langchain-community langchain-text-splitters python-dotenv

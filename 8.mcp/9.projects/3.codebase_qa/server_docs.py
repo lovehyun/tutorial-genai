@@ -26,7 +26,7 @@ from mcp.server.fastmcp import FastMCP
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_community.document_loaders import TextLoader
+from langchain_core.documents import Document       # (구) langchain_community.TextLoader 대신 — sunset 의존성 제거
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 load_dotenv()
@@ -58,10 +58,8 @@ def _index_corpus():
         parts = set(os.path.normpath(path).split(os.sep))
         if parts & SKIP:
             continue
-        loaded = TextLoader(path, encoding="utf-8").load()
-        for d in loaded:
-            d.metadata["source"] = os.path.relpath(path, CORPUS_DIR)
-        docs += loaded
+        text = open(path, encoding="utf-8").read()
+        docs.append(Document(page_content=text, metadata={"source": os.path.relpath(path, CORPUS_DIR)}))
     chunks = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=120).split_documents(docs)
     store.add_documents(chunks)
     return len(docs), len(chunks)

@@ -25,7 +25,7 @@ from langchain.agents import create_agent
 load_dotenv()
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-TOOLBOX = os.path.join(HERE, "..", "..", "1.common", "2.server_quickstart", "3.server_tools_resource.py")
+TOOLBOX = os.path.join(HERE, "..", "..", "1.common", "2.protocol_deep", "5.server_tools_resource.py")
 
 
 async def main():

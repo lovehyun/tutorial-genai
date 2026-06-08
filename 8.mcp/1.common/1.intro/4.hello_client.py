@@ -13,7 +13,7 @@ async def main():
     # command: 실행할 프로그램 (여기서는 "python")
     # args: 실행할 파이썬 스크립트 (MCP 서버 코드)
     # 예: hello_server.py → 기본 서버
-    server_params = StdioServerParameters(command="python", args=["hello_server.py"])
+    server_params = StdioServerParameters(command="python", args=["3.hello_server.py"])
 
     # stdio_client() → 지정한 명령으로 MCP 서버를 실행하고
     # 클라이언트에서 서버와 표준 입출력(stdin/stdout) 기반 연결 생성
