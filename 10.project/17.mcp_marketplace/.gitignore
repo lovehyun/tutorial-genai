@@ -1,0 +1,5 @@
+# 런타임 산출물 — 저장소에 커밋하지 않음
+core/marketplace.db
+core/marketplace.db-*
+**/__pycache__/
+*.pyc

@@ -1,0 +1,195 @@
+{% extends "_base.html" %}
+{% block title %}채팅 컨슈머 · MCP 마켓플레이스{% endblock %}
+
+{% block style %}
+  .chatwrap { display: grid; grid-template-columns: 300px 1fr; gap: 14px; align-items: stretch; }
+  @media (max-width: 760px) { .chatwrap { grid-template-columns: 1fr; } }
+  .side { display: flex; flex-direction: column; height: 74vh; min-height: 460px; }
+  .side .field { margin-bottom: 12px; }
+  .side .field.grow { flex: 1; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0; }
+  .side label.h { display: block; font-size: 12px; color: #6b7280; text-transform: uppercase; margin-bottom: 4px; }
+  .toollist { flex: 1; min-height: 120px; overflow-y: auto; border: 1px solid #eef2f7; border-radius: 8px; padding: 4px 6px; }
+  /* 서버별 트리 */
+  .srv { border-bottom: 1px solid #f1f5f9; padding: 3px 0; }
+  .srv:last-child { border-bottom: 0; }
+  .srv-head { display: flex; align-items: center; gap: 6px; font-size: 12.5px; }
+  .srv-caret { cursor: pointer; color: #6b7280; width: 12px; display: inline-block; text-align: center; user-select: none; }
+  .srv-head b { cursor: pointer; color: #2563eb; }
+  .srv-head .cnt { color: #9ca3af; font-size: 11px; margin-left: auto; }
+  .srv-body { margin: 2px 0 4px 20px; }
+  .toolitem { display: flex; gap: 6px; align-items: flex-start; font-size: 12.5px; padding: 2px 0; }
+  .toolitem small { color: #9ca3af; }
+  .chat { display: flex; flex-direction: column; height: 74vh; min-height: 460px; }
+  .msgs { flex: 1; overflow-y: auto; padding: 4px; }
+  .msg { margin: 8px 0; display: flex; }
+  .msg.user { justify-content: flex-end; }
+  .msg > div { max-width: 92%; }
+  .bubble { display: inline-block; min-width: 64px; padding: 9px 13px; border-radius: 12px;
+            font-size: 14px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+  .msg.user .bubble { background: #2563eb; color: #fff; border-bottom-right-radius: 3px; }
+  .msg.bot .bubble { background: #f1f5f9; color: #1f2937; border-bottom-left-radius: 3px; }
+  .steps { margin: 2px 0 0 4px; }
+  .step { font-size: 11.5px; color: #475569; background: #fff7ed; border-left: 3px solid #f59e0b;
+          border-radius: 0 6px 6px 0; padding: 4px 8px; margin: 3px 0; white-space: pre-wrap; word-break: break-word; }
+  .composer { display: flex; gap: 8px; margin-top: 8px; }
+  .composer input { flex: 1; }
+  .pill-model { font-size: 11px; background: #ecfdf5; color: #047857; padding: 2px 8px; border-radius: 999px; }
+  .warn { background: #fff7ed; border-left: 4px solid #f97316; padding: 8px 12px; border-radius: 6px; font-size: 13px; }
+{% endblock %}
+
+{% block content %}
+  <div class="chatwrap">
+    <!-- 좌측: 설정 -->
+    <div class="card side">
+      <div class="field">
+        <label class="h">컨슈머</label>
+        <select id="consumer" onchange="loadTools()" style="width:100%"></select>
+      </div>
+      <div class="field">
+        <label class="h">LLM 모델</label>
+        <div id="llmBox"><span class="muted">확인 중…</span></div>
+      </div>
+      <div class="field grow">
+        <label class="h">사용할 도구 <span class="muted" id="toolCount"></span></label>
+        <div class="muted" style="font-size:11px; margin:-2px 0 4px">
+          구독한 서버의 도구만 표시 · 체크는 이번 대화에서 쓸 도구 ·
+          구독 변경은 <a href="{{ base }}/consumers">👤 컨슈머</a>에서</div>
+        <div style="margin:2px 0 6px"><a href="#" onclick="setAll(true);return false" style="font-size:12px">전체</a>
+          · <a href="#" onclick="setAll(false);return false" style="font-size:12px">해제</a></div>
+        <div class="toollist" id="tools"></div>
+      </div>
+    </div>
+
+    <!-- 우측: 대화 -->
+    <div class="card chat">
+      <div class="msgs" id="msgs">
+        <div class="msg bot"><div class="bubble">안녕하세요! 좌측에서 도구를 켜고 무엇이든 물어보세요.
+          예) "도쿄 여행 예약하고 거기 날씨도 알려줘"</div></div>
+      </div>
+      <div class="composer">
+        <input id="inp" placeholder="메시지를 입력하세요…" onkeydown="if(event.key==='Enter')send()">
+        <button id="sendBtn" onclick="send()">보내기</button>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+let CONSUMERS = [], SUBS = [], HISTORY = [], LLMS = [];
+
+async function init() {
+  CONSUMERS = await j("/api/consumers");
+  document.getElementById("consumer").innerHTML =
+    CONSUMERS.map(c => `<option value="${c.id}">${c.name} (${c.id})</option>`).join("")
+    || `<option value="">컨슈머 없음 — 탐색·현황에서 먼저 만드세요</option>`;
+  // LLM 선택지
+  const info = await j("/api/llm");
+  LLMS = info.available || [];
+  const box = document.getElementById("llmBox");
+  if (!LLMS.length) box.innerHTML = `<div class="warn">서버에 LLM 키가 없습니다. OPENAI_API_KEY 또는 ANTHROPIC_API_KEY 설정 필요.</div>`;
+  else if (LLMS.length === 1) box.innerHTML = `<span class="pill-model">${LLMS[0].provider} · ${LLMS[0].model}</span>`;
+  else box.innerHTML = `<select id="llm" style="width:100%">` +
+        LLMS.map(a => `<option value="${a.provider}" ${a.provider===info.default?'selected':''}>${a.provider} · ${a.model}</option>`).join("") + `</select>`;
+  await loadTools();
+}
+
+async function loadTools() {
+  const cid = document.getElementById("consumer").value;
+  SUBS = cid ? await j(`/api/consumers/${cid}/subscriptions`) : [];
+  const esc = x => (x||'').replace(/</g,'&lt;');
+  let html = "", n = 0;
+  for (const s of SUBS) {
+    const tools = s.tools || [];
+    html += `<div class="srv" data-srv="${s.id}">
+      <div class="srv-head">
+        <input type="checkbox" class="srv-tg" data-sid="${s.id}" onchange="onSrvToggle('${s.id}', this.checked)" checked>
+        <span class="srv-caret" onclick="toggleSrv('${s.id}')">▾</span>
+        <b onclick="toggleSrv('${s.id}')">${s.id}</b> <small class="muted">${s.namespace||'default'}</small>
+        <span class="cnt">${tools.length}개</span>
+      </div>
+      <div class="srv-body" data-body="${s.id}">`;
+    for (const t of tools) {
+      const name = `${s.id}__${t.name}`; n++;
+      html += `<label class="toolitem"><input type="checkbox" class="tg" data-sid="${s.id}" value="${name}"
+                 onchange="onToolChange('${s.id}')" checked>
+        <span>${esc(t.name)}<br><small>${esc(t.description)}</small></span></label>`;
+    }
+    html += `</div></div>`;
+  }
+  document.getElementById("tools").innerHTML = html ||
+    `<span class="muted">이 컨슈머가 구독한 서버가 없습니다.<br><a href="${BASE}/consumers">👤 컨슈머</a>에서 구독을 설정하세요.</span>`;
+  document.getElementById("toolCount").textContent = n ? `(${n}개)` : "";
+}
+
+function toggleSrv(sid) {                                  // 서버 그룹 접기/펴기
+  const body = document.querySelector(`[data-body="${sid}"]`);
+  const caret = document.querySelector(`[data-srv="${sid}"] .srv-caret`);
+  const open = body.style.display === "none";
+  body.style.display = open ? "" : "none";
+  caret.textContent = open ? "▾" : "▸";
+}
+function onSrvToggle(sid, on) {                            // 서버 통째 전체/해제
+  document.querySelectorAll(`.tg[data-sid="${sid}"]`).forEach(c => c.checked = on);
+  refreshSrv(sid);
+}
+function onToolChange(sid) { refreshSrv(sid); updateCount(); }
+function refreshSrv(sid) {                                 // 서버 체크박스 전체/일부/해제 상태 갱신
+  const kids = [...document.querySelectorAll(`.tg[data-sid="${sid}"]`)];
+  const on = kids.filter(c => c.checked).length;
+  const box = document.querySelector(`.srv-tg[data-sid="${sid}"]`);
+  box.checked = on === kids.length;
+  box.indeterminate = on > 0 && on < kids.length;          // 일부만 → 중간 상태
+  updateCount();
+}
+function updateCount() {
+  const total = document.querySelectorAll(".tg").length, on = document.querySelectorAll(".tg:checked").length;
+  document.getElementById("toolCount").textContent = total ? `(${on}/${total}개 사용)` : "";
+}
+
+function setAll(on) {
+  document.querySelectorAll(".tg").forEach(c => c.checked = on);
+  document.querySelectorAll(".srv-tg").forEach(c => { c.checked = on; c.indeterminate = false; });
+  updateCount();
+}
+function enabledTools() { return [...document.querySelectorAll(".tg:checked")].map(c => c.value); }
+function provider() { const el = document.getElementById("llm"); return el ? el.value : (LLMS[0]?.provider || ""); }
+
+function addMsg(role, text, steps) {
+  const wrap = document.createElement("div");
+  wrap.className = "msg " + (role === "user" ? "user" : "bot");
+  wrap.innerHTML = `<div><div class="bubble">${(text||'').replace(/</g,'&lt;')}</div>` +
+    (steps && steps.length ? `<div class="steps">` + steps.map(s =>
+      `<div class="step">🔧 ${s.tool}(${JSON.stringify(s.args)})\n→ ${String(s.result).replace(/</g,'&lt;').slice(0,300)}</div>`).join("") + `</div>` : "") +
+    `</div>`;
+  const box = document.getElementById("msgs");
+  box.appendChild(wrap); box.scrollTop = box.scrollHeight;
+}
+
+async function send() {
+  const cid = document.getElementById("consumer").value;
+  if (!cid) { alert("컨슈머를 먼저 선택/생성하세요."); return; }
+  const inp = document.getElementById("inp"), text = inp.value.trim();
+  if (!text) return;
+  inp.value = ""; addMsg("user", text);
+  HISTORY.push({role: "user", content: text});
+  const btn = document.getElementById("sendBtn"); btn.disabled = true;
+  const thinking = document.createElement("div");
+  thinking.className = "msg bot"; thinking.innerHTML = `<div class="bubble">…</div>`;
+  document.getElementById("msgs").appendChild(thinking);
+  try {
+    const r = await jw("/api/chat", "POST", {
+      consumer_id: cid, messages: HISTORY, enabled_tools: enabledTools(), provider: provider(),
+    });
+    const data = await r.json();
+    thinking.remove();
+    if (data.error) { addMsg("bot", `⚠ ${data.error}: ${data.detail||''}`); }
+    else {
+      addMsg("bot", data.reply, data.steps);
+      HISTORY.push({role: "assistant", content: data.reply || ""});
+    }
+  } catch (e) {
+    thinking.remove(); addMsg("bot", "요청 실패: " + e);
+  } finally { btn.disabled = false; inp.focus(); }
+}
+init();
+{% endblock %}

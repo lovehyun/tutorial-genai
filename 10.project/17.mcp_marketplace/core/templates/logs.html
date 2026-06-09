@@ -1,0 +1,98 @@
+{% extends "_base.html" %}
+{% block title %}요청 로그 · MCP 마켓플레이스{% endblock %}
+
+{% block style %}
+  table { border-collapse: collapse; width: 100%; font-size: 13px; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  th, td { border-bottom: 1px solid #eef2f7; padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { color: #6b7280; font-weight: 600; background: #f8fafc; }
+  tr.main { cursor: pointer; }
+  tr.main:hover td { background: #f8fafc; }
+  tr.main.open td { background: #eef2ff; }                 /* 열린 행 강조 */
+  tr.main.open td:first-child { box-shadow: inset 3px 0 0 #2563eb; }  /* 좌측 강조선 */
+  .caret { display: inline-block; width: 16px; font-size: 13px; line-height: 1; color: #2563eb;
+           font-weight: 600; text-align: center; }
+  .ok-y { color: #166534; font-weight: 600; } .ok-n { color: #991b1b; font-weight: 600; }
+  .via { font-size: 11px; background: #f1f5f9; color: #475569; padding: 1px 7px; border-radius: 6px; }
+  .ip { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #475569; }
+  /* 펼침 영역: 첫 칸(캐럿 열)은 비워 들여쓰고, 좌측 굵은 강조선으로 범위를 명확히 */
+  .detail-row td { background: #eef2ff; padding: 0; }
+  .detail-row td.pad { background: #eef2ff; }
+  .detail-box { margin: 0 12px 10px 0; padding: 12px 16px; background: #fff;
+                border-left: 4px solid #2563eb; border-radius: 0 8px 8px 0; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .detail-box .lbl { font-size: 11px; color: #6b7280; text-transform: uppercase; margin: 8px 0 2px; }
+  .detail-box .lbl:first-child { margin-top: 0; }
+  .detail-box pre { background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 10px 12px; margin: 0;
+                    font-size: 12px; white-space: pre-wrap; word-break: break-word; }
+  .detail-box pre.err { color: #fca5a5; }
+  .pager { display: flex; gap: 8px; align-items: center; margin: 14px 0; }
+{% endblock %}
+
+{% block content %}
+  <div class="bar">
+    <span>프록시를 통과한 모든 호출 기록 (최신순)</span>
+    <span style="flex:1"></span>
+    <label>페이지당</label>
+    <select id="size" onchange="go(1)"><option>20</option><option>50</option><option>100</option></select>
+    <button class="ghost mini" onclick="go(page)">새로고침</button>
+  </div>
+
+  <div class="pager">
+    <button class="ghost mini" id="prev" onclick="go(page-1)">← 이전</button>
+    <span class="muted" id="pginfo"></span>
+    <button class="ghost mini" id="next" onclick="go(page+1)">다음 →</button>
+    <span style="flex:1"></span>
+    <span class="muted" id="cap"></span>
+  </div>
+
+  <p class="muted" style="margin:0 0 6px">행을 클릭하면 입력 인자·출력 결과가 펼쳐집니다.</p>
+  <table>
+    <thead><tr><th></th><th>#</th><th>시각</th><th>IP</th><th>경로(via)</th><th>서버·도구</th><th>결과</th><th>지연</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <div class="pager"><button class="ghost mini" onclick="go(page-1)">← 이전</button>
+    <span class="muted" id="pginfo2"></span>
+    <button class="ghost mini" onclick="go(page+1)">다음 →</button></div>
+{% endblock %}
+
+{% block script %}
+let page = 1;
+const fmt = ts => new Date(ts * 1000).toLocaleString("ko-KR");
+function toggle(id) {
+  const row = document.getElementById("d" + id), c = document.getElementById("c" + id);
+  const open = row.style.display === "none";
+  row.style.display = open ? "table-row" : "none";
+  c.textContent = open ? "▾" : "▸";
+  c.closest("tr").classList.toggle("open", open);   // 열린 본행 하이라이트
+}
+
+async function go(p) {
+  const size = parseInt(document.getElementById("size").value, 10);
+  const d = await j(`/api/calls?page=${Math.max(1,p)}&size=${size}`);
+  page = d.page;
+  const esc = s => (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  document.getElementById("rows").innerHTML = d.items.map(r =>
+    `<tr class="main" onclick="toggle(${r.id})">
+       <td><span class="caret" id="c${r.id}">▸</span></td>
+       <td>${r.id}</td><td>${fmt(r.ts)}</td><td class="ip">${esc(r.ip)}</td>
+       <td><span class="via">${r.via||''}</span></td>
+       <td>${r.server_id}·${r.tool}</td>
+       <td class="${r.ok?'ok-y':'ok-n'}">${r.ok?'성공':(r.error||'실패')}</td>
+       <td>${r.latency_ms}ms</td></tr>
+     <tr class="detail-row" id="d${r.id}" style="display:none">
+       <td class="pad"></td>
+       <td colspan="7">
+       <div class="detail-box">
+         <div class="lbl">입력 인자 (arguments)</div><pre>${esc(r.args)||'(없음)'}</pre>
+         <div class="lbl">출력 / 메시지</div><pre class="${r.ok?'':'err'}">${esc(r.result)||'(없음)'}</pre>
+       </div></td></tr>`).join("")
+    || `<tr><td colspan="8" class="muted">기록이 없습니다.</td></tr>`;
+  const info = `${d.total}건 중 ${d.page}/${d.pages} 페이지`;
+  document.getElementById("pginfo").textContent = info;
+  document.getElementById("pginfo2").textContent = info;
+  document.getElementById("cap").textContent = `보관 상한 초과 시 오래된 기록부터 자동 삭제`;
+  document.getElementById("prev").disabled = d.page <= 1;
+  document.getElementById("next").disabled = d.page >= d.pages;
+}
+go(1);
+{% endblock %}

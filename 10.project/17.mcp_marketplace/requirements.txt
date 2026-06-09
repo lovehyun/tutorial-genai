@@ -1,0 +1,17 @@
+# 마켓플레이스 코어(등록서버+게이트웨이) 실행
+mcp>=1.9
+flask>=3.0
+starlette>=0.40
+uvicorn>=0.30
+requests>=2.31
+python-dotenv>=1.0      # .env 의 OPENAI_API_KEY/ANTHROPIC_API_KEY 자동 로드
+
+# 채팅 컨슈머(/chat) — 쓰는 provider 쪽만 있으면 됨
+openai>=1.40            # LLM_PROVIDER=openai (기본 gpt-4o-mini)
+anthropic>=0.40         # LLM_PROVIDER=anthropic (기본 claude-haiku-4-5)
+
+# 소비자 에이전트(consumer/agent.py) 실행 시 추가
+langchain>=1.0
+langchain-openai>=0.2
+langchain-mcp-adapters>=0.2
+langgraph>=1.0

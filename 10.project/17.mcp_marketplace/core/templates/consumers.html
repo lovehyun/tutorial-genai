@@ -1,0 +1,105 @@
+{% extends "_base.html" %}
+{% block title %}컨슈머 · MCP 마켓플레이스{% endblock %}
+
+{% block style %}
+  .gwbox { background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 10px 12px; margin-top: 12px; font-size: 13px; display: none; }
+  .gwbox code { background: #fff; padding: 2px 6px; border-radius: 5px; color: #047857; }
+  .gwbox .url { color: #047857; word-break: break-all; cursor: pointer; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 14px; }
+  .scard { background: #fff; border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .scard.dim { opacity: .55; }
+  .scard h3 { margin: 0 0 2px; font-size: 15px; }
+  .meta { font-size: 12px; color: #6b7280; }
+  .ns { display: inline-block; background: #f1f5f9; color: #475569; font-size: 11px; padding: 1px 7px; border-radius: 6px; }
+  .sub { display: flex; align-items: center; gap: 6px; font-size: 13px; margin-top: 8px; }
+  .tag { display: inline-block; background: #eef2ff; color: #3730a3; font-size: 11px; padding: 1px 7px; border-radius: 999px; margin: 2px 2px 0 0; }
+{% endblock %}
+
+{% block content %}
+  <div class="bar">
+    <label>컨슈머(에이전트):</label>
+    <select id="consumer" onchange="render()"></select>
+    <button class="danger mini" onclick="delConsumer()" title="선택한 컨슈머 삭제">삭제</button>
+    <span style="flex:1"></span>
+    <input id="newC" placeholder="새 컨슈머 id (예: travel-agent)" size="22">
+    <button class="ghost" onclick="addConsumer()">+ 컨슈머</button>
+  </div>
+  <div id="gwbox" class="gwbox">
+    이 컨슈머의 게이트웨이 주소(SDK <code>url</code>):
+    <span class="url" id="gwurl" onclick="copy(this.textContent)"></span><br>
+    <span class="muted">아래에서 구독한 서버들의 도구가 이 주소로 합쳐져 나옵니다. 채팅은 <a href="{{ base }}/chat">💬 채팅</a>에서.</span>
+  </div>
+
+  <section>
+    <h2>구독할 MCP 서버 <span class="muted">— 체크하면 이 컨슈머가 해당 서버를 사용할 수 있어요</span></h2>
+    <div id="grid" class="grid"></div>
+  </section>
+{% endblock %}
+
+{% block script %}
+let SERVERS = [], CONSUMERS = [], SUBS = [];
+
+async function load() {
+  SERVERS = await j("/api/servers");
+  CONSUMERS = await j("/api/consumers");
+  const sel = document.getElementById("consumer"); const cur = sel.value;
+  sel.innerHTML = CONSUMERS.map(c => `<option value="${c.id}">${c.name} (${c.id})</option>`).join("")
+                  || `<option value="">컨슈머 없음 — 우측에서 추가하세요</option>`;
+  if (cur) sel.value = cur;
+  await render();
+}
+
+async function render() {
+  const cid = document.getElementById("consumer").value;
+  SUBS = cid ? (await j(`/api/consumers/${cid}/subscriptions`)).map(s => s.id) : [];
+  const box = document.getElementById("gwbox");
+  if (cid) {
+    document.getElementById("gwurl").textContent = `${location.origin}${BASE}/mcp/consumers/${cid}`;
+    box.style.display = "block";
+  } else box.style.display = "none";
+  document.getElementById("grid").innerHTML = SERVERS.map(card).join("")
+    || `<p class="muted">등록된 서버가 없습니다. <a href="${BASE}/browse">🖥️ MCP 서버</a>에서 먼저 등록하세요.</p>`;
+}
+
+function card(s) {
+  const on = SUBS.includes(s.id);
+  const dead = s.status === "OFFLINE" || s.status === "ARCHIVED";
+  const tools = (s.tools || []).map(t => `<span class="tag">${t.name}</span>`).join("") || `<span class="muted">도구 없음</span>`;
+  return `<div class="scard ${dead?'dim':''}">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>${s.name}</h3><span class="status ${s.status}">${s.status}</span></div>
+    <div class="meta">${s.id} · ${s.owner||'소유 미상'} · <span class="ns">${s.namespace||'default'}</span></div>
+    <div style="margin-top:6px">${tools}</div>
+    <label class="sub"><input type="checkbox" ${on?'checked':''} onchange="toggle('${s.id}', this.checked)">
+      이 컨슈머가 구독</label>
+  </div>`;
+}
+
+function copy(text) { navigator.clipboard?.writeText(text); }
+
+async function toggle(serverId, on) {
+  const cid = document.getElementById("consumer").value;
+  if (!cid) { alert("먼저 컨슈머를 만들거나 선택하세요."); return load(); }
+  const next = on ? [...new Set([...SUBS, serverId])] : SUBS.filter(x => x !== serverId);
+  await jw(`/api/consumers/${cid}/subscriptions`, "PUT", {server_ids: next});
+  render();
+}
+
+async function addConsumer() {
+  const id = document.getElementById("newC").value.trim();
+  if (!id) return;
+  await jw(`/api/consumers`, "POST", {id, name: id});
+  document.getElementById("newC").value = "";
+  await load(); document.getElementById("consumer").value = id; render();
+}
+
+async function delConsumer() {
+  const cid = document.getElementById("consumer").value;
+  if (!cid) { alert("삭제할 컨슈머가 없습니다."); return; }
+  if (!confirm(`컨슈머 '${cid}' 를 삭제할까요? (구독도 함께 삭제)`)) return;
+  await jw(`/api/consumers/${cid}`, "DELETE");
+  await load();
+}
+
+load();
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends "_base.html" %}
+{% block title %}도구 테스트 · MCP 마켓플레이스{% endblock %}
+
+{% block style %}
+  .pg { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 720px) { .pg { grid-template-columns: 1fr; } }
+  .field { margin-bottom: 10px; }
+  .field label { display: block; font-size: 12px; color: #374151; margin-bottom: 3px; }
+  .field label .req { color: #ef4444; }
+  .field input[type=text], .field input[type=number] { width: 100%; }
+  .result { background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 12px 14px; margin-top: 10px;
+            font-size: 13px; white-space: pre-wrap; word-break: break-word; min-height: 40px; }
+  .req-json { background: #f1f5f9; color: #334155; border-radius: 8px; padding: 10px 12px; font-size: 12px;
+              white-space: pre-wrap; margin-top: 8px; }
+  .err { color: #fca5a5; }
+  h4 { font-size: 12px; color: #6b7280; text-transform: uppercase; margin: 14px 0 4px; }
+  .tdesc { color: #374151; font-size: 13.5px; margin: 6px 0; }
+  .info { background: #f8fafc; border: 1px solid #eef2f7; border-radius: 8px; padding: 10px 12px; margin-top: 6px; }
+  .ptable { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+  .ptable th, .ptable td { border: 1px solid #e5e7eb; padding: 4px 7px; text-align: left; vertical-align: top; }
+  .ptable th { background: #fff; color: #6b7280; font-weight: 600; }
+  .req-dot { color: inherit; }
+  .schema { background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: 12px;
+            white-space: pre-wrap; word-break: break-word; }
+{% endblock %}
+
+{% block content %}
+  <p class="muted" style="margin-top:0">서버와 도구를 고르고 인자를 넣어 <b>게이트웨이 프록시 경로로</b> 실제 호출해 봅니다.
+     (LLM 없이 raw tool_call — 모든 호출은 요청 로그/대시보드 통계에도 잡힙니다.)</p>
+  <div class="pg">
+    <div class="card">
+      <h2 style="margin-top:0">① 도구 선택</h2>
+      <div class="field">
+        <label>MCP 서버</label>
+        <div style="display:flex; gap:6px">
+          <select id="server" onchange="onServer()" style="flex:1"></select>
+          <button id="fetchBtn" class="ghost" onclick="fetchTools()"
+                  title="이 서버에 실제 접속해 도구 목록·설명·인자·출력 스키마를 다시 가져옵니다">🔄 도구 가져오기</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>도구</label>
+        <select id="tool" onchange="onTool()" style="width:100%"></select>
+      </div>
+      <div id="toolInfo"></div>
+      <h4>인자 입력</h4>
+      <div id="fields"></div>
+      <div style="margin-top:10px"><button id="run" onclick="run()">실행</button></div>
+    </div>
+    <div class="card">
+      <h2 style="margin-top:0">② 결과</h2>
+      <div class="muted">보내는 요청</div>
+      <div class="req-json" id="reqJson">서버·도구를 선택하세요.</div>
+      <div class="muted" style="margin-top:10px">응답</div>
+      <div class="result" id="result">—</div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+let SERVERS = [];
+
+async function load(keepServer, keepTool) {
+  SERVERS = await j("/api/servers");
+  document.getElementById("server").innerHTML =
+    SERVERS.map(s => `<option value="${s.id}">${s.name} (${s.id}) · ${s.status}</option>`).join("")
+    || `<option value="">등록된 서버 없음</option>`;
+  if (keepServer) document.getElementById("server").value = keepServer;
+  onServer();
+  if (keepTool) {                                  // 도구 선택 복원
+    const sel = document.getElementById("tool");
+    if ([...sel.options].some(o => o.value === keepTool)) { sel.value = keepTool; onTool(); }
+  }
+}
+
+// 선택한 서버에 실제 접속해 도구를 다시 수집(re-probe)하고 화면 갱신
+async function fetchTools() {
+  const s = curServer();
+  if (!s) { alert("먼저 서버를 선택하세요."); return; }
+  const sid = s.id, tid = document.getElementById("tool").value;
+  const btn = document.getElementById("fetchBtn"), label = btn.textContent;
+  btn.disabled = true; btn.textContent = "가져오는 중…";
+  try {
+    const r = await jw(`/api/servers/${sid}/refresh`, "POST");
+    if (!r.ok) { alert("도구 가져오기 실패 (토큰/서버 상태 확인): " + r.status); btn.textContent = label; return; }
+    await load(sid, tid);
+    // list_tools 응답을 결과 영역(콘솔)에 그대로 출력
+    const tools = (curServer()?.tools || []).map(t => ({
+      name: t.name, description: t.description,
+      inputSchema: t.input_schema, outputSchema: t.output_schema,
+    }));
+    document.getElementById("reqJson").textContent = `list_tools  @  ${sid}   →   ${tools.length} tools`;
+    const res = document.getElementById("result");
+    res.classList.remove("err");
+    res.textContent = JSON.stringify(tools, null, 2);
+    btn.textContent = `✓ ${tools.length}개`;
+    setTimeout(() => { btn.textContent = label; }, 1500);
+  } catch (e) {
+    alert("오류: " + e); btn.textContent = label;
+  } finally { btn.disabled = false; }
+}
+
+function curServer() { return SERVERS.find(s => s.id === document.getElementById("server").value); }
+function curTool() {
+  const s = curServer();
+  return (s?.tools || []).find(t => t.name === document.getElementById("tool").value);
+}
+
+function onServer() {
+  const s = curServer();
+  document.getElementById("tool").innerHTML =
+    (s?.tools || []).map(t => `<option value="${t.name}">${t.name}</option>`).join("")
+    || `<option value="">도구 없음</option>`;
+  onTool();
+}
+
+function esc(s) { return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+function onTool() {
+  const t = curTool();
+  const schema = t?.input_schema || {type:"object", properties:{}};
+  const props = schema.properties || {}, required = schema.required || [];
+
+  // ── 도구 정보 패널: 설명 + 입력 인자 표 + 출력 스키마 ──
+  if (!t) { document.getElementById("toolInfo").innerHTML = ""; }
+  else {
+    const inTable = Object.keys(props).length
+      ? `<table class="ptable"><tr><th>이름</th><th>타입</th><th>필수</th><th>설명</th></tr>` +
+        Object.entries(props).map(([k, p]) =>
+          `<tr><td>${esc(k)}</td><td>${esc(p.type||'-')}</td>
+            <td>${required.includes(k)?'<span class="req-dot">O</span>':''}</td>
+            <td>${esc(p.description||p.title||'')}</td></tr>`).join("") + `</table>`
+      : `<p class="muted" style="margin:2px 0">입력 인자 없음</p>`;
+    const out = t.output_schema || {};
+    const outBox = Object.keys(out).length
+      ? `<div class="schema">${esc(JSON.stringify(out, null, 2))}</div>`
+      : `<p class="muted" style="margin:2px 0">출력 스키마 정의 없음(자유 텍스트 반환)</p>`;
+    document.getElementById("toolInfo").innerHTML =
+      `<div class="tdesc">${esc(t.description) || '(설명 없음)'}</div>
+       <div class="info"><h4 style="margin-top:0">입력 인자</h4>${inTable}
+         <h4>출력 스키마</h4>${outBox}</div>`;
+  }
+
+  document.getElementById("fields").innerHTML = Object.keys(props).length
+    ? Object.entries(props).map(([k, p]) => {
+        const req = required.includes(k) ? `<span class="req">*</span>` : "";
+        const hint = p.description ? ` — ${p.description}` : "";
+        if (p.type === "boolean")
+          return `<div class="field"><label>${k}${req}${hint}</label>
+                  <input type="checkbox" data-k="${k}" data-t="boolean" onchange="preview()"></div>`;
+        const isNum = p.type === "number" || p.type === "integer";
+        return `<div class="field"><label>${k}${req} <span class="muted">(${p.type||'string'})</span>${hint}</label>
+                <input type="${isNum?'number':'text'}" data-k="${k}" data-t="${p.type||'string'}"
+                       oninput="preview()" placeholder="${p.default!==undefined?('기본값: '+p.default):''}"></div>`;
+      }).join("")
+    : `<p class="muted">입력 인자가 없는 도구입니다. 바로 실행하세요.</p>`;
+  preview();
+}
+
+function collect() {
+  const args = {};
+  document.querySelectorAll("#fields input").forEach(el => {
+    const k = el.dataset.k, ty = el.dataset.t;
+    if (ty === "boolean") { args[k] = el.checked; return; }
+    const v = el.value.trim();
+    if (v === "") return;
+    if (ty === "number") args[k] = parseFloat(v);
+    else if (ty === "integer") args[k] = parseInt(v, 10);
+    else args[k] = v;
+  });
+  return args;
+}
+
+function preview() {
+  const s = curServer(), t = curTool();
+  if (!s || !t) { document.getElementById("reqJson").textContent = "서버·도구를 선택하세요."; return; }
+  document.getElementById("reqJson").textContent =
+    `POST ${BASE}/api/servers/${s.id}/call\n` +
+    JSON.stringify({tool: t.name, arguments: collect()}, null, 2);
+}
+
+async function run() {
+  const s = curServer(), t = curTool();
+  if (!s || !t) return;
+  const res = document.getElementById("result"), btn = document.getElementById("run");
+  btn.disabled = true; res.classList.remove("err"); res.textContent = "실행 중…";
+  try {
+    const r = await jw(`/api/servers/${s.id}/call`, "POST", {tool: t.name, arguments: collect()});
+    const data = await r.json();
+    res.textContent = data.result ?? JSON.stringify(data, null, 2);
+    if ((data.result||"").includes('"error"')) res.classList.add("err");
+  } catch (e) {
+    res.classList.add("err"); res.textContent = "요청 실패: " + e;
+  } finally { btn.disabled = false; }
+}
+load();
+{% endblock %}

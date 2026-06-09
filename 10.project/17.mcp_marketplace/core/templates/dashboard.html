@@ -1,0 +1,96 @@
+{% extends "_base.html" %}
+{% block title %}대시보드 · MCP 마켓플레이스{% endblock %}
+
+{% block style %}
+  .kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .kpi { background: #fff; border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .kpi .n { font-size: 26px; font-weight: 700; }
+  .kpi .l { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+  @media (max-width: 720px) { .cols { grid-template-columns: 1fr; } }
+  .barrow { display: grid; grid-template-columns: 150px 1fr 56px; align-items: center; gap: 8px; margin: 6px 0; font-size: 13px; }
+  .track { background: #eef2ff; border-radius: 6px; height: 16px; overflow: hidden; }
+  .fill { background: #2563eb; height: 100%; }
+  .fill.fail { background: #ef4444; }
+  .spark { display: flex; align-items: flex-end; gap: 3px; height: 70px; margin-top: 6px; }
+  .spark .b { flex: 1; background: #c7d2fe; border-radius: 3px 3px 0 0; min-height: 2px; position: relative; }
+  .spark .b .ok { position: absolute; bottom: 0; left: 0; right: 0; background: #2563eb; border-radius: 3px 3px 0 0; }
+  .pill { display:inline-block; font-size:11px; padding:2px 8px; border-radius:999px; margin-right:4px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { border-bottom: 1px solid #eef2f7; padding: 6px 8px; text-align: left; }
+  th { color: #6b7280; font-weight: 600; }
+  .ok-y { color: #166534; } .ok-n { color: #991b1b; }
+{% endblock %}
+
+{% block content %}
+  <div class="kpis" id="kpis"></div>
+
+  <div class="cols">
+    <div class="card">
+      <h2 style="margin-top:0">서버별 프록시 호출</h2>
+      <div id="byServer"><p class="muted">아직 호출 기록이 없습니다.</p></div>
+    </div>
+    <div class="card">
+      <h2 style="margin-top:0">많이 쓰인 도구 TOP</h2>
+      <div id="byTool"><p class="muted">아직 호출 기록이 없습니다.</p></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h2 style="margin-top:0">최근 15분 호출 추이 <span class="muted">(파란색=성공)</span></h2>
+    <div class="spark" id="spark"></div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h2 style="margin-top:0">최근 호출 <a href="{{ base }}/logs" style="font-size:12px">전체 로그 →</a></h2>
+    <table><thead><tr><th>시각</th><th>경로(via)</th><th>서버·도구</th><th>결과</th><th>지연</th></tr></thead>
+    <tbody id="recent"></tbody></table>
+  </div>
+{% endblock %}
+
+{% block script %}
+const fmtTime = ts => new Date(ts * 1000).toLocaleTimeString("ko-KR");
+
+function bars(rows, el, total) {
+  if (!rows.length) return;
+  const max = Math.max(...rows.map(r => r.total), 1);
+  el.innerHTML = rows.map(r => {
+    const label = r.tool ? `${r.server_id}·${r.tool}` : r.server_id;
+    const okPct = r.ok != null ? (r.ok / r.total * 100) : 100;
+    return `<div class="barrow"><span title="${label}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${label}</span>
+      <div class="track"><div class="fill" style="width:${r.total/max*100}%"></div></div>
+      <span style="text-align:right">${r.total}</span></div>`;
+  }).join("");
+}
+
+async function load() {
+  const s = await j("/api/stats");
+  const sc = s.status_counts || {};
+  const COLOR = {ONLINE:'#166534', UNHEALTHY:'#854d0e', OFFLINE:'#991b1b', ARCHIVED:'#6b7280'};
+  const statusText = ["ONLINE","UNHEALTHY","OFFLINE","ARCHIVED"].filter(k => sc[k])
+    .map(k => `<span style="color:${COLOR[k]}">${k} ${sc[k]}</span>`).join("&nbsp; ") || "—";
+  document.getElementById("kpis").innerHTML = `
+    <div class="kpi"><div class="n">${s.servers_total}</div><div class="l">등록 서버</div></div>
+    <div class="kpi"><div class="n" style="font-size:14px;line-height:1.6;padding-top:6px">${statusText}</div><div class="l">서버 상태</div></div>
+    <div class="kpi"><div class="n">${s.consumers_total}</div><div class="l">컨슈머</div></div>
+    <div class="kpi"><div class="n">${s.calls_total}</div><div class="l">총 프록시 호출</div></div>
+    <div class="kpi"><div class="n">${s.success_rate==null?'—':s.success_rate+'%'}</div><div class="l">성공률 (${s.calls_ok}/${s.calls_total})</div></div>
+    <div class="kpi"><div class="n">${s.avg_latency_ms==null?'—':s.avg_latency_ms+'ms'}</div><div class="l">평균 지연(성공)</div></div>`;
+
+  if (s.by_server.length) bars(s.by_server, document.getElementById("byServer"));
+  if (s.by_tool.length) bars(s.by_tool, document.getElementById("byTool"));
+
+  const tl = s.timeline, tlMax = Math.max(...tl.map(b => b.total), 1);
+  document.getElementById("spark").innerHTML = tl.map(b =>
+    `<div class="b" style="height:${b.total/tlMax*100}%" title="${b.total}건 (성공 ${b.ok})">
+       <div class="ok" style="height:${b.total? b.ok/b.total*100:0}%"></div></div>`).join("");
+
+  document.getElementById("recent").innerHTML = s.recent.map(r =>
+    `<tr><td>${fmtTime(r.ts)}</td><td>${r.via||''}</td><td>${r.server_id}·${r.tool}</td>
+      <td class="${r.ok?'ok-y':'ok-n'}">${r.ok?'성공':(r.error||'실패')}</td>
+      <td>${r.latency_ms}ms</td></tr>`).join("")
+    || `<tr><td colspan="5" class="muted">아직 호출이 없습니다. 도구 테스트나 에이전트로 호출해 보세요.</td></tr>`;
+}
+load();
+setInterval(load, 10000);
+{% endblock %}

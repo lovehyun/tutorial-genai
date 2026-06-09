@@ -3,9 +3,11 @@
 # stdout 에 print() 절대 금지! 로깅은 stderr로만.
 import asyncio, platform, socket, sys, logging
 from typing import Dict, List
+
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
+
 from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("simple-net-local")  # Claude 도구 패널에 표시될 서버 이름

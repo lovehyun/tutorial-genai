@@ -1,0 +1,179 @@
+{% extends "_base.html" %}
+{% block title %}MCP 서버 · 마켓플레이스{% endblock %}
+
+{% block style %}
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; margin-top: 16px; }
+  .scard { background: #fff; border-radius: 10px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .scard.dim { opacity: .55; }
+  .scard h3 { margin: 0 0 2px; font-size: 16px; }
+  .meta { font-size: 12px; color: #6b7280; margin-bottom: 6px; }
+  .ns { display: inline-block; background: #f1f5f9; color: #475569; font-size: 11px; padding: 1px 7px; border-radius: 6px; }
+  .desc { font-size: 13px; color: #374151; min-height: 18px; }
+  .url { font-size: 11px; color: #2563eb; word-break: break-all; background: #f8fafc; padding: 4px 6px; border-radius: 6px; margin: 6px 0; cursor: pointer; }
+  .tools { margin: 10px 0; }
+  .tag { display: inline-block; background: #eef2ff; color: #3730a3; font-size: 11px; padding: 2px 8px; border-radius: 999px; margin: 2px 2px 0 0; cursor: pointer; }
+  .tag:hover { background: #c7d2fe; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .reg-form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
+  .reg-form input { width: 100%; } .reg-form .full { grid-column: 1 / -1; }
+  /* 도구 상세 모달 */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 50; }
+  .modal { background: #fff; max-width: 520px; margin: 6vh auto; border-radius: 12px; padding: 20px 22px; box-shadow: 0 10px 40px rgba(0,0,0,.25); max-height: 84vh; overflow-y: auto; }
+  .modal h3 { margin: 0 0 2px; font-size: 16px; }
+  .modal .tdesc { color: #374151; font-size: 13.5px; margin: 6px 0 12px; }
+  .modal h4 { font-size: 12px; color: #6b7280; text-transform: uppercase; margin: 14px 0 4px; }
+  .ptable { border-collapse: collapse; width: 100%; font-size: 13px; }
+  .ptable th, .ptable td { border: 1px solid #eef2f7; padding: 5px 8px; text-align: left; vertical-align: top; }
+  .ptable th { background: #f8fafc; color: #6b7280; font-weight: 600; }
+  .req-dot { color: inherit; }
+  .schema { background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 10px 12px; font-size: 12px; white-space: pre-wrap; word-break: break-word; }
+  .modal-actions { display: flex; justify-content: flex-end; margin-top: 14px; }
+{% endblock %}
+
+{% block content %}
+  <div class="bar">
+    <input id="q" placeholder="🔎 이름·팀·도구·설명 검색" size="26" oninput="render()">
+    <label>네임스페이스</label>
+    <select id="nsFilter" onchange="render()"><option value="">전체</option></select>
+    <label>상태</label>
+    <select id="stFilter" onchange="render()">
+      <option value="">전체</option><option>ONLINE</option><option>UNHEALTHY</option>
+      <option>OFFLINE</option><option>ARCHIVED</option>
+    </select>
+    <span style="flex:1"></span>
+    <span class="muted" id="count"></span>
+    <span class="muted">· 구독/컨슈머는 <a href="{{ base }}/consumers">👤 컨슈머</a></span>
+  </div>
+
+  <section><h2>등록된 MCP 서버 <span class="muted">— 도구를 클릭하면 설명·입출력을 볼 수 있어요</span></h2>
+    <div id="grid" class="grid"></div></section>
+
+  <!-- 도구 상세 모달 -->
+  <div class="overlay" id="overlay" onclick="if(event.target===this)closeTool()">
+    <div class="modal">
+      <h3 id="t_name"></h3>
+      <div class="tdesc" id="t_desc"></div>
+      <div id="t_in"></div>
+      <div id="t_out"></div>
+      <div class="modal-actions">
+        <a id="t_try" href="#" style="margin-right:auto;font-size:13px">🧪 이 도구 테스트하기 →</a>
+        <button class="ghost" onclick="closeTool()">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <h2>새 MCP 서버 등록 (등록 시 도구 자동 수집)</h2>
+    <div class="bar" style="display:block">
+      <div class="reg-form">
+        <input id="s_id" placeholder="id (예: travel)">
+        <input id="s_name" placeholder="이름 (예: Travel MCP)">
+        <input id="s_owner" placeholder="만든 팀 (예: 1조)">
+        <input id="s_namespace" placeholder="네임스페이스 (예: default)">
+        <input id="s_endpoint" class="full" placeholder="엔드포인트 — 게이트웨이가 접속할 내부 주소 (예: http://127.0.0.1:8001/mcp)">
+        <input id="s_desc" class="full" placeholder="설명">
+      </div>
+      <div style="margin-top:10px"><button onclick="addServer()">서버 등록</button></div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block script %}
+let SERVERS = [];
+
+async function load() {
+  SERVERS = await j("/api/servers");
+  const nss = [...new Set(SERVERS.map(s => s.namespace).filter(Boolean))].sort();
+  const nsf = document.getElementById("nsFilter"), curNs = nsf.value;
+  nsf.innerHTML = `<option value="">전체</option>` + nss.map(n => `<option>${n}</option>`).join("");
+  nsf.value = curNs;
+  render();
+}
+
+function render() {
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  const ns = document.getElementById("nsFilter").value;
+  const st = document.getElementById("stFilter").value;
+  const shown = SERVERS.filter(s => {
+    if (ns && s.namespace !== ns) return false;
+    if (st && s.status !== st) return false;
+    if (!q) return true;
+    const hay = [s.id, s.name, s.owner, s.namespace, s.description,
+                 ...(s.tools||[]).map(t => t.name + " " + (t.description||""))].join(" ").toLowerCase();
+    return hay.includes(q);
+  });
+  document.getElementById("count").textContent = `${shown.length} / ${SERVERS.length} 서버`;
+  document.getElementById("grid").innerHTML = shown.map(card).join("")
+    || `<p class="muted">조건에 맞는 서버가 없습니다.</p>`;
+}
+
+function card(s) {
+  const dead = s.status === "OFFLINE" || s.status === "ARCHIVED";
+  const tools = (s.tools || []).map(t =>
+      `<span class="tag" title="클릭해서 설명·입출력 보기" onclick="showTool('${s.id}','${t.name}')">${t.name}</span>`
+    ).join("") || `<span class="muted">도구 없음</span>`;
+  const directUrl = `${location.origin}${BASE}/mcp/servers/${s.namespace||'default'}/${s.id}`;
+  return `<div class="scard ${dead?'dim':''}">
+    <div class="row"><h3>${s.name}</h3><span class="status ${s.status}">${s.status}</span></div>
+    <div class="meta">${s.id} · ${s.owner || '소유 미상'} · <span class="ns">${s.namespace||'default'}</span></div>
+    <div class="desc">${s.description || ''}</div>
+    <div class="url" title="개별 프록시 주소 (복사)" onclick="copy('${directUrl}')">${directUrl}</div>
+    <div class="tools">${tools}</div>
+    <div class="row"><span class="muted">${(s.tools||[]).length}개 도구</span>
+      <span>
+        <button class="ghost mini" onclick="refresh('${s.id}')">도구 새로고침</button>
+        <button class="danger mini" onclick="delServer('${s.id}')">삭제</button>
+      </span>
+    </div>
+  </div>`;
+}
+
+function copy(text) { navigator.clipboard?.writeText(text); }
+
+// ── 도구 상세(설명·입력·출력) ──
+function showTool(serverId, toolName) {
+  const s = SERVERS.find(x => x.id === serverId);
+  const t = (s?.tools || []).find(x => x.name === toolName);
+  if (!t) return;
+  const esc = x => (x==null?'':String(x)).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  document.getElementById("t_name").textContent = `${serverId} · ${t.name}`;
+  document.getElementById("t_desc").textContent = t.description || "(설명 없음)";
+  const ins = t.input_schema || {}, props = ins.properties || {}, req = ins.required || [];
+  document.getElementById("t_in").innerHTML = "<h4>입력 인자</h4>" + (Object.keys(props).length
+    ? `<table class="ptable"><tr><th>이름</th><th>타입</th><th>필수</th><th>설명</th></tr>` +
+      Object.entries(props).map(([k, p]) =>
+        `<tr><td>${esc(k)}</td><td>${esc(p.type||'-')}</td>
+          <td>${req.includes(k)?'<span class="req-dot">O</span>':''}</td>
+          <td>${esc(p.description||p.title||'')}</td></tr>`).join("") + `</table>`
+    : `<p class="muted">입력 인자 없음</p>`);
+  const out = t.output_schema || {};
+  document.getElementById("t_out").innerHTML = "<h4>출력 스키마</h4>" + (Object.keys(out).length
+    ? `<div class="schema">${esc(JSON.stringify(out, null, 2))}</div>`
+    : `<p class="muted">출력 스키마 정의 없음(자유 텍스트 반환)</p>`);
+  document.getElementById("t_try").href = `${BASE}/playground`;
+  document.getElementById("overlay").style.display = "block";
+}
+function closeTool() { document.getElementById("overlay").style.display = "none"; }
+
+async function addServer() {
+  const body = {
+    id: s_id.value.trim(), name: s_name.value.trim(), owner: s_owner.value.trim(),
+    namespace: s_namespace.value.trim() || "default",
+    endpoint: s_endpoint.value.trim(), description: s_desc.value.trim()
+  };
+  if (!body.id || !body.name || !body.endpoint) { alert("id / 이름 / 엔드포인트는 필수입니다."); return; }
+  const r = await jw(`/api/servers`, "POST", body);
+  if (!r.ok) { const e = await r.json().catch(()=>({})); alert("등록 실패: " + (e.detail || e.error || r.status)); return; }
+  ["s_id","s_name","s_owner","s_namespace","s_endpoint","s_desc"].forEach(i => document.getElementById(i).value = "");
+  load();
+}
+
+async function refresh(id) { await jw(`/api/servers/${id}/refresh`, "POST"); load(); }
+async function delServer(id) {
+  if (!confirm(`${id} 서버를 삭제할까요? (메타+구독 함께 삭제)`)) return;
+  await jw(`/api/servers/${id}`, "DELETE"); load();
+}
+
+load();
+setInterval(load, 30000);
+{% endblock %}
