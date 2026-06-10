@@ -161,13 +161,28 @@ def api_register_server():
     reason = security.check_endpoint(body["endpoint"])      # SSRF 방어
     if reason:
         return jsonify({"error": "ENDPOINT_REJECTED", "detail": reason}), 400
+    ns = body.get("namespace", "default")
     db.upsert_server(
         id=body["id"], name=body["name"], endpoint=body["endpoint"],
-        owner=body.get("owner", ""), namespace=body.get("namespace", "default"),
-        description=body.get("description", ""),
+        owner=body.get("owner", ""), namespace=ns, description=body.get("description", ""),
     )
+    if ns == "demo":          # 데모는 '다시 등록' 버튼용으로 기억(삭제돼도 보존)
+        db.remember_seed(body["id"], body["name"], body["endpoint"],
+                         body.get("owner", ""), ns, body.get("description", ""))
     _probe_and_store(body["id"], body["endpoint"])
     return jsonify(db.get_server(body["id"])), 201
+
+
+@flask_app.post("/api/demo/seed")
+@require_token
+def api_demo_seed():
+    """기억해 둔 데모 서버들을 재등록 + 재탐지한다('데모 서버 다시 등록' 버튼)."""
+    seeds = db.get_demo_seeds()
+    for s in seeds:
+        db.upsert_server(id=s["id"], name=s["name"], endpoint=s["endpoint"],
+                         owner=s["owner"], namespace=s["namespace"], description=s["description"])
+        _probe_and_store(s["id"], s["endpoint"])
+    return jsonify({"seeded": [s["id"] for s in seeds]})
 
 
 @flask_app.post("/api/servers/<server_id>/refresh")

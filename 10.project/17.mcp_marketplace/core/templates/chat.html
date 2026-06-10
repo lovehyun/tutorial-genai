@@ -175,7 +175,8 @@ async function send() {
   const btn = document.getElementById("sendBtn"); btn.disabled = true;
   const thinking = document.createElement("div");
   thinking.className = "msg bot"; thinking.innerHTML = `<div class="bubble">…</div>`;
-  document.getElementById("msgs").appendChild(thinking);
+  const box = document.getElementById("msgs");
+  box.appendChild(thinking); box.scrollTop = box.scrollHeight;   // 생각중에도 맨 아래로
   try {
     const r = await jw("/api/chat", "POST", {
       consumer_id: cid, messages: HISTORY, enabled_tools: enabledTools(), provider: provider(),

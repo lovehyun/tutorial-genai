@@ -63,7 +63,10 @@
   </div>
 
   <section>
-    <h2>새 MCP 서버 등록 (등록 시 도구 자동 수집)</h2>
+    <h2 style="display:flex; align-items:center; justify-content:space-between; gap:10px">
+      <span>새 MCP 서버 등록 (등록 시 도구 자동 수집)</span>
+      <button class="ghost mini" onclick="seedDemo()" title="삭제한 데모 서버(travel/weather/shopping)를 다시 등록">🌱 데모 서버 다시 등록</button>
+    </h2>
     <div class="bar" style="display:block">
       <div class="reg-form">
         <input id="s_id" placeholder="id (예: travel)">
@@ -166,6 +169,16 @@ async function addServer() {
   if (!r.ok) { const e = await r.json().catch(()=>({})); alert("등록 실패: " + (e.detail || e.error || r.status)); return; }
   ["s_id","s_name","s_owner","s_namespace","s_endpoint","s_desc"].forEach(i => document.getElementById(i).value = "");
   load();
+}
+
+async function seedDemo() {
+  const r = await jw(`/api/demo/seed`, "POST");
+  const d = await r.json().catch(() => ({}));
+  if (r.ok) {
+    const n = (d.seeded || []).length;
+    alert(n ? `데모 서버 ${n}개 재등록: ${d.seeded.join(", ")}` : "기억된 데모 서버가 없습니다(아직 한 번도 자가등록 안 됨).");
+    load();
+  }
 }
 
 async function refresh(id) { await jw(`/api/servers/${id}/refresh`, "POST"); load(); }

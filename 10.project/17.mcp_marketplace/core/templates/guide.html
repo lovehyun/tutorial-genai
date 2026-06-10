@@ -65,7 +65,7 @@
 
   <h2 id="server">① 내 MCP 서버를 등록하기 (공급자)</h2>
   <p>먼저 평범한 MCP 서버를 만듭니다. (공식 <code>mcp</code> SDK의 FastMCP 예시)</p>
-  <pre><code># my_server.py
+  <pre><code># my_server.py   —   pip install mcp   /   실행: python my_server.py
 from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("My MCP", host="0.0.0.0", port=8101)
@@ -100,34 +100,76 @@ if __name__ == "__main__":
   <h2 id="consume">② 게이트웨이로 사용하기 (소비자)</h2>
   <p><a href="{{ base }}/consumers">👤 컨슈머</a> 페이지에서 <b>컨슈머</b>를 만들고, 쓰고 싶은 서버들을 <b>구독</b> 체크하세요. 그러면 아래 한 줄이면 끝입니다.</p>
 
-  <h3>LangChain 에이전트</h3>
-  <pre><code>from langchain_openai import ChatOpenAI
+  <h3>LangChain 에이전트 (그대로 복붙해서 실행되는 전체 코드)</h3>
+  <pre><code># pip install mcp langchain langchain-openai langchain-mcp-adapters langgraph requests
+# export OPENAI_API_KEY=sk-...                ← 본인 OpenAI 키
+import asyncio, requests
+from langchain_openai import ChatOpenAI
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain.agents import create_agent
 
-URL = "{{ public }}/mcp/consumers/my-agent"   # ← 내 컨슈머 엔드포인트 (토큰 불필요)
+MARKET   = "{{ public }}"
+CONSUMER = "my-agent"                          # 내 컨슈머 id (원하는 이름)
+TOKEN    = "&lt;공유토큰&gt;"                       # 컨슈머 생성/구독(관리)에만 필요. 게이트웨이 접속엔 불필요.
+H = {"Authorization": f"Bearer {TOKEN}"}
 
-client = MultiServerMCPClient({
-    "market": {"url": URL, "transport": "streamable_http"}
-})
-tools = await client.get_tools()              # 구독한 모든 서버의 도구 (서버id__도구명)
+def setup():
+    """컨슈머가 없으면 만들고, 구독이 비어 있으면 등록된 서버 전체를 구독한다(관리=토큰 필요)."""
+    s = requests.get(f"{MARKET}/api/consumers/{CONSUMER}/subscriptions")
+    if s.status_code == 404:
+        requests.post(f"{MARKET}/api/consumers", json={"id": CONSUMER, "name": CONSUMER}, headers=H)
+        s = requests.get(f"{MARKET}/api/consumers/{CONSUMER}/subscriptions")
+    if not s.json():
+        ids = [x["id"] for x in requests.get(f"{MARKET}/api/servers").json()]
+        requests.put(f"{MARKET}/api/consumers/{CONSUMER}/subscriptions",
+                     json={"server_ids": ids}, headers=H)
 
-agent = create_agent(ChatOpenAI(model="gpt-4o-mini"), tools)
-res = await agent.ainvoke({"messages": [("user", "철수에게 인사해줘")]})
-print(res["messages"][-1].content)</code></pre>
+async def main():
+    setup()
+    # 게이트웨이는 토큰 불필요 — 그냥 붙는다
+    client = MultiServerMCPClient({"market": {
+        "url": f"{MARKET}/mcp/consumers/{CONSUMER}", "transport": "streamable_http"}})
+    tools = await client.get_tools()           # 구독한 모든 서버의 도구 (서버id__도구명)
+    print("쓸 수 있는 도구:", [t.name for t in tools])
+    agent = create_agent(ChatOpenAI(model="gpt-4o-mini"), tools)
+    res = await agent.ainvoke({"messages": [("user", "도쿄 여행 상품 검색해줘")]})
+    print(res["messages"][-1].content)
 
-  <h3>순수 MCP 클라이언트 (SDK)</h3>
-  <pre><code>from mcp import ClientSession
+asyncio.run(main())</code></pre>
+
+  <h3>순수 MCP 클라이언트 (LLM 없이 — 그대로 복붙 실행)</h3>
+  <pre><code># pip install mcp requests
+import asyncio, requests
+from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 
-URL = "{{ public }}/mcp/consumers/my-agent"   # 게이트웨이는 토큰 불필요
+MARKET   = "{{ public }}"
+CONSUMER = "my-agent"
+TOKEN    = "&lt;공유토큰&gt;"                       # 컨슈머 생성/구독(관리)에만 필요 (🔑 토큰에서 복사)
 
-async with streamablehttp_client(URL) as (r, w, _):
-    async with ClientSession(r, w) as s:
-        await s.initialize()
-        print([t.name for t in (await s.list_tools()).tools])
-        out = await s.call_tool("myteam-greet__greet", {"name": "철수"})
-        print(out.content[0].text)</code></pre>
+def setup():
+    """컨슈머가 없으면 만들고, 구독이 비었으면 등록된 서버 전체를 구독한다."""
+    H = {"Authorization": f"Bearer {TOKEN}"}
+    s = requests.get(f"{MARKET}/api/consumers/{CONSUMER}/subscriptions")
+    if s.status_code == 404:
+        requests.post(f"{MARKET}/api/consumers", json={"id": CONSUMER, "name": CONSUMER}, headers=H)
+        s = requests.get(f"{MARKET}/api/consumers/{CONSUMER}/subscriptions")
+    if not s.json():
+        ids = [x["id"] for x in requests.get(f"{MARKET}/api/servers").json()]
+        requests.put(f"{MARKET}/api/consumers/{CONSUMER}/subscriptions",
+                     json={"server_ids": ids}, headers=H)
+
+async def main():
+    setup()                                       # ← 이게 없으면 게이트웨이가 404(=Session terminated)
+    async with streamablehttp_client(f"{MARKET}/mcp/consumers/{CONSUMER}") as (r, w, _):
+        async with ClientSession(r, w) as s:      # 게이트웨이 접속 — 토큰 불필요
+            await s.initialize()
+            tools = (await s.list_tools()).tools
+            print("도구:", [t.name for t in tools])
+            out = await s.call_tool("weather__get_weather", {"city": "서울"})   # 데모 도구 예시
+            print(out.content[0].text)
+
+asyncio.run(main())</code></pre>
 
   <div class="note">개별 서버만 쓸 땐 <code>{{ public }}/mcp/servers/&lt;서버id&gt;</code>에 붙고,
     도구 이름은 네임스페이스 없이 <code>greet</code> 처럼 원래 이름 그대로입니다.</div>

@@ -20,7 +20,8 @@ import json
 import time
 import sqlite3
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "marketplace.db")
+# DB 경로. 도커에선 DB_PATH=/data/marketplace.db + 볼륨 마운트로 영속화(재시작에도 보존).
+DB_PATH = os.getenv("DB_PATH") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "marketplace.db")
 
 # 상태 임계값(초) — 교육용으로 짧게. 운영에선 env 로 늘린다.
 ONLINE_SEC = int(os.getenv("HEALTH_ONLINE_SEC", "90"))      # 이 이내면 ONLINE
@@ -88,6 +89,10 @@ def init_db():
             ip         TEXT                       -- 요청자 IP (X-Forwarded-For 우선)
         );
         CREATE INDEX IF NOT EXISTS idx_calls_id ON calls(id DESC);
+        CREATE TABLE IF NOT EXISTS demo_seeds (   -- 데모 서버 재등록용 기억(삭제돼도 보존)
+            id          TEXT PRIMARY KEY,
+            name        TEXT, endpoint TEXT, owner TEXT, namespace TEXT, description TEXT
+        );
         """)
         c.commit()
 
@@ -118,6 +123,24 @@ def upsert_server(id, name, endpoint, owner="", namespace="default", description
             (id, name, endpoint, owner, namespace, description, now()),
         )
         c.commit()
+
+
+def remember_seed(id, name, endpoint, owner="", namespace="demo", description="") -> None:
+    """데모 서버 재등록용 기억. 서버를 삭제해도 이 기록은 남아 '데모 다시 등록'에 쓰인다."""
+    with get_conn() as c:
+        c.execute(
+            """INSERT INTO demo_seeds (id, name, endpoint, owner, namespace, description)
+               VALUES (?, ?, ?, ?, ?, ?)
+               ON CONFLICT(id) DO UPDATE SET name=excluded.name, endpoint=excluded.endpoint,
+                   owner=excluded.owner, namespace=excluded.namespace, description=excluded.description""",
+            (id, name, endpoint, owner, namespace, description),
+        )
+        c.commit()
+
+
+def get_demo_seeds() -> list[dict]:
+    with get_conn() as c:
+        return [dict(r) for r in c.execute("SELECT * FROM demo_seeds ORDER BY id")]
 
 
 def mark_seen(server_id: str) -> None:

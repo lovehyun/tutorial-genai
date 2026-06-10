@@ -46,15 +46,18 @@ def token_ok(header_value: str | None) -> bool:
 
 
 def check_endpoint(url: str) -> str | None:
-    """SSRF 방어. 안전하면 None, 위험하면 사유(문자열) 반환."""
+    """SSRF 방어. 안전하면 None, 위험하면 사유(문자열) 반환.
+
+    · 링크로컬(169.254.0.0/16 — AWS/GCP/Azure 메타데이터 포함, fe80::/10)은
+      ALLOW_PRIVATE 여부와 '무관하게 항상' 차단 → IAM 키 유출 등 방지.
+    · 그 외 사설/루프백은 ALLOW_PRIVATE=1 일 때만 허용(도커 내부망·로컬 데모용).
+    """
     p = urlparse(url)
     if p.scheme not in ("http", "https"):
         return "scheme 은 http/https 만 허용"
     host = p.hostname
     if not host:
         return "host 가 없는 URL"
-    if ALLOW_PRIVATE:                              # 로컬 데모: 사설 허용
-        return None
     port = p.port or (443 if p.scheme == "https" else 80)
     try:
         infos = socket.getaddrinfo(host, port, proto=socket.IPPROTO_TCP)
@@ -62,7 +65,11 @@ def check_endpoint(url: str) -> str | None:
         return f"호스트 DNS 해석 실패: {e}"
     for info in infos:                             # 호스트가 가리키는 모든 IP 검사
         ip = ipaddress.ip_address(info[4][0])
-        if (ip.is_private or ip.is_loopback or ip.is_link_local
+        if ip.is_link_local:                       # 메타데이터/링크로컬 → 항상 금지
+            return f"링크로컬/메타데이터 IP 로 향하는 endpoint 는 금지: {ip}"
+        if ALLOW_PRIVATE:                          # 그 외 사설/루프백은 허용(데모/내부망)
+            continue
+        if (ip.is_private or ip.is_loopback
                 or ip.is_reserved or ip.is_multicast or ip.is_unspecified):
-            return f"사설/내부/메타데이터 IP 로 향하는 endpoint 는 금지: {ip}"
+            return f"사설/내부 IP 로 향하는 endpoint 는 금지: {ip}"
     return None
