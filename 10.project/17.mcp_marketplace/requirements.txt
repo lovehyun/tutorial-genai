@@ -10,8 +10,5 @@ python-dotenv>=1.0      # .env 의 OPENAI_API_KEY/ANTHROPIC_API_KEY 자동 로�
 openai>=1.40            # LLM_PROVIDER=openai (기본 gpt-4o-mini)
 anthropic>=0.40         # LLM_PROVIDER=anthropic (기본 claude-haiku-4-5)
 
-# 소비자 에이전트(consumer/agent.py) 실행 시 추가
-langchain>=1.0
-langchain-openai>=0.2
-langchain-mcp-adapters>=0.2
-langgraph>=1.0
+# 참고: consumer/agent.py(로컬 LangChain 에이전트 예제)는 requirements-consumer.txt 로 분리.
+#       서버/도커 이미지에는 langchain 이 필요 없다(채팅은 openai/anthropic SDK 직접 사용).

@@ -28,7 +28,6 @@ from mcp.server.lowlevel import Server
 from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
 
 import db
-import security
 from mcp_client import call_upstream
 
 log = logging.getLogger("gateway")
@@ -163,15 +162,8 @@ async def _get_manager(key: str, build) -> StreamableHTTPSessionManager:
 async def gateway_asgi(scope, receive, send) -> None:
     if scope["type"] != "http":
         return
-    # 게이트웨이도 공유 Bearer 토큰 요구(MCP streamable-http = HTTP 라 헤더로 게이트)
-    auth = next((v.decode() for k, v in scope.get("headers", []) if k == b"authorization"), None)
-    if not security.token_ok(auth):
-        await send({"type": "http.response.start", "status": 401,
-                    "headers": [(b"content-type", b"application/json"),
-                                (b"www-authenticate", b"Bearer")]})
-        await send({"type": "http.response.body",
-                    "body": b'{"error":"UNAUTHORIZED"}'})
-        return
+    # 게이트웨이(MCP streamable-http)는 토큰 불필요 — MCP 표준대로 개방.
+    # (인증이 필요한 건 레지스트리 관리 API 와 채팅뿐이다. → app.py require_token)
     # 경로에서 'consumers'/'servers' 키워드를 찾고, 대상 id 는 '마지막 세그먼트'.
     #  · /mcp/consumers/<id>                 (통합)
     #  · /mcp/servers/<id>                   (개별 — 구버전)

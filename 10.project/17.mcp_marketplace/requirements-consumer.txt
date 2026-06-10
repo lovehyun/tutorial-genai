@@ -1,0 +1,7 @@
+# consumer/agent.py (로컬 LangChain 에이전트 예제) 전용 추가 의존성.
+#   서버/도커에는 불필요 — 이 파일은 로컬에서 에이전트 예제를 돌릴 때만 설치한다.
+#   pip install -r requirements.txt -r requirements-consumer.txt
+langchain>=1.0
+langchain-openai>=0.2
+langchain-mcp-adapters>=0.2
+langgraph>=1.0

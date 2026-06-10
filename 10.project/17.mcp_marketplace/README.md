@@ -149,9 +149,11 @@ cd core && uvicorn main:app --port 8000
 등록(레지스트리)은 MCP 프로토콜이 아니라 **평범한 HTTP REST** 이고, 게이트웨이는 MCP
 streamable-http(=HTTP) 이므로, 둘 다 **공유 Bearer 토큰**으로 보호한다.
 
-- **공유 토큰** (`MARKET_TOKEN`): 설정하면 **쓰기(POST/PUT/DELETE)** 와 **게이트웨이(`/mcp/*`)** 에
-  `Authorization: Bearer <토큰>` 을 요구한다. 읽기 GET·페이지는 공개. 미설정 시 인증 비활성(로컬 개발).
-  UI는 우상단 **🔑 토큰**에 한 번 저장하면 localStorage에 보관해 자동 첨부한다.
+- **공유 토큰** (`MARKET_TOKEN`): 설정하면 아래 **관리 작업 + 채팅에만** `Authorization: Bearer <토큰>` 을 요구한다.
+  - 토큰 필요: 서버 등록/삭제/재수집, 컨슈머 생성/삭제, 구독 변경(PUT), heartbeat, **채팅(`/api/chat`, LLM 비용)**
+  - 토큰 불필요(개방): 모든 읽기, **게이트웨이 `/mcp/*`(MCP 표준)**, 도구 테스트 호출(`/api/servers/<id>/call`)
+  - bearer 는 MCP 스펙 요구가 아니라 *남용 방지용 우리 선택*이라, 실제 MCP 트래픽은 열어 둔다.
+  - 미설정 시 인증 비활성(로컬 개발). UI 우상단 **🔑 토큰**에서 토큰 확인/복사(데모는 자동 첨부).
 - **토큰 UI 노출** (`SHOW_TOKEN_IN_UI`): `1` 이면 `/api/token-hint` 가 토큰을 알려줘 UI가 자동으로
   채운다(데모 편의 — 클릭조차 불필요). **단 이때 쓰기는 사실상 공개**(페이지를 여는 누구나 토큰 획득)이므로,
   진짜 보호가 필요하면 끄고(기본 0) 토큰을 화면 밖(슬라이드/슬랙)으로 전달한다. `run_demo.sh` 는 데모용으로 켜둔다.

@@ -33,6 +33,15 @@
   .UNHEALTHY { background: #fef9c3; color: #854d0e; }
   .OFFLINE   { background: #fee2e2; color: #991b1b; }
   .ARCHIVED  { background: #f3f4f6; color: #6b7280; }
+  /* 🔑 토큰 모달 */
+  .tk-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100; }
+  .tk-modal { background: #fff; max-width: 460px; margin: 14vh auto; border-radius: 12px; padding: 20px 22px; box-shadow: 0 10px 40px rgba(0,0,0,.25); }
+  .tk-modal h3 { margin: 0 0 10px; font-size: 16px; }
+  .tk-row { display: flex; gap: 8px; }
+  .tk-row input { flex: 1; font-family: ui-monospace, Menlo, monospace; }
+  .tk-row input[readonly] { background: #f8fafc; color: #334155; }
+  .tk-note { font-size: 12px; color: #6b7280; margin-top: 10px; line-height: 1.5; }
+  .tk-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
   {% block style %}{% endblock %}
 </style>
 </head>
@@ -59,31 +68,55 @@
   {% block content %}{% endblock %}
 </div>
 
+<!-- 🔑 토큰 모달 -->
+<div class="tk-overlay" id="tkOverlay" onclick="if(event.target===this)tkClose()">
+  <div class="tk-modal">
+    <h3>🔑 공유 토큰</h3>
+    <div id="tkBody"></div>
+    <div class="tk-actions"><button class="ghost" onclick="tkClose()">닫기</button></div>
+  </div>
+</div>
+
 <script>
 const BASE = "{{ base }}";   // nginx prefix(/mcp-market 등) 반영 — 모든 fetch는 이 BASE 기준
 const j = (u, o) => fetch(BASE + u, o).then(r => r.json());
 
-// ── 공유 Bearer 토큰 (읽기는 불필요, 쓰기/구독/등록에만) ──
+// ── 공유 Bearer 토큰 (읽기는 불필요, 쓰기/구독/등록/도구실행/채팅에 필요) ──
 const _TK = "mkt_token";
 function getToken() { return localStorage.getItem(_TK) || ""; }
-async function askToken() {
-  let cur = getToken();
-  let msg = "공유 토큰을 입력하세요 (쓰기/구독/등록/도구실행에 필요)";
-  if (!cur) {                                    // 데모 모드면 서버가 토큰을 알려줌 → 자동 채움
-    try {
-      const h = await j("/api/token-hint");
-      if (h && h.token) { cur = h.token; msg = "이 데모의 공유 토큰입니다. 확인을 누르면 저장됩니다."; }
-      else if (h && !h.auth) { alert("이 서버는 토큰 인증이 꺼져 있습니다(누구나 쓰기 가능)."); return; }
-    } catch (e) {}
-  }
-  const t = prompt(msg, cur);
-  if (t !== null) localStorage.setItem(_TK, t.trim());
-}
-// 데모 모드: 저장된 토큰이 없으면 서버가 알려준 토큰을 조용히 채워둔다(클릭조차 불필요).
+
+// 페이지 로드 시: 서버가 토큰을 공개(SHOW_TOKEN_IN_UI)하면 '항상' 그 값으로 동기화한다.
+// → 서버가 정한 값이 진실. 사용자가 임의로 바꿔 깨뜨릴 수 없게 한다.
 (async () => {
-  if (getToken()) return;
   try { const h = await j("/api/token-hint"); if (h && h.token) localStorage.setItem(_TK, h.token); } catch (e) {}
 })();
+
+async function askToken() {
+  let info = {};
+  try { info = await j("/api/token-hint"); } catch (e) {}
+  const body = document.getElementById("tkBody");
+  if (info && info.token) {
+    // 서버가 정한 토큰 — 읽기전용 + 복사 (변경 불가)
+    localStorage.setItem(_TK, info.token);
+    body.innerHTML =
+      `<div class="tk-row"><input id="tkVal" readonly value="${info.token}" onclick="this.select()">
+         <button onclick="tkCopy()">복사</button></div>
+       <div class="tk-note">이 서버가 정한 <b>공유 토큰</b>입니다. <b>변경할 수 없으며</b>, UI는 자동으로 이 토큰을 사용합니다.
+         SDK/curl 로 직접 호출할 때 <code>Authorization: Bearer &lt;위 토큰&gt;</code> 로 쓰세요.</div>`;
+  } else if (info && info.auth) {
+    // 보호 모드 — 서버가 토큰을 공개하지 않음 → 외부에서 받은 토큰을 직접 입력
+    body.innerHTML =
+      `<div class="tk-row"><input id="tkVal" placeholder="발급받은 토큰 붙여넣기" value="${getToken()}">
+         <button onclick="tkSave()">저장</button></div>
+       <div class="tk-note">쓰기/구독/도구실행에 필요합니다. 강사가 안내한 토큰을 입력하세요.</div>`;
+  } else {
+    body.innerHTML = `<div class="tk-note">이 서버는 토큰 인증이 꺼져 있습니다(누구나 쓰기 가능).</div>`;
+  }
+  document.getElementById("tkOverlay").style.display = "block";
+}
+function tkClose() { document.getElementById("tkOverlay").style.display = "none"; }
+function tkCopy() { const v = document.getElementById("tkVal"); v.select(); navigator.clipboard?.writeText(v.value); }
+function tkSave() { localStorage.setItem(_TK, document.getElementById("tkVal").value.trim()); tkClose(); }
 function authHeaders(extra) {
   const h = Object.assign({"Content-Type": "application/json"}, extra || {});
   const t = getToken();

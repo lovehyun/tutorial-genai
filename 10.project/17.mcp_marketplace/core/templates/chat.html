@@ -81,7 +81,7 @@ async function init() {
   CONSUMERS = await j("/api/consumers");
   document.getElementById("consumer").innerHTML =
     CONSUMERS.map(c => `<option value="${c.id}">${c.name} (${c.id})</option>`).join("")
-    || `<option value="">컨슈머 없음 — 탐색·현황에서 먼저 만드세요</option>`;
+    || `<option value="">컨슈머 없음 — 👤 컨슈머 페이지에서 먼저 만드세요</option>`;
   // LLM 선택지
   const info = await j("/api/llm");
   LLMS = info.available || [];

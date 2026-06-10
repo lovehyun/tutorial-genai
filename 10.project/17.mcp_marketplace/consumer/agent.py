@@ -60,8 +60,9 @@ async def build_agent(consumer_id: str):
     url = f"{MARKET}/mcp/consumers/{consumer_id}"
     print(f"게이트웨이 연결: {url}")
 
+    # 게이트웨이(MCP)는 토큰 불필요 — 그냥 붙는다. (토큰은 컨슈머 생성/구독 같은 관리에만)
     client = MultiServerMCPClient({"market": {
-        "url": url, "transport": "streamable_http", "headers": HEADERS,
+        "url": url, "transport": "streamable_http",
     }})
     tools = await client.get_tools()
     if not tools:

@@ -33,10 +33,9 @@
   </div>
 
   <div class="warn">
-    🔑 <b>공유 토큰</b>: 등록·구독·도구 호출 같은 <b>쓰기</b>와 <b>게이트웨이 접속</b>에는
-    강사가 안내한 공유 토큰을 <code>Authorization: Bearer &lt;토큰&gt;</code> 헤더로 보내야 합니다.
-    (목록·검색 같은 <b>읽기</b>는 토큰 없이 가능). 아래 예제에 모두 포함돼 있습니다.
-    UI에서는 우상단 <b>🔑 토큰</b>에 한 번 넣어두면 됩니다.
+    🔑 <b>공유 토큰</b>은 <b>관리 작업</b>(서버 등록/삭제, 컨슈머 생성/삭제, 구독 변경)과 <b>채팅</b>에만 필요합니다.
+    이때 <code>Authorization: Bearer &lt;토큰&gt;</code> 헤더를 보냅니다. UI에서는 우상단 <b>🔑 토큰</b>에서 확인/복사.<br>
+    <b>게이트웨이(MCP) 접속·도구 호출·목록/검색에는 토큰이 필요 없습니다</b> — MCP 표준대로 그냥 붙으면 됩니다.
   </div>
 
   <p class="toc">
@@ -106,11 +105,10 @@ if __name__ == "__main__":
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain.agents import create_agent
 
-URL = "{{ public }}/mcp/consumers/my-agent"   # ← 내 컨슈머 엔드포인트
-H = {"Authorization": "Bearer <공유토큰>"}     # ← 게이트웨이 접속에도 토큰 필요
+URL = "{{ public }}/mcp/consumers/my-agent"   # ← 내 컨슈머 엔드포인트 (토큰 불필요)
 
 client = MultiServerMCPClient({
-    "market": {"url": URL, "transport": "streamable_http", "headers": H}
+    "market": {"url": URL, "transport": "streamable_http"}
 })
 tools = await client.get_tools()              # 구독한 모든 서버의 도구 (서버id__도구명)
 
@@ -122,10 +120,9 @@ print(res["messages"][-1].content)</code></pre>
   <pre><code>from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 
-URL = "{{ public }}/mcp/consumers/my-agent"
-H = {"Authorization": "Bearer <공유토큰>"}
+URL = "{{ public }}/mcp/consumers/my-agent"   # 게이트웨이는 토큰 불필요
 
-async with streamablehttp_client(URL, headers=H) as (r, w, _):
+async with streamablehttp_client(URL) as (r, w, _):
     async with ClientSession(r, w) as s:
         await s.initialize()
         print([t.name for t in (await s.list_tools()).tools])
