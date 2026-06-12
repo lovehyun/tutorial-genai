@@ -25,12 +25,23 @@
                     font-size: 12px; white-space: pre-wrap; word-break: break-word; }
   .detail-box pre.err { color: #fca5a5; }
   .pager { display: flex; gap: 8px; align-items: center; margin: 14px 0; }
+  .bar input.search { padding: 5px 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; min-width: 200px; }
+  .bar input.search:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,.15); }
+  mark { background: #fde68a; color: inherit; padding: 0 1px; border-radius: 2px; }
 {% endblock %}
 
 {% block content %}
   <div class="bar">
     <span>프록시를 통과한 모든 호출 기록 (최신순)</span>
     <span style="flex:1"></span>
+    <select id="field" onchange="go(1)">
+      <option value="all">통합</option>
+      <option value="ip">IP</option>
+      <option value="path">경로</option>
+      <option value="server">서버·도구</option>
+    </select>
+    <input id="q" class="search" placeholder="검색어 입력…" oninput="onSearch()" onkeydown="if(event.key==='Enter')go(1)">
+    <button class="ghost mini" id="clear" onclick="clearSearch()" style="display:none">지움</button>
     <label>페이지당</label>
     <select id="size" onchange="go(1)"><option>20</option><option>50</option><option>100</option></select>
     <button class="ghost mini" onclick="go(page)">새로고침</button>
@@ -57,7 +68,29 @@
 
 {% block script %}
 let page = 1;
+let searchTimer = null;
 const fmt = ts => new Date(ts * 1000).toLocaleString("ko-KR");
+
+// 입력 디바운스 — 타이핑이 멈추면 검색
+function onSearch() {
+  document.getElementById("clear").style.display =
+    document.getElementById("q").value ? "" : "none";
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => go(1), 300);
+}
+function clearSearch() {
+  document.getElementById("q").value = "";
+  document.getElementById("clear").style.display = "none";
+  go(1);
+}
+// 검색어 강조
+function hi(s, q) {
+  if (!q) return s;
+  const i = s.toLowerCase().indexOf(q.toLowerCase());
+  if (i < 0) return s;
+  return s.slice(0, i) + "<mark>" + s.slice(i, i + q.length) + "</mark>" + s.slice(i + q.length);
+}
+
 function toggle(id) {
   const row = document.getElementById("d" + id), c = document.getElementById("c" + id);
   const open = row.style.display === "none";
@@ -68,16 +101,22 @@ function toggle(id) {
 
 async function go(p) {
   const size = parseInt(document.getElementById("size").value, 10);
-  const d = await j(`/api/calls?page=${Math.max(1,p)}&size=${size}`);
+  const q = document.getElementById("q").value.trim();
+  const field = document.getElementById("field").value;
+  const d = await j(`/api/calls?page=${Math.max(1,p)}&size=${size}`
+                    + `&q=${encodeURIComponent(q)}&field=${field}`);
   page = d.page;
   const esc = s => (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  // 통합/해당 필드에 맞춰 검색어 강조
+  const onCol = f => field === "all" || field === f;
+  const mk = (s, f) => onCol(f) ? hi(esc(s), q) : esc(s);
   document.getElementById("rows").innerHTML = d.items.map(r =>
     `<tr class="main" onclick="toggle(${r.id})">
        <td><span class="caret" id="c${r.id}">▸</span></td>
-       <td>${r.id}</td><td>${fmt(r.ts)}</td><td class="ip">${esc(r.ip)}</td>
-       <td><span class="via">${r.via||''}</span></td>
-       <td>${r.server_id}·${r.tool}</td>
-       <td class="${r.ok?'ok-y':'ok-n'}">${r.ok?'성공':(r.error||'실패')}</td>
+       <td>${r.id}</td><td>${fmt(r.ts)}</td><td class="ip">${mk(r.ip,'ip')}</td>
+       <td><span class="via">${mk(r.via||'','path')}</span></td>
+       <td>${mk(r.server_id,'server')}·${mk(r.tool,'server')}</td>
+       <td class="${r.ok?'ok-y':'ok-n'}">${r.ok?'성공':(esc(r.error)||'실패')}</td>
        <td>${r.latency_ms}ms</td></tr>
      <tr class="detail-row" id="d${r.id}" style="display:none">
        <td class="pad"></td>
@@ -86,8 +125,8 @@ async function go(p) {
          <div class="lbl">입력 인자 (arguments)</div><pre>${esc(r.args)||'(없음)'}</pre>
          <div class="lbl">출력 / 메시지</div><pre class="${r.ok?'':'err'}">${esc(r.result)||'(없음)'}</pre>
        </div></td></tr>`).join("")
-    || `<tr><td colspan="8" class="muted">기록이 없습니다.</td></tr>`;
-  const info = `${d.total}건 중 ${d.page}/${d.pages} 페이지`;
+    || `<tr><td colspan="8" class="muted">${q?'검색 결과가 없습니다.':'기록이 없습니다.'}</td></tr>`;
+  const info = (q?`'${esc(q)}' 검색 — `:'') + `${d.total}건 중 ${d.page}/${d.pages} 페이지`;
   document.getElementById("pginfo").textContent = info;
   document.getElementById("pginfo2").textContent = info;
   document.getElementById("cap").textContent = `보관 상한 초과 시 오래된 기록부터 자동 삭제`;

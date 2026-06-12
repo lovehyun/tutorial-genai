@@ -204,6 +204,18 @@ def delete_server(server_id: str) -> None:
         c.commit()
 
 
+def delete_all_servers() -> int:
+    """등록된 모든 서버 + 도구 + 구독을 삭제하고 삭제된 서버 수를 돌려준다.
+       데모 재등록용 demo_seeds 는 보존하므로 '데모 서버 다시 등록'은 계속 동작한다."""
+    with get_conn() as c:
+        n = c.execute("SELECT COUNT(*) FROM servers").fetchone()[0]
+        c.execute("DELETE FROM tools")
+        c.execute("DELETE FROM subscriptions")
+        c.execute("DELETE FROM servers")
+        c.commit()
+    return n
+
+
 def get_tools(server_id: str) -> list[dict]:
     with get_conn() as c:
         rows = c.execute(
@@ -246,6 +258,16 @@ def delete_consumer(consumer_id: str) -> None:
         c.execute("DELETE FROM subscriptions WHERE consumer_id=?", (consumer_id,))
         c.execute("DELETE FROM consumers WHERE id=?", (consumer_id,))
         c.commit()
+
+
+def delete_all_consumers() -> int:
+    """모든 컨슈머 + 그 구독을 삭제하고 삭제된 컨슈머 수를 돌려준다."""
+    with get_conn() as c:
+        n = c.execute("SELECT COUNT(*) FROM consumers").fetchone()[0]
+        c.execute("DELETE FROM subscriptions")
+        c.execute("DELETE FROM consumers")
+        c.commit()
+    return n
 
 
 # ─── 구독(SUBSCRIPTION) ────────────────────────────────────
@@ -293,17 +315,34 @@ def record_call(server_id, tool, via, ok, latency_ms, error=None, args=None, res
         c.commit()
 
 
-def list_calls(page: int = 1, size: int = 20) -> dict:
-    """요청 로그 페이지네이션. 최신순(id DESC)."""
+# 검색 필드 → 대상 컬럼. '통합'은 여러 컬럼을 OR 로 묶어 한 번에 검색.
+_CALL_SEARCH_FIELDS = {
+    "all":    ["ip", "via", "server_id", "tool"],   # 통합
+    "ip":     ["ip"],
+    "path":   ["via"],                              # 경로(via)
+    "server": ["server_id", "tool"],                # 서버·도구
+}
+
+
+def list_calls(page: int = 1, size: int = 20, q: str = "", field: str = "all") -> dict:
+    """요청 로그 페이지네이션. 최신순(id DESC). q/field 로 검색 필터링."""
     page = max(1, page); size = max(1, min(size, 200))
+    cols = _CALL_SEARCH_FIELDS.get(field, _CALL_SEARCH_FIELDS["all"])
+    q = (q or "").strip()
+    where, params = "", []
+    if q:
+        like = f"%{q}%"
+        where = " WHERE (" + " OR ".join(f"{col} LIKE ?" for col in cols) + ")"
+        params = [like] * len(cols)
     with get_conn() as c:
-        total = c.execute("SELECT COUNT(*) FROM calls").fetchone()[0]
+        total = c.execute("SELECT COUNT(*) FROM calls" + where, params).fetchone()[0]
         rows = c.execute(
-            "SELECT * FROM calls ORDER BY id DESC LIMIT ? OFFSET ?", (size, (page - 1) * size)
+            "SELECT * FROM calls" + where + " ORDER BY id DESC LIMIT ? OFFSET ?",
+            params + [size, (page - 1) * size]
         ).fetchall()
     pages = max(1, (total + size - 1) // size)
     return {"items": [dict(r) for r in rows], "total": total,
-            "page": page, "size": size, "pages": pages}
+            "page": page, "size": size, "pages": pages, "q": q, "field": field}
 
 
 def stats() -> dict:

@@ -45,7 +45,11 @@
     <span class="muted">· 구독/컨슈머는 <a href="{{ base }}/consumers">👤 컨슈머</a></span>
   </div>
 
-  <section><h2>등록된 MCP 서버 <span class="muted">— 도구를 클릭하면 설명·입출력을 볼 수 있어요</span></h2>
+  <section>
+    <h2 style="display:flex; align-items:center; justify-content:space-between; gap:10px">
+      <span>등록된 MCP 서버 <span class="muted">— 도구를 클릭하면 설명·입출력을 볼 수 있어요</span></span>
+      <button class="danger mini" onclick="delAllServers()" title="등록된 모든 서버를 일괄 삭제">🗑 모두 삭제</button>
+    </h2>
     <div id="grid" class="grid"></div></section>
 
   <!-- 도구 상세 모달 -->
@@ -185,6 +189,20 @@ async function refresh(id) { await jw(`/api/servers/${id}/refresh`, "POST"); loa
 async function delServer(id) {
   if (!confirm(`${id} 서버를 삭제할까요? (메타+구독 함께 삭제)`)) return;
   await jw(`/api/servers/${id}`, "DELETE"); load();
+}
+
+function delAllServers() {
+  if (!SERVERS.length) { alert("등록된 서버가 없습니다."); return; }
+  confirmDelete({
+    title: `등록된 MCP 서버 ${SERVERS.length}개를 모두 삭제`,
+    warn: "아래 서버가 <b>전부 삭제</b>됩니다. 각 서버의 도구·구독 정보도 함께 사라집니다. (데모 서버는 🌱 버튼으로 다시 등록 가능)",
+    items: SERVERS.map(s => ({id: s.id, label: `${s.name} · ${s.namespace||'default'}`})),
+    onConfirm: async () => {
+      const r = await jw("/api/servers", "DELETE");
+      if (r.ok) { const d = await r.json().catch(()=>({})); alert(`${d.deleted ?? 0}개 서버를 삭제했습니다.`); }
+      load();
+    },
+  });
 }
 
 load();

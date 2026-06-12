@@ -109,7 +109,9 @@ def api_stats():
 def api_calls():
     page = request.args.get("page", 1, type=int)
     size = request.args.get("size", 20, type=int)
-    return jsonify(db.list_calls(page, size))
+    q = request.args.get("q", "", type=str)
+    field = request.args.get("field", "all", type=str)
+    return jsonify(db.list_calls(page, size, q, field))
 
 
 @flask_app.get("/api/token-hint")
@@ -202,6 +204,14 @@ def api_delete_server(server_id):
     return jsonify({"ok": True})
 
 
+@flask_app.delete("/api/servers")
+@require_token
+def api_delete_all_servers():
+    """등록된 모든 서버를 일괄 삭제(도구·구독 포함). UI에서 '삭제' 타이핑 확인 후 호출."""
+    n = db.delete_all_servers()
+    return jsonify({"ok": True, "deleted": n})
+
+
 def _blocks_to_text(blocks) -> str:
     """MCP content 블록 → 화면에 보여줄 텍스트."""
     out = []
@@ -261,6 +271,14 @@ def api_register_consumer():
 def api_delete_consumer(consumer_id):
     db.delete_consumer(consumer_id)
     return jsonify({"ok": True})
+
+
+@flask_app.delete("/api/consumers")
+@require_token
+def api_delete_all_consumers():
+    """모든 컨슈머를 일괄 삭제(구독 포함). UI에서 '삭제' 타이핑 확인 후 호출."""
+    n = db.delete_all_consumers()
+    return jsonify({"ok": True, "deleted": n})
 
 
 # ─── 구독(SUBSCRIPTION) API ────────────────────────────────

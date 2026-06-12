@@ -20,6 +20,7 @@
     <label>컨슈머(에이전트):</label>
     <select id="consumer" onchange="render()"></select>
     <button class="danger mini" onclick="delConsumer()" title="선택한 컨슈머 삭제">삭제</button>
+    <button class="danger mini" onclick="delAllConsumers()" title="모든 컨슈머를 일괄 삭제">🗑 일괄 삭제</button>
     <span style="flex:1"></span>
     <input id="newC" placeholder="새 컨슈머 id (예: travel-agent)" size="22">
     <button class="ghost" onclick="addConsumer()">+ 컨슈머</button>
@@ -99,6 +100,20 @@ async function delConsumer() {
   if (!confirm(`컨슈머 '${cid}' 를 삭제할까요? (구독도 함께 삭제)`)) return;
   await jw(`/api/consumers/${cid}`, "DELETE");
   await load();
+}
+
+function delAllConsumers() {
+  if (!CONSUMERS.length) { alert("등록된 컨슈머가 없습니다."); return; }
+  confirmDelete({
+    title: `컨슈머 ${CONSUMERS.length}개를 모두 삭제`,
+    warn: "아래 컨슈머가 <b>전부 삭제</b>됩니다. 각 컨슈머의 구독 정보도 함께 사라집니다. (등록된 서버는 그대로 유지)",
+    items: CONSUMERS.map(c => ({id: c.id, label: c.name})),
+    onConfirm: async () => {
+      const r = await jw("/api/consumers", "DELETE");
+      if (r.ok) { const d = await r.json().catch(()=>({})); alert(`${d.deleted ?? 0}개 컨슈머를 삭제했습니다.`); }
+      await load();
+    },
+  });
 }
 
 load();

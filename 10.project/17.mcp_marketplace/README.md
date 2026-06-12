@@ -33,13 +33,19 @@
 │       ├── chat.html         #   채팅 컨슈머 (/chat) — 도구 on/off + LLM 채팅
 │       ├── logs.html         #   요청 로그 (/logs)   — IP·입출력, 행 클릭 확장
 │       └── guide.html        #   멘티용 SDK 가이드 (/guide)
-├── demo/                     # 테스트용 데모 서버 (부팅 시 'demo' 네임스페이스로 셀프 등록)
+├── demo_server/              # 테스트용 데모 서버 (부팅 시 'demo' 네임스페이스로 셀프 등록)
 │   ├── travel_server.py      #   1조 — 여행 (8001)
 │   ├── shopping_server.py    #   2조 — 쇼핑 (8003)
 │   ├── weather_server.py     #   3조 — 날씨 (8002)
 │   └── _selfreg.py           #   부팅 후 /api/servers 로 자기 자신 등록
-├── consumer/
-│   └── agent.py              # 게이트웨이만 보고 동작하는 LangChain 에이전트 예시
+├── consumer_agent/           # 소비자(컨슈머) 예제 모음 (게이트웨이만 보고 동작)
+│   ├── 01_register_my_server.py      #   내 앱(서버) 등록
+│   ├── 02_subscribe_all.py           #   모두 구독
+│   ├── 03_subscribe_selected_servers.py  #   원하는 서버만 구독
+│   ├── 04_subscribe_selected_tools.py    #   원하는 서버 내 원하는 도구만
+│   ├── agent.py              #   LLM 에이전트(전체) — LangChain
+│   ├── _market.py            #   02~04 공유 마켓 API 헬퍼
+│   └── README.md             #   예제 인덱스
 ├── requirements.txt
 ├── run_demo.sh / stop_demo.sh
 └── README.md
@@ -59,7 +65,7 @@ pip install -r requirements.txt
 
 # (다른 터미널) 게이트웨이만 보고 동작하는 에이전트
 export OPENAI_API_KEY=sk-...
-cd consumer && python agent.py travel-agent "도쿄 여행 예약하고 거기 날씨도 알려줘"
+cd consumer_agent && python agent.py travel-agent "도쿄 여행 예약하고 거기 날씨도 알려줘"
 
 ./stop_demo.sh   # 종료
 ```

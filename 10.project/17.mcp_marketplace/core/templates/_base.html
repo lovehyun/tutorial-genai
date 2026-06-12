@@ -42,6 +42,14 @@
   .tk-row input[readonly] { background: #f8fafc; color: #334155; }
   .tk-note { font-size: 12px; color: #6b7280; margin-top: 10px; line-height: 1.5; }
   .tk-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+  /* ⚠️ 일괄 삭제(타이핑 확인) 모달 */
+  .dc-warn { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; border-radius: 8px;
+             padding: 10px 12px; font-size: 13px; margin-bottom: 10px; }
+  .dc-list { max-height: 280px; overflow-y: auto; margin: 0 0 12px; padding: 8px 10px;
+             border: 1px solid #eef2f7; border-radius: 8px; background: #f8fafc; list-style: none; font-size: 13px; }
+  .dc-list li { padding: 4px 2px; border-bottom: 1px solid #eef2f7; }
+  .dc-list li:last-child { border-bottom: 0; }
+  .dc-list .muted { font-size: 12px; }
   {% block style %}{% endblock %}
 </style>
 </head>
@@ -74,6 +82,23 @@
     <h3>🔑 공유 토큰</h3>
     <div id="tkBody"></div>
     <div class="tk-actions"><button class="ghost" onclick="tkClose()">닫기</button></div>
+  </div>
+</div>
+
+<!-- ⚠️ 일괄 삭제 확인 모달 ('삭제' 타이핑 후에만 활성) -->
+<div class="tk-overlay" id="dcOverlay" onclick="if(event.target===this)dcClose()">
+  <div class="tk-modal" style="max-width:560px">
+    <h3 id="dcTitle">정말 삭제할까요?</h3>
+    <div class="dc-warn" id="dcWarn"></div>
+    <ul class="dc-list" id="dcList"></ul>
+    <div class="tk-row">
+      <input id="dcInput" placeholder='삭제하려면 삭제 라고 입력하세요'
+             oninput="dcSync()" onkeydown="if(event.key==='Enter')dcGo()" autocomplete="off">
+    </div>
+    <div class="tk-actions">
+      <button class="ghost" onclick="dcClose()">취소</button>
+      <button class="danger" id="dcBtn" disabled onclick="dcGo()">삭제</button>
+    </div>
   </div>
 </div>
 
@@ -131,6 +156,33 @@ async function jw(url, method, body) {
   });
   if (r.status === 401) { alert("토큰이 필요하거나 올바르지 않습니다. 🔑 토큰을 설정하세요."); askToken(); }
   return r;
+}
+
+// ── 공용: '삭제' 타이핑 확인 후 실행되는 일괄 삭제 모달 ──
+//   confirmDelete({title, warn, items:[{id,label}], onConfirm})  — items 를 나열해 보여준다.
+const _esc = x => (x==null?'':String(x)).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+let _dcAction = null;
+function confirmDelete({title, warn, items, onConfirm}) {
+  document.getElementById("dcTitle").textContent = title;
+  document.getElementById("dcWarn").innerHTML = warn || "이 작업은 되돌릴 수 없습니다.";
+  document.getElementById("dcList").innerHTML = (items && items.length)
+    ? items.map(it => `<li><b>${_esc(it.id)}</b>${it.label ? ' — ' + _esc(it.label) : ''}</li>`).join("")
+    : `<li class="muted">대상이 없습니다.</li>`;
+  const inp = document.getElementById("dcInput");
+  inp.value = ""; document.getElementById("dcBtn").disabled = true;
+  _dcAction = onConfirm;
+  document.getElementById("dcOverlay").style.display = "block";
+  setTimeout(() => inp.focus(), 50);
+}
+function dcSync() {
+  document.getElementById("dcBtn").disabled =
+    document.getElementById("dcInput").value.trim() !== "삭제";
+}
+function dcClose() { document.getElementById("dcOverlay").style.display = "none"; _dcAction = null; }
+async function dcGo() {
+  if (document.getElementById("dcInput").value.trim() !== "삭제") return;
+  const fn = _dcAction; dcClose();
+  if (fn) await fn();
 }
 {% block script %}{% endblock %}
 </script>

@@ -21,8 +21,8 @@ echo $! > "$LOG/market.pid"
 sleep 4
 
 for s in travel weather shopping; do
-  echo "▶ demo/${s}_server.py 起動 (셀프 등록)"
-  ( cd "$HERE/demo" && exec "$PY" "${s}_server.py" ) > "$LOG/${s}.log" 2>&1 &
+  echo "▶ demo_server/${s}_server.py 起動 (셀프 등록)"
+  ( cd "$HERE/demo_server" && exec "$PY" "${s}_server.py" ) > "$LOG/${s}.log" 2>&1 &
   echo $! > "$LOG/${s}.pid"
 done
 
@@ -31,4 +31,4 @@ echo
 echo "✅ 기동 완료. 로그: $LOG/*.log"
 echo "   마켓플레이스 UI : http://localhost:8000/"
 echo "   SDK 가이드      : http://localhost:8000/guide"
-echo "   소비자 에이전트 : (별도 터미널) cd consumer && python agent.py travel-agent"
+echo "   소비자 에이전트 : (별도 터미널) cd consumer_agent && python agent.py travel-agent"

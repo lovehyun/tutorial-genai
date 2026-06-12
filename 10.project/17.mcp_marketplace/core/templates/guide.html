@@ -137,6 +137,47 @@ async def main():
 
 asyncio.run(main())</code></pre>
 
+  <h3>구독 레시피 — 상황별 간단 예제</h3>
+  <p>구독은 <b>서버 단위</b>입니다(도구 단위 선택은 ④처럼 클라이언트에서 거릅니다).
+     아래 네 토막은 모두 같은 변수(<code>MARKET</code>·<code>CONSUMER</code>·<code>H</code>)를 앞에 둔다고 가정합니다.</p>
+  <pre><code># 공통 — 아래 네 예제 앞에 한 번만 둔다.  pip install requests
+import requests
+MARKET   = "{{ public }}"
+CONSUMER = "my-agent"                           # 내 컨슈머 id (원하는 이름)
+TOKEN    = "&lt;공유토큰&gt;"                       # 등록/구독(관리)에만 필요. 게이트웨이 접속엔 불필요.
+H = {"Authorization": f"Bearer {TOKEN}"}
+SUBS = f"{MARKET}/api/consumers/{CONSUMER}/subscriptions"</code></pre>
+
+  <p><b>① 내 앱(서버)을 등록</b> — 켜둔 MCP 서버 주소를 마켓에 알린다. 등록 즉시 도구가 자동 수집된다.</p>
+  <pre><code>requests.post(f"{MARKET}/api/servers", headers=H, json={
+    "id": "myteam-greet", "name": "인사 서버", "owner": "4조",
+    "namespace": "myteam", "endpoint": "http://my-public-host:8101/mcp"})
+# 도구를 바꾼 뒤 다시 수집: POST {MARKET}/api/servers/myteam-greet/refresh</code></pre>
+
+  <p><b>② 모두 구독</b> — 등록된 서버 전부를 구독한다.</p>
+  <pre><code>requests.post(f"{MARKET}/api/consumers", json={"id": CONSUMER, "name": CONSUMER}, headers=H)  # 없으면 생성(있어도 안전)
+ids = [s["id"] for s in requests.get(f"{MARKET}/api/servers").json()]
+requests.put(SUBS, json={"server_ids": ids}, headers=H)</code></pre>
+
+  <p><b>③ 원하는 서버만 구독</b> — id 목록으로 구독을 <b>통째 교체</b>한다.</p>
+  <pre><code>requests.post(f"{MARKET}/api/consumers", json={"id": CONSUMER, "name": CONSUMER}, headers=H)
+requests.put(SUBS, json={"server_ids": ["weather", "travel"]}, headers=H)   # ← 원하는 id 만</code></pre>
+
+  <p><b>④ 원하는 서버 안에서 원하는 도구만</b> — 구독은 서버 단위라, 도구는 <b>클라이언트에서 거른다</b>.
+     게이트웨이는 도구 이름을 <code>서버id__도구명</code> 으로 준다.</p>
+  <pre><code># ③으로 weather·travel 을 구독해 둔 상태라고 하자. (async 함수 안에서)
+from langchain_mcp_adapters.client import MultiServerMCPClient
+client = MultiServerMCPClient({"market": {
+    "url": f"{MARKET}/mcp/consumers/{CONSUMER}", "transport": "streamable_http"}})
+all_tools = await client.get_tools()                       # 구독한 서버의 모든 도구
+WANT = {"weather__get_weather", "travel__search_trips"}    # 실제로 쓸 도구만
+tools = [t for t in all_tools if t.name in WANT]
+# 이 tools 만 에이전트에 넘기면 나머지 도구는 LLM 에게 보이지 않는다.</code></pre>
+  <div class="note">구독 조회(<code>GET …/subscriptions</code>) 응답은 <b>서버 객체 목록</b>이라 id 만 뽑아 씁니다(<code>[s["id"] for s in …]</code>).
+    구독을 <b>추가만</b> 하려면 현재 id 에 합쳐 보내고
+    (<code>cur = requests.get(SUBS).json()</code> → <code>server_ids = list({s["id"] for s in cur} | {"shopping"})</code>),
+    <code>server_ids: []</code> 는 전체 해지입니다. ④의 도구 단위 선택은 서버에 저장되지 않고 매번 클라이언트가 거릅니다.</div>
+
   <h3>순수 MCP 클라이언트 (LLM 없이 — 그대로 복붙 실행)</h3>
   <pre><code># pip install mcp requests
 import asyncio, requests
