@@ -1,0 +1,33 @@
+# Modelfile.reasoning — '추론 과정을 태그로 분리'하는 비서
+# 빌드: ollama create gemma4-korean -f Modelfile.reasoning
+# 실행: ollama run gemma4-korean
+#
+# 핵심: SYSTEM 만 바꿔서 출력 '형식'까지 고정한다.
+#   <think>…</think> 안에 추론, <answer>…</answer> 안에 최종 답.
+#   → 파싱이 쉬워져서 앱에서 "생각 과정은 접고 답만 보여주기" 같은 UI 가 가능.
+
+FROM gemma4:e4b
+
+# ── temperature 메모 ──────────────────────────────────────────────
+# gemma4 는 'reasoning(thinking) 모델' 이다. 그래도 temperature 는 무의미하지 않다.
+#   - reasoning 모델도 <think> 안 추론까지 토큰을 '샘플링' 하므로 temperature 가 그대로 작동.
+#     (단, OpenAI o1/o3 같은 일부 '호스팅 API' 는 손잡이를 잠가 무시 — 오픈웨이트+Ollama 는 100% 살아있음)
+#   - 오히려 reasoning 모델은 temperature 가 더 민감: 0 근처로 낮추면 추론이 같은 말 반복(루프)에 빠지기 쉬움.
+# ★ Google 공식 권장값(Gemma 4): temperature=1.0, top_p=0.95, top_k=64
+#   출처: https://ai.google.dev/gemma/docs/core/model_card_4
+#         https://docs.vllm.ai/projects/recipes/en/latest/Google/Gemma4.html
+# 아래 0.2 는 '일관된 출력' 우선의 보수적 값(원 예제). 추론 품질·다양성을 살리려면 1.0(+top_p 0.95/top_k 64)로.
+# ─────────────────────────────────────────────────────────────────
+PARAMETER temperature 0.2
+PARAMETER num_ctx 8192
+
+SYSTEM """
+당신은 한국어 AI 비서입니다.
+
+규칙:
+- 모든 답변은 한국어 존댓말
+- 기술 질문은 예제를 포함
+- 단계별 설명
+- 추론 과정은 <think> 와 </think> 태그 안에 작성
+- 최종 답변은 <answer> 와 </answer> 태그 안에 작성
+"""

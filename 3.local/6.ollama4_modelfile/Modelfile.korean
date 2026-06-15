@@ -1,0 +1,24 @@
+# Modelfile.korean — 기존 모델을 '한국어 비서'로 커스터마이즈
+# 빌드: ollama create qwen-korean -f Modelfile.korean
+# 실행: ollama run qwen-korean
+
+# FROM = 베이스 모델 (이미 받아둔 모델 위에 설정만 얹는다 → 재학습 아님)
+FROM qwen3.5:4b
+
+# PARAMETER = 추론 옵션을 모델에 '내장'시킨다 (호출할 때마다 안 줘도 됨)
+# ※ 주석은 반드시 줄 단위로 — 값 뒤 인라인 주석(PARAMETER x 0.2 # ...)은 에러
+PARAMETER temperature 0.2
+PARAMETER num_ctx 8192
+# top_p: 주통제는 temperature(0.2)고, 이건 저확률 꼬리 토큰만 잘라내는 보조 안전벨트
+PARAMETER top_p 0.9
+
+# SYSTEM = 항상 적용되는 역할/규칙 (대화마다 안 붙여도 됨)
+SYSTEM """
+당신은 한국어 AI 비서입니다.
+
+규칙:
+- 질문이 어떤 언어로 들어오든 반드시 한국어 존댓말로만 답변
+- 기술 질문은 예제 코드를 포함
+- 단계별로 설명
+"""
+
