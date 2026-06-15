@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gemma4-korean · 입력 / 생각 / 답변</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>gemma4-korean</h1>
+    <span class="sub">입력 → 생각(스트림) → 답변</span>
+  </header>
+
+  <main>
+    <!-- 1. 입력 -->
+    <section class="col">
+      <h2>① 입력</h2>
+      <textarea id="q" placeholder="질문을 입력하세요&#10;예) 재귀와 반복문의 차이를 설명해줘"></textarea>
+      <button id="send">보내기</button>
+      <div id="status" class="status"></div>
+    </section>
+
+    <!-- 2. 생각 (스트리밍) -->
+    <section class="col">
+      <h2>② 생각 <small>thinking</small></h2>
+      <pre id="think" class="stream think"></pre>
+    </section>
+
+    <!-- 3+4. 답변 (위: raw / 아래: 마크다운 렌더) -->
+    <section class="col">
+      <div class="half">
+        <h2>③ 답변 <small>raw</small></h2>
+        <pre id="answerRaw" class="stream answer"></pre>
+      </div>
+      <div class="half">
+        <h2>④ 답변 <small>md 포맷팅</small></h2>
+        <div id="answerMd" class="stream answer md"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 마크다운 렌더러 (오프라인이면 raw 그대로 표시되도록 app.js 에서 폴백) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

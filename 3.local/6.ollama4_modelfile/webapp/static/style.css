@@ -1,0 +1,107 @@
+/* 최소 디자인 — 3컬럼 입력/생각/답변 */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #1c1c1e;
+  background: #f6f6f7;
+}
+header {
+  padding: 14px 20px;
+  border-bottom: 1px solid #e2e2e4;
+  background: #fff;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+header h1 { margin: 0; font-size: 18px; }
+header .sub { color: #888; font-size: 13px; }
+
+main {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  padding: 16px;
+  height: calc(100vh - 110px);
+}
+.col {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #e2e2e4;
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 0;
+}
+.col h2 { margin: 0 0 10px; font-size: 14px; }
+.col h2 small { color: #aaa; font-weight: 400; }
+
+textarea {
+  flex: 0 0 auto;
+  height: 120px;
+  resize: vertical;
+  padding: 10px;
+  border: 1px solid #d4d4d6;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+}
+button {
+  margin-top: 10px;
+  padding: 10px;
+  border: 0;
+  border-radius: 6px;
+  background: #2d6cdf;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+button:disabled { background: #9bb6e8; cursor: default; }
+.status { margin-top: 8px; font-size: 12px; color: #999; min-height: 16px; }
+
+.stream {
+  flex: 1 1 auto;
+  margin: 0;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 13px;
+  line-height: 1.5;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+.think  { color: #6b6b70; }              /* 생각 = 흐리게 */
+.answer { color: #111; font-weight: 500; } /* 답변 = 또렷하게 */
+
+/* 답변 컬럼: 위(raw) / 아래(md) 상하 분할 */
+.half {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 50%;
+}
+.half + .half {
+  margin-top: 10px;
+  border-top: 1px dashed #e2e2e4;
+  padding-top: 10px;
+}
+
+/* 마크다운 렌더 영역 — 코드/리스트/제목 기본 스타일 */
+.md { white-space: normal; font-family: inherit; }
+.md h1, .md h2, .md h3 { margin: 8px 0 4px; font-size: 15px; }
+.md p { margin: 6px 0; }
+.md ul, .md ol { margin: 6px 0; padding-left: 20px; }
+.md code {
+  background: #f0f0f2;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 12px;
+}
+.md pre {
+  background: #1e1e1e;
+  color: #e6e6e6;
+  padding: 10px;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+.md pre code { background: none; color: inherit; padding: 0; }

@@ -34,6 +34,7 @@ ollama run    qwen-korean                        # 쓰기
 | `2.compare.py` | **베이스 vs 커스텀** — 영어로 물어도 커스텀은 한국어로 (튜닝 효과 체감) |
 | `3.params.py` | `temperature` 만 바꾼 두 모델로 **파라미터 영향** 비교 |
 | `4.reasoning_parse.py` | `<think>`/`<answer>` 태그를 **정규식으로 분리**해 활용 |
+| `webapp/` | **웹앱** — gemma4-korean 과 대화, 입력/생각(스트림)/답변(raw·md) 컬럼 분리 |
 
 ## CLI vs SDK — 같은 일, 두 방법
 
