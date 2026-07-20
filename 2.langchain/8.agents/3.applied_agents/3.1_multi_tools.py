@@ -31,10 +31,13 @@ def calculator(expression: str) -> str:
 @tool
 def get_weather(city: str) -> str:
     """도시의 현재 날씨를 조회한다 (데모 데이터)."""
-    return {"서울": "맑음, 22도", "부산": "흐림, 25도", "제주": "맑음, 24도"}.get(
-        city, f"{city} 날씨 정보 없음"
-    )
+    weather = {
+        "서울": "맑음, 22도",
+        "부산": "흐림, 25도",
+        "제주": "맑음, 24도",
+    }
 
+    return weather.get(city, "날씨 정보 없음")
 
 @tool
 def get_current_time() -> str:
