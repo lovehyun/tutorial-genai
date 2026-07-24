@@ -1,0 +1,28 @@
+# 8.mcp 전체를 돌리기 위한 파이썬 의존성
+# 레포 최상위에 venv 하나 만들어 여기에 설치하는 걸 권장 (하위 폴더별 venv ✗)
+#
+#   # 레포 최상위(tutorial-genai/)에서 1번만
+#   python -m venv .venv
+#   .venv\Scripts\activate           # Windows (PowerShell/CMD)
+#   # source .venv/bin/activate      # macOS / Linux
+#   pip install -r 8.mcp/requirements.txt
+
+# ── 핵심(1.common / 9.projects): MCP 그 자체 ──────────────────
+mcp                       # MCP 파이썬 SDK (FastMCP, ClientSession)
+uvicorn                   # 원격 HTTP 서버 실행 (3.transports, 9.projects/2.remote)
+python-dotenv             # .env 로딩 (원격/프로젝트 클라이언트)
+
+# ── 2.openai / 9.projects (GPT 클라이언트) ───────────────────
+openai                    # GPT function calling 로 MCP 도구 자동 호출
+
+# ── 3.anthropic (Claude API 연동) ────────────────────────────
+anthropic                 # Claude API 클라이언트
+
+# ── 4.langchain (어댑터·브릿지·에이전트) ─────────────────────
+langchain
+langchain-openai
+langchain-mcp-adapters    # LangChain ↔ MCP 도구 자동 변환
+langgraph
+
+# ── 참고: 공식 MCP 서버(filesystem 등)는 Node.js 18+ 의 npx 로 실행 ──
+#   node --version   # 별도 설치 (pip 아님)

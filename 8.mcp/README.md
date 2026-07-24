@@ -14,7 +14,7 @@
 
 | 폴더 | 내용 | LLM/Node |
 |------|------|----------|
-| [`1.common/`](1.common/) | **공통(중립): MCP 그 자체** — 서버 만들기, 순수 클라이언트, 전송(stdio/HTTP) | 없음 |
+| [`1.common/`](1.common/) | **공통(중립): MCP 그 자체** — 서버 만들기, 순수 클라이언트, 전송(stdio/HTTP), 양방향 심화 | 없음 |
 | [`2.openai/`](2.openai/) | GPT 로 MCP 도구 호출 (agent_tool, multi_tools) | OpenAI |
 | [`3.anthropic/`](3.anthropic/) | Claude API + **Claude Desktop** 연동 | Claude |
 | [`4.langchain/`](4.langchain/) | `langchain-mcp-adapters` · LangGraph 브릿지 · 도구 안전성 | OpenAI |
@@ -27,11 +27,12 @@
   - `1.intro/` — MCP 첫 접촉: SDK 확인 + hello 서버/클라이언트(첫 왕복). 상세: [`1.intro/README.md`](1.common/1.intro/README.md)
   - `2.protocol_deep/` — 프로토콜 깊게: 도구·resource·prompt 발견 + `debug_proxy` 로 JSON-RPC 보기 + tool vs resource
   - `3.transports/` — stdio vs HTTP 전송
+  - `4.advanced/` — **양방향·Context 심화**: sampling / progress·logging / elicitation / roots. 상세: [`4.advanced/README.md`](1.common/4.advanced/README.md)
 - **2.openai** — `1.agent_tool/`, `2.multi_tools/` (각 폴더: 공통 서버 + manual 클라이언트 → GPT 클라이언트 빌드업)
 - **3.anthropic** — `1.claude_desktop/` (Hello, 네트워크 서버, 파일 컨버터 등 Claude Desktop 등록용)
 - **4.langchain** — `1.quickstart/`(adapters 빠른 시작) · `2.langchain_agent/` · `3.langchain_bridge/` · `4.tools_safety/`
 - **5.vscode** — `server.py` + `.vscode/mcp.json` → VSCode 에서 내 도구 호출 (Copilot Agent Mode, 또는 Copilot 없이 Cline/Continue/Inspector)
-- **9.projects** — `1.local/`(filesystem 서버·클라이언트) · `2.remote/`(원격) · `3.codebase_qa/`(**RAG 를 MCP 서버로 노출**, 멀티 클라이언트)
+- **9.projects** — `1.local/`(filesystem 서버·클라이언트) · `2.remote/`(원격: `1.intro` 무인증 → `2.oauth` **Bearer 인증**) · `3.codebase_qa/`(**RAG 를 MCP 서버로 노출**, 멀티 클라이언트)
 
 ## 학습 단계 (쉬운 기초 → 응용)
 
@@ -51,16 +52,20 @@
    1.common/3.transports       stdio → HTTP(streamable-http)
    2.openai/2.multi_tools      여러 MCP 서버를 한 클라이언트에서
         ▼
-[4단계] LangChain 심화 (수동 변환 · 브릿지 · 안전성)                 난이도 ★★★
+[4단계] 양방향·Context 심화 (프로토콜의 나머지 절반)                 난이도 ★★★
+   1.common/4.advanced         sampling → progress·logging → elicitation → roots
+   (서버가 되묻고, 진행률/로그를 흘리고, 사람에게 확인받고, 접근범위를 받는다)
+        ▼
+[5단계] LangChain 심화 (수동 변환 · 브릿지 · 안전성)                 난이도 ★★★
    4.langchain/2.langchain_agent → 3.langchain_bridge → 4.tools_safety
    (옛 문법 비교: 4.langchain/0.legacy(deprecated))
         ▼
-[5단계] 실제 클라이언트에 붙이기 — 코드 없이 '설정'                  난이도 ★★
+[6단계] 실제 클라이언트에 붙이기 — 코드 없이 '설정'                  난이도 ★★
    3.anthropic/1.claude_desktop  Claude Desktop 에 내 서버 등록
    5.vscode                      VSCode(Copilot / Cline / Continue)에서 내 서버
         ▼
-[6단계] 실전 응용 프로젝트                                           난이도 ★★★
-   9.projects/1.local(filesystem) → 2.remote → 3.codebase_qa (RAG 를 MCP 로 노출)
+[7단계] 실전 응용 프로젝트                                           난이도 ★★★
+   9.projects/1.local(filesystem) → 2.remote(1.intro → 2.oauth 인증) → 3.codebase_qa (RAG 를 MCP 로 노출)
 ```
 
 > **빠른 길**: 코드보다 결과를 먼저 보고 싶으면 1단계 → 5단계(Claude Desktop/VSCode 설정) 로 건너뛰어도 된다.
@@ -77,14 +82,22 @@ cd 8.mcp/1.common/1.intro && python 4.hello_client.py    # 첫 왕복 (LLM 불�
 
 ## 환경 설정
 
-```bash
-# 공통/LangChain (순수 파이썬)
-pip install mcp langchain-mcp-adapters langchain-openai langgraph python-dotenv
+**가상환경은 레포 최상위에 하나만** 만들어 쓴다(하위 폴더별 venv ✗). `.venv/` 는 이미 gitignore.
 
-# 공식 MCP 서버(filesystem 등) 실행용
+```bash
+# 레포 최상위(tutorial-genai/)에서 1번만
+python -m venv .venv
+.venv\Scripts\activate            # Windows (PowerShell/CMD)
+# source .venv/bin/activate       # macOS / Linux
+
+pip install -r 8.mcp/requirements.txt   # mcp·uvicorn·openai·langchain 등 일괄
+
+# 공식 MCP 서버(filesystem 등) 실행용 — pip 아님, 별도
 node --version    # Node.js 18+ (npx)
 ```
-`.env` 에 `OPENAI_API_KEY`(2.openai·4.langchain), `ANTHROPIC_API_KEY`(3.anthropic) 가 필요할 수 있다.
+- 개별 폴더만 빠르게 볼 땐 최소로 `pip install mcp` 만 해도 `1.common` 은 동작한다.
+- `.env` 에 `OPENAI_API_KEY`(2.openai·4.langchain), `ANTHROPIC_API_KEY`(3.anthropic) 가 필요할 수 있다.
+  원격 인증 예제는 [`9.projects/2.remote/2.oauth/.env.example`](9.projects/2.remote/2.oauth/.env.example) 를 `.env` 로 복사해 쓴다.
 
 ## 관련 커리큘럼 / 프로젝트
 - `99.curriculums/3.advanced/1.mcp_protocol_deep_dive/` — MCP 3일 심화 과정

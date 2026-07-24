@@ -8,6 +8,7 @@ MCP를 **밑바닥부터** 본다. LLM·프레임워크 없이, 서버를 만들
 | [`1.intro/`](1.intro/) | 첫 접촉 — SDK 확인 + hello 서버/클라이언트(첫 왕복) | stdio |
 | [`2.protocol_deep/`](2.protocol_deep/) | 도구 여러 개·**resource·prompt 발견**·`debug_proxy`로 JSON-RPC 보기 | stdio |
 | [`3.transports/`](3.transports/) | stdio ↔ HTTP(streamable-http) 차이 | HTTP |
+| [`4.advanced/`](4.advanced/) | **양방향·Context**: sampling·progress/logging·elicitation·roots | stdio |
 
 ## MCP 서버가 제공하는 3가지 (핵심 개념)
 
@@ -41,4 +42,5 @@ def translate(text, lang) -> str: ...
 - 서버는 stdio에서 **stdout에 `print()` 금지**(JSON-RPC 채널 오염) — 로그는 stderr로.
 
 ## 다음 단계
-LLM이 이 도구들을 **자동 호출**하게 → [`../4.langchain/1.quickstart/`](../4.langchain/)(어댑터) · [`../2.openai/`](../2.openai/)(GPT)
+- **양방향 심화** → [`4.advanced/`](4.advanced/): 서버가 되묻고(sampling·elicit), 진행률/로그를 흘리고, 접근범위(roots)를 받는다.
+- LLM이 이 도구들을 **자동 호출**하게 → [`../4.langchain/1.quickstart/`](../4.langchain/)(어댑터) · [`../2.openai/`](../2.openai/)(GPT)
