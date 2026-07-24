@@ -20,10 +20,10 @@ original = documents[0].page_content
 print(f"원본 글자수: {len(original)}\n")
 
 
-# 1) CharacterTextSplitter — 단순히 정해진 separator 로 나누기
+# 1) CharacterTextSplitter — 단순히 정해진 separator 로 나누기 (\n\n 로 나눈 조각들은 chunk_size가 될때까지 합침)
 char_splitter = CharacterTextSplitter(
     separator="\n\n",     # 목표는 빈 줄 기준
-    chunk_size=500,       # 그리고 여기 만족하도록 최대 500글자로 합침 (넘치지 않게)
+    chunk_size=500,       # 그리고 여기 만족하도록 최대 500글자로 합침 (넘치지 않게) - 안넣으면 기본값은 4000
     chunk_overlap=100,    # 이전과 겹치게
 )
 chunks_char = char_splitter.split_documents(documents)

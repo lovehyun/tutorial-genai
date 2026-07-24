@@ -64,3 +64,25 @@ def rag_query(user_query):
 
 query = "OpenAI는 어떤 기업인가요?"
 print("\n답변:", rag_query(query))
+
+
+###############
+# 참고
+###############
+def rag_query(user_query):
+    query_embedding = get_embedding(user_query)
+
+    # 가장 가까운 문서 3개 검색
+    distances, indices = index.search(np.array([query_embedding]), k=3)
+
+    print(f"질문: {user_query}\n") # 질문과 가까운 후보군 3개 출력
+    for rank, (idx, dist) in enumerate(zip(indices[0], distances[0]), start=1):
+        true_distance = np.sqrt(dist)          # 실제 L2 거리
+        similarity = 1 / (1 + true_distance)   # 0~1로 변환
+
+        print(f"[{rank}위]")
+        print(f"문서 : {documents[idx]}")
+        print(f"L2^2 : {dist:.4f}")
+        print(f"L2   : {true_distance:.4f}")
+        print(f"유사도: {similarity:.4f}")
+        print("-" * 40)

@@ -25,6 +25,7 @@ count = store._collection.count()
 print(f"컬렉션 '{COLLECTION_NAME}' 의 문서 수: {count}\n")
 
 # 2) 일부 문서 샘플 — get(limit=N) 으로 그냥 가져오기 (검색 아님)
+#    ★ embeddings 는 기본 제외라서, 벡터를 보려면 include 에 직접 넣어야 함
 results = store._collection.get(include=["documents", "metadatas"], limit=3)
 
 print("=== 샘플 3 개 ===")
@@ -34,4 +35,19 @@ for i, (doc_id, content, meta) in enumerate(
 ):
     print(f"[{i}] id={doc_id[:8]}...")
     print(f"    내용: {content[:80]}...")
-    print(f"    메타: {meta}\n")
+    print(f"    메타: {meta}")
+
+
+
+# 참고 - 백터까지 출력
+results = store._collection.get(include=["documents", "metadatas", "embeddings"], limit=3)
+for i, (doc_id, content, meta, vec) in enumerate(
+    zip(results["ids"], results["documents"], results["metadatas"], results["embeddings"]),
+    start=1,
+):
+    print(f"[{i}] id={doc_id[:8]}...")
+    print(f"    내용: {content[:80]}...")
+    print(f"    메타: {meta}")
+    # 1536 차원 전부 찍으면 화면이 넘치니 앞 8 개만 — 이게 '의미의 좌표' 임
+    head = ", ".join(f"{v:+.4f}" for v in vec[:8])
+    print(f"    벡터: {len(vec)} 차원 [{head}, ...]\n")

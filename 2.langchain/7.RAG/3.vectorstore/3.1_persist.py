@@ -51,8 +51,11 @@ def load_store():
     return store
 
 
-# 디스크에 컬렉션이 이미 있으면 로드, 없으면 새로 만들기
-if os.path.exists(PERSIST_DIR) and os.listdir(PERSIST_DIR):
+# 디스크에 "이 컬렉션" 이 이미 있으면 로드, 없으면 새로 만들기
+#   ※ 디렉터리 존재 여부로 판단하면 안 됨 — 다른 예제가 만든 chroma_db 가 이미 있으면
+#     내 컬렉션은 비어있는데도 로드 분기로 빠져서 영영 임베딩이 안 만들어짐
+probe = Chroma(collection_name=COLLECTION_NAME, embedding_function=embeddings, persist_directory=PERSIST_DIR)
+if probe._collection.count() > 0:
     store = load_store()
 else:
     store = build_store()

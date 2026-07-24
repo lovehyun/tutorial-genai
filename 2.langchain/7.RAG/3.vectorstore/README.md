@@ -13,6 +13,8 @@
 [검색 모드]        3.4 similarity / with_score / MMR → 3.4-2 MMR 심화(다양성·lambda_mult)
 [배치 전략] ★핵심  3.5 분리(sep) → 3.6 통합(unified) → 3.7 혼합(mixed)
 [검색 동작]        3.8 통합 vs 분리 검색 차이 → 3.9 정답이 두 문서에 쪼개진 경우
+[메타데이터]       3.11 metadata 부여 + where 필터
+[마무리]          3.12 검색 결과를 LLM 에 넘겨 '문장 답변' 까지  ← 4.rag_chain 으로 가는 다리
 [부록]            3.10 FAISS 와 비교
 ```
 
@@ -41,7 +43,7 @@
 |---|---|---|---|
 | [3.5_multi_collection_sep.py](3.5_multi_collection_sep.py) | **분리 (sep)** | 파일마다 **다른 컬렉션** | 한 컬렉션만 검색 가능(격리). 통합하려면 각각 검색 후 `search_all` 로 **직접 합쳐야** 함 |
 | [3.6_single_collection_unified.py](3.6_single_collection_unified.py) | **통합 (unified)** | 여러 파일(txt 2~3개+pdf)을 **한 컬렉션** | 종류 달라도 한 곳에 → 검색 한 번에 전부 후보. 출처 구분은 `metadata["source"]` (실무 RAG 기본형) |
-| [3.7_mixed_sources.py](3.7_mixed_sources.py) | **혼합 (mixed)** | txt 는 묶고 pdf 는 각각 분리 | 통합+분리를 **섞은 배치** — "주제별로 이렇게 골라 담는다"는 설계 선택 |
+| [3.7_txtpdf_mixed_sources.py](3.7_txtpdf_mixed_sources.py) | **혼합 (mixed)** | txt 는 묶고 pdf 는 각각 분리 | 통합+분리를 **섞은 배치** — "주제별로 이렇게 골라 담는다"는 설계 선택 |
 
 ### 검색 동작
 
@@ -61,6 +63,12 @@
 | 파일 | 목적 | 관전 포인트 |
 |---|---|---|
 | [3.11_metadata_filter.py](3.11_metadata_filter.py) | 삽입 시 metadata 부여 + 그걸로 필터 검색 | `Document(metadata={...})` 로 넣고 `similarity_search(filter=...)` 의 `where` 연산자: `$eq`(동등)/`$in`(목록)/`$gte`(숫자)/`$and`(복합). **벡터 유사도 + 정형 조건**을 함께 거는 게 실무 기본 |
+
+### 마무리 — 검색에서 답변까지
+
+| 파일 | 목적 | 관전 포인트 |
+|---|---|---|
+| [3.12_search_to_answer.py](3.12_search_to_answer.py) | 찾은 청크를 LLM 에 넘겨 **문장 답변**까지 | 3.1~3.11 의 산출물은 '청크 목록', 여기서 한 칸 추가. LLM 은 벡터 DB 를 모르므로 청크를 **문자열 context 로 펴서** 프롬프트에 붙여야 함. 같은 질문을 `k=1` / `k=4` 로 던져 **검색이 반쪽이면 답도 반쪽**(3.9) 임을 확인. 체인(`|`) 없이 손으로 짠 버전 → LCEL 표준형은 [../4.rag_chain/](../4.rag_chain/) |
 
 ## 분리 vs 통합 vs 혼합 — 한 장 요약
 

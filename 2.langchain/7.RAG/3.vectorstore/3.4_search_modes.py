@@ -34,7 +34,7 @@ print("(2) similarity_search_with_score — 점수(거리) 포함")
 print("=" * 60)
 for d, score in store.similarity_search_with_score(query, k=3):
     # 거리 → 대략적 유사도(%) 변환 (참고용, 정확한 공식은 아님)
-    sim_pct = round((1 - score) * 100, 1)
+    sim_pct = 100 / (1 + max(score, 0))
     print(f"  거리 {score:.3f} (유사도 ≈ {sim_pct}%)  {d.page_content[:60]}...")
 
 # 3) MMR — 다양성 보장

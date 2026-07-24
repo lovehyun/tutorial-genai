@@ -53,7 +53,8 @@ def load_store():
 
 
 # 같은 컬렉션이 이미 디스크에 있으면 로드, 없으면 새로 생성
-existing = Chroma(collection_name=COLLECTION_NAME, embedding_function=embeddings, persist_directory=PERSIST_DIR)
+# existing = Chroma(collection_name=COLLECTION_NAME, embedding_function=embeddings, persist_directory=PERSIST_DIR)
+existing = load_store()
 store = existing if existing._collection.count() > 0 else build_store()
 
 # 검색 동작 확인 — PDF 청크에는 page 메타데이터가 붙어있음
