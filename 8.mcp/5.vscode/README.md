@@ -1,6 +1,6 @@
 # 5.vscode — 내 MCP 서버를 실제 클라이언트(VSCode·Claude Code 등)에 붙이기
 
-`1.common`~`4.langchain` 에서 배운 FastMCP 서버를, 이제 **실제 클라이언트에 등록해서** 쓴다.
+`1.basic`~`4.langchain` 에서 배운 FastMCP 서버를, 이제 **실제 클라이언트에 등록해서** 쓴다.
 서버 코드는 그대로 두고 **클라이언트(VSCode Copilot / Cline / Continue / Claude Code)만 바꿔 끼우는** 게 MCP 의 핵심 가치다.
 
 ## 하위 폴더
@@ -55,7 +55,7 @@ Copilot / Cline / Continue / Claude Code ──stdio──▶ server.py ──�
 서버 확인·설정 출처·상태·**인증(login)·재연결(reconnect)**, `claude mcp` 명령, claude.ai 커넥터가
 어디 저장되는지 등 **클라이언트 운영 지식**은 별도 문서로 정리했다 (섹션별 `====` 구분):
 
-→ **[`claude_code_mcp_guide.md`](claude_code_mcp_guide.md)**
+→ **[`claude_code_mcp_guide.md`](../claude_code_mcp_guide.md)**
 
 핵심만:
 - MCP 서버는 **출처가 여러 갈래** — `claude.ai 커넥터`(웹/계정) vs `project(.mcp.json)` vs `local/user(claude mcp add)`.

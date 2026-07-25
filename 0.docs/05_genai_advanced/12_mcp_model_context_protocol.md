@@ -192,10 +192,10 @@ MCP는 **JSON-RPC 2.0** 프로토콜 기반으로 통신합니다. 요청과 응
 | Transport | 방식 | 적합한 경우 | 특징 |
 |-----------|------|-------------|------|
 | **stdio** | 표준 입출력 (stdin/stdout) | 로컬 프로세스 간 통신 | 가장 단순, 로컬 전용 |
-| **SSE** | Server-Sent Events (HTTP) | 원격 서버 통신 | 서버→클라이언트 스트리밍 |
-| **Streamable HTTP** | HTTP 기반 양방향 | 최신 원격 통신 | SSE 대체, 양방향 |
+| **Streamable HTTP** | HTTP POST + SSE 스트림 | 원격 서버 통신 (**현행 표준**) | 2025-03 도입, 양방향 |
+| ~~SSE~~ (레거시) | Server-Sent Events (HTTP) | (구) 원격 통신 | **2025-03-26 스펙부터 deprecated** → Streamable HTTP로 대체 |
 
-**stdio**는 Claude Desktop이나 VS Code에서 MCP 서버를 실행할 때 주로 사용합니다. **Streamable HTTP**는 원격 서버에 MCP 서버를 배포할 때 사용하는 최신 전송 방식입니다.
+**stdio**는 Claude Desktop·VS Code·Claude Code에서 로컬 MCP 서버를 실행할 때 쓰고, **Streamable HTTP**가 원격 배포의 현행 표준입니다. (예전 `SSE` 전송은 폐기 예정이므로 신규 개발엔 쓰지 않습니다.)
 
 ### 프로토콜 흐름
 
@@ -252,7 +252,35 @@ mcp-weather-server/
 pip install mcp httpx
 ```
 
-### 기본 MCP 서버 -- 날씨 조회
+### FastMCP -- 권장 방식 (훨씬 간결)
+
+실무에서는 저수준 `Server` API 대신 **`FastMCP`** 를 쓴다. 파이썬 **타입 힌트와 docstring 이 곧 도구 스키마**가 되어 `inputSchema` 를 손으로 쓸 필요가 없다.
+
+```python
+# server.py -- FastMCP 로 만든 날씨 서버 (아래 저수준 버전과 동일 기능)
+from mcp.server.fastmcp import FastMCP
+import httpx, os
+
+mcp = FastMCP("weather-server")
+API_KEY = os.environ.get("OPENWEATHER_API_KEY", "")
+
+@mcp.tool()
+def get_weather(city: str) -> str:
+    """지정한 도시의 현재 날씨를 조회합니다. 도시명은 영문으로 입력합니다."""
+    d = httpx.get("https://api.openweathermap.org/data/2.5/weather",
+                  params={"q": city, "appid": API_KEY, "units": "metric", "lang": "kr"}).json()
+    return f"{city}: {d['weather'][0]['description']}, {d['main']['temp']}°C"
+
+if __name__ == "__main__":
+    mcp.run()   # 기본 stdio (원격은 mcp.run(transport="streamable-http"))
+```
+
+- `@mcp.tool()` + **타입 힌트**(`city: str`) + **docstring** → 이름·설명·입력 스키마가 자동 생성.
+- 리소스는 `@mcp.resource("info://...")`, 프롬프트는 `@mcp.prompt()`.
+
+> 아래 이어지는 예제들은 **저수준 `Server` API**(`@server.list_tools`/`@server.call_tool`)로, 프로토콜 내부가 어떻게 도는지 보여준다. 개념 이해엔 좋지만 **실제 개발은 위 FastMCP 를 권장**한다.
+
+### 기본 MCP 서버 (저수준 API) -- 날씨 조회
 
 OpenWeatherMap API를 사용하여 날씨를 조회하는 MCP 서버입니다.
 
@@ -557,9 +585,17 @@ Claude Desktop은 MCP를 기본 지원합니다. 설정 파일에 서버를 등�
 }
 ```
 
-### VS Code에서 사용하기
+### VS Code / Claude Code 에서 사용하기
 
-프로젝트 루트에 `.mcp.json` 파일을 생성합니다.
+**클라이언트마다 설정 파일이 다르다** (MCP 는 설정 파일 위치를 표준화하지 않는다):
+
+| 클라이언트 | 설정 파일 | 최상위 키 | 인식 시점 |
+|-----------|-----------|-----------|-----------|
+| **VS Code (Copilot)** | `.vscode/mcp.json` (워크스페이스) | `"servers"` | 그 폴더를 열면 |
+| **Claude Code** | `.mcp.json` (프로젝트 루트) | `"mcpServers"` | 그 폴더에서 `claude` 실행 (또는 `claude mcp add`) |
+| **Cursor** | `.cursor/mcp.json` | `"mcpServers"` | 그 폴더를 열면 |
+
+VS Code 용 `.vscode/mcp.json` 예시 (키가 `servers`):
 
 ```json
 {
@@ -576,6 +612,8 @@ Claude Desktop은 MCP를 기본 지원합니다. 설정 파일에 서버를 등�
     }
 }
 ```
+
+> ⚠️ `.mcp.json`(프로젝트 루트) 은 **Claude Code** 설정이고 키가 `mcpServers` 다. VS Code 는 `.vscode/mcp.json` 에 `servers` 키를 쓴다 — 둘을 혼동하지 말 것.
 
 ### 커스텀 MCP 클라이언트 구현
 
@@ -674,27 +712,62 @@ if __name__ == "__main__":
 
 ## 5. MCP 생태계
 
-### 공개 MCP 서버 목록
+MCP 활용은 두 갈래다:
+- **직접 만들기** (3~4장) — 내 API·DB·도구를 서버로 감싼다.
+- **갖다 쓰기** (이 장) — **이미 남이 만든 유명 서버를 코드 없이 등록만** 해서 쓴다. 대부분 `npx`(Node) 한 줄, 또는 `claude mcp add` / `.vscode/mcp.json` / `.mcp.json` 로 등록.
 
-MCP 생태계에는 이미 다양한 공개 서버가 존재합니다. 직접 개발하지 않아도 바로 활용할 수 있습니다.
+### 공개 MCP 서버 목록 (갖다 쓰기)
 
-| MCP 서버 | 제공 기능 | 설치 |
-|----------|----------|------|
-| `@modelcontextprotocol/server-filesystem` | 파일 읽기/쓰기/검색 | `npx -y @modelcontextprotocol/server-filesystem /path` |
-| `@modelcontextprotocol/server-github` | GitHub 이슈, PR, 파일 관리 | `npx -y @modelcontextprotocol/server-github` |
-| `@modelcontextprotocol/server-postgres` | PostgreSQL DB 조회 | `npx -y @modelcontextprotocol/server-postgres` |
-| `@modelcontextprotocol/server-slack` | Slack 메시지 읽기/보내기 | `npx -y @modelcontextprotocol/server-slack` |
-| `@modelcontextprotocol/server-brave-search` | 웹 검색 | `npx -y @modelcontextprotocol/server-brave-search` |
-| `@playwright/mcp` | 브라우저 자동화 | `npx -y @playwright/mcp` |
-| `@modelcontextprotocol/server-memory` | 지식 그래프 메모리 | `npx -y @modelcontextprotocol/server-memory` |
-| `@modelcontextprotocol/server-fetch` | 웹 페이지 가져오기 | `npx -y @modelcontextprotocol/server-fetch` |
+| MCP 서버 | 제공 기능 | 제작 | 설치(예) |
+|----------|----------|------|----------|
+| **`@playwright/mcp`** | **브라우저 자동화** (클릭·입력·스크래핑·E2E) | Microsoft | `npx @playwright/mcp@latest` |
+| **`@upstash/context7-mcp`** | **최신·버전별 라이브러리 문서 주입** (할루시네이션 ↓) | Upstash | `npx -y @upstash/context7-mcp` |
+| `@modelcontextprotocol/server-filesystem` | 파일 읽기/쓰기/검색 | 공식 | `npx -y @modelcontextprotocol/server-filesystem /path` |
+| GitHub MCP (`github-mcp-server`) | 이슈·PR·코드 검색·리뷰 | GitHub | GitHub 공식 배포 |
+| `@modelcontextprotocol/server-fetch` | 웹 페이지 가져오기 | 공식 | `npx -y @modelcontextprotocol/server-fetch` |
+| `@modelcontextprotocol/server-memory` | 지식 그래프 메모리 | 공식 | `npx -y @modelcontextprotocol/server-memory` |
+| `@modelcontextprotocol/server-sequential-thinking` | 단계적 추론 보조 | 공식 | `npx -y @modelcontextprotocol/server-sequential-thinking` |
+| DB 커넥터 (sqlite/postgres 등) | DB 조회 | 다양 | 각 패키지 참고 |
+| Slack / Notion / Sentry / Supabase … | 각 서비스 연동 | 각 벤더 | 각 벤더 배포 |
 
-### MCP 서버 찾기
+> ※ 공식 서버 저장소는 시점에 따라 재편된다(일부는 각 벤더가 자체 배포로 이동). 정확한 패키지명은 아래 "서버 찾기"의 레지스트리에서 확인.
 
-1. **[mcp.so](https://mcp.so)**: MCP 서버 전용 검색 사이트 (카테고리별, 인기순)
+### Playwright MCP 자세히 (대표 예제)
+
+**Microsoft 공식** 브라우저 자동화 서버([microsoft/playwright-mcp](https://github.com/microsoft/playwright-mcp), Apache-2.0). AI 가 브라우저를 직접 조작하는 게 아니라, **고수준 명령을 서버에 보내면 서버가 실제 브라우저(Chromium/Firefox/WebKit)를 몰고** 결과를 돌려준다.
+
+- **접근성 트리(accessibility tree) 방식** — 스크린샷/비전 모델 대신 페이지의 구조화 스냅샷(역할·이름·상태)을 준다 → **빠르고 결정적이고 저렴**(이미지 API 불필요).
+- 40+ 도구: `browser_navigate` · `browser_click` · `browser_type` · `browser_snapshot` · 폼 · 네트워크 목킹 · 트레이싱 · 스크린샷. 로그인/쿠키 세션 유지, 크로스 브라우저.
+
+**추가·동작 (Claude Code 예)**
+```bash
+# 등록 = npx 로 남이 만든 서버를 띄우는 것뿐 (우리가 코드 안 짬)
+claude mcp add playwright -- npx @playwright/mcp@latest
+claude mcp list          # ✔ Connected 확인
+```
+```
+사용자: "이 사이트 열어서 로그인 폼 찾아줘"
+ └ Claude(호스트) 가 playwright 서버를 자식 프로세스(stdio)로 띄움
+ └ initialize → tools/list (browser_* 도구 발견)
+ └ Claude 가 browser_navigate → browser_snapshot 을 call_tool
+ └ 서버가 실제 브라우저를 몰고 접근성 스냅샷 반환 → Claude 가 해석
+```
+> VS Code 는 `.vscode/mcp.json`, Claude Desktop 은 `claude_desktop_config.json` 에 같은 `npx @playwright/mcp` 를 등록. **서버 코드는 우리가 짜지 않는다 — 등록만** 한다.
+
+### Context7 -- 최신 문서 주입 (할루시네이션 방지)
+
+**Upstash** 제작([upstash/context7](https://github.com/upstash/context7), MIT). LLM 은 지식 컷오프 이후 라이브러리의 **없는 API 를 지어내기** 쉬운데, Context7 이 **버전별 최신 공식 문서·예제를 실시간으로 컨텍스트에 주입**해 이를 막는다.
+
+- 도구 2개: `resolve-library-id`(라이브러리명 → Context7 ID) · `get-library-docs`(그 ID 로 최신 문서 조회).
+- 등록: `npx -y @upstash/context7-mcp` (Node 18+, API 키는 rate limit 용 선택).
+- 사용: 프롬프트에 *"use context7"* 를 붙이거나, 코딩 질문 시 에이전트가 자동 호출 → 최신 API 로 답변.
+
+### MCP 서버 찾기 (레지스트리·마켓플레이스)
+
+1. **[mcp.so](https://mcp.so)** · **[Smithery](https://smithery.ai)** · **[Glama](https://glama.ai/mcp/servers)** · **[PulseMCP](https://www.pulsemcp.com)**: MCP 서버 검색/레지스트리 (카테고리·인기순, 일부 원클릭 설치)
 2. **[GitHub Topics](https://github.com/topics/mcp-server)**: `mcp-server` 토픽으로 검색
-3. **[Smithery](https://smithery.ai)**: MCP 서버 레지스트리, 원클릭 설치 지원
-4. **npm/PyPI**: `npm search mcp-server` 또는 [pypi.org](https://pypi.org/search/?q=mcp-server) 웹 검색 (`pip search`는 폐기됨)
+3. **[Kakao PlayMCP](https://playmcp.kakao.com)**: 카카오의 **오픈 플랫폼**(마켓플레이스/허브). 개별 서버가 아니라, MCP 서버를 **등록·발견**하고 "Toolbox" 에 담아 카카오 로그인으로 ChatGPT/Claude 등에 커넥터 연결. (2025-08 베타)
+4. **npm/PyPI**: `npm search mcp` 또는 [pypi.org](https://pypi.org/search/?q=mcp-server) 웹 검색 (`pip search` 는 폐기됨)
 
 ### MCP와 에이전트 프레임워크 통합
 
@@ -1083,7 +1156,104 @@ Tool(name="search_products",
 
 ---
 
-## 8. 핵심 정리
+## 8. MCP 심화 -- 양방향 기능 (Sampling / Elicitation / Roots / Progress)
+
+지금까지는 방향이 하나였다: **클라이언트 → 서버**(도구 호출). 하지만 MCP 세션은 `initialize` 후 **연결이 계속 열려 있고 JSON-RPC 가 양방향**으로 흐른다. 그래서 **서버도 클라이언트에게 요청·알림을 보낼 수 있다.**
+
+| 종류 | 무엇 | 응답 | 예 |
+|------|------|:---:|----|
+| **요청(request)** | 서버가 "이거 해줘" (역방향 RPC) | ✅ 필요 | sampling · elicitation · roots |
+| **알림(notification)** | 서버가 "이런 일 있었어" (일방 push) | ❌ | progress · logging · list_changed |
+
+### ① Sampling -- 서버가 클라이언트의 LLM 을 빌린다
+도구 실행 중 서버가 "이 프롬프트로 생성해줘"를 **클라이언트에게** 요청한다(서버는 API 키·모델을 몰라도 된다).
+```python
+from mcp.server.fastmcp import Context, FastMCP
+from mcp.types import SamplingMessage, TextContent
+
+@mcp.tool()
+async def summarize(text: str, ctx: Context) -> str:
+    r = await ctx.session.create_message(
+        messages=[SamplingMessage(role="user",
+                  content=TextContent(type="text", text=f"요약: {text}"))],
+        max_tokens=200)
+    return r.content.text
+# 클라이언트가 ClientSession(..., sampling_callback=...) 을 등록해야 동작
+```
+
+### ② Elicitation -- 서버가 사용자에게 되묻는다
+위험한 작업·정보 부족 시 도구가 멈추고 **사용자에게 확인/입력**을 요청한다(스키마는 원시 타입만). *2025-06-18 스펙에서 추가된 비교적 새 기능.*
+```python
+from pydantic import BaseModel
+class Confirm(BaseModel):
+    confirm: bool
+
+@mcp.tool()
+async def delete_file(path: str, ctx: Context) -> str:
+    r = await ctx.elicit(message=f"{path} 삭제할까요?", schema=Confirm)
+    return "삭제됨" if (r.action == "accept" and r.data.confirm) else "취소"
+# 클라이언트 elicitation_callback 은 실제로는 input()/GUI 로 사용자에게 질의
+```
+sampling 은 **클라의 LLM(기계)**, elicitation 은 **사용자(사람)** 에게 되묻는 차이.
+
+### ③ Progress / Logging -- 오래 걸리는 도구의 진행 상황
+```python
+@mcp.tool()
+async def batch(items: int, ctx: Context) -> str:
+    for i in range(items):
+        await ctx.report_progress(progress=i+1, total=items)  # 진행률 push
+        await ctx.info(f"{i+1}/{items} 처리")                  # 로그 push
+    return "완료"
+# 클라이언트: call_tool(..., progress_callback=...) + ClientSession(logging_callback=...)
+```
+
+### ④ Roots -- 클라이언트가 서버에 허용 경로를 알려준다
+```python
+@mcp.tool()
+async def show_roots(ctx: Context) -> str:
+    r = await ctx.session.list_roots()   # 클라가 준 작업 허용 디렉토리
+    return str([str(x.uri) for x in r.roots])
+# 클라이언트: list_roots_callback 으로 Root(uri="file:///...") 목록 제공
+```
+
+> **핵심 포인트:** MCP 는 지속 연결 위의 **양방향 JSON-RPC** 다. 서버도 요청(sampling·elicit·roots)·알림(progress·log)을 보낼 수 있고, 이 되물음은 보통 **도구 실행 도중**(nested) 일어난다. 단, 클라이언트가 해당 **capability/콜백을 등록**해야 동작한다.
+
+---
+
+## 9. 원격 MCP 서버와 인증
+
+로컬 stdio 서버는 "내가 띄운 내 프로세스"라 클라↔서버 인증이 없다. 하지만 **원격 HTTP 서버**는 여러 사용자를 서빙하므로 **인증이 필수**다.
+
+### Streamable HTTP + Bearer 토큰
+```python
+# 서버: FastMCP 앱 앞에 인증 미들웨어를 끼운다
+app = mcp.streamable_http_app()
+# BearerAuthMiddleware 로 Authorization 헤더 검사 → 없거나 틀리면 401
+uvicorn.run(app, host="0.0.0.0", port=8000)
+
+# 클라이언트: 헤더에 토큰을 실어 접속 (나머지 initialize/list/call 은 동일)
+streamablehttp_client("https://api.example.com/mcp",
+                      headers={"Authorization": f"Bearer {token}"})
+```
+- **TLS/HTTPS**: URL 을 `https://` 로만 바꾸면 라이브러리(httpx)가 TLS 처리. 보통 **앞단 nginx 가 TLS 종단**하고 내부는 평문(서버 코드 무변경). 사설 CA/mTLS 면 클라이언트에 `verify=`/`cert=` 지정.
+- **TLS(서버 인증·암호화)와 Bearer(클라 인증)는 다른 층** → 실전은 `https://` + `Authorization` 헤더 **둘 다**.
+
+### 인증이 얽히는 3가지 모델
+| 모델 | 자격증명 소유 | 사용자별 접근 | 예 |
+|------|--------------|:---:|----|
+| **서버 관리** | 서버(.env/시크릿) | 모두 동일 | 사내 대시보드 |
+| **사용자별 스코프** | 서버 | ✅ 토큰→신원→권한 | SaaS 멀티테넌트 |
+| **클라이언트 제공(프록시)** | 클라이언트 | 대상이 요구 | 범용 커넥터 |
+
+- **혼동된 대리인(confused deputy)** 주의: 공유 서버가 모두의 비밀을 쥘 때, A 요청이 B 자격증명을 쓰지 않도록 **다운스트림 조회를 반드시 '인증된 신원'에만 바인딩**한다.
+- **비밀은 툴 인자로 받지 말 것** — 접속 문자열/토큰을 도구 파라미터로 받으면 LLM 대화 로그에 남는다. 세션 초기화나 헤더로 전달.
+- 표준으로는 **OAuth 2.1**(Protected Resource Metadata·동적 토큰)을 쓴다.
+
+> **핵심 포인트:** 원격 배포 = **Streamable HTTP + TLS(https) + 토큰 인증**. 여러 사용자를 서빙하는 순간 "누가 호출했나(인증)"와 "무엇에 접근 가능한가(인가·스코프)"를 분리해 설계한다.
+
+---
+
+## 10. 핵심 정리
 
 ### MCP 핵심 개념 요약
 

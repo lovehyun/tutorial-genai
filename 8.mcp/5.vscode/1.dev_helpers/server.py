@@ -3,7 +3,7 @@ VSCode 연동용 MCP 서버 — 내 도구를 VSCode Copilot Agent Mode 에서 �
 이 예제: 개발에 쓸만한 작은 도구 3개 + 서버 정보 resource 를 가진 FastMCP 서버.
 
 핵심:
-  - 1.common 에서 배운 FastMCP 서버와 똑같다 — 달라지는 건 '클라이언트가 VSCode' 라는 점뿐.
+  - 1.basic 에서 배운 FastMCP 서버와 똑같다 — 달라지는 건 '클라이언트가 VSCode' 라는 점뿐.
   - 같은 서버를 .vscode/mcp.json 으로 등록하면 Copilot 채팅(Agent Mode)이 이 도구들을 호출한다.
 
 준비:
@@ -12,7 +12,7 @@ VSCode 연동용 MCP 서버 — 내 도구를 VSCode Copilot Agent Mode 에서 �
 단독 테스트(선택):
   pip install "mcp[cli]"
   mcp dev server.py          # Inspector 로 도구 확인
-  # 또는 1.common/1.intro/4.hello_client.py 스타일로 직접 호출
+  # 또는 1.basic/1.intro/4.hello_client.py 스타일로 직접 호출
 
 VSCode 등록:
   같은 폴더의 .vscode/mcp.json 참고 → README.md 워크스루대로 진행.

@@ -15,20 +15,20 @@
 | ID | 모듈 | 폴더 | 표준분량 | 핵심 |
 |----|------|------|---------|------|
 | **M0** | 오리엔테이션 | [README](README.md) | 15m | MCP=도구↔LLM의 USB, 왜/무엇 |
-| **M1** | 프로토콜 첫 접촉 | [1.common/1.intro](1.common/1.intro/) | 30m | 첫 왕복 `initialize→list_tools→call_tool` |
-| **M2** | 프로토콜 심화 | [1.common/2.protocol_deep](1.common/2.protocol_deep/) | 40m | tool/resource/prompt · **debug_proxy로 JSON-RPC** |
-| **M3** | 전송 | [1.common/3.transports](1.common/3.transports/) | 25m | stdio ↔ HTTP(streamable) |
-| **M4** | 양방향·Context | [1.common/4.advanced](1.common/4.advanced/) | 50m(핵심 25m) | sampling·progress·elicitation·roots + 지속세션/양방향 |
+| **M1** | 프로토콜 첫 접촉 | [1.basic/1.intro](1.basic/1.intro/) | 30m | 첫 왕복 `initialize→list_tools→call_tool` |
+| **M2** | 프로토콜 심화 | [1.basic/2.protocol_deep](1.basic/2.protocol_deep/) | 40m | tool/resource/prompt · **debug_proxy로 JSON-RPC** |
+| **M3** | 전송 | [1.basic/3.transports](1.basic/3.transports/) | 25m | stdio ↔ HTTP(streamable) |
+| **M4** | 양방향·Context | [1.basic/4.advanced](1.basic/4.advanced/) | 50m(핵심 25m) | sampling·progress·elicitation·roots + 지속세션/양방향 |
 | **M5** | LLM 자동호출(LangChain) | [4.langchain/1.quickstart](4.langchain/1.quickstart/) | 40m | 어댑터로 에이전트가 도구 자동 선택 |
 | **M6** | LLM 자동호출(OpenAI) | [2.openai](2.openai/) | 35m | GPT function calling, 수동→자동 |
 | **M7** | LangChain 심화 | [4.langchain/2~4](4.langchain/) | 60m | 수동변환·LangGraph 브릿지·도구 안전성 |
-| **M8** | 클라이언트 등록 | [5.vscode/1.dev_helpers](5.vscode/1.dev_helpers/) + [운영가이드](5.vscode/claude_code_mcp_guide.md) | 45m | `.mcp.json`/`.vscode/mcp.json`/`claude mcp add` |
+| **M8** | 클라이언트 등록 | [5.vscode/1.dev_helpers](5.vscode/1.dev_helpers/) + [운영가이드](claude_code_mcp_guide.md) | 45m | `.mcp.json`/`.vscode/mcp.json`/`claude mcp add` |
 | **M9** | DB 자연어 질의 | [5.vscode/2.sql_helpers](5.vscode/2.sql_helpers/) | 45m | 자연어→조인 SQL · read-only 가드 |
 | **M10** | DB 인증 3모델 | [5.vscode/3.sql_helpers_auth](5.vscode/3.sql_helpers_auth/) | 60m | 서버관리 / 사용자별 스코프 / 클라 제공 |
 | **M11** | 원격 배포·인증·TLS | [9.projects/2.remote](9.projects/2.remote/) | 45m | HTTP 원격 · Bearer/OAuth · http→https·mTLS |
 | **M12** | RAG를 MCP로 | [9.projects/3.codebase_qa](9.projects/3.codebase_qa/) | 40m | `search`/`answer` 서버, 멀티 클라 재사용 |
 | **M13** | 실전 프로젝트 | [9.projects/1.local·4·5](9.projects/) | 60m | filesystem·챗봇·멀티MCP 컨시어지 |
-| **M14** | 클라이언트 운영 | [claude_code_mcp_guide](5.vscode/claude_code_mcp_guide.md) | 30m | 서버 출처·상태·login/reconnect |
+| **M14** | 클라이언트 운영 | [claude_code_mcp_guide](claude_code_mcp_guide.md) | 30m | 서버 출처·상태·login/reconnect |
 | **M15** | 미니 프로젝트/종합 | (자유) | 60m | 내 도구/DB를 MCP로 만들어 붙이기 |
 
 > 임팩트 큰 3순간: **M5**(LLM이 도구 자동 호출) · **M9**(자연어→SQL 조인) · **M8**(내가 붙인 서버를 클라가 호출). 시간 없으면 이 셋 사수.
@@ -180,4 +180,4 @@ node --version                    # 공식 서버용 Node 18+ (선택)
 - **폴더 README를 슬라이드처럼** 써도 된다(실행법·관전 포인트 포함).
 
 ---
-> 폴더별 상세=각 README · 학습 로드맵=[`README.md`](README.md) · 클라이언트 운영=[`5.vscode/claude_code_mcp_guide.md`](5.vscode/claude_code_mcp_guide.md)
+> 폴더별 상세=각 README · 학습 로드맵=[`README.md`](README.md) · 클라이언트 운영=[`claude_code_mcp_guide.md`](claude_code_mcp_guide.md)

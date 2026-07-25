@@ -1,6 +1,6 @@
 # 5.vscode/1.dev_helpers — 여러 클라이언트에서 내 MCP 서버 쓰기 (Copilot / Cline / Continue / Claude Code)
 
-`1.common` 에서 만든 것과 똑같은 FastMCP 서버를, 이번엔 **클라이언트가 VSCode** 인 경우로 연결한다.
+`1.basic` 에서 만든 것과 똑같은 FastMCP 서버를, 이번엔 **클라이언트가 VSCode** 인 경우로 연결한다.
 `.vscode/mcp.json` 으로 서버를 등록하면 **Copilot Chat 의 Agent Mode** 가 내 도구(`add`,
 `word_count`, `to_snake_case`)를 직접 호출한다.
 

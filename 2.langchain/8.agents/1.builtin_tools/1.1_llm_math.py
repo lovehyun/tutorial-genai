@@ -27,3 +27,13 @@ agent = create_agent(llm, tools)
 result = agent.invoke({"messages": [("user", "(12.5 * 4) + 7 의 제곱근을 계산해줘")]})
 print(result["messages"][-1].content)
 
+
+
+# for message in result["messages"]:
+#     if getattr(message, "tool_calls", None):
+#         for call in message.tool_calls:
+#             print(f"→ 도구: {call['name']}")
+#             print(f"→ 인자: {call['args']}")
+#
+#     if message.type == "tool":
+#         print(f"← 결과: {message.content}")

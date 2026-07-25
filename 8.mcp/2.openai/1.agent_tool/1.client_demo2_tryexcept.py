@@ -21,6 +21,7 @@ async def call(session, name, args=None):
 
 async def main():
     params = StdioServerParameters(command="python", args=["server.py"])
+
     try:
         async with stdio_client(params) as (read, write):
             async with ClientSession(read, write) as session:
@@ -31,6 +32,7 @@ async def main():
                 print("hello:", await call(session, "hello", {"name": "John"}))
                 print("add  :", await call(session, "add", {"a": 5, "b": 7}))
                 print("now  :", await call(session, "now"))
+                print("test  :", await call(session, "test"))
     except Exception as e:
         print(f"서버 연결 실패: {e} — server.py 가 같은 폴더에 있는지 확인")
 
@@ -38,9 +40,12 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 
+
 # ── 실행 결과 (예) ───────────────────────────────────────────
 #   도구: ['hello', 'add', 'now']
 #   hello: Hello, John!
 #   add  : 12
 #   now  : 지금 시간은 2026-06-09 ... 입니다.
-#   (존재하지 않는 도구를 부르면 → "(실패: Unknown tool ...)" 로 안전하게 보고)
+#   test  : Unknown tool: test
+#
+#   (존재하지 않는 도구를 부르면 → "(실패: Unknown tool ...)" 로 안전하게 보고) - try/except 와 무관함

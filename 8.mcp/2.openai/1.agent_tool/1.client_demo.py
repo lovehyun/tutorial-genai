@@ -21,6 +21,7 @@ async def main():
             # 2) 핸드셰이크 — 이후부터 list_tools / call_tool 가능
             await session.initialize()
 
+
             # 3) 도구 발견: 서버가 어떤 도구를 제공하는지 조회
             tools = (await session.list_tools()).tools
             print("도구:", [t.name for t in tools])
@@ -35,6 +36,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 # ── 실행 결과 (예) ───────────────────────────────────────────
 #   도구: ['hello', 'add', 'now']

@@ -19,14 +19,14 @@
 | 시간 | 주제 | 실습 파일 | 설명 |
 |------|------|-----------|------|
 | 09:00-09:30 | 오리엔테이션 | — | MCP 프로토콜 아키텍처, 환경 설정 |
-| 09:30-10:00 | MCP 버전 & 문서 | `8.mcp/1.common/1.intro/1.mcp_version.py`, `8.mcp/1.common/1.intro/2.mcp_docs.py` | MCP 버전 확인, 공식 문서 접근 |
-| 10:00-10:30 | Hello MCP | `8.mcp/1.common/1.intro/3.hello_server.py`, `8.mcp/1.common/1.intro/4.hello_client.py` | 최소 MCP 서버/클라이언트 구현 |
-| 10:45-11:15 | Simple 서버 | `8.mcp/1.common/2.protocol_deep/1.simple_server.py`, `8.mcp/1.common/2.protocol_deep/3.simple_server2.py` | 도구를 제공하는 MCP 서버 |
-| 11:15-12:00 | Simple 클라이언트 | `8.mcp/1.common/2.protocol_deep/2.simple_client.py`, `8.mcp/1.common/2.protocol_deep/2.simple_client2_tryexcept.py` | MCP 클라이언트 기본 + 예외 처리 |
-| 13:00-13:30 | 클라이언트 정보 조회 | `8.mcp/1.common/2.protocol_deep/4.simple_client3_getinfo.py`, `8.mcp/1.common/2.protocol_deep/4.simple_client3_getinfo2_tryexcept.py` | 서버 정보 조회, 디버깅 |
-| 13:30-14:00 | 디버그 프록시 | `8.mcp/1.common/2.protocol_deep/debug_proxy.py` | MCP 통신 디버깅 프록시 |
-| 14:00-14:30 | asyncio 이벤트 루프 | `8.mcp/1.common/1.intro/0.asyncio_eventloop/1.asyncio_sep_eventloop_test.py`, `8.mcp/1.common/1.intro/0.asyncio_eventloop/2.asyncio_reuse_eventloop_test.py` | MCP의 비동기 기반 이해 |
-| 14:45-15:15 | asyncio 심화 | `8.mcp/1.common/1.intro/0.asyncio_eventloop/3.asyncio_eventloop_test.py`, `8.mcp/1.common/1.intro/0.asyncio_eventloop/4.asyncio_eventloop_test2_stats.py` | 이벤트 루프 재사용, 성능 측정 |
+| 09:30-10:00 | MCP 버전 & 문서 | `8.mcp/1.basic/1.intro/1.mcp_version.py`, `8.mcp/1.basic/1.intro/2.mcp_docs.py` | MCP 버전 확인, 공식 문서 접근 |
+| 10:00-10:30 | Hello MCP | `8.mcp/1.basic/1.intro/3.hello_server.py`, `8.mcp/1.basic/1.intro/4.hello_client.py` | 최소 MCP 서버/클라이언트 구현 |
+| 10:45-11:15 | Simple 서버 | `8.mcp/1.basic/2.protocol_deep/1.simple_server.py`, `8.mcp/1.basic/2.protocol_deep/3.simple_server2.py` | 도구를 제공하는 MCP 서버 |
+| 11:15-12:00 | Simple 클라이언트 | `8.mcp/1.basic/2.protocol_deep/2.simple_client.py`, `8.mcp/1.basic/2.protocol_deep/2.simple_client2_tryexcept.py` | MCP 클라이언트 기본 + 예외 처리 |
+| 13:00-13:30 | 클라이언트 정보 조회 | `8.mcp/1.basic/2.protocol_deep/4.simple_client3_getinfo.py`, `8.mcp/1.basic/2.protocol_deep/4.simple_client3_getinfo2_tryexcept.py` | 서버 정보 조회, 디버깅 |
+| 13:30-14:00 | 디버그 프록시 | `8.mcp/1.basic/2.protocol_deep/debug_proxy.py` | MCP 통신 디버깅 프록시 |
+| 14:00-14:30 | asyncio 이벤트 루프 | `8.mcp/1.basic/1.intro/0.asyncio_eventloop/1.asyncio_sep_eventloop_test.py`, `8.mcp/1.basic/1.intro/0.asyncio_eventloop/2.asyncio_reuse_eventloop_test.py` | MCP의 비동기 기반 이해 |
+| 14:45-15:15 | asyncio 심화 | `8.mcp/1.basic/1.intro/0.asyncio_eventloop/3.asyncio_eventloop_test.py`, `8.mcp/1.basic/1.intro/0.asyncio_eventloop/4.asyncio_eventloop_test2_stats.py` | 이벤트 루프 재사용, 성능 측정 |
 | 15:15-17:00 | 실습: 나만의 MCP 서버/클라이언트 | — | 직접 MCP 서버 설계 및 클라이언트 연결 |
 
 ### Day 2: MCP 에이전트와 LangChain 브릿지
@@ -39,7 +39,7 @@
 | 10:45-11:15 | GPT 에이전트 클라이언트 | `8.mcp/2.openai/1.agent_tool/3.client_gpt.py`, `8.mcp/2.openai/1.agent_tool/3.client_gpt2_tryexcept.py` | GPT 기반 MCP 에이전트 |
 | 11:15-12:00 | 멀티 도구 서버 | `8.mcp/2.openai/2.multi_tools/math_server.py`, `8.mcp/2.openai/2.multi_tools/utility_server.py` | 수학/유틸리티 다중 MCP 서버 |
 | 13:00-13:30 | 멀티 도구 클라이언트 | `8.mcp/2.openai/2.multi_tools/1.smart_client_manual.py`, `8.mcp/2.openai/2.multi_tools/2.smart_client_gpt.py` | 다중 서버 연결 스마트 클라이언트 |
-| 13:30-14:00 | HTTP 네트워크 도구 | `8.mcp/1.common/3.transports/server_http.py`, `8.mcp/1.common/3.transports/1.client_http.py` | HTTP 기반 MCP 통신 |
+| 13:30-14:00 | HTTP 네트워크 도구 | `8.mcp/1.basic/3.transports/server_http.py`, `8.mcp/1.basic/3.transports/1.client_http.py` | HTTP 기반 MCP 통신 |
 | 14:00-14:30 | LangChain 에이전트 (Pydantic) | `8.mcp/4.langchain/2.langchain_agent/server.py`, `8.mcp/4.langchain/2.langchain_agent/1.1_client1_pydantic.py` | LangChain + MCP Pydantic 통합 |
 | 14:45-15:15 | LangChain 멀티 도구 | `8.mcp/4.langchain/2.langchain_agent/1.4_client1_multi_tools.py`, `8.mcp/4.langchain/2.langchain_agent/1.5_client1_multi_tools2_exception.py` | LangChain 멀티 도구 에이전트 |
 | 15:15-15:45 | LangChain 브릿지 | `8.mcp/4.langchain/3.langchain_bridge/mcp_bridge.py`, `8.mcp/4.langchain/3.langchain_bridge/2.langchain_agent_demo.py` | MCP → LangChain 브릿지 모듈 |
@@ -76,7 +76,7 @@ pip install anthropic mcp langchain langchain-anthropic langgraph
 | `0.docs/05_genai_advanced/12_mcp_model_context_protocol.md` | MCP 프로토콜 (서버/클라이언트/전송 계층) |
 
 ## 참고 자료
-- `8.mcp/1.common/1.intro/` — MCP 기초
+- `8.mcp/1.basic/1.intro/` — MCP 기초
 - `8.mcp/2.openai/` — MCP 에이전트
 - `8.mcp/4.langchain/2.langchain_agent/` — LangChain + MCP
 - `8.mcp/4.langchain/3.langchain_bridge/` — LangChain/LangGraph 브릿지

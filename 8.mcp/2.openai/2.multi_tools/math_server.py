@@ -4,6 +4,7 @@ from mcp.server.fastmcp import FastMCP
 # 수학 관련 기능을 제공하는 서버
 mcp = FastMCP("MathServer")
 
+
 @mcp.tool()
 def hello(name: str = "World") -> str:
     """친근한 인사말을 생성합니다."""
@@ -17,10 +18,12 @@ def add(a: float, b: float) -> str:
     result = a + b
     return f"{a} + {b} = {result}"
 
+
 if __name__ == "__main__":
     print("[MATH_SERVER] 수학 서버 시작됨", file=sys.stderr)
     print("[MATH_SERVER] 제공 기능: hello, add", file=sys.stderr)
     mcp.run()
+
 
 # 1. 초기화
 # {"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"cli-test","version":"0.1.0"}}}

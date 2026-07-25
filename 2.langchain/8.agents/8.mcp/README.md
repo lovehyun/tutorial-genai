@@ -7,7 +7,7 @@ MCP(Model Context Protocol)는 특정 프레임워크에 묶이지 않는 **prov
 
 | 찾는 내용 | 새 위치 |
 |-----------|---------|
-| MCP 가 뭔지 / 내 서버 만들기 / 순수 클라이언트 / 전송(stdio·HTTP) | [`/8.mcp/1.common/`](../../../8.mcp/1.common/) |
+| MCP 가 뭔지 / 내 서버 만들기 / 순수 클라이언트 / 전송(stdio·HTTP) | [`/8.mcp/1.basic/`](../../../8.mcp/1.basic/) |
 | GPT(OpenAI)로 MCP 도구 호출 | [`/8.mcp/2.openai/`](../../../8.mcp/2.openai/) |
 | Claude API · Claude Desktop 연동 | [`/8.mcp/3.anthropic/`](../../../8.mcp/3.anthropic/) |
 | **LangChain 에이전트에서 MCP 쓰기** | [`/8.mcp/4.langchain/`](../../../8.mcp/4.langchain/) |

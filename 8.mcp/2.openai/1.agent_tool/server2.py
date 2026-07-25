@@ -12,6 +12,7 @@ import os
 # 이 이름은 클라이언트가 서버를 식별하는 데 사용됨
 mcp = FastMCP("MultiToolServer")
 
+
 # ===== 기존 도구들 =====
 
 @mcp.tool()  # 함수를 MCP 도구로 등록하는 데코레이터
@@ -27,6 +28,7 @@ def hello(name: str = "World") -> str:
     """
     return f"Hello, {name}!"
 
+
 @mcp.tool()
 def add(a: int, b: int) -> int:
     """
@@ -41,6 +43,7 @@ def add(a: int, b: int) -> int:
     """
     return a + b
 
+
 @mcp.tool()
 def now() -> str:
     """
@@ -52,6 +55,7 @@ def now() -> str:
         str: "지금 시간은 YYYY-MM-DD HH:MM:SS 입니다." 형태의 시간 정보
     """
     return datetime.now().strftime("지금 시간은 %Y-%m-%d %H:%M:%S 입니다.")
+
 
 # ===== 추가된 계산기 도구들 =====
 
@@ -69,6 +73,7 @@ def multiply(a: int, b: int) -> int:
     """
     return a * b
 
+
 @mcp.tool()
 def subtract(a: int, b: int) -> int:
     """
@@ -82,6 +87,7 @@ def subtract(a: int, b: int) -> int:
         int: a - b의 결과
     """
     return a - b
+
 
 @mcp.tool()
 def divide(a: float, b: float) -> str:
@@ -99,6 +105,7 @@ def divide(a: float, b: float) -> str:
         return "오류: 0으로 나눌 수 없습니다."
     result = a / b
     return f"{a} ÷ {b} = {result}"
+
 
 @mcp.tool()
 def power(base: float, exponent: float) -> str:
@@ -118,6 +125,7 @@ def power(base: float, exponent: float) -> str:
     except Exception as e:
         return f"계산 오류: {str(e)}"
 
+
 @mcp.tool()
 def square_root(number: float) -> str:
     """
@@ -133,6 +141,7 @@ def square_root(number: float) -> str:
         return "오류: 음수의 제곱근은 계산할 수 없습니다."
     result = math.sqrt(number)
     return f"√{number} = {result}"
+
 
 # ===== 유틸리티 도구들 =====
 
@@ -154,6 +163,7 @@ def random_number(min_val: int = 1, max_val: int = 100) -> str:
     result = random.randint(min_val, max_val)
     return f"{min_val}부터 {max_val} 사이의 임의 숫자: {result}"
 
+
 @mcp.tool()
 def flip_coin() -> str:
     """
@@ -166,6 +176,7 @@ def flip_coin() -> str:
     """
     result = random.choice(["앞면", "뒷면"])
     return f"동전 던지기 결과: {result}"
+
 
 @mcp.tool()
 def roll_dice(sides: int = 6, count: int = 1) -> str:
@@ -194,6 +205,7 @@ def roll_dice(sides: int = 6, count: int = 1) -> str:
     else:
         return f"{sides}면 주사위 {count}개 결과: {results} (총합: {total})"
 
+
 # ===== 텍스트 처리 도구들 =====
 
 @mcp.tool()
@@ -221,6 +233,7 @@ def count_words(text: str) -> str:
 - 공백 제외 문자 수: {chars_no_spaces}개  
 - 줄 수: {lines}개"""
 
+
 @mcp.tool()
 def reverse_text(text: str) -> str:
     """
@@ -237,6 +250,7 @@ def reverse_text(text: str) -> str:
     
     reversed_text = text[::-1]
     return f"원본: {text}\n뒤집은 결과: {reversed_text}"
+
 
 @mcp.tool()
 def to_upper_lower(text: str, mode: str = "upper") -> str:
@@ -262,6 +276,7 @@ def to_upper_lower(text: str, mode: str = "upper") -> str:
     else:
         return "오류: mode는 'upper' 또는 'lower'여야 합니다."
 
+
 # ===== 정보 조회 도구들 =====
 
 @mcp.tool()
@@ -279,6 +294,7 @@ def system_info() -> str:
 - 현재 작업 디렉토리: {cwd}
 - 운영체제: {os.name}
 - 서버 시작 시간: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
+
 
 @mcp.tool()
 def calculate_age(birth_year: int) -> str:
@@ -300,6 +316,7 @@ def calculate_age(birth_year: int) -> str:
     
     age = current_year - birth_year
     return f"{birth_year}년생의 현재 나이: 만 {age}세 (또는 만 {age-1}세)"
+
 
 # ===== 서버 실행 =====
 if __name__ == "__main__":

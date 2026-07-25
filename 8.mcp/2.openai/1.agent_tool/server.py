@@ -9,6 +9,7 @@ from datetime import datetime
 # 이 이름은 클라이언트가 서버를 식별하는 데 사용됨
 mcp = FastMCP("MultiToolServer")
 
+
 # ===== 도구 1: 인사말 생성기 =====
 @mcp.tool()  # 함수를 MCP 도구로 등록하는 데코레이터
 def hello(name: str = "World") -> str:
@@ -22,6 +23,7 @@ def hello(name: str = "World") -> str:
         str: "Hello, {name}!" 형태의 인사말
     """
     return f"Hello, {name}!"
+
 
 # ===== 도구 2: 덧셈 계산기 =====
 @mcp.tool()
@@ -38,6 +40,7 @@ def add(a: int, b: int) -> int:
     """
     return a + b
 
+
 # ===== 도구 3: 현재 시간 조회 =====
 @mcp.tool()
 def now() -> str:
@@ -50,6 +53,7 @@ def now() -> str:
         str: "지금 시간은 YYYY-MM-DD HH:MM:SS 입니다." 형태의 시간 정보
     """
     return datetime.now().strftime("지금 시간은 %Y-%m-%d %H:%M:%S 입니다.")
+
 
 # ===== 서버 실행 =====
 if __name__ == "__main__":

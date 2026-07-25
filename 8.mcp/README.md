@@ -14,7 +14,7 @@
 
 | 폴더 | 내용 | LLM/Node |
 |------|------|----------|
-| [`1.common/`](1.common/) | **공통(중립): MCP 그 자체** — 서버 만들기, 순수 클라이언트, 전송(stdio/HTTP), 양방향 심화 | 없음 |
+| [`1.basic/`](1.basic/) | **공통(중립): MCP 그 자체** — 서버 만들기, 순수 클라이언트, 전송(stdio/HTTP), 양방향 심화 | 없음 |
 | [`2.openai/`](2.openai/) | GPT 로 MCP 도구 호출 (agent_tool, multi_tools) | OpenAI |
 | [`3.anthropic/`](3.anthropic/) | Claude API + **Claude Desktop** 연동 | Claude |
 | [`4.langchain/`](4.langchain/) | `langchain-mcp-adapters` · LangGraph 브릿지 · 도구 안전성 | OpenAI |
@@ -23,11 +23,11 @@
 
 ### 각 폴더 안
 
-- **1.common**
-  - `1.intro/` — MCP 첫 접촉: SDK 확인 + hello 서버/클라이언트(첫 왕복). 상세: [`1.intro/README.md`](1.common/1.intro/README.md)
+- **1.basic**
+  - `1.intro/` — MCP 첫 접촉: SDK 확인 + hello 서버/클라이언트(첫 왕복). 상세: [`1.intro/README.md`](1.basic/1.intro/README.md)
   - `2.protocol_deep/` — 프로토콜 깊게: 도구·resource·prompt 발견 + `debug_proxy` 로 JSON-RPC 보기 + tool vs resource
   - `3.transports/` — stdio vs HTTP 전송
-  - `4.advanced/` — **양방향·Context 심화**: sampling / progress·logging / elicitation / roots. 상세: [`4.advanced/README.md`](1.common/4.advanced/README.md)
+  - `4.advanced/` — **양방향·Context 심화**: sampling / progress·logging / elicitation / roots. 상세: [`4.advanced/README.md`](1.basic/4.advanced/README.md)
 - **2.openai** — `1.agent_tool/`, `2.multi_tools/` (각 폴더: 공통 서버 + manual 클라이언트 → GPT 클라이언트 빌드업)
 - **3.anthropic** — `1.claude_desktop/` (Hello, 네트워크 서버, 파일 컨버터 등 Claude Desktop 등록용)
 - **4.langchain** — `1.quickstart/`(adapters 빠른 시작) · `2.langchain_agent/` · `3.langchain_bridge/` · `4.tools_safety/`
@@ -41,19 +41,19 @@
 
 ```
 [1단계] MCP 프로토콜 그 자체 — LLM 없음                              난이도 ★
-   1.common/1.intro            첫 왕복: hello 서버 + 클라이언트로 initialize→call_tool 를 '손으로'
-   1.common/2.protocol_deep    프로토콜 깊게: 도구·resource·prompt 발견 + JSON-RPC 디버그
+   1.basic/1.intro            첫 왕복: hello 서버 + 클라이언트로 initialize→call_tool 를 '손으로'
+   1.basic/2.protocol_deep    프로토콜 깊게: 도구·resource·prompt 발견 + JSON-RPC 디버그
         ▼
 [2단계] LLM 이 MCP 도구를 '자동' 호출                                난이도 ★★
    4.langchain/1.quickstart    langchain-mcp-adapters → 에이전트가 자동 호출 (가장 쉬움)
    2.openai/1.agent_tool       GPT function calling 으로 직접 (수동 → 자동 빌드업)
         ▼
 [3단계] 전송 방식 · 멀티 서버                                        난이도 ★★
-   1.common/3.transports       stdio → HTTP(streamable-http)
+   1.basic/3.transports       stdio → HTTP(streamable-http)
    2.openai/2.multi_tools      여러 MCP 서버를 한 클라이언트에서
         ▼
 [4단계] 양방향·Context 심화 (프로토콜의 나머지 절반)                 난이도 ★★★
-   1.common/4.advanced         sampling → progress·logging → elicitation → roots
+   1.basic/4.advanced         sampling → progress·logging → elicitation → roots
    (서버가 되묻고, 진행률/로그를 흘리고, 사람에게 확인받고, 접근범위를 받는다)
         ▼
 [5단계] LangChain 심화 (수동 변환 · 브릿지 · 안전성)                 난이도 ★★★
@@ -76,10 +76,10 @@
 
 ```bash
 pip install mcp
-cd 8.mcp/1.common/1.intro && python 4.hello_client.py    # 첫 왕복 (LLM 불필요)
+cd 8.mcp/1.basic/1.intro && python 4.hello_client.py    # 첫 왕복 (LLM 불필요)
 ```
-- **폴더별 상세·관전 포인트는 각 폴더 README** 참고. 특히 [`1.common/README`](1.common/) 에 **tool / resource / prompt** 개념 정리.
-- 브라우저 클릭 테스트: `pip install "mcp[cli]"` → `mcp dev 1.common/2.protocol_deep/5.server_tools_resource.py` (Node 18+ Inspector).
+- **폴더별 상세·관전 포인트는 각 폴더 README** 참고. 특히 [`1.basic/README`](1.basic/) 에 **tool / resource / prompt** 개념 정리.
+- 브라우저 클릭 테스트: `pip install "mcp[cli]"` → `mcp dev 1.basic/2.protocol_deep/5.server_tools_resource.py` (Node 18+ Inspector).
 
 ## 환경 설정
 
@@ -96,7 +96,7 @@ pip install -r 8.mcp/requirements.txt   # mcp·uvicorn·openai·langchain 등 �
 # 공식 MCP 서버(filesystem 등) 실행용 — pip 아님, 별도
 node --version    # Node.js 18+ (npx)
 ```
-- 개별 폴더만 빠르게 볼 땐 최소로 `pip install mcp` 만 해도 `1.common` 은 동작한다.
+- 개별 폴더만 빠르게 볼 땐 최소로 `pip install mcp` 만 해도 `1.basic` 은 동작한다.
 - `.env` 에 `OPENAI_API_KEY`(2.openai·4.langchain), `ANTHROPIC_API_KEY`(3.anthropic) 가 필요할 수 있다.
   원격 인증 예제는 [`9.projects/2.remote/2.oauth/.env.example`](9.projects/2.remote/2.oauth/.env.example) 를 `.env` 로 복사해 쓴다.
 
@@ -106,6 +106,7 @@ node --version    # Node.js 18+ (npx)
 - `10.project/12.nas_mcp_agent/` — NAS 파일스캔 MCP 에이전트 실전 프로젝트
 
 ## 더 보기
+- **[`claude_code_mcp_guide.md`](claude_code_mcp_guide.md)** — Claude Code 에서 MCP 다루기(운영 가이드): 서버 출처(커넥터/project/local)·상태·인증(login/reconnect)·`claude mcp` 명령·**MCP 등록 vs 직접 설치(Bash)**
 - 공식 문서: <https://modelcontextprotocol.io/>
 - 공식 서버 모음: <https://github.com/modelcontextprotocol/servers>
 - 파이썬 SDK: <https://github.com/modelcontextprotocol/python-sdk>

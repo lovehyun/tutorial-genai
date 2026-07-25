@@ -10,10 +10,11 @@
 | 클라이언트 | 도구 선택 방식 | 띄우는 서버 |
 |---|---|---|
 | `1.client_demo.py` | 수동(도구 목록 + 하드코딩 호출) | `server.py` |
-| `2.client_simple_nlp.py` | 키워드/정규식 매칭 | `server.py` |
+| `2.client_simple_nlp.py` | 키워드/정규식 매칭 (함수 스타일) | `server.py` |
 | `3.client_gpt.py` | **GPT function calling 자동 선택** | `server2.py` |
 
 - `*2_tryexcept.py` = 같은 내용 + 네트워크/도구 오류 예외 처리 강화
+- `2.client_simple_nlp_class.py` = `2.client_simple_nlp.py` 를 **클래스(`SimpleAIAgent`)** 로 구성한 변형 — 내용 동일(함수 vs 클래스 비교용)
 
 ## 실행
 ```bash

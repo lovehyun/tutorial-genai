@@ -5,6 +5,7 @@ from mcp.server.fastmcp import FastMCP
 # 유틸리티 기능을 제공하는 서버
 mcp = FastMCP("UtilityServer")
 
+
 @mcp.tool()
 def current_time() -> str:
     """현재 시간을 반환합니다."""

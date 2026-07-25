@@ -1,14 +1,14 @@
 """
 MCP 4단계: 내 MCP 서버를 LangChain 에이전트에 연결한다.
-이 예제: 1.common 의 toolbox 서버(3.server_tools_resource)를 띄우고, 그 도구들을 LLM 에이전트가 자동으로 골라 쓰게 한다.
+이 예제: 1.basic 의 toolbox 서버(3.server_tools_resource)를 띄우고, 그 도구들을 LLM 에이전트가 자동으로 골라 쓰게 한다.
 
-순수 클라이언트(1.common/1.intro/4.hello_client)와의 차이:
+순수 클라이언트(1.basic/1.intro/4.hello_client)와의 차이:
   - 그건 우리가 직접 list_tools / call_tool 을 호출했다(수동).
   - 여기선 langchain-mcp-adapters 가 MCP 도구 → LangChain Tool 로 자동 변환하고,
     LLM 이 질문을 보고 '어떤 도구를 어떤 인자로' 부를지 스스로 결정한다(자동).
 
 준비:
-  pip install mcp langchain-mcp-adapters langchain-openai langgraph
+  pip install mcp langchain-mcp-adapters langchain-openai
   .env 에 OPENAI_API_KEY
 
 흐름:
@@ -28,8 +28,8 @@ from langchain.agents import create_agent
 load_dotenv()
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-# 내가 1.common 에서 만든 서버를 그대로 재사용 (도구와 사용처의 분리)
-SERVER = os.path.join(HERE, "..", "..", "1.common", "2.protocol_deep", "5.server_tools_resource.py")
+# 내가 1.basic 에서 만든 서버를 그대로 재사용 (도구와 사용처의 분리)
+SERVER = os.path.join(HERE, "..", "..", "1.basic", "2.protocol_deep", "5.server_tools_resource.py")
 
 
 async def main():
@@ -67,6 +67,7 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 
+
 # 정리:
-#   - 내가 1.common 에서 만든 서버를 그대로 에이전트가 사용 — '소유한 도구' 로 시작해 여기 도달.
+#   - 내가 1.basic 에서 만든 서버를 그대로 에이전트가 사용 — '소유한 도구' 로 시작해 여기 도달.
 #   - 서버 주소만 바꾸면(2.official_server) 공식 외부 서버도 똑같은 코드로 붙는다.
