@@ -1,0 +1,18 @@
+{
+  // VSCode(1.102+) 워크스페이스 MCP 설정.
+  // 이 폴더(8.mcp/5.vscode/2.sql_helpers)를 VSCode 로 열면 ${workspaceFolder} = 이 폴더가 되어
+  // 아래 server.py 가 그대로 실행된다.
+  //
+  // 사전: `python init_db.py` 로 sample.db 생성 + (원격이면) .env 작성.
+  // python 이 PATH 에 없거나 venv 를 쓰면 "command" 를 venv python 절대경로로 바꾸세요.
+  //   예) "command": "C:\\path\\to\\.venv\\Scripts\\python.exe"
+  //
+  // ※ 접속정보(비밀)는 여기 넣지 말고 server.py 폴더의 .env 에 둔다(gitignore).
+  "servers": {
+    "sql-helper": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["${workspaceFolder}/server.py"]
+    }
+  }
+}

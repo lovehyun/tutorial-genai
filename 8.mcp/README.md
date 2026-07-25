@@ -18,7 +18,7 @@
 | [`2.openai/`](2.openai/) | GPT 로 MCP 도구 호출 (agent_tool, multi_tools) | OpenAI |
 | [`3.anthropic/`](3.anthropic/) | Claude API + **Claude Desktop** 연동 | Claude |
 | [`4.langchain/`](4.langchain/) | `langchain-mcp-adapters` · LangGraph 브릿지 · 도구 안전성 | OpenAI |
-| [`5.vscode/`](5.vscode/) | **VSCode 연동** (`.vscode/mcp.json` + Copilot agent mode) | VSCode |
+| [`5.vscode/`](5.vscode/) | **실제 클라이언트에 등록** — `1.dev_helpers`(등록법) · `2.sql_helpers`(**DB 자연어 질의**) · `3.sql_helpers_auth`(**인증 3모델**) | VSCode·Claude Code |
 | [`9.projects/`](9.projects/) | 실전 프로젝트 (filesystem, remote, codebase-QA) | 혼합 |
 
 ### 각 폴더 안
@@ -31,7 +31,7 @@
 - **2.openai** — `1.agent_tool/`, `2.multi_tools/` (각 폴더: 공통 서버 + manual 클라이언트 → GPT 클라이언트 빌드업)
 - **3.anthropic** — `1.claude_desktop/` (Hello, 네트워크 서버, 파일 컨버터 등 Claude Desktop 등록용)
 - **4.langchain** — `1.quickstart/`(adapters 빠른 시작) · `2.langchain_agent/` · `3.langchain_bridge/` · `4.tools_safety/`
-- **5.vscode** — `server.py` + `.vscode/mcp.json` → VSCode 에서 내 도구 호출 (Copilot Agent Mode, 또는 Copilot 없이 Cline/Continue/Inspector)
+- **5.vscode** — 내 서버를 실제 클라이언트에 등록. `1.dev_helpers/`(dev-helper 도구를 Copilot·Cline·Continue·**Claude Code** 에 등록) · `2.sql_helpers/`(**내 DB 를 MCP 로 노출 → 자연어로 SQL 질의**, sqlite/postgres/mysql, 단순·무인증) · `3.sql_helpers_auth/`(**인증 3모델**: 서버관리 / 사용자별 스코프(HTTP+Bearer) / 클라이언트 제공 프록시)
 - **9.projects** — `1.local/`(filesystem 서버·클라이언트) · `2.remote/`(원격: `1.intro` 무인증 → `2.oauth` **Bearer 인증**) · `3.codebase_qa/`(**RAG 를 MCP 서버로 노출**, 멀티 클라이언트)
 
 ## 학습 단계 (쉬운 기초 → 응용)
@@ -62,7 +62,8 @@
         ▼
 [6단계] 실제 클라이언트에 붙이기 — 코드 없이 '설정'                  난이도 ★★
    3.anthropic/1.claude_desktop  Claude Desktop 에 내 서버 등록
-   5.vscode                      VSCode(Copilot / Cline / Continue)에서 내 서버
+   5.vscode/1.dev_helpers        Copilot/Cline/Continue/Claude Code 에 등록
+   5.vscode/2.sql_helpers        내 DB 를 MCP 로 → 자연어로 SQL 질의(인증·보안 포함)
         ▼
 [7단계] 실전 응용 프로젝트                                           난이도 ★★★
    9.projects/1.local(filesystem) → 2.remote(1.intro → 2.oauth 인증) → 3.codebase_qa (RAG 를 MCP 로 노출)
