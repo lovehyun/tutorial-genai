@@ -101,6 +101,7 @@ node --version    # Node.js 18+ (npx)
   원격 인증 예제는 [`9.projects/2.remote/2.oauth/.env.example`](9.projects/2.remote/2.oauth/.env.example) 를 `.env` 로 복사해 쓴다.
 
 ## 관련 커리큘럼 / 프로젝트
+- **[`CURRICULUMS.md`](CURRICULUMS.md) — 강의 커리큘럼(시간 포맷별: 3H · 8H · 3H×2day · 8H×2days · 90분, + 주제별 트랙)**
 - `99.curriculums/3.advanced/1.mcp_protocol_deep_dive/` — MCP 3일 심화 과정
 - `10.project/12.nas_mcp_agent/` — NAS 파일스캔 MCP 에이전트 실전 프로젝트
 

@@ -6,7 +6,7 @@
 # [assistant 역할의 쓰임]
 #   모델의 지난 답변을 assistant 역할로 messages에 다시 넣어야
 #   모델이 "내가 이렇게 답했지" 하고 맥락을 이어간다.
-# 이 원리를 본격적으로 다루는 곳이 다음 폴더 3.chatbot2_history 다.
+# 이 원리를 본격적으로 다루는 곳이 다음 폴더 2.chatbot/2.history 다.
 #
 # 참고: Responses API(/v1/responses)는 이 누적을 서버가 대신 해준다 —
 #       6.restapi_response_chain.py (REST) / 16.response_multiturn.py (SDK) 참고.

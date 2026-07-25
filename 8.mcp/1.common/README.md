@@ -39,6 +39,8 @@ def translate(text, lang) -> str: ...
 - **타입힌트 + docstring 이 곧 LLM이 읽는 도구 명세**가 된다 (FastMCP가 JSON Schema 자동 생성).
 - 클라이언트가 **서버를 자식 프로세스(stdio)로 띄운다** → 서버는 단독 실행 시 입력 대기로 멈춤(정상).
 - MCP 핵심 흐름은 항상 **`initialize → list_tools → call_tool`** (전송이 stdio든 HTTP든 동일).
+- `initialize` 로 맺은 **세션은 끝까지 열린 채** 유지되고, 그 위로 **JSON-RPC 가 양방향**으로 흐른다 →
+  **서버도 요청을 보낼 수 있다**(되묻기·알림). 원리·흐름도는 [`4.advanced/README`](4.advanced/) 참고.
 - 서버는 stdio에서 **stdout에 `print()` 금지**(JSON-RPC 채널 오염) — 로그는 stderr로.
 
 ## 다음 단계

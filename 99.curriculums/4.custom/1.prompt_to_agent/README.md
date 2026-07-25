@@ -57,7 +57,7 @@
 | | | `12.study/6.embedding/1.tokenize_visualize.py` | [실습] 토큰화 과정 시각화 |
 | | | `12.study/6.embedding/2.embedding_visualize.py` | [실습] 임베딩 벡터 공간 시각화 |
 | 10:45-12:00 | RAG 기본 구현 (Indexing & Search) | `12.study/6.embedding/4.similarity_matrix.py` | [실습] 코사인 유사도 행렬 |
-| | | `1.openai/7.rag/1.rag_basic.py` | [실습] FAISS 인덱스 생성과 검색 |
+| | | `1.openai/4.rag/1.rag_basic.py` | [실습] FAISS 인덱스 생성과 검색 |
 | | | `2.langchain/7.RAG/2.loaders/2.1_text_loader.py` | [실습] 텍스트 로드 |
 | | | `2.langchain/7.RAG/3.vectorstore/3.1_persist.py` | [실습] ChromaDB 저장/로드 |
 | 13:00-14:30 | RAG 기본 구현 (Generation & 웹앱) | `2.langchain/7.RAG/1.basics/1.3_first_rag.py` | [실습] Store & Retrieve 기본 RAG |
@@ -112,7 +112,7 @@
 | 11:15-11:45 | 패턴 4: Orchestrator-Worker | `2.langchain/8.agents/9.agentic_patterns/9.4_orchestrator_worker.py` | [실습] 오케스트레이터의 작업 분배 패턴 |
 | 11:45-12:00 | 패턴 5: Evaluator-Optimizer | `2.langchain/8.agents/9.agentic_patterns/9.5_evaluator_optimizer.py` | [실습] 평가 → 최적화 반복 패턴 |
 | 13:00-13:45 | Tool Calling | `0.docs/05_genai_advanced/01_openai_advanced.md` | Function Calling, tool_calls, JSON Schema |
-| | | `1.openai/9.structured_output/5.func_calling_basic.py` | [실습] OpenAI Function Calling |
+| | | `1.openai/6.structured_output_func_calling/5.func_calling_basic.py` | [실습] OpenAI Function Calling |
 | | | `2.langchain/8.agents/0.legacy(initialize_agent)/3.custom_tools/4.4_customtools2_getinfo.py` | [실습] 정보 조회 도구 |
 | 13:45-14:30 | MCP 프로토콜 연동 | `0.docs/05_genai_advanced/12_mcp_model_context_protocol.md` | MCP 아키텍처, 서버/클라이언트, 전송 계층 |
 | | | `8.mcp/1.common/2.protocol_deep/1.simple_server.py` | [실습] MCP 서버 구현 |

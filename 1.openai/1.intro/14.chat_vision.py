@@ -5,7 +5,7 @@
 #       [{'type':'text', ...}, {'type':'image_url', ...}] 리스트로 구성한다.
 #
 # 이미지는 URL 또는 base64 Data URL로 전달 (여기서는 로컬 파일 → base64).
-# 멀티모달은 10.multimodal 폴더에서 본격적으로 다룬다.
+# 멀티모달은 7.multimodal 폴더에서 본격적으로 다룬다.
 
 import os
 import base64

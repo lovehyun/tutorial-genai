@@ -39,10 +39,10 @@ REST API를 처음부터 함수로 잘 추상화해 보여주면 편하지만, "
 | 13:00-13:45 | **SDK ⑤** 구버전(v0.x) | `1.openai/1.intro/10.sdk_old.py` | `openai.ChatCompletion.create()` — 옛 코드 읽기용 (`pip install openai==0.28`) |
 | 13:45-14:15 | **SDK ⑥** 신버전(v1.x) | `1.openai/1.intro/11.sdk_new.py` | `OpenAI()` 클라이언트 + `client.chat.completions.create()` — 현재 표준 |
 | 14:15-14:45 | **SDK ⑦** SDK 방식 파라미터 | `1.openai/1.intro/12.sdk_params.py` | REST의 `json={...}` ↔ SDK의 키워드 인자 비교, 표준/추론 모델 주의점 |
-| 15:00-15:30 | **⑧** 멀티턴 대화 | `1.openai/1.intro/13.chat_multiturn.py` | `messages` 누적으로 대화 맥락 유지 → 이후 `3.chatbot2_history`로 연결 |
-| 15:30-16:00 | **⑨** Vision — 이미지 입력 | `1.openai/1.intro/14.chat_vision.py` | `content`를 리스트로 (`text` + `image_url`) → 이후 `10.multimodal`로 연결 |
-| 16:00-16:30 | Streaming 응답 | `1.openai/8.streaming/1.concept/1.sse_stream_template.py`, `2.sse_stream_restapi.py` | SSE로 토큰 단위 스트리밍 (SDK 템플릿 → REST 직접 호출) |
-| 16:30-16:50 | Structured Output 맛보기 | `1.openai/9.structured_output/3.json_schema.py`, `5.func_calling_basic.py` | JSON Schema 강제 출력 / Function Calling — 구조화된 응답 |
+| 15:00-15:30 | **⑧** 멀티턴 대화 | `1.openai/1.intro/13.chat_multiturn.py` | `messages` 누적으로 대화 맥락 유지 → 이후 `2.chatbot/2.history`로 연결 |
+| 15:30-16:00 | **⑨** Vision — 이미지 입력 | `1.openai/1.intro/14.chat_vision.py` | `content`를 리스트로 (`text` + `image_url`) → 이후 `7.multimodal`로 연결 |
+| 16:00-16:30 | Streaming 응답 | `1.openai/3.streaming/1.concept/1.sse_stream_template.py`, `2.sse_stream_restapi.py` | SSE로 토큰 단위 스트리밍 (SDK 템플릿 → REST 직접 호출) |
+| 16:30-16:50 | Structured Output 맛보기 | `1.openai/6.structured_output_func_calling/3.json_schema.py`, `5.func_calling_basic.py` | JSON Schema 강제 출력 / Function Calling — 구조화된 응답 |
 | 16:50-17:00 | Gemini로 같은 호출 비교 | `7.google/1.basic/1.intro.py`, `2.chat.py` | 다른 프로바이더의 인터페이스 차이를 빠르게 살펴보기 |
 
 ## 환경 설정
@@ -74,6 +74,6 @@ GEMINI_API_KEY=...
 - [OpenAI Python SDK 마이그레이션 가이드 (v0 → v1)](https://github.com/openai/openai-python/discussions/742)
 - [Google Gemini API 문서](https://ai.google.dev/docs)
 - `1.openai/1.intro/README.md` — REST/SDK 단계별 흐름과 표준·추론 모델 구분 정리
-- `1.openai/8.streaming/README.md` — 스트리밍 응답 처리
-- `1.openai/9.structured_output/README.md` — 구조화 출력 6단계
+- `1.openai/3.streaming/README.md` — 스트리밍 응답 처리
+- `1.openai/6.structured_output_func_calling/README.md` — 구조화 출력 & Function Calling (1~7단계)
 - `7.google/1.basic/` — Gemini 기초 예제 전체

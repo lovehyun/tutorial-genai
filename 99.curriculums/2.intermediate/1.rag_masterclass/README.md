@@ -23,9 +23,9 @@
 | 10:00-10:30 | 임베딩 시각화 | `12.study/6.embedding/2.embedding_visualize.py` | 임베딩 벡터의 의미 공간 시각화 |
 | 10:45-11:15 | 벡터 공간 (2D/3D) | `12.study/6.embedding/3.vector_space_2d.py`, `12.study/6.embedding/5.vector_space_3d.py` | 2D, 3D 벡터 공간에서 유사도 이해 |
 | 11:15-12:00 | 유사도 행렬 | `12.study/6.embedding/4.similarity_matrix.py` | 코사인 유사도 행렬 계산 및 시각화 |
-| 13:00-13:45 | FAISS 기초 | `1.openai/7.rag/1.rag_basic.py`, `1.openai/7.rag/2.rag_similarity_score.py` | FAISS 인덱스 생성, 검색 기초 |
-| 13:45-14:30 | FAISS 로컬 임베딩 | `1.openai/7.rag/3.rag_local_embedding.py`, `1.openai/7.rag/4.rag_cosine_similarity.py` | 로컬 임베딩 모델 + 코사인 유사도 |
-| 14:45-15:30 | FAISS 모델 비교 | `1.openai/7.rag/5.rag_better_embedding_model.py` | 다양한 임베딩 모델 성능 비교 |
+| 13:00-13:45 | FAISS 기초 | `1.openai/4.rag/1.rag_basic.py`, `1.openai/4.rag/2.rag_similarity_score.py` | FAISS 인덱스 생성, 검색 기초 |
+| 13:45-14:30 | FAISS 로컬 임베딩 | `1.openai/4.rag/3.rag_local_embedding.py`, `1.openai/4.rag/4.rag_cosine_similarity.py` | 로컬 임베딩 모델 + 코사인 유사도 |
+| 14:45-15:30 | FAISS 모델 비교 | `1.openai/4.rag/5.rag_better_embedding_model.py` | 다양한 임베딩 모델 성능 비교 |
 | 15:30-16:15 | 로컬 모델 RAG | `2.langchain/7.RAG/7.local_model/1.ollama/2_rag.py` | 로컬 LLM + RAG 완전 로컬 파이프라인 |
 | 16:15-17:00 | Day 1 정리 & Q&A | — | FAISS 실습 정리, 질의응답 |
 
@@ -74,6 +74,6 @@ pip install langchain langchain-openai langchain-community chromadb faiss-cpu fl
 
 ## 참고 자료
 - `12.study/6.embedding/` — 임베딩 이론 및 시각화
-- `1.openai/7.rag/` — FAISS 기초
+- `1.openai/4.rag/` — FAISS 기초
 - `2.langchain/7.RAG/` — LangChain RAG 전체
 - `2.langchain/7.RAG/8.web_app/` — RAG 웹 앱 프로젝트

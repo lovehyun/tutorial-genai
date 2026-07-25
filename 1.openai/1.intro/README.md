@@ -28,8 +28,8 @@ REST API(Chat Completions → Responses) → SDK 순으로 배우는 입문 예�
 | `10.sdk_old.py` | 구버전 SDK (v0.x) — 옛 코드 참고용 |
 | `11.sdk_new.py` | 신버전 SDK (v1.x) — 현재 표준 |
 | `12.sdk_params.py` | SDK 방식의 파라미터 전달 |
-| `13.chat_multiturn.py` | chat.completions 멀티턴 (클라이언트가 messages 누적) → 3.chatbot2_history 로 연결 |
-| `14.chat_vision.py` | 이미지 입력 (Vision) → 10.multimodal 로 연결 |
+| `13.chat_multiturn.py` | chat.completions 멀티턴 (클라이언트가 messages 누적) → 2.chatbot/2.history 로 연결 |
+| `14.chat_vision.py` | 이미지 입력 (Vision) → 7.multimodal 로 연결 |
 
 ### SDK — Responses API
 | 파일 | 이 단계에서 새로 배우는 것 |

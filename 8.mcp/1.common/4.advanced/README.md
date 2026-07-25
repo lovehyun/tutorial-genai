@@ -20,6 +20,38 @@
 - 클라이언트는 **`ClientSession(read, write, <xxx>_callback=...)`** 로 콜백을 등록.
 - 콜백을 **안 주면** 해당 요청은 `... not supported` 로 거부되거나(progress/log 는) 조용히 버려진다.
 
+## 어떻게 서버가 "먼저" 되물을 수 있나 — 지속 세션 + 양방향
+
+> "클라 요청도 없는데 서버가 어떻게 물어봐?" 의 답: MCP 는 **요청 하나 보내고 끊는 REST 가 아니다.**
+> `initialize` 로 **세션을 맺으면 그 연결이 끝까지 열린 채** 유지되고, 그 위로 **JSON-RPC 가 양방향**으로 흐른다.
+> 클라만 요청하는 게 아니라 **서버도 요청을 보낼 수 있다**(각 메시지의 `id` 로 요청↔응답을 매칭).
+
+사실 "생판 아무것도 없는데 서버가 먼저"가 아니라, **클라가 부른 도구를 처리하는 '도중'** 같은 열린 연결로 되쏘는 것:
+
+```
+① 클라 ── tools/call("delete_file") ──▶ 서버      (클라가 먼저 요청)
+                                          │ 도구 실행 시작
+② 클라 ◀── elicitation/create ─────────── 서버      ← 도중에 서버가 '되물음'
+                                          │ 도구는 await 로 멈춰 답을 기다림
+③ 클라 ── ElicitResult(accept) ────────▶ 서버
+                                          │ 도구 로직 계속
+④ 클라 ◀── tools/call 응답 ─────────────── 서버      (그제서야 원래 응답)
+```
+①의 응답(④)이 아직 안 나간 사이에, **같은 연결로** 서버가 새 요청(②)을 끼워넣는다.
+
+**물리적으로 가능한 이유 = 전송이 지속 양방향 스트림:**
+- **stdio**: 클라가 서버를 자식 프로세스로 띄우고 **stdin/stdout 파이프가 세션 내내 열림.** 클라는 서버 stdout 을 **비동기 read 루프**로 계속 듣는다 → 도구 응답을 기다리는 중에도 서버의 `elicitation/create` 를 집어 콜백으로 넘긴다. (그래서 클라가 **async/이벤트 루프**여야 한다 — [`../1.intro/4.hello_client.py`](../1.intro/4.hello_client.py) 주석의 그 이유.)
+- **HTTP(streamable)**: `tools/call` POST 가 **SSE 스트림을 열어둔 채**, 서버가 최종 응답 전에 그 스트림으로 추가 메시지(요청 포함)를 push.
+
+**누가 뭘 할 수 있나는 `initialize` 에서 미리 합의**: capability 교환 시 클라가 *"나 elicitation/sampling/roots 지원"* 을 선언해야 서버가 쓴다(안 하면 `... not supported`).
+
+**요청(request) vs 알림(notification)** — 둘 다 서버→클라지만:
+| | 예제 | 응답 필요? | "도중"인가 |
+|---|---|---|---|
+| **요청** | sampling · elicitation · roots | ✅ 클라가 답해야 함 | 도구 처리 도중(nested) |
+| **알림** | progress · logging | ❌ 일방 push | 도구 처리 도중 |
+| (참고) 독립 알림 | `notifications/*/list_changed` 등 | ❌ | **요청 없이도 아무 때나** push 가능 |
+
 ## 학습 순서
 ```
 1.sampling         "MCP 는 도구 호출만 하는 게 아니다" — 양방향의 핵심     ★★★
