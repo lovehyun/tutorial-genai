@@ -33,7 +33,8 @@ pdf_output/
 books/
 
 # 별도 lecture 프로젝트 (lecture-platform2026 — 통합 강의 repo)
-lectures/
+# lectures/, lectures-22/ 등은 그 repo의 로컬 클론이라 여기선 전부 무시
+lectures*/
 
 # logging
 *.log
