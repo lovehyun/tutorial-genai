@@ -50,3 +50,6 @@ TEMP/
 **/.vscode/*
 !**/.vscode/mcp.json
 !**/.vscode/settings.json
+
+# graphify 산출물 (지식 그래프 출력물 — 재생성 가능; /docker/data 로의 심볼릭 링크라 슬래시 없이)
+graphify-out
