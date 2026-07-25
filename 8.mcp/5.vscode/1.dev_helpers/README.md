@@ -11,7 +11,8 @@
 | 파일 | 설명 |
 |------|------|
 | `server.py` | dev-helper MCP 서버 (도구 3개 + resource) — 순수 파이썬 |
-| `.vscode/mcp.json` | VSCode 워크스페이스 MCP 등록 설정 (git 추적됨 — 클론하면 바로 동작) |
+| `.vscode/mcp.json` | **VSCode** 워크스페이스 MCP 설정 — 이 폴더를 Open Folder 하면 자동 인식 |
+| `.mcp.json` | **Claude Code** 프로젝트 MCP 설정 — 이 폴더에서 `claude` 실행 시 자동 인식 |
 
 > 레포 루트 `.gitignore` 는 `.vscode/*` 를 무시하되 `mcp.json` / `settings.json` 만 예외로 추적한다.
 > 그래서 이 설정은 커밋되어, **폴더만 열면 별도 복사 없이 바로** 인식된다.

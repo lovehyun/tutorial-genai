@@ -27,7 +27,8 @@ DB 를 MCP 서버로 감싸면, 클라이언트(Claude Code / Copilot / Cline �
 | `server.py` | `sql-helper` MCP 서버 (3종 DB, SQLite 완성) |
 | `client.py` | 데모/검증용 raw 클라이언트 (조인 질의 + 가드 확인) |
 | `.env.example` | 접속정보 템플릿 → `.env` 로 복사 |
-| `.vscode/mcp.json` | VSCode 등록 설정 |
+| `.vscode/mcp.json` | **VSCode** 설정 — 이 폴더를 Open Folder 하면 자동 인식 |
+| `.mcp.json` | **Claude Code** 프로젝트 설정 — 이 폴더에서 `claude` 실행 시 자동 인식 |
 
 ## 제공 도구
 | 도구 | 설명 |
