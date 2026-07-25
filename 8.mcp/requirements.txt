@@ -23,6 +23,7 @@ langchain
 langchain-openai
 langchain-mcp-adapters    # LangChain ↔ MCP 도구 자동 변환
 langgraph
+yfinance                  # 4.langchain/5.remote_http 의 주가 조회 서버 (키 불필요)
 
 # ── 참고: 공식 MCP 서버(filesystem 등)는 Node.js 18+ 의 npx 로 실행 ──
 #   node --version   # 별도 설치 (pip 아님)
