@@ -29,7 +29,8 @@ MCP 도구는 **남이 만든 서버**의 도구다. 이 폴더의 [server.py](s
 | `server.py` | 안전한 도구(`list_files`, `read_file`) + 위험한 도구(`delete_file`, `send_email`). **아무 것도 막지 않는다** | — |
 | `1.approval_gate.py` | 모든 도구 호출 전 y/n — 가장 단순한 형태 | 도구마다 |
 | `2.risky_only.py` | 위험한 도구만 승인 + **거부하면 에이전트가 대안을 제안** | 위험한 도구만 |
-| `3.plan_approve.py` | **작업 계획 전체를 먼저 보여주고 한 번만 승인** | 작업 단위 |
+| `3.plan_approve.py` | **작업 계획 전체를 먼저 보여주고 한 번만 승인** (y/n) | 작업 단위 |
+| `3.plan_approve2_edit.py` | 위와 같되 **수정 요청** 추가 — y / n / 고칠 점 입력 → 계획 재작성 | 작업 단위 |
 | `4.interactive.py` | **대화형 비서** — 직접 질문하며 대화, 위험한 작업만 승인 | 위험한 도구만 |
 
 데이터는 전부 메모리 안의 가짜다. 실제 파일이 지워지거나 메일이 나가지 않는다.
@@ -62,8 +63,9 @@ pip install mcp langchain langchain-openai langchain-mcp-adapters langgraph pyth
 
 python 1.approval_gate.py
 python 2.risky_only.py
-python 3.plan_approve.py
-python 4.interactive.py      # 대화형 — 직접 질문을 입력한다
+python 3.plan_approve.py         # y/n
+python 3.plan_approve2_edit.py   # y / n / 고칠 점 입력 (예: "메일은 빼고 삭제만 해")
+python 4.interactive.py          # 대화형 — 직접 질문을 입력한다
 ```
 > `server.py` 는 stdio 로 **자동 실행**된다. 터미널 하나면 된다.
 > 실행하면 터미널이 `y/n` 을 물어보므로 직접 입력해야 진행된다.
