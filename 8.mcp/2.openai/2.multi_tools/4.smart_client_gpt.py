@@ -33,6 +33,7 @@ async def main():
         oa_tools = []                 # OpenAI function 형식 도구 목록 (모든 서버 합본)
         tool_session = {}             # tool_name → 그 도구를 가진 세션 (실행 라우팅용)
 
+        # 1) 서버들에 접속해서 사용 가능한 툴들 가져오기
         for sf in SERVERS:
             session, tools = await connect(sf, stack)
             for t in tools:
@@ -42,6 +43,7 @@ async def main():
         print("전체 도구:", list(tool_session))
 
         for q in ["안녕하세요 Alice!", "15 더하기 25는?", "지금 몇 시?", "부산 날씨는?", "파일 삭제해줘"]:
+            # 2) 질문을 기반으로 툴 사용여부 결정
             print(f"\n질문: {q}")
             r = await gpt.chat.completions.create(
                 model="gpt-4o-mini",
@@ -52,11 +54,31 @@ async def main():
             if not msg.tool_calls:                 # 적합한 도구 없음 → 바로 답
                 print(f"답변: {msg.content}")
                 continue
+
             call = msg.tool_calls[0]
             args = json.loads(call.function.arguments)
             print(f"  선택: {call.function.name}({args})  → 해당 서버 세션으로 실행")
+
+            # 3) 도구를 선택한 경우, 해당 도구 호출
             result = await tool_session[call.function.name].call_tool(call.function.name, args)
-            print(f"답변: {result.content[0].text}")
+            tool_result = result.content[0].text
+            print(f"답변: {tool_result}")
+
+            # 4) 기존 질문 + GPT의 도구 호출 요청 + 실제 도구 결과를 다시 GPT에 전달하여 최종 답변 만들기
+            final_r = await gpt.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "user", "content": q},
+                    msg,
+                    {
+                        "role": "tool",
+                        "tool_call_id": call.id,
+                        "content": tool_result,
+                    },
+                ],
+            )
+
+            print(f"답변: {final_r.choices[0].message.content}")
 
 
 if __name__ == "__main__":

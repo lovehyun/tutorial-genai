@@ -32,6 +32,7 @@
 | `3.server_stock.py` | **yfinance 로 실제 주가를 조회**하는 서버 (LangChain 없음) | 8001 |
 | `4.client_stock_agent.py` | 주식 정보 에이전트 (도구 여러 번 호출) | — |
 | `5.client_multi.py` | 두 원격 서버를 한 에이전트에 동시 연결 | — |
+| `6.client_interactive.py` | **대화형** — 직접 질문하며 멀티턴 대화 (`그럼 MS는?` 이 통한다) | — |
 
 ## 실행
 
@@ -53,6 +54,14 @@ python 4.client_stock_agent.py
 
 # 두 서버를 동시에 (8000, 8001 을 각각 띄워둔 뒤)
 python 5.client_multi.py
+
+# 대화형 — 직접 질문을 입력한다 (3.server_stock.py 가 떠 있어야 함)
+python 6.client_interactive.py
+```
+`6.client_interactive.py` 는 `checkpointer` + 고정 `thread_id` 로 대화를 기억한다.
+이어지는 질문이 통하는지 확인해 보기:
+```
+애플 주가 알려줘  →  그럼 마이크로소프트는?  →  둘 중 최근 1개월 더 오른 쪽은?
 ```
 > stdio 예제와 달리 **서버가 자동으로 뜨지 않는다.** 먼저 띄워두는 것이 이 단계의 핵심이다.
 
@@ -82,4 +91,6 @@ python 5.client_multi.py
 
 ## 추천 순서
 
-`1.server_simple` + `2.client_agent` → `3.server_stock` + `4.client_stock_agent` → `5.client_multi`
+`1.server_simple` + `2.client_agent` → `3.server_stock` + `4.client_stock_agent` → `5.client_multi` → `6.client_interactive`
+
+다음: 되돌릴 수 없는 도구(삭제·발송)가 섞이면 실행 전 사람 승인이 필요하다 → [6.human_in_loop](../6.human_in_loop/)
