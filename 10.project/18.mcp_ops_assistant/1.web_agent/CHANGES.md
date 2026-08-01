@@ -8,9 +8,9 @@ MCP 서버 3개에 챗봇을 붙이기만 한다. 승인 절차는 없다.
 |---|---|
 | `app.py` | `MultiServerMCPClient` 로 서버 3개 → `create_agent` → `/chat` |
 | `templates/index.html` | 채팅 UI + 호출한 도구 표시 |
-| `static/style.css` | **2·3단계용 클래스까지 미리 들어 있다** — 이후 단계에서 안 건드려도 된다 |
+| `static/style.css` | **2~4단계용 클래스까지 미리 들어 있다** — 이후 단계에서 안 건드려도 된다 |
 
-MCP 서버(`../servers/`)는 **1~3단계 내내 한 줄도 바뀌지 않는다.**
+MCP 서버(`../servers/`)는 **1~4단계 내내 한 줄도 바뀌지 않는다.**
 
 ## 이 단계의 한계 → 2단계로 가는 이유
 

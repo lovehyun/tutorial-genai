@@ -38,6 +38,7 @@ from langchain.agents import create_agent
 from langchain_core.messages import ToolMessage
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_openai import ChatOpenAI
+from langgraph.checkpoint.memory import MemorySaver
 
 load_dotenv()
 
@@ -61,6 +62,9 @@ SYSTEM = """너는 사내 IT 헬프데스크 비서다. 세 시스템의 도구�
 - 계정이 없으면 create_account 를 먼저 하고 권한을 부여한다.
 - 관리자가 어떤 작업을 거부하면 존중하고 다시 시도하지 않는다.
   대신 왜 거부했는지 묻거나, 할 수 있는 다른 방법을 한 가지 제안한다.
+- 요청에 맞는 도구가 없으면 "그 작업을 할 수 있는 도구가 없다" 고 그대로 말한다.
+  "승인이 필요하다" 거나 "거부되었다" 는 식으로 이유를 지어내지 않는다.
+  승인·거부는 실제로 승인 절차를 거친 작업에 대해서만 언급한다.
 - 답변은 한국어로, 무엇을 했고 무엇을 못 했는지 사실 그대로 정리한다."""
 
 
@@ -73,7 +77,7 @@ threading.Thread(target=LOOP.run_forever, daemon=True).start()
 
 
 def run(coro):
-    """Flask 요청 스레드에서 백그라운드 루프에 코루틴을 맡기고 결과를 기다린다."""
+    """Flask 요청 스레드 → 백그라운드 루프. 결과를 기다린다(채팅용)."""
     return asyncio.run_coroutine_threadsafe(coro, LOOP).result()
 
 
@@ -82,6 +86,7 @@ def run(coro):
 # ══════════════════════════════════════════════════════════════
 
 def mcp_config() -> dict:
+    """세 MCP 서버를 stdio 로 띄우는 설정. 1~4단계가 모두 이 설정을 똑같이 쓴다."""
     return {
         "directory": {"command": "python",
                       "args": [os.path.join(SERVERS, "directory_server.py")],
@@ -96,24 +101,17 @@ def mcp_config() -> dict:
 
 
 async def make_checkpointer():
-    """
-    가능하면 파일 기반(영속) 체크포인터를, 안 되면 메모리로 물러선다.
-
-    영속이어야 하는 이유: 승인 대기 상태가 '저장소' 에 있어야
-    브라우저를 닫아도 서버가 재시작해도 승인 대기가 살아남는다.
-    (langgraph-checkpoint-sqlite 패키지가 필요하다)
-    """
+    """영속 체크포인터. 없으면 메모리로 물러선다."""
     try:
         from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
         # from_conn_string 은 async context manager 다.
         # 앱이 살아 있는 동안 계속 써야 하므로 수동으로 진입시켜 붙잡아 둔다.
         cm = AsyncSqliteSaver.from_conn_string(CHECKPOINT_DB)
         saver = await cm.__aenter__()
-        globals()["_CHECKPOINT_CM"] = cm       # 가비지 컬렉션 방지
+        globals()["_CHECKPOINT_CM"] = cm
         print(f"[체크포인터] SQLite 영속 — {CHECKPOINT_DB}")
         return saver
     except Exception as e:
-        from langgraph.checkpoint.memory import MemorySaver
         print(f"[체크포인터] 메모리 폴백 ({type(e).__name__}: {e})")
         print("             → pip install langgraph-checkpoint-sqlite 하면 영속으로 바뀐다.")
         return MemorySaver()
@@ -142,13 +140,12 @@ CONFIG = {"configurable": {"thread_id": "web"}}     # 데모라 대화 하나. �
 # ══════════════════════════════════════════════════════════════
 
 def collect(messages, start: int) -> list:
-    """start 이후에 새로 생긴 메시지에서 도구 호출/결과를 뽑아낸다."""
     out = []
     for m in messages[start:]:
         for c in (getattr(m, "tool_calls", None) or []):
-            out.append({"kind": "call", "name": c["name"], "detail": c["args"]})
+            out.append(f"→ {c['name']}({c['args']})")
         if m.type == "tool":
-            out.append({"kind": "result", "name": m.name, "detail": str(m.content)})
+            out.append(f"← {m.name}: {str(m.content)[:160]}")
     return out
 
 
@@ -211,9 +208,7 @@ async def resume(approved: bool) -> dict:
             ]},
             as_node="tools",
         )
-        trace.append({"kind": "reject",
-                      "name": ", ".join(c["name"] for c in calls),
-                      "detail": "관리자 거부"})
+        trace.append(f"✗ 거부됨: {', '.join(c['name'] for c in calls)}")
 
     state = await agent.ainvoke(None, config=CONFIG)
     trace.extend(collect(state["messages"], before))

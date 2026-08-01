@@ -40,11 +40,13 @@ SYSTEM = """너는 사내 IT 헬프데스크 비서다. 세 시스템의 도구�
 - 권한을 주기 전에 list_groups 로 그룹명이 맞는지 확인한다.
 - 계정이 없으면 create_account 를 먼저 하고 권한을 부여한다.
 - 도구가 오류 메시지를 돌려주면 그대로 사용자에게 알리고 어떻게 할지 묻는다.
+- 요청에 맞는 도구가 없으면 "그 작업을 할 수 있는 도구가 없다" 고 그대로 말한다.
+  할 수 없는 이유를 지어내지 않는다.
 - 답변은 한국어로, 무엇을 했는지 사실 그대로 간결하게 정리한다."""
 
 
 def mcp_config() -> dict:
-    """세 MCP 서버를 stdio 로 띄우는 설정. 1~3단계가 모두 이 설정을 똑같이 쓴다."""
+    """세 MCP 서버를 stdio 로 띄우는 설정. 1~4단계가 모두 이 설정을 똑같이 쓴다."""
     return {
         "directory": {"command": "python",
                       "args": [os.path.join(SERVERS, "directory_server.py")],
@@ -97,9 +99,9 @@ def chat():
     trace = []
     for m in result["messages"][before:]:
         for c in (getattr(m, "tool_calls", None) or []):
-            trace.append({"kind": "call", "name": c["name"], "detail": c["args"]})
+            trace.append(f"→ {c['name']}({c['args']})")
         if m.type == "tool":
-            trace.append({"kind": "result", "name": m.name, "detail": str(m.content)})
+            trace.append(f"← {m.name}: {str(m.content)[:160]}")
 
     return jsonify({"reply": result["messages"][-1].content, "trace": trace})
 

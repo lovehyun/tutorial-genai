@@ -74,6 +74,9 @@ WORKER_SYSTEM = """너는 사내 IT 운영 담당자다. 배정받은 작업 지
 - 계정이 없으면 create_account 를 먼저 하고 권한을 부여한다.
 - 관리자가 어떤 작업을 거부하면 다시 시도하지 않는다. 나머지 작업은 이어서 하고,
   마지막에 무엇을 했고 무엇이 거부됐는지 보고한다.
+- 요청에 맞는 도구가 없으면 "그 작업을 할 수 있는 도구가 없다" 고 그대로 말한다.
+  "승인이 필요하다" 거나 "거부되었다" 는 식으로 이유를 지어내지 않는다.
+  승인·거부는 실제로 승인 절차를 거친 작업에 대해서만 언급한다.
 - 작업이 끝나면 처리 결과를 한국어로 3줄 이내로 요약한다."""
 
 
@@ -133,6 +136,7 @@ def public(job: dict) -> dict:
 # ══════════════════════════════════════════════════════════════
 
 def mcp_config() -> dict:
+    """세 MCP 서버를 stdio 로 띄우는 설정. 1~4단계가 모두 이 설정을 똑같이 쓴다."""
     return {
         "directory": {"command": "python",
                       "args": [os.path.join(SERVERS, "directory_server.py")],
@@ -147,7 +151,7 @@ def mcp_config() -> dict:
 
 
 async def make_checkpointer():
-    """워커용 영속 체크포인터. 없으면 메모리로 물러선다 (2단계와 동일)."""
+    """영속 체크포인터. 없으면 메모리로 물러선다."""
     try:
         from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
         cm = AsyncSqliteSaver.from_conn_string(CHECKPOINT_DB)

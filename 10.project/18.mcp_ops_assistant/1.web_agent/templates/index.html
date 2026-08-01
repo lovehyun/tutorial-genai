@@ -52,10 +52,7 @@ function renderTrace(trace) {
   if (!trace.length) return;
   const el = document.createElement('div');
   el.className = 'trace';
-  el.innerHTML = trace.map(t => t.kind === 'call'
-    ? `<div class="call">→ ${t.name}(${escapeHtml(JSON.stringify(t.detail))})</div>`
-    : `<div class="res">← ${t.name}: ${escapeHtml(t.detail).slice(0, 300)}</div>`
-  ).join('');
+  el.innerHTML = trace.map(t => `<div class="call">${escapeHtml(t)}</div>`).join('');
   chat.appendChild(el);
 }
 

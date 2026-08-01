@@ -58,11 +58,7 @@ function renderTrace(trace) {
   if (!trace || !trace.length) return;
   const el = document.createElement('div');
   el.className = 'trace';
-  el.innerHTML = trace.map(t => {
-    if (t.kind === 'call')   return `<div class="call">→ ${escapeHtml(t.name)}(${escapeHtml(JSON.stringify(t.detail))})</div>`;
-    if (t.kind === 'reject') return `<div class="res">✗ ${escapeHtml(t.name)} — ${escapeHtml(t.detail)}</div>`;
-    return `<div class="res">← ${escapeHtml(t.name)}: ${escapeHtml(t.detail).slice(0, 300)}</div>`;
-  }).join('');
+  el.innerHTML = trace.map(t => `<div class="call">${escapeHtml(t)}</div>`).join('');
   chat.appendChild(el);
   chat.scrollTop = chat.scrollHeight;
 }

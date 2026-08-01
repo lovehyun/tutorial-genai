@@ -137,3 +137,133 @@ button:disabled { background: #9aa5b1; cursor: default; }
   overflow-y: auto;
 }
 .empty { color: #9aa5b1; font-size: 12.5px; }
+
+/* ── 4단계: 3단 레이아웃 + 왼쪽 패널 ─────────────────────── */
+body:has(.layout4) { max-width: 1400px; }
+
+.layout4 {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 1100px) { .layout4 { grid-template-columns: 1fr; } }
+
+.side { display: flex; flex-direction: column; gap: 16px; }
+
+.panel {
+  background: #fff;
+  border: 1px solid #e3e6ea;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 12.5px;
+}
+.panel h2 { font-size: 14px; margin: 0 0 10px; }
+.panel .note { font-size: 11px; color: #9aa5b1; margin: 10px 0 0; line-height: 1.5; }
+
+/* 자동승인 목록 */
+.autoitem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #fff8e6;
+  border: 1px solid #f2c94c;
+  border-radius: 7px;
+  padding: 6px 9px;
+  margin-bottom: 6px;
+}
+.autoitem code { font-size: 11.5px; color: #8a6100; }
+.revoke {
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 500;
+  background: #fff;
+  color: #a8300a;
+  border: 1px solid #e5b8a8;
+}
+.revoke:disabled { color: #9aa5b1; border-color: #e3e6ea; }
+
+/* DB 현황 */
+.dbgroup { margin-bottom: 12px; }
+.dbgroup h3 {
+  font-size: 11px;
+  color: #6b7280;
+  margin: 0 0 5px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.dbgroup > div { padding: 3px 0; line-height: 1.45; }
+.dbgroup code { font-size: 11.5px; color: #1c5dbb; }
+.dbgroup .dim { color: #9aa5b1; font-size: 11px; }
+.risk {
+  font-size: 10px;
+  background: #fdecec;
+  color: #a8300a;
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+
+/* 승인 카드 세 번째 버튼 */
+.btn-always { background: #8a6100; }
+.approval .btns { flex-wrap: wrap; }
+
+/* ── 4단계: 접기/펼치기 (DB 현황 · 작업 로그) ─────────────── */
+details.dbgroup, details.worklog { margin-bottom: 10px; }
+
+details.dbgroup > summary,
+details.worklog > summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: 4px 0;
+  user-select: none;
+}
+details > summary::-webkit-details-marker { display: none; }
+details.dbgroup > summary::before,
+details.worklog > summary::before {
+  content: "▸";
+  font-size: 10px;
+  transition: transform .12s;
+}
+details[open].dbgroup > summary::before,
+details[open].worklog > summary::before { transform: rotate(90deg); }
+
+/* 접었을 때도 개수가 보인다 */
+.count {
+  background: #eef0f2;
+  color: #4b5563;
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+/* 작업 로그 — 채팅창 아래 */
+.worklog {
+  background: #fff;
+  border: 1px solid #e3e6ea;
+  border-radius: 10px;
+  padding: 10px 13px;
+  margin-top: 12px;
+}
+.worklog > summary { text-transform: none; font-size: 12.5px; color: #1c2024; }
+#worklogbody { max-height: 260px; overflow-y: auto; margin-top: 8px; }
+.wl-job { border-top: 1px solid #eef0f2; padding: 8px 0; }
+.wl-job:first-child { border-top: 0; }
+.wl-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+.wl-lines {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 11px;
+  color: #6b7280;
+  line-height: 1.6;
+  word-break: break-all;
+}
