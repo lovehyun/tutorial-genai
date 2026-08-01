@@ -91,6 +91,7 @@ cd 10.project/18.mcp_ops_assistant/4.auto_approve    && python app.py # → loca
 
 - MCP 서버는 **stdio 로 자동 실행**된다. 따로 띄울 필요 없다.
 - 데모 데이터를 초기화하려면 `servers/ops.db` 를 지운다 (다음 실행 때 다시 시드된다).
+  4단계는 **DB 현황 패널의 [초기화] 버튼**으로 앱을 끄지 않고도 되돌릴 수 있다 (확인 창을 거친다).
 - 승인 대기까지 초기화하려면 각 단계 폴더의 `checkpoints.sqlite` 도 지운다.
 - `langgraph-checkpoint-sqlite` 가 없으면 **메모리 체크포인터로 자동 폴백**한다(앱은 정상 동작,
   대신 서버를 재시작하면 대기 중인 승인이 사라진다). 시작 로그에 어느 쪽인지 찍힌다.

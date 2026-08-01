@@ -15,6 +15,7 @@
 
 import asyncio
 import threading
+import uuid
 
 from langchain_core.messages import ToolMessage
 from langchain_core.tools import tool
@@ -62,6 +63,12 @@ JOBS = {}
 JOB_SEQ = 0
 JOB_LOCK = threading.Lock()
 
+# 이 실행에만 해당하는 식별자. 작업 스레드 id 앞에 붙인다.
+#   체크포인터는 파일(checkpoints.sqlite)에 남으므로, 앱을 재시작하면 JOB_SEQ 는 0 으로
+#   돌아가는데 'job-J001' 체크포인트는 그대로 남아 있다. 그대로 쓰면 새 작업이
+#   옛날 대화를 이어받아 "이미 처리했다" 며 도구를 안 부른다. RUN_ID 로 그걸 막는다.
+RUN_ID = uuid.uuid4().hex[:8]
+
 
 def new_job(title: str, instruction: str) -> str:
     global JOB_SEQ
@@ -80,6 +87,14 @@ def new_job(title: str, instruction: str) -> str:
         "_decision": None,         # True(승인) / False(거부)
     }
     return job_id
+
+
+def clear() -> None:
+    """작업 목록을 비운다. 데모 초기화([초기화] 버튼)에서 부른다."""
+    global JOB_SEQ
+    with JOB_LOCK:
+        JOBS.clear()
+        JOB_SEQ = 0
 
 
 def public(job: dict) -> dict:
@@ -113,7 +128,7 @@ def collect(messages, start: int) -> list:
 
 async def run_job(job_id: str) -> None:
     job = JOBS[job_id]
-    config = {"configurable": {"thread_id": f"job-{job_id}"}}   # 작업마다 독립된 대화
+    config = {"configurable": {"thread_id": f"job-{RUN_ID}-{job_id}"}}   # 작업마다 독립된 대화
     job["status"] = "running"
 
     try:

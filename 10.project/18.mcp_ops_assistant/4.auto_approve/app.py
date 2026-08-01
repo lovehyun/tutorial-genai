@@ -66,9 +66,12 @@ def db_snapshot() -> dict:
         FROM accounts a LEFT JOIN employees e ON e.id = a.employee_id
         ORDER BY a.created_at
     """)]
+    # 권한 줄에도 이름을 붙인다 — 사번(E1001)만 보고는 누군지 알 수 없다
     access = [dict(r) for r in conn.execute("""
-        SELECT ac.employee_id, ac.group_name, g.risk
-        FROM access ac LEFT JOIN groups g ON g.name = ac.group_name
+        SELECT ac.employee_id, ac.group_name, g.risk, e.name
+        FROM access ac
+        LEFT JOIN groups g    ON g.name = ac.group_name
+        LEFT JOIN employees e ON e.id   = ac.employee_id
         ORDER BY ac.employee_id, ac.group_name
     """)]
     sent = [dict(r) for r in conn.execute("""
@@ -88,7 +91,13 @@ main, worker, TOOL_NAMES = jobs.run(agents.build())
 jobs.bind(worker)                     # 워커 에이전트를 jobs 모듈에 넣어준다
 
 app = Flask(__name__)
-CHAT_CONFIG = {"configurable": {"thread_id": "web"}}
+# 채팅 대화 번호. [초기화] 를 누르면 하나 올려서 '새 대화' 로 시작한다.
+#   안 그러면 에이전트가 초기화 전 대화를 기억해 "아까 처리했다" 고 답해버린다.
+CHAT_SEQ = 0
+
+
+def chat_config() -> dict:
+    return {"configurable": {"thread_id": f"web-{CHAT_SEQ}"}}
 
 
 # ══════════════════════════════════════════════════════════════
@@ -107,9 +116,10 @@ def chat():
         return jsonify({"reply": "메시지를 입력하세요.", "trace": []})
 
     async def turn():
-        snapshot = await main.aget_state(CHAT_CONFIG)
+        config = chat_config()
+        snapshot = await main.aget_state(config)
         before = len(snapshot.values.get("messages", []))
-        state = await main.ainvoke({"messages": [("user", message)]}, config=CHAT_CONFIG)
+        state = await main.ainvoke({"messages": [("user", message)]}, config=config)
         trace = []
         for m in state["messages"][before:]:
             for c in (getattr(m, "tool_calls", None) or []):
@@ -164,6 +174,26 @@ def revoke_auto(name):
     """[4단계] 자동승인 해제 — 다음부터 다시 물어본다."""
     jobs.AUTO_APPROVED.discard(name)
     return jsonify({"ok": True, "auto": sorted(jobs.AUTO_APPROVED)})
+
+
+@app.route("/db/reset", methods=["POST"])
+def reset_db():
+    """
+    [4단계] 데모를 처음 상태로 되돌린다. 실습을 여러 번 돌릴 때 쓴다.
+
+    셋을 함께 되돌려야 한다 — DB 만 지우면 앱 상태와 어긋나 버린다:
+      · DB      : 시드 상태로
+      · 작업 목록: 비운다 (지워진 계정을 가리키는 기록이 남으면 혼란스럽다)
+      · 채팅 대화: 새 대화로 (안 그러면 "아까 온보딩 했잖아요" 라며 일을 안 한다)
+
+    자동승인 목록은 그대로 둔다 — 데이터가 아니라 '정책' 이라서
+    초기화 뒤에도 자동승인이 유지되는지 실습으로 확인할 수 있어야 한다.
+    """
+    global CHAT_SEQ
+    store.reset()
+    jobs.clear()
+    CHAT_SEQ += 1
+    return jsonify({"ok": True, "db": db_snapshot()})
 
 
 if __name__ == "__main__":

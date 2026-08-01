@@ -27,12 +27,25 @@
   <details class="hint">
     <summary>예제 프롬프트</summary>
     <ol>
-      <li>김철수 찾아서 계정 상태 알려줘 — <b>조회라 안 물어본다</b></li>
-      <li>계정 만들어줘. 아이디는 chulsoo 로 — <b>승인 카드가 뜬다</b></li>
-      <li>email 이랑 vpn 권한 줘 — 승인</li>
-      <li>prod-db 권한도 줘 — <b>거부</b>해 보기. AI 가 이유를 묻거나 대안을 낸다</li>
-      <li>브라우저를 새로고침해도 승인 대기가 남아 있는지 확인 (영속 체크포인터)</li>
+      <li><code class="p">김철수 찾아서 계정 상태 알려줘</code>
+        <ul><li>조회 도구뿐이라 안 물어본다</li></ul></li>
+
+      <li><code class="p">계정 만들어줘. 아이디는 chulsoo 로</code>
+        <ul><li>승인 카드가 뜬다 — 여기서 에이전트는 멈춰 있다</li>
+            <li>승인하면 그 지점부터 이어서 실행된다</li></ul></li>
+
+      <li><code class="p">email 이랑 vpn 권한 줘</code>
+        <ul><li>권한마다 승인 카드가 뜬다</li></ul></li>
+
+      <li><code class="p">prod-db 권한도 줘</code>
+        <ul><li><b>거부</b>를 눌러 보기</li>
+            <li>중단이 아니라 대화로 이어진다 — AI 가 이유를 묻거나 대안을 낸다</li></ul></li>
+
+      <li><code class="p">계정 삭제해줘</code>
+        <ul><li>삭제 도구가 <b>없으므로</b> "할 수 있는 도구가 없다" 고 답해야 정상이다</li>
+            <li>"승인이 필요한데 거부됐다" 는 식으로 지어내면 프롬프트 가드레일이 실패한 것</li></ul></li>
     </ol>
+    <p class="after">승인 카드가 뜬 상태에서 <b>브라우저를 새로고침</b>해도 승인 대기가 남아 있다 (영속 체크포인터).</p>
   </details>
 
 <script>

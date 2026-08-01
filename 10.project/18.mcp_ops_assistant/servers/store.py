@@ -80,5 +80,31 @@ def init() -> None:
     conn.close()
 
 
+def reset() -> None:
+    """
+    모든 테이블을 비우고 시드 데이터를 다시 넣는다 (데모 초기화용).
+
+    4단계의 [초기화] 버튼이 이걸 부른다. 실습을 여러 번 돌릴 때
+    ops.db 파일을 직접 지우지 않고도 처음 상태로 되돌리기 위한 것이다.
+    """
+    conn = connect()
+    conn.executescript("""
+        DELETE FROM access;
+        DELETE FROM accounts;
+        DELETE FROM notifications;
+        DELETE FROM employees;
+        DELETE FROM groups;
+    """)
+    try:
+        # notifications 의 자동 증가 번호도 1 부터 다시 (없으면 무시)
+        conn.execute("DELETE FROM sqlite_sequence WHERE name = 'notifications'")
+    except Exception:
+        pass
+    conn.commit()
+    conn.close()
+
+    init()      # 테이블이 비었으므로 시드가 다시 들어간다
+
+
 def now() -> str:
     return datetime.now().isoformat(timespec="seconds")
