@@ -44,6 +44,8 @@ OpenAI API · LangChain · LangGraph 를 활용한 실전 프로젝트 모음.
 | `14.musicvibe_app/` | 음악 무드 | F | ★★ | 분위기 기반 추천 |
 | `15.todo_chatbot/` | **Todo + 챗봇** (3단계 빌드업) | G | ★★ | Flask, SQLite, `@tool`, `create_react_agent` |
 | `16.airline_chatbot/` | **항공 예약 + 챗봇 + 상담사 연결** (3단계 빌드업) | G | ★★★ | Flask, SQLite, 권한 분리, 폴링 채팅 |
+| `17.mcp_marketplace/` | MCP 마켓플레이스 | E | ★★★ | MCP 게이트웨이, 등록/구독, Docker |
+| `18.mcp_ops_assistant/` | **사내 IT 비서 — 다중 MCP + 사람 승인 + 서브에이전트** (3단계 빌드업) | G | ★★★ | MCP 3개, LangGraph interrupt, 체크포인터, 백그라운드 워커 |
 
 ---
 
@@ -133,6 +135,21 @@ LLM 이 도구를 능동적으로 호출.
 - 챗봇 한계 인지 → 사람 상담사 에스컬레이션 패턴
 - WebSocket 없이 폴링만으로 실시간 채팅 구현
 
+### `18.mcp_ops_assistant/` — 사내 IT 비서: 다중 MCP + 사람 승인 + 서브에이전트 (★★★)
+
+| 단계 | 포트 | 추가된 기능 |
+|---|---|---|
+| `1.web_agent/` | 5081 | 웹 챗봇 + **MCP 서버 3개**(조회 / 계정·권한 / 알림) — 승인 X |
+| `2.hitl_approve/` | 5082 | + **승인 게이트** — 되돌릴 수 없는 작업 전 정지 → 승인 카드 → 승인·거부로 재개 |
+| `3.background_tasks/` | 5083 | + **서브에이전트 위임** — 백그라운드 실행, 작업 패널, 여러 건 동시 + 각자 승인 대기 |
+
+**학습 포인트**:
+- **웹에는 `input()` 이 없다** — 멈춘 에이전트를 checkpointer 에 저장해 두고, 승인 버튼이 꺼내 재개시킨다
+  (기다림을 프로세스가 아니라 저장소가 담당한다)
+- MCP 서버는 3단계 내내 **한 줄도 안 바뀐다** — 안전장치는 서버가 아니라 서버를 쓰는 쪽이 건다
+- 메인/워커 에이전트 분리 + `asyncio.Event` 로 백그라운드 작업을 재우고 깨우기
+- 승인 피로를 피하는 화이트리스트 설계, 거부를 '중단' 이 아니라 '대화' 로 만들기
+
 ---
 
 ## 시작 추천
@@ -141,5 +158,6 @@ LLM 이 도구를 능동적으로 호출.
 |---|---|---|---|---|
 | A.1.chatbot_gui | A.1.chatbot_gui | D.13.document_qa | E.10.ai_agent | G.15.todo_chatbot |
 | → B/C 적당히 | → A.1.agents | → D.7.job_match | → E.12.nas_mcp | → G.16.airline_chatbot |
+| | | | → E.17.mcp_marketplace | → G.18.mcp_ops_assistant |
 
 각 프로젝트 폴더에 자체 `README.md` 가 있으니 자세한 내용은 거기에서.

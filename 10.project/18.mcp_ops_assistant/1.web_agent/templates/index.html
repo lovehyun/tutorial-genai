@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>사내 IT 헬프데스크 AI — 1단계 (승인 없음)</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>사내 IT 헬프데스크 AI</h1>
+    <span class="stage stage-warn">1단계 · 승인 절차 없음</span>
+  </header>
+
+  <p class="tools">연결된 MCP 도구 {{ tools|length }}개: {{ tools|join(', ') }}</p>
+
+  <div id="chat"></div>
+
+  <form id="form">
+    <input id="msg" autocomplete="off" placeholder="예) 김철수 찾아줘 / E1001 계정 만들어줘 (아이디 chulsoo)">
+    <button id="send">보내기</button>
+  </form>
+
+  <details class="hint">
+    <summary>예제 프롬프트</summary>
+    <ol>
+      <li>김철수 찾아줘</li>
+      <li>그 사람 계정 상태 알려줘</li>
+      <li>계정 만들어줘. 아이디는 chulsoo 로</li>
+      <li>email 이랑 vpn 권한 줘</li>
+      <li><b>prod-db 권한도 줘</b> — 아무도 안 물어보고 그냥 나간다. 이게 1단계의 문제다</li>
+      <li>환영 메일 보내줘</li>
+    </ol>
+  </details>
+
+<script>
+const chat = document.getElementById('chat');
+const form = document.getElementById('form');
+const msg  = document.getElementById('msg');
+const send = document.getElementById('send');
+
+function bubble(who, text, cls) {
+  const el = document.createElement('div');
+  el.className = 'bubble ' + cls;
+  el.innerHTML = `<b>${who}</b><div>${text}</div>`;
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+  return el;
+}
+
+function renderTrace(trace) {
+  if (!trace.length) return;
+  const el = document.createElement('div');
+  el.className = 'trace';
+  el.innerHTML = trace.map(t => t.kind === 'call'
+    ? `<div class="call">→ ${t.name}(${escapeHtml(JSON.stringify(t.detail))})</div>`
+    : `<div class="res">← ${t.name}: ${escapeHtml(t.detail).slice(0, 300)}</div>`
+  ).join('');
+  chat.appendChild(el);
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+
+form.onsubmit = async (e) => {
+  e.preventDefault();
+  const text = msg.value.trim();
+  if (!text) return;
+
+  bubble('나', escapeHtml(text), 'me');
+  msg.value = '';
+  send.disabled = true;
+  const waiting = bubble('AI', '<i>처리 중…</i>', 'bot');
+
+  try {
+    const r = await fetch('/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: text}),
+    });
+    const data = await r.json();
+    waiting.remove();
+    renderTrace(data.trace || []);
+    bubble('AI', escapeHtml(data.reply || ''), 'bot');
+  } catch (err) {
+    waiting.remove();
+    bubble('오류', escapeHtml(String(err)), 'err');
+  } finally {
+    send.disabled = false;
+    msg.focus();
+  }
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>사내 IT 헬프데스크 AI — 2단계 (승인 게이트)</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>사내 IT 헬프데스크 AI</h1>
+    <span class="stage stage-ok">2단계 · 위험한 작업은 승인 필요</span>
+  </header>
+
+  <p class="tools">
+    MCP 도구 {{ tools|length }}개 · 자동 통과(조회): {{ safe|join(', ') }} ·
+    나머지는 실행 전 승인
+  </p>
+
+  <div id="chat"></div>
+
+  <form id="form">
+    <input id="msg" autocomplete="off" placeholder="예) 김철수 온보딩 해줘 (계정 chulsoo, email·vpn 권한)">
+    <button id="send">보내기</button>
+  </form>
+
+  <details class="hint">
+    <summary>예제 프롬프트</summary>
+    <ol>
+      <li>김철수 찾아서 계정 상태 알려줘 — <b>조회라 안 물어본다</b></li>
+      <li>계정 만들어줘. 아이디는 chulsoo 로 — <b>승인 카드가 뜬다</b></li>
+      <li>email 이랑 vpn 권한 줘 — 승인</li>
+      <li>prod-db 권한도 줘 — <b>거부</b>해 보기. AI 가 이유를 묻거나 대안을 낸다</li>
+      <li>브라우저를 새로고침해도 승인 대기가 남아 있는지 확인 (영속 체크포인터)</li>
+    </ol>
+  </details>
+
+<script>
+const chat = document.getElementById('chat');
+const form = document.getElementById('form');
+const msg  = document.getElementById('msg');
+const send = document.getElementById('send');
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+
+function bubble(who, text, cls) {
+  const el = document.createElement('div');
+  el.className = 'bubble ' + cls;
+  el.innerHTML = `<b>${who}</b><div>${text}</div>`;
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+  return el;
+}
+
+function renderTrace(trace) {
+  if (!trace || !trace.length) return;
+  const el = document.createElement('div');
+  el.className = 'trace';
+  el.innerHTML = trace.map(t => {
+    if (t.kind === 'call')   return `<div class="call">→ ${escapeHtml(t.name)}(${escapeHtml(JSON.stringify(t.detail))})</div>`;
+    if (t.kind === 'reject') return `<div class="res">✗ ${escapeHtml(t.name)} — ${escapeHtml(t.detail)}</div>`;
+    return `<div class="res">← ${escapeHtml(t.name)}: ${escapeHtml(t.detail).slice(0, 300)}</div>`;
+  }).join('');
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+/* 승인 카드 — 에이전트는 지금 checkpointer 안에 멈춰 있다.
+   버튼을 눌러야 /approve 가 그 상태를 꺼내 재개시킨다. */
+function renderApproval(calls) {
+  const card = document.createElement('div');
+  card.className = 'approval';
+  card.innerHTML = `
+    <h3>⚠️ 승인이 필요합니다</h3>
+    ${calls.map(c => `<div class="args">${escapeHtml(c.name)}
+${Object.entries(c.args).map(([k, v]) => `  ${escapeHtml(k)} = ${escapeHtml(v)}`).join('\n')}</div>`).join('')}
+    <div class="btns">
+      <button class="btn-yes">승인하고 실행</button>
+      <button class="btn-no">거부</button>
+    </div>`;
+  chat.appendChild(card);
+  chat.scrollTop = chat.scrollHeight;
+
+  const decide = async (approved) => {
+    card.querySelectorAll('button').forEach(b => b.disabled = true);
+    card.querySelector('.btns').innerHTML = approved ? '<i>실행 중…</i>' : '<i>거부 처리 중…</i>';
+    const r = await fetch('/approve', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({approved}),
+    });
+    card.remove();
+    handle(await r.json());
+  };
+
+  card.querySelector('.btn-yes').onclick = () => decide(true);
+  card.querySelector('.btn-no').onclick  = () => decide(false);
+}
+
+/* 서버 응답은 둘 중 하나다: 최종 답변(done) 이거나 승인 대기(pending) */
+function handle(data) {
+  renderTrace(data.trace);
+  if (data.state === 'pending') {
+    renderApproval(data.calls || []);
+  } else {
+    bubble('AI', escapeHtml(data.reply || ''), 'bot');
+  }
+  send.disabled = false;
+  msg.focus();
+}
+
+form.onsubmit = async (e) => {
+  e.preventDefault();
+  const text = msg.value.trim();
+  if (!text) return;
+
+  bubble('나', escapeHtml(text), 'me');
+  msg.value = '';
+  send.disabled = true;
+  const waiting = bubble('AI', '<i>처리 중…</i>', 'bot');
+
+  try {
+    const r = await fetch('/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: text}),
+    });
+    waiting.remove();
+    handle(await r.json());
+  } catch (err) {
+    waiting.remove();
+    bubble('오류', escapeHtml(String(err)), 'err');
+    send.disabled = false;
+  }
+};
+</script>
+</body>
+</html>

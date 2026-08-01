@@ -1,0 +1,139 @@
+/* 1~3단계가 공유하는 스타일. 단계별로 조금씩 클래스가 추가된다. */
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  background: #f7f8fa;
+  color: #1c2024;
+}
+
+header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+h1 { font-size: 20px; margin: 0; }
+
+.stage {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.stage-warn { background: #ffe9e0; color: #a8300a; }
+.stage-ok   { background: #e2f4e8; color: #14683a; }
+
+.tools { font-size: 12px; color: #6b7280; margin: 8px 0 16px; }
+
+#chat {
+  background: #fff;
+  border: 1px solid #e3e6ea;
+  border-radius: 12px;
+  padding: 16px;
+  height: 460px;
+  overflow-y: auto;
+}
+
+.bubble { margin-bottom: 14px; line-height: 1.55; white-space: pre-wrap; }
+.bubble b { display: block; font-size: 11px; color: #6b7280; margin-bottom: 3px; }
+.bubble.me  > div { background: #e8f0fe; padding: 9px 12px; border-radius: 10px; display: inline-block; }
+.bubble.bot > div { background: #f1f3f5; padding: 9px 12px; border-radius: 10px; display: inline-block; }
+.bubble.err > div { background: #fdecec; color: #a8300a; padding: 9px 12px; border-radius: 10px; }
+
+/* 에이전트가 부른 도구와 그 결과 */
+.trace {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 11.5px;
+  background: #fbfbfc;
+  border-left: 3px solid #cbd2d9;
+  padding: 7px 10px;
+  margin: 0 0 12px;
+  border-radius: 0 6px 6px 0;
+  color: #495057;
+}
+.trace .call { color: #1c5dbb; }
+.trace .res  { color: #4b5563; }
+
+form { display: flex; gap: 8px; margin-top: 14px; }
+input {
+  flex: 1;
+  padding: 11px 13px;
+  border: 1px solid #d4d8dd;
+  border-radius: 9px;
+  font-size: 14px;
+}
+button {
+  padding: 11px 20px;
+  border: 0;
+  border-radius: 9px;
+  background: #1c5dbb;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+button:disabled { background: #9aa5b1; cursor: default; }
+
+.hint { margin-top: 18px; font-size: 13px; color: #4b5563; }
+.hint summary { cursor: pointer; font-weight: 600; }
+.hint ol { line-height: 1.8; }
+
+/* ── 2단계: 승인 카드 ───────────────────────────────────── */
+.approval {
+  background: #fff8e6;
+  border: 1px solid #f2c94c;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.approval h3 { margin: 0 0 8px; font-size: 14px; color: #8a6100; }
+.approval .args {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 12px;
+  background: #fffdf5;
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  white-space: pre-wrap;
+}
+.approval .btns { display: flex; gap: 8px; }
+.approval button { padding: 8px 16px; font-size: 13px; }
+.btn-yes { background: #14683a; }
+.btn-no  { background: #a8300a; }
+
+/* ── 3단계: 작업 패널 ───────────────────────────────────── */
+.layout { display: grid; grid-template-columns: 1fr 320px; gap: 16px; align-items: start; }
+@media (max-width: 780px) { .layout { grid-template-columns: 1fr; } }
+
+#jobs {
+  background: #fff;
+  border: 1px solid #e3e6ea;
+  border-radius: 12px;
+  padding: 14px;
+  max-height: 520px;
+  overflow-y: auto;
+}
+#jobs h2 { font-size: 14px; margin: 0 0 10px; }
+.job {
+  border: 1px solid #e3e6ea;
+  border-radius: 9px;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-size: 12.5px;
+}
+.job .title { font-weight: 600; margin-bottom: 5px; }
+.job .status { font-size: 11px; padding: 2px 8px; border-radius: 999px; }
+.st-running  { background: #e8f0fe; color: #1c5dbb; }
+.st-waiting  { background: #fff3cd; color: #8a6100; }
+.st-done     { background: #e2f4e8; color: #14683a; }
+.st-rejected { background: #fdecec; color: #a8300a; }
+.st-error    { background: #fdecec; color: #a8300a; }
+.st-queued   { background: #eef0f2; color: #4b5563; }
+.job .log {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 6px;
+  max-height: 110px;
+  overflow-y: auto;
+}
+.empty { color: #9aa5b1; font-size: 12.5px; }
