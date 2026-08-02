@@ -30,7 +30,7 @@
   - `4.advanced/` — **양방향·Context 심화**: sampling / progress·logging / elicitation / roots. 상세: [`4.advanced/README.md`](1.basic/4.advanced/README.md)
 - **2.openai** — `1.agent_tool/`, `2.multi_tools/` (각 폴더: 공통 서버 + manual 클라이언트 → GPT 클라이언트 빌드업)
 - **3.anthropic** — `1.claude_desktop/` (Hello, 네트워크 서버, 파일 컨버터 등 Claude Desktop 등록용)
-- **4.langchain** — `1.quickstart/`(adapters 빠른 시작) · `2.langchain_agent/` · `3.langchain_bridge/` · `4.tools_safety/` · `5.remote_http/`(**원격 HTTP 서버 + 실전 API(yfinance) 서버**) · `6.human_in_loop/`(**MCP 도구 실행 전 사람 승인**)
+- **4.langchain** — `1.quickstart/`(adapters 빠른 시작) · `2.langchain_agent/` · `3.langchain_bridge/` · `4.tools_safety/` · `5.remote_http/`(**원격 HTTP 서버 + 실전 API(yfinance) 서버**) · `6.human_in_loop/`(**MCP 도구 실행 전 사람 승인**) · `7.guardrails/`(**인젝션·rm -rf·PII·악성 서버 차단**)
 - **5.vscode** — 내 서버를 실제 클라이언트에 등록. `1.dev_helpers/`(dev-helper 도구를 Copilot·Cline·Continue·**Claude Code** 에 등록) · `2.sql_helpers/`(**내 DB 를 MCP 로 노출 → 자연어로 SQL 질의**, sqlite/postgres/mysql, 단순·무인증) · `3.sql_helpers_auth/`(**인증 3모델**: 서버관리 / 사용자별 스코프(HTTP+Bearer) / 클라이언트 제공 프록시)
 - **9.projects** — `1.local/`(filesystem 서버·클라이언트) · `2.remote/`(원격: `1.intro` 무인증 → `2.oauth` **Bearer 인증**) · `3.codebase_qa/`(**RAG 를 MCP 서버로 노출**, 멀티 클라이언트)
 
@@ -58,9 +58,10 @@
         ▼
 [5단계] LangChain 심화 (수동 변환 · 브릿지 · 안전성)                 난이도 ★★★
    4.langchain/2.langchain_agent → 3.langchain_bridge → 4.tools_safety
-              → 5.remote_http → 6.human_in_loop
+              → 5.remote_http → 6.human_in_loop → 7.guardrails
    (5.remote_http:   원격 HTTP 서버 + 실제 API 호출 서버 — 서버엔 LangChain 이 없다는 걸 확인)
    (6.human_in_loop: 되돌릴 수 없는 도구 실행 전 사람 승인 — 서버를 못 고칠 때의 안전장치)
+   (7.guardrails:    코드가 판정 — 프롬프트 인젝션·rm -rf·PII·악성 MCP 서버(tool poisoning))
    (옛 문법 비교: 4.langchain/0.legacy(deprecated))
         ▼
 [6단계] 실제 클라이언트에 붙이기 — 코드 없이 '설정'                  난이도 ★★

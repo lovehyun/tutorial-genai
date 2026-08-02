@@ -21,7 +21,7 @@
 | **M4** | 양방향·Context | [1.basic/4.advanced](1.basic/4.advanced/) | 50m(핵심 25m) | sampling·progress·elicitation·roots + 지속세션/양방향 |
 | **M5** | LLM 자동호출(LangChain) | [4.langchain/1.quickstart](4.langchain/1.quickstart/) | 40m | 어댑터로 에이전트가 도구 자동 선택 |
 | **M6** | LLM 자동호출(OpenAI) | [2.openai](2.openai/) | 35m | GPT function calling, 수동→자동 |
-| **M7** | LangChain 심화 | [4.langchain/2~6](4.langchain/) | 110m | 수동변환·LangGraph 브릿지·도구 안전성 + 원격 HTTP/실전 API 서버 + 사람 승인(HITL) |
+| **M7** | LangChain 심화 | [4.langchain/2~7](4.langchain/) | 145m | 수동변환·LangGraph 브릿지·도구 안전성 + 원격 HTTP/실전 API 서버 + 사람 승인(HITL) + 가드레일(인젝션·PII·악성 서버) |
 | **M8** | 클라이언트 등록 | [5.vscode/1.dev_helpers](5.vscode/1.dev_helpers/) + [운영가이드](claude_code_mcp_guide.md) | 45m | `.mcp.json`/`.vscode/mcp.json`/`claude mcp add` |
 | **M9** | DB 자연어 질의 | [5.vscode/2.sql_helpers](5.vscode/2.sql_helpers/) | 45m | 자연어→조인 SQL · read-only 가드 |
 | **M10** | DB 인증 3모델 | [5.vscode/3.sql_helpers_auth](5.vscode/3.sql_helpers_auth/) | 60m | 서버관리 / 사용자별 스코프 / 클라 제공 |
