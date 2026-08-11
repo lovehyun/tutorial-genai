@@ -1,4 +1,4 @@
-# 4.chatbot_web — 웹 챗봇 × LangChain 에이전트 × MCP
+# 5.chatbot_web — 웹 챗봇 × LangChain 에이전트 × MCP
 
 브라우저 채팅창에서 자연어로 물으면, **LangChain 에이전트가 MCP 서버의 도구를 자동으로 골라** 답한다.
 *"내 기능을 MCP 서버로 만들면, 웹앱이든 어디든 에이전트가 그대로 쓴다"* 를 보여주는 작은 실전 예제.

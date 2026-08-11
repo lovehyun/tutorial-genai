@@ -8,7 +8,8 @@
 #   pip install -r 8.mcp/requirements.txt
 
 # ── 핵심(1.common / 9.projects): MCP 그 자체 ──────────────────
-mcp                       # MCP 파이썬 SDK (FastMCP, ClientSession)
+mcp<2.0                   # MCP 파이썬 SDK (FastMCP, ClientSession) — 2.0.0 은 mcp.server.fastmcp 가
+                           # mcp.server.mcpserver 로 바뀌어 이 폴더 예제 전체가 깨짐. 1.x 로 고정.
 uvicorn                   # 원격 HTTP 서버 실행 (3.transports, 9.projects/2.remote)
 python-dotenv             # .env 로딩 (원격/프로젝트 클라이언트)
 
