@@ -3,6 +3,9 @@
 !.env.example
 gapi-*.json
 
+# superpowers 스킬이 자동 생성하는 계획서·설계서 스크래치 (프로젝트 문서 아님)
+docs/superpowers/
+
 # python
 *.pyc
 __pycache__/
