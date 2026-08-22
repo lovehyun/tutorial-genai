@@ -21,8 +21,12 @@ load_dotenv()
 
 @tool
 def send_payment(recipient: str, amount: int) -> str:
-    """수신자에게 지정 금액을 송금한다. (데모 — 실제 송금 X)"""
-    return f"✅ {recipient} 에게 {amount}원 송금 완료"
+    """수신자에게 지정 금액을 송금한다."""
+
+    if amount <= 0:
+        return "송금 실패: 송금 금액은 1원 이상이어야 합니다."
+
+    return f"{recipient} 에게 {amount}원 송금 완료"
 
 
 checkpointer = MemorySaver()

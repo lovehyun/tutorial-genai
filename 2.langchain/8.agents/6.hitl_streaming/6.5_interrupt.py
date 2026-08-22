@@ -28,7 +28,7 @@ load_dotenv()
 @tool
 def send_payment(recipient: str, amount: int) -> str:
     """수신자에게 지정 금액을 송금한다. (데모 — 실제 송금 X)"""
-    return f"✅ {recipient} 에게 {amount}원 송금 완료"
+    return f"{recipient} 에게 {amount}원 송금 완료"
 
 
 @tool
