@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>포지셔널 인코딩 인터랙티브 데모</title>
+<style>
+    body {
+        font-family: 'Malgun Gothic', 'Arial', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+    }
+    .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.97);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    h1 {
+        text-align: center;
+        color: #2c3e50;
+        font-size: 2.1em;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    p.subtitle { text-align: center; color: #555; margin-top: -10px; }
+    .section {
+        margin: 24px 0;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 15px;
+        border-left: 5px solid #667eea;
+    }
+    .controls { display: flex; gap: 30px; flex-wrap: wrap; align-items: center; }
+    .control { display: flex; flex-direction: column; gap: 4px; }
+    label { font-weight: bold; color: #34495e; font-size: 0.9em; }
+    input[type=range] { width: 220px; }
+    .value-badge {
+        display: inline-block; background: #667eea; color: white;
+        border-radius: 6px; padding: 2px 8px; font-size: 0.85em; margin-left: 6px;
+    }
+    canvas { background: white; border-radius: 10px; border: 1px solid #ddd; display: block; margin: 0 auto; }
+    .explain { color: #444; line-height: 1.6; font-size: 0.95em; }
+    .highlight { color: #764ba2; font-weight: bold; }
+    code { background: #eee; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>🌊 포지셔널 인코딩 인터랙티브 데모</h1>
+    <p class="subtitle">30.study/8.positional_encoding/1.pe_visualize.py 의 브라우저 버전 — 슬라이더로 직접 조작해본다</p>
+
+    <div class="section">
+        <div class="controls">
+            <div class="control">
+                <label>문장 길이(position 수) <span class="value-badge" id="seqLenVal">30</span></label>
+                <input type="range" id="seqLen" min="5" max="80" value="30">
+            </div>
+            <div class="control">
+                <label>차원 수(d_model) <span class="value-badge" id="dModelVal">32</span></label>
+                <input type="range" id="dModel" min="8" max="64" step="2" value="32">
+            </div>
+            <div class="control">
+                <label>보기 모드</label>
+                <select id="viewMode">
+                    <option value="heatmap">히트맵(위치 x 차원)</option>
+                    <option value="wave">파형(선택 차원)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <canvas id="chart" width="1000" height="360"></canvas>
+    </div>
+
+    <div class="section explain">
+        <p><span class="highlight">왜 필요한가</span> — Self-Attention 계산(QK^T→softmax→×V)에는 "몇 번째 토큰인지"가 전혀 등장하지 않는다.
+        토큰 순서를 섞어도 attention 결과 자체는 똑같다(순서에 무관, permutation invariant). 그래서 Transformer는
+        입력 임베딩에 <code>위치 정보</code>를 명시적으로 더해준다 — 그게 포지셔널 인코딩이다.</p>
+        <p><span class="highlight">공식</span> — 짝수 차원엔 <code>sin(pos / 10000^(2i/d))</code>, 홀수 차원엔 <code>cos(pos / 10000^(2i/d))</code>를 쓴다.
+        차원마다 주파수(파장)가 다르다 — <b>낮은 차원(왼쪽)은 빠르게 진동</b>하고, <b>높은 차원(오른쪽)은 느리게 진동</b>한다.
+        슬라이더를 움직여서 차원 수를 늘려보면 이 패턴이 더 촘촘해지는 걸 볼 수 있다.</p>
+        <p><span class="highlight">파형 모드</span>로 바꾸면 실제 sin/cos 곡선 몇 개를 겹쳐서 볼 수 있다 — 왜 "파동"이라고 부르는지 직관적으로 확인.</p>
+    </div>
+</div>
+
+<script>
+function positionalEncoding(seqLen, dModel) {
+    // 표준 sin/cos 포지셔널 인코딩 — 1.pe_visualize.py 의 sinusoidal_positional_encoding()과 동일 공식
+    const pe = [];
+    for (let pos = 0; pos < seqLen; pos++) {
+        const row = [];
+        for (let i = 0; i < dModel; i++) {
+            const divTerm = Math.pow(10000, (2 * Math.floor(i / 2)) / dModel);
+            const angle = pos / divTerm;
+            row.push(i % 2 === 0 ? Math.sin(angle) : Math.cos(angle));
+        }
+        pe.push(row);
+    }
+    return pe;
+}
+
+const canvas = document.getElementById('chart');
+const ctx = canvas.getContext('2d');
+const seqLenInput = document.getElementById('seqLen');
+const dModelInput = document.getElementById('dModel');
+const viewModeSelect = document.getElementById('viewMode');
+const seqLenVal = document.getElementById('seqLenVal');
+const dModelVal = document.getElementById('dModelVal');
+
+function valueToColor(v) {
+    // -1(파랑) ~ 0(흰색) ~ +1(빨강) — RdBu 스타일 diverging colormap
+    const t = (v + 1) / 2; // 0..1
+    if (t < 0.5) {
+        const k = t / 0.5;
+        const r = Math.round(255 * k + 0 * (1 - k)) * 0 + Math.round(70 + (255 - 70) * k);
+        const g = Math.round(90 + (255 - 90) * k);
+        const b = Math.round(180 + (255 - 180) * k);
+        return `rgb(${r},${g},${b})`;
+    } else {
+        const k = (t - 0.5) / 0.5;
+        const r = Math.round(255 - (255 - 180) * k);
+        const g = Math.round(255 - (255 - 30) * k);
+        const b = Math.round(255 - (255 - 50) * k);
+        return `rgb(${r},${g},${b})`;
+    }
+}
+
+function drawHeatmap(pe, seqLen, dModel) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const marginL = 60, marginT = 20, marginB = 40;
+    const w = canvas.width - marginL - 20;
+    const h = canvas.height - marginT - marginB;
+    const cellW = w / seqLen, cellH = h / dModel;
+
+    for (let pos = 0; pos < seqLen; pos++) {
+        for (let d = 0; d < dModel; d++) {
+            ctx.fillStyle = valueToColor(pe[pos][d]);
+            ctx.fillRect(marginL + pos * cellW, marginT + d * cellH, cellW + 0.5, cellH + 0.5);
+        }
+    }
+    ctx.fillStyle = '#333';
+    ctx.font = '12px Arial';
+    ctx.fillText('위치(position) →', marginL + w / 2 - 40, canvas.height - 10);
+    ctx.save();
+    ctx.translate(15, marginT + h / 2 + 30);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('차원(dimension) →', 0, 0);
+    ctx.restore();
+}
+
+function drawWave(pe, seqLen, dModel) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const marginL = 50, marginT = 20, marginR = 30, marginB = 40;
+    const w = canvas.width - marginL - marginR;
+    const h = canvas.height - marginT - marginB;
+    const midY = marginT + h / 2;
+
+    // 기준선
+    ctx.strokeStyle = '#ccc';
+    ctx.beginPath();
+    ctx.moveTo(marginL, midY);
+    ctx.lineTo(marginL + w, midY);
+    ctx.stroke();
+
+    const dimsToShow = [0, 1, Math.floor(dModel * 0.25), Math.floor(dModel * 0.25) + 1,
+                        Math.min(dModel - 2, Math.floor(dModel * 0.6)), Math.min(dModel - 1, Math.floor(dModel * 0.6) + 1)];
+    const colors = ['#e74c3c', '#e67e22', '#2ecc71', '#27ae60', '#3498db', '#2980b9'];
+    const uniqueDims = [...new Set(dimsToShow)].filter(d => d < dModel);
+
+    uniqueDims.forEach((d, ci) => {
+        ctx.strokeStyle = colors[ci % colors.length];
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let pos = 0; pos < seqLen; pos++) {
+            const x = marginL + (pos / (seqLen - 1)) * w;
+            const y = midY - pe[pos][d] * (h / 2 - 10);
+            if (pos === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.fillStyle = colors[ci % colors.length];
+        ctx.font = '11px Arial';
+        ctx.fillText(`dim ${d}`, marginL + w + 5 > canvas.width - 40 ? marginL + 5 + ci * 55 : marginL + w - 150 + ci * 25,
+                     marginT + 12 + ci * 0);
+    });
+    ctx.fillStyle = '#333';
+    ctx.fillText('위치(position) →', marginL + w / 2 - 40, canvas.height - 10);
+}
+
+function render() {
+    const seqLen = parseInt(seqLenInput.value);
+    const dModel = parseInt(dModelInput.value);
+    seqLenVal.textContent = seqLen;
+    dModelVal.textContent = dModel;
+    const pe = positionalEncoding(seqLen, dModel);
+    if (viewModeSelect.value === 'heatmap') drawHeatmap(pe, seqLen, dModel);
+    else drawWave(pe, seqLen, dModel);
+}
+
+[seqLenInput, dModelInput, viewModeSelect].forEach(el => el.addEventListener('input', render));
+render();
+</script>
+</body>
+</html>

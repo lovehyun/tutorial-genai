@@ -20,6 +20,10 @@ Transformer의 핵심인 Self-Attention이 실제로 어떤 단어에 주목하�
 | 파일 | 설명 |
 |------|------|
 | `1.attention_visualize.py` | BERT Attention 가중치 추출 및 히트맵 시각화 |
+| `2.qkv_visualize.py` | Q/K/V 행렬 추출 + QK^T→scale→softmax→×V 4단계를 직접 분해해서 시각화(이 폴더에서 가장 심화된 내용) |
+
+## 다음 단계
+- attention만으로는 "순서"를 모른다는 것 → [`../8.positional_encoding/`](../8.positional_encoding/)
 
 ## 설치
 

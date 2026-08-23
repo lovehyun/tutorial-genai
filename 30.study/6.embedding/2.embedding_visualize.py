@@ -13,7 +13,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 warnings.filterwarnings('ignore', message='Glyph .* missing from font')
 matplotlib.rcParams['font.family'] = 'sans-serif'
-matplotlib.rcParams['font.sans-serif'] = ['NanumGothic', 'DejaVu Sans']
+matplotlib.rcParams['font.sans-serif'] = ['Malgun Gothic', 'NanumGothic', 'AppleGothic', 'DejaVu Sans']
 matplotlib.rcParams['axes.unicode_minus'] = False
 
 MODEL_NAME = "paraphrase-multilingual-MiniLM-L12-v2"

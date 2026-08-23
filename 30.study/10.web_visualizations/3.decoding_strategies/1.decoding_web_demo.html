@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>디코딩 전략 인터랙티브 데모</title>
+<style>
+    body {
+        font-family: 'Malgun Gothic', 'Arial', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0; padding: 20px; min-height: 100vh;
+    }
+    .container {
+        max-width: 1100px; margin: 0 auto; background: rgba(255,255,255,0.97);
+        border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    h1 {
+        text-align: center; color: #2c3e50; font-size: 2.1em;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    p.subtitle { text-align: center; color: #555; margin-top: -10px; }
+    .prompt-box {
+        text-align: center; font-size: 1.2em; margin: 10px 0 20px;
+        color: #2c3e50; background: #f0f0ff; padding: 12px; border-radius: 10px;
+    }
+    .prompt-box .blank { color: #764ba2; font-weight: bold; }
+    .section { margin: 22px 0; padding: 20px; background: #f8f9fa; border-radius: 15px; border-left: 5px solid #667eea; }
+    .controls { display: flex; gap: 30px; flex-wrap: wrap; align-items: center; }
+    .control { display: flex; flex-direction: column; gap: 4px; }
+    label { font-weight: bold; color: #34495e; font-size: 0.9em; }
+    input[type=range] { width: 200px; }
+    .value-badge { display: inline-block; background: #667eea; color: white; border-radius: 6px; padding: 2px 8px; font-size: 0.85em; margin-left: 6px; }
+    #chart { width: 100%; }
+    .bar-row { display: flex; align-items: center; margin: 4px 0; }
+    .bar-label { width: 70px; text-align: right; padding-right: 8px; font-size: 0.9em; color: #333; font-weight: 600; }
+    .bar-track { flex: 1; background: #eee; border-radius: 4px; height: 22px; position: relative; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width 0.25s ease, background 0.25s ease; }
+    .bar-pct { width: 60px; padding-left: 8px; font-size: 0.85em; color: #555; }
+    button {
+        background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none;
+        padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: bold;
+    }
+    button:hover { opacity: 0.9; }
+    #sampleResult { text-align: center; font-size: 1.1em; margin-top: 14px; min-height: 1.4em; color: #2c3e50; }
+    .explain { color: #444; line-height: 1.6; font-size: 0.95em; }
+    .highlight { color: #764ba2; font-weight: bold; }
+    code { background: #eee; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>🎲 디코딩 전략 인터랙티브 데모</h1>
+    <p class="subtitle">30.study/9.decoding_strategies/1.decoding_visualize.py 의 브라우저 버전 — 실제 GPT-2 logit 값을 그대로 씀</p>
+    <div class="prompt-box">"The capital of France is <span class="blank">___</span>" 의 다음 토큰 후보 (실측 GPT-2 logits)</div>
+
+    <div class="section">
+        <div class="controls">
+            <div class="control">
+                <label>Temperature <span class="value-badge" id="tempVal">1.0</span></label>
+                <input type="range" id="temp" min="0.1" max="2.5" step="0.1" value="1.0">
+            </div>
+            <div class="control">
+                <label>Top-k(0=끄기) <span class="value-badge" id="topkVal">0</span></label>
+                <input type="range" id="topk" min="0" max="15" step="1" value="0">
+            </div>
+            <div class="control">
+                <label>Top-p(1.0=끄기) <span class="value-badge" id="toppVal">1.0</span></label>
+                <input type="range" id="topp" min="0.1" max="1.0" step="0.05" value="1.0">
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div id="chart"></div>
+    </div>
+
+    <div class="section" style="text-align:center;">
+        <button onclick="sampleToken()">🎲 이 분포에서 샘플링해보기</button>
+        <div id="sampleResult"></div>
+    </div>
+
+    <div class="section explain">
+        <p><span class="highlight">이 막대들이 어디서 왔나</span> — 진짜로 GPT-2(소형)에 "The capital of France is"를 넣고 뽑은
+        다음 토큰 logit 값이다(1.decoding_visualize.py 실행 결과와 동일 데이터). <b>1등이 "the"</b>이고 "Paris"는 5위밖에
+        안 된다 — 소형 모델은 생각보다 불확실하다는 걸 실제 데이터로 확인할 수 있다.
+        ⚠️ 단, 이 데모는 상위 15개 후보로만 정규화한다(실제 GPT-2는 5만 개 넘는 어휘 전체로 정규화한다) —
+        그래서 여기 보이는 %는 1.decoding_visualize.py가 출력한 실제 확률(예: "the" 8.4%)보다 크게 나온다.
+        <b>후보 간 상대적 비율과 temperature/top-k/top-p의 효과</b>를 보여주는 게 이 데모의 목적이다.</p>
+        <p><span class="highlight">Temperature</span>를 낮추면(0.1쪽) logit 차이가 과장되어 1등에 확률이 쏠리고,
+        높이면(2.5쪽) 거의 모든 후보가 비슷한 확률로 평평해진다.</p>
+        <p><span class="highlight">Top-k/Top-p</span>를 켜면 회색으로 바뀐 후보는 "샘플링 후보에서 제외"된 것이다 —
+        Top-k는 순위로, Top-p는 누적확률로 자른다는 차이를 슬라이더를 움직이며 비교해볼 것.</p>
+        <p>🎲 버튼을 여러 번 누르면 <b>같은 분포에서도 매번 다른 토큰이 뽑힐 수 있다</b>는 걸 직접 체감할 수 있다 —
+        이게 <code>do_sample=True</code>가 하는 일이다.</p>
+    </div>
+</div>
+
+<script>
+// 실측 GPT-2 logits — 30.study/9.decoding_strategies/1.decoding_visualize.py 로 직접 추출한 값
+const CANDIDATES = [
+    {token: "the", logit: -100.2498}, {token: "now", logit: -100.8175}, {token: "a", logit: -100.8555},
+    {token: "France", logit: -101.2101}, {token: "Paris", logit: -101.2142}, {token: "in", logit: -101.4052},
+    {token: "also", logit: -101.4141}, {token: "not", logit: -101.5167}, {token: "home", logit: -101.5371},
+    {token: "still", logit: -101.9462}, {token: "under", logit: -102.031}, {token: "located", logit: -102.0527},
+    {token: "on", logit: -102.0933}, {token: "one", logit: -102.2632}, {token: "known", logit: -102.4446},
+];
+
+const tempInput = document.getElementById('temp');
+const topkInput = document.getElementById('topk');
+const toppInput = document.getElementById('topp');
+const chart = document.getElementById('chart');
+
+function softmax(logits, temperature) {
+    const scaled = logits.map(l => l / temperature);
+    const maxL = Math.max(...scaled);
+    const exps = scaled.map(l => Math.exp(l - maxL));
+    const sum = exps.reduce((a, b) => a + b, 0);
+    return exps.map(e => e / sum);
+}
+
+function computeState() {
+    const temperature = parseFloat(tempInput.value);
+    const k = parseInt(topkInput.value);
+    const p = parseFloat(toppInput.value);
+
+    const logits = CANDIDATES.map(c => c.logit);
+    const probs = softmax(logits, temperature);
+
+    // 확률 내림차순으로 정렬한 인덱스
+    const order = probs.map((v, i) => i).sort((a, b) => probs[b] - probs[a]);
+
+    const kept = new Set(order);
+    if (k > 0) {
+        order.slice(k).forEach(i => kept.delete(i));
+    }
+    if (p < 1.0) {
+        let cum = 0;
+        for (const i of order) {
+            if (cum >= p) { kept.delete(i); continue; }
+            cum += probs[i];
+        }
+    }
+    return { probs, kept };
+}
+
+function render() {
+    document.getElementById('tempVal').textContent = parseFloat(tempInput.value).toFixed(1);
+    document.getElementById('topkVal').textContent = topkInput.value;
+    document.getElementById('toppVal').textContent = parseFloat(toppInput.value).toFixed(2);
+
+    const { probs, kept } = computeState();
+    const maxProb = Math.max(...probs);
+
+    chart.innerHTML = CANDIDATES.map((c, i) => {
+        const pct = (probs[i] * 100).toFixed(1);
+        const widthPct = (probs[i] / maxProb) * 100;
+        const isKept = kept.has(i);
+        const color = isKept ? (i === 0 ? '#c0392b' : '#667eea') : '#ccc';
+        return `<div class="bar-row">
+            <div class="bar-label">${c.token}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${widthPct}%;background:${color}"></div></div>
+            <div class="bar-pct">${pct}%</div>
+        </div>`;
+    }).join('');
+}
+
+function sampleToken() {
+    const { probs, kept } = computeState();
+    // kept 안에서만 재정규화 후 샘플링 — top-k/top-p가 켜져 있으면 그 후보 중에서만 뽑는다
+    const idxs = [...kept];
+    const keptProbs = idxs.map(i => probs[i]);
+    const sum = keptProbs.reduce((a, b) => a + b, 0);
+    const r = Math.random() * sum;
+    let acc = 0, chosen = idxs[0];
+    for (let j = 0; j < idxs.length; j++) {
+        acc += keptProbs[j];
+        if (r <= acc) { chosen = idxs[j]; break; }
+    }
+    const el = document.getElementById('sampleResult');
+    el.textContent = `→ "${CANDIDATES[chosen].token}" 선택됨 (확률 ${(probs[chosen] * 100).toFixed(1)}%)`;
+}
+
+[tempInput, topkInput, toppInput].forEach(el => el.addEventListener('input', render));
+render();
+</script>
+</body>
+</html>

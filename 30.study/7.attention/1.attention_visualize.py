@@ -12,7 +12,7 @@ from transformers import AutoTokenizer, AutoModel
 
 warnings.filterwarnings('ignore', message='Glyph .* missing from font')
 matplotlib.rcParams['font.family'] = 'sans-serif'
-matplotlib.rcParams['font.sans-serif'] = ['NanumGothic', 'DejaVu Sans']
+matplotlib.rcParams['font.sans-serif'] = ['Malgun Gothic', 'NanumGothic', 'AppleGothic', 'DejaVu Sans']
 matplotlib.rcParams['axes.unicode_minus'] = False
 
 

@@ -127,11 +127,11 @@ PTQ는 다시 **동적(Dynamic)**과 **정적(Static)** 양자화로 나뉩니�
 
 ### 실습: PyTorch 동적 양자화
 
-리포지토리의 `3.local/2.mymodel/3.quantization_save.py`를 참조한 양자화 실습입니다. PyTorch의 `torch.ao.quantization.quantize_dynamic`을 사용하여 선형 계층의 가중치를 INT8로 변환합니다.
+리포지토리의 `31.local/2.mymodel/3.quantization_save.py`를 참조한 양자화 실습입니다. PyTorch의 `torch.ao.quantization.quantize_dynamic`을 사용하여 선형 계층의 가중치를 INT8로 변환합니다.
 
 ```python
 # quantization_dynamic.py -- PyTorch 동적 양자화 실습
-# 참조: 3.local/2.mymodel/3.quantization_save.py
+# 참조: 31.local/2.mymodel/3.quantization_save.py
 
 import os, torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
@@ -174,11 +174,11 @@ for text in ["I love this product!", "This is terrible."]:
 
 ### 양자화 모델 로드 및 추론
 
-저장된 양자화 모델을 로드할 때는 동일한 구조를 먼저 생성한 뒤 가중치를 로드해야 합니다. 자세한 코드는 `3.local/2.mymodel/3.quantization_load.py`를 참조하세요. 핵심 흐름은 다음과 같습니다.
+저장된 양자화 모델을 로드할 때는 동일한 구조를 먼저 생성한 뒤 가중치를 로드해야 합니다. 자세한 코드는 `31.local/2.mymodel/3.quantization_load.py`를 참조하세요. 핵심 흐름은 다음과 같습니다.
 
 ```python
 # quantization_load.py -- 양자화 모델 로드 핵심 흐름
-# 참조: 3.local/2.mymodel/3.quantization_load.py
+# 참조: 31.local/2.mymodel/3.quantization_load.py
 
 # 1. 동일 구조의 모델을 생성하고 양자화 적용
 model = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased")
@@ -305,7 +305,7 @@ L1-norm 가지치기는 가장 직관적인 방법으로, 가중치의 절대값
 
 ```python
 # pruning_l1.py -- L1-norm 기반 비구조적 가지치기
-# 참조: 3.local/2.mymodel/5.pruning.py
+# 참조: 31.local/2.mymodel/5.pruning.py
 
 import torch
 import torch.nn.utils.prune as prune
@@ -422,11 +422,11 @@ total_loss = alpha * distill_loss + (1 - alpha) * ce_loss
 
 ### 실습: BERT -> DistilBERT 지식증류
 
-리포지토리의 `3.local/2.mymodel/7.knowledge_distillation.py`를 참조한 지식증류 실습입니다.
+리포지토리의 `31.local/2.mymodel/7.knowledge_distillation.py`를 참조한 지식증류 실습입니다.
 
 ```python
 # knowledge_distillation.py -- BERT -> DistilBERT 지식증류 핵심 코드
-# 참조: 3.local/2.mymodel/7.knowledge_distillation.py
+# 참조: 31.local/2.mymodel/7.knowledge_distillation.py
 
 import torch
 import torch.nn.functional as F
@@ -526,11 +526,11 @@ student_model.save_pretrained("./distilled_model")
 
 ### 실습: BERT 레이어 축소
 
-리포지토리의 `3.local/2.mymodel/4.layer_reduction.py`를 참조한 실습입니다.
+리포지토리의 `31.local/2.mymodel/4.layer_reduction.py`를 참조한 실습입니다.
 
 ```python
 # layer_reduction.py -- BERT 레이어 축소 실습
-# 참조: 3.local/2.mymodel/4.layer_reduction.py
+# 참조: 31.local/2.mymodel/4.layer_reduction.py
 
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
@@ -613,7 +613,7 @@ Transformer 모델에서 임베딩 레이어는 전체 파라미터의 상당 �
 
 ```python
 # vocab_reduction.py -- 어휘 축소 실습
-# 참조: 3.local/2.mymodel/6.vocab_reduction.py
+# 참조: 31.local/2.mymodel/6.vocab_reduction.py
 
 from transformers import AutoTokenizer
 from collections import Counter
@@ -779,11 +779,11 @@ for name, m in [("원본 FP32", original), ("INT8 양자화", quantized), ("6레
 
 ### Flask / FastAPI 서빙 연계
 
-경량화된 모델을 Flask 또는 FastAPI로 서빙하는 코드입니다. 기본 서빙 코드는 `3.local/3.huggingface/4.local4_neo27_flask.py`와 `4.local5_neo27_fastapi.py`를 참조하세요.
+경량화된 모델을 Flask 또는 FastAPI로 서빙하는 코드입니다. 기본 서빙 코드는 `31.local/3.huggingface/4.local4_neo27_flask.py`와 `4.local5_neo27_fastapi.py`를 참조하세요.
 
 ```python
 # optimized_server_flask.py -- 경량화 모델 Flask 서빙
-# 참조: 3.local/3.huggingface/4.local4_neo27_flask.py
+# 참조: 31.local/3.huggingface/4.local4_neo27_flask.py
 
 from flask import Flask, request, jsonify
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
@@ -811,7 +811,7 @@ if __name__ == "__main__":
     app.run(port=5000)
 ```
 
-FastAPI 버전에서는 `lifespan`으로 모델을 서버 시작 시 한 번만 로딩하고, `run_in_executor`로 동기 추론을 비동기로 감쌉니다. 자세한 패턴은 `3.local/3.huggingface/4.local5_neo27_fastapi.py`를 참조하세요.
+FastAPI 버전에서는 `lifespan`으로 모델을 서버 시작 시 한 번만 로딩하고, `run_in_executor`로 동기 추론을 비동기로 감쌉니다. 자세한 패턴은 `31.local/3.huggingface/4.local5_neo27_fastapi.py`를 참조하세요.
 
 ### 배포 환경별 권장 스택
 
@@ -899,14 +899,14 @@ def optimization_pipeline(model_name, output_dir, quantize=True, reduce_layers=N
 
 | 파일 | 기법 | 설명 |
 |---|---|---|
-| `3.local/2.mymodel/3.quantization_save.py` | 양자화 | PyTorch 동적 양자화 및 저장 |
-| `3.local/2.mymodel/3.quantization_load.py` | 양자화 | 양자화 모델 로드 및 추론 |
-| `3.local/2.mymodel/5.pruning.py` | 가지치기 | L1-norm 비구조적 가지치기 |
-| `3.local/2.mymodel/7.knowledge_distillation.py` | 지식증류 | BERT -> DistilBERT 증류 |
-| `3.local/2.mymodel/4.layer_reduction.py` | 레이어 축소 | BERT 상위 레이어 제거 |
-| `3.local/2.mymodel/6.vocab_reduction.py` | 어휘 축소 | 도메인 특화 어휘 최적화 |
-| `3.local/3.huggingface/4.local4_neo27_flask.py` | 서빙 | Flask 기반 모델 서빙 |
-| `3.local/3.huggingface/4.local5_neo27_fastapi.py` | 서빙 | FastAPI 기반 모델 서빙 |
+| `31.local/2.mymodel/3.quantization_save.py` | 양자화 | PyTorch 동적 양자화 및 저장 |
+| `31.local/2.mymodel/3.quantization_load.py` | 양자화 | 양자화 모델 로드 및 추론 |
+| `31.local/2.mymodel/5.pruning.py` | 가지치기 | L1-norm 비구조적 가지치기 |
+| `31.local/2.mymodel/7.knowledge_distillation.py` | 지식증류 | BERT -> DistilBERT 증류 |
+| `31.local/2.mymodel/4.layer_reduction.py` | 레이어 축소 | BERT 상위 레이어 제거 |
+| `31.local/2.mymodel/6.vocab_reduction.py` | 어휘 축소 | 도메인 특화 어휘 최적화 |
+| `31.local/3.huggingface/4.local4_neo27_flask.py` | 서빙 | Flask 기반 모델 서빙 |
+| `31.local/3.huggingface/4.local5_neo27_fastapi.py` | 서빙 | FastAPI 기반 모델 서빙 |
 
 ### 요약
 
