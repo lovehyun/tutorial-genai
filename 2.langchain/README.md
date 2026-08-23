@@ -13,9 +13,11 @@ LangChain 프레임워크를 활용한 LLM 애플리케이션 개발 예제입�
 | 5 | `5.tasks/` | **응용 태스크** | 요약 / 번역 / 이메일 / SQL 생성 (위 도구 종합 응용) |
 | 6 | `6.memory/` | 대화 메모리 | `RunnableWithMessageHistory`, ConversationMemory, LangGraph 체크포인팅 |
 | 7 | `7.RAG/` | RAG | 문서 로더, 텍스트 분할, 임베딩, 벡터스토어, 검색 + 생성 파이프라인 |
-| 8 | `8.agents/` | 에이전트 | 도구(`@tool`/`bind_tools`), `create_agent`, 검색 + **Agentic 패턴(9) · 미니앱(10)** 포함 |
+| 8 | `8.agents/` | 에이전트 | 도구(`@tool`/`bind_tools`), `create_agent`, 검색 + **Agentic 패턴(9) · 멀티에이전트(10) · 미니앱(20)** 포함 |
 | 9 | `9.langgraph/` | LangGraph | 상태 기반 그래프 워크플로우, `StateGraph`, `MemorySaver` |
 | 10 | `10.multimodal/` | (선택) 멀티모달 | 이미지 포함 메시지 (gpt-4o vision) — 필요할 때만 보면 OK |
+| 11 | `11.guardrails/` | 가드레일 | 입력 필터·프롬프트 인젝션 방어·출력 검증 — 여러 층을 겹쳐 쓰는 Defense in Depth |
+| 12 | `12.observability/` | 관찰가능성 | LangSmith 자동 트레이싱, 콜백 핸들러 — 왜 느리고 왜 그런 답이 나왔는지 보기 |
 
 > Anthropic 5대 디자인 패턴(Chaining/Routing/Parallelization/Orchestrator/Evaluator)은 `8.agents/9.agentic_patterns/` 로 이동했습니다.
 
@@ -38,6 +40,9 @@ LangChain 프레임워크를 활용한 LLM 애플리케이션 개발 예제입�
         ↓
 [고급 오케스트레이션]
 8.agents (9.agentic_patterns) → 9.langgraph
+
+[가드레일] 11.guardrails — 에이전트 전용이 아님, 아무 체인/챗봇에나 적용 가능
+[관찰가능성] 12.observability — 이것도 전용이 아님, LangSmith로 모든 체인을 트레이싱
 
 [부록] 10.multimodal — 이미지 입력 (필요할 때만 참고)
 ```

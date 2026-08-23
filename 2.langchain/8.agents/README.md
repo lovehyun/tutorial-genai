@@ -16,7 +16,6 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 ├── 5.langgraph_memory/           ← 메모리 (멀티턴 / 장기기억 / trim / sqlite 영속)
 ├── 6.hitl_streaming/             ← 사람 승인 / 스트리밍 UX
 ├── 7.routing/                    ← 다중 도구 라우팅 + 복합 시나리오
-├── 8.mcp/                        ← (포인터) MCP 는 최상위 /8.mcp 로 이전
 ├── 9.agentic_patterns/           ← Anthropic 5대 워크플로우 패턴 (체이닝/라우팅/병렬/오케스트레이터/평가자)
 ├── 10.multi_agent/               ← 멀티 에이전트 (에이전트를 도구로 / 슈퍼바이저)
 ├── 11.evaluation/                ← 에이전트 평가 (도구 선택 정확도 등 자동 검증)
@@ -26,6 +25,11 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 │                                    ← 학습 토픽이 아니라 '통합 앱' POC. 필요한 시점에 조립.
 └── README.md
 ```
+
+> 이 폴더는 **자체 tool calling**(빌트인/커스텀 도구, 라우팅, 멀티에이전트, 미들웨어 등)만 다룹니다.
+> 표준 프로토콜로 외부 서버의 도구를 가져다 쓰는 **MCP 연동은 [`5.mcp/4.langchain/`](../../5.mcp/4.langchain/)** 참고.
+> 가드레일(입력 필터·프롬프트 인젝션 방어·출력 검증 등 기법 전반)은 **[`2.langchain/11.guardrails/`](../11.guardrails/)** 참고
+> — `12.middleware/12.2_pii_guardrail.py`는 그중 미들웨어로 PII를 처리하는 한 가지 구현 사례입니다.
 
 > **방침**
 > - 메인 폴더 (1~12) 는 모두 **현행 API**: `create_agent` / `@tool` / `bind_tools` / `middleware`
@@ -51,8 +55,6 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
        ↓
 7.routing           ─ 다중 도구 + 복합 시나리오 (여행 플래너 등)
        ↓
-8.mcp               ─ MCP 표준 프로토콜로 외부 서버 도구 사용
-       ↓
 9.agentic_patterns  ─ Anthropic 5대 워크플로우 패턴 (체이닝/라우팅/병렬/오케스트레이터/평가자)
        ↓
 10.multi_agent      ─ 멀티 에이전트 (에이전트를 도구로 / 슈퍼바이저 / 병렬 분석)
@@ -73,7 +75,7 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 | `bind_tools()` + 수동 디스패치 | ✅ 저수준 표준 | 1-shot / 내부 이해 | `4.internals/4.1` |
 | `langchain.agents.create_agent` | ✅ **현행 표준** (LangChain 1.x) | **신규 권장** | 1~3, 5~7, 10 |
 | `langgraph.prebuilt.create_react_agent` | ⚠️ 구 위치 (deprecated 이동) | → `create_agent` 사용 | `2.custom_tools/2.1` 주석의 마이그레이션 노트 |
-| `MultiServerMCPClient` (MCP) | ✨ 표준 프로토콜 | 외부 도구 재사용 | `8.mcp/` |
+| `MultiServerMCPClient` (MCP) | ✨ 표준 프로토콜 | 외부 도구 재사용 | `5.mcp/4.langchain/` |
 
 > **마이그레이션:** `from langgraph.prebuilt import create_react_agent` → `from langchain.agents import create_agent`,
 > 인자 `prompt=` → `system_prompt=`. 사용법(`invoke`/`stream`/`checkpointer`/`interrupt_before`)은 동일.
@@ -95,7 +97,7 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 | 메서드 | 하는 일 | 배우는 곳 |
 |---|---|---|
 | `agent.invoke({"messages":[...]}, config=)` | 한 번 실행 → 최종 상태(dict) 반환 | 1.builtin_tools |
-| `agent.ainvoke(...)` | 비동기 실행 (MCP 등 async 도구) | 8.mcp |
+| `agent.ainvoke(...)` | 비동기 실행 (MCP 등 async 도구) | `5.mcp/4.langchain/` |
 | `agent.stream(..., stream_mode=...)` | 스트리밍 — `"updates"`(노드별) / `"messages"`(토큰) / `"values"`(전체 스냅샷) | 6.2 |
 
 ### 상태·메모리 (checkpointer 필요)
@@ -113,7 +115,7 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 | `config={"configurable":{"thread_id":...}}` | 세션 구분 키 (+ `recursion_limit` 등 실행 옵션) | 5.langgraph_memory, 4.3 |
 | `interrupt_before=["tools"]` | 도구 실행 **직전 정지** (사람 승인/수정) | 6.1, 6.2, 6.4, 6.5 |
 | `response_format=Pydantic` | 최종 답을 구조화 → `result["structured_response"]` | 2.6 |
-| `MultiServerMCPClient` | MCP 서버 도구 → LangChain 도구로 자동 변환 | 8.mcp |
+| `MultiServerMCPClient` | MCP 서버 도구 → LangChain 도구로 자동 변환 | `5.mcp/4.langchain/` |
 
 ## 폴더별 파일 상세
 
@@ -187,12 +189,13 @@ LLM 이 **도구를 자율적으로 사용**하여 작업을 수행하는 에이
 | `7.1_basic_routing.py` | 도구 여러 개 등록만 하면 LLM 이 알아서 선택. 별도 라우터 불필요 |
 | `7.2_complex_agent.py` | 여행 플래너 — 날씨/계산/위키 + 메모리 + 멀티턴 종합 |
 
-### `8.mcp/` — Model Context Protocol → 최상위 [`/8.mcp`](../../8.mcp/) 로 이전됨
-> MCP 는 provider/framework 중립 주제라 분량이 커서 **레포 최상위 [`8.mcp/`](../../8.mcp/)** 로 승격했습니다.
+### MCP (Model Context Protocol) — 이 폴더에는 없음
+> MCP 는 provider/framework 중립 주제라 이 폴더가 아니라 **레포 최상위 [`5.mcp/`](../../5.mcp/)** 에 있습니다.
 > 공통(서버 만들기·프로토콜) / openai / anthropic / langchain / vscode / projects 로 분류되어 있습니다.
 >
-> LangChain 에이전트에서 MCP 를 쓰는 부분만 보려면 → [`/8.mcp/4.langchain/`](../../8.mcp/4.langchain/)
-> (`0.quickstart` = adapters 빠른 시작, `1.langchain_agent` · `2.langchain_bridge` · `3.tools_safety` = 심화)
+> LangChain 에이전트에서 MCP 를 쓰는 부분만 보려면 → [`5.mcp/4.langchain/`](../../5.mcp/4.langchain/)
+> (`1.quickstart` = adapters 빠른 시작, `2.langchain_agent` · `3.langchain_bridge` · `4.tools_safety` = 심화,
+> `7.guardrails` = MCP 도구 호출에 특화된 가드레일 — 일반적인 가드레일 기법은 [`../11.guardrails/`](../11.guardrails/))
 
 ### `9.agentic_patterns/` — Anthropic 워크플로우 패턴
 > [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) 의 5대 패턴. 상세는 `9.agentic_patterns/README.md`.
@@ -300,7 +303,7 @@ result = agent.invoke({"messages": [("user", "질문")]})
 
 **Q. MCP 와 @tool 의 차이는?**
 → @tool 은 LangChain 안에서만 도구로 인식. MCP 는 표준 프로토콜이라 같은 서버를
-   Claude Desktop / Cursor / LangChain 등 어디서든 재사용 가능. `8.mcp/` 참고.
+   Claude Desktop / Cursor / LangChain 등 어디서든 재사용 가능. `5.mcp/4.langchain/` 참고.
 
 ## 관련 폴더
 
@@ -309,6 +312,8 @@ result = agent.invoke({"messages": [("user", "질문")]})
 - [`../6.memory/`](../6.memory/) — `MemorySaver` 가 에이전트 메모리의 핵심
 - [`../7.RAG/6.agentic/`](../7.RAG/6.agentic/) — RAG 에 에이전트 패턴 적용
 - [`../9.langgraph/`](../9.langgraph/) — LangGraph 본격 학습
+- [`../11.guardrails/`](../11.guardrails/) — 입력 필터·프롬프트 인젝션 방어·출력 검증 등 가드레일 기법 전반
+- [`../../5.mcp/4.langchain/`](../../5.mcp/4.langchain/) — MCP 표준 프로토콜로 외부 서버 도구 연동
 
 ## 설치 & 실행
 
@@ -318,7 +323,7 @@ pip install langchain langchain-openai langchain-community langgraph python-dote
 # 1.builtin_tools
 pip install wikipedia arxiv langchain-tavily
 
-# 8.mcp 는 최상위 /8.mcp 로 이전됨 — 설치/실행은 8.mcp/README.md 참고
+# MCP 는 이 폴더에 없음 — 설치/실행은 5.mcp/4.langchain/README.md 참고
 pip install mcp langchain-mcp-adapters          # LangChain↔MCP 연동 (+ 공식 서버는 Node.js 18+)
 
 # 10.multi_agent (10.3_finance_analyst 는 주가/뉴스 조회)

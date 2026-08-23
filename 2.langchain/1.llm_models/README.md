@@ -6,7 +6,7 @@
 
 1. **OpenAI API 두 종류** — Chat Completions vs Legacy Completions
 2. **Instruct Fine-tuning 개념** — Instruct 모델이란 무엇이고 파인튜닝과 어떤 관계인지
-3. **오픈소스 LLM 모델 비교** — GPT-2 / GPT-Neo / Mistral 등 학습/실습용 참고
+3. **오픈소스 LLM 모델 비교** — GPT-2 / GPT-Neo / Mistral 등 학습/실습용 참고 (+ Ollama로 실제 실행)
 4. **실무 가이드 (2026년 기준)** — 새 프로젝트에서 어떻게 선택할지
 5. **Reasoning 모델** — 답하기 전 "생각" 단계를 거치는 LLM (gpt-5, o-series, Claude thinking)
 
@@ -217,6 +217,18 @@ client.completions.create(
 | JSON 변환 | `Convert the following data into JSON format: name: Alice, age: 30, city: Paris` |
 
 > **비교 팁:** 같은 프롬프트를 GPT-2, GPT-Neo-2.7B, Mistral-7B-Instruct 등에 동일하게 입력해보면, Instruct 튜닝 여부에 따라 얼마나 다른 결과를 내는지 명확히 알 수 있습니다.
+
+### 3.4 직접 실행 — Ollama
+
+위 비교는 참고 자료였고, **실제로 로컬 모델을 돌려보는 예제**는 `3.1_ollama.py`입니다.
+`ChatOllama`는 `ChatOpenAI`와 인터페이스가 동일해서(`.invoke()`, `|` 체인 등) provider만
+바꾸면 기존 프롬프트/체인 코드를 그대로 재사용할 수 있습니다. API 키 없이 완전 무료·오프라인으로
+동작하며, `11.guardrails/`에서는 이 호환성을 이용해 OpenAI ↔ Ollama를 환경변수 하나로 전환합니다.
+
+```bash
+ollama pull qwen2.5:7b   # 최초 1회
+python 3.1_ollama.py
+```
 
 ---
 
