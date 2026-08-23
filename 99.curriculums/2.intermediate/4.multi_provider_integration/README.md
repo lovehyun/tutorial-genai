@@ -26,9 +26,9 @@
 | 13:30-14:00 | Claude 텍스트/벡터 | `3.anthropic/10.langchain/5.textloader.py`, `3.anthropic/10.langchain/6.vectorstore.py` | 텍스트 로더, 벡터스토어 연동 |
 | 14:00-14:30 | Claude 복합 체인 | `3.anthropic/10.langchain/7.complex.py` | 복합 체인 예제 |
 | 14:45-15:15 | Gemini 기초 & 채팅 | `4.google/1.basic/1.intro.py`, `4.google/1.basic/2.chat.py`, `4.google/1.basic/3.params.py` | Gemini API 기초 |
-| 15:15-15:45 | Gemini 멀티모달 | `4.google/2.multimodal/1.vision.py`, `4.google/2.multimodal/2.image_gen.py` | Gemini Vision, 이미지 생성 |
-| 15:45-16:15 | Gemini + LangChain | `4.google/3.langchain/1.intro.py`, `4.google/3.langchain/2.chain.py` | LangChain에서 Gemini 사용 |
-| 16:15-17:00 | Gemini Structured Output | `4.google/3.langchain/3.structured_output.py`, `4.google/1.basic/5.structured_output.py` | Gemini Structured Output, 종합 비교 |
+| 15:15-15:45 | Gemini 멀티모달 | `4.google/4.vision/1.vision.py`, `4.google/5.image_generation/2.image_gen.py` | Gemini Vision, 이미지 생성 |
+| 15:45-16:15 | Gemini + LangChain | `4.google/10.langchain/1.intro.py`, `4.google/10.langchain/2.chain.py` | LangChain에서 Gemini 사용 |
+| 16:15-17:00 | Gemini Structured Output | `4.google/10.langchain/3.structured_output.py`, `4.google/2.structured_output/1.structured_output.py` | Gemini Structured Output, 종합 비교 |
 
 ### Day 2: 코드리뷰 앱 — 멀티 프로바이더 실전
 

@@ -1,3 +1,15 @@
+# 🛑 이 파일은 더 이상 동작하지 않습니다 — 학습 히스토리로만 보존합니다.
+#
+# Imagen 3(`imagen-3.0-generate-002`)와 `client.models.generate_images()`는
+# **2026-08-17부로 서비스 종료**됐습니다. 이 코드를 그대로 실행하면 404/model-not-found 에러가 납니다.
+#
+# 무엇이 바뀌었는지 비교해보세요:
+#   - 모델: 이미지 전용 Imagen → 범용 Gemini 모델(`gemini-2.5-flash-image`)이 이미지까지 생성
+#   - API : client.models.generate_images() → client.interactions.create()
+#   - 응답: response.generated_images[i].image.image_bytes → interaction.output_image.data(base64)
+#
+# 현재 동작하는 버전은 → 2.image_gen.py
+
 # pip install google-genai python-dotenv Pillow
 
 import os
