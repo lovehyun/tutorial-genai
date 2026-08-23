@@ -18,7 +18,7 @@ MCP 를 **가장 처음** 만나는 곳. SDK 를 확인하고, `@mcp.tool()` 하
 ## 실행
 ```bash
 pip install mcp
-cd 8.mcp/1.basic/1.intro
+cd 5.mcp/1.basic/1.intro
 python 4.hello_client.py        # 3.hello_server 를 자동으로 띄워 호출 (LLM 불필요)
 ```
 

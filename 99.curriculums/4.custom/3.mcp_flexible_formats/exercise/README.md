@@ -47,9 +47,9 @@ instructor 전용 보너스 파일은 `{자리 알파벳}x` 로 표시한다 —
 
 | 파일 | 내용 | 원본 |
 |---|---|---|
-| `2a.mcp_math_local_server.py` / `2b.mcp_math_local_client.py` | mcp-math 로컬 연동(stdio) | [`8.mcp/2.openai/2.multi_tools/math_server.py`](../../../../8.mcp/2.openai/2.multi_tools/math_server.py) + `1.math_client.py` |
-| `2bx.mcp_math_local_client_debug.py`(**instructor 전용 보너스**) + `debug_proxy.py`(비실습, 지원용 — 세 폴더 모두 원본 그대로) | 2a 서버는 그대로 두고 클라이언트만 `debug_proxy.py`를 경유하도록 바꿔서, `call_tool` 한 줄이 실제로는 `initialize → list_tools → call_tool` JSON-RPC 왕복이라는 걸 로그로 직접 확인 | [`8.mcp/1.basic/2.protocol_deep/2.simple_client.py`](../../../../8.mcp/1.basic/2.protocol_deep/2.simple_client.py)(프록시 경유 방식) + [`debug_proxy.py`](../../../../8.mcp/1.basic/2.protocol_deep/debug_proxy.py) |
-| `2c.mcp_math_remote_server.py` / `2d.mcp_math_remote_client.py` | mcp-math 원격 연동(HTTP) — `mcp.run()` 한 줄만 다름 | [`4.langchain/5.remote_http/1.server_simple.py`](../../../../8.mcp/4.langchain/5.remote_http/1.server_simple.py) + `2.client_agent.py` |
+| `2a.mcp_math_local_server.py` / `2b.mcp_math_local_client.py` | mcp-math 로컬 연동(stdio) | [`5.mcp/2.openai/2.multi_tools/math_server.py`](../../../../5.mcp/2.openai/2.multi_tools/math_server.py) + `1.math_client.py` |
+| `2bx.mcp_math_local_client_debug.py`(**instructor 전용 보너스**) + `debug_proxy.py`(비실습, 지원용 — 세 폴더 모두 원본 그대로) | 2a 서버는 그대로 두고 클라이언트만 `debug_proxy.py`를 경유하도록 바꿔서, `call_tool` 한 줄이 실제로는 `initialize → list_tools → call_tool` JSON-RPC 왕복이라는 걸 로그로 직접 확인 | [`5.mcp/1.basic/2.protocol_deep/2.simple_client.py`](../../../../5.mcp/1.basic/2.protocol_deep/2.simple_client.py)(프록시 경유 방식) + [`debug_proxy.py`](../../../../5.mcp/1.basic/2.protocol_deep/debug_proxy.py) |
+| `2c.mcp_math_remote_server.py` / `2d.mcp_math_remote_client.py` | mcp-math 원격 연동(HTTP) — `mcp.run()` 한 줄만 다름 | [`4.langchain/5.remote_http/1.server_simple.py`](../../../../5.mcp/4.langchain/5.remote_http/1.server_simple.py) + `2.client_agent.py` |
 
 > **`2bx`가 왜 서버(2a)는 안 건드리고 클라이언트만 바꾸나**: debug_proxy는 클라↔서버 "사이"에
 > 끼는 중계자다 — 서버 코드는 한 글자도 안 바뀐다, 클라이언트가 접속 대상을 `2a` 대신
@@ -63,9 +63,9 @@ instructor 전용 보너스 파일은 `{자리 알파벳}x` 로 표시한다 —
 
 | 파일 | 내용 | 원본 |
 |---|---|---|
-| `3a.math_server.py` / `3b.utility_server.py`(비실습, 지원용) | 도메인이 다른 두 서버(계산 vs 시간·날씨) | [`8.mcp/2.openai/2.multi_tools/`](../../../../8.mcp/2.openai/2.multi_tools/) `math_server.py` + `utility_server.py` |
-| `3c.routing_manual.py` | **라우팅 1단계**: 키워드 규칙(`find_tool`/`extract_params`)으로 수동 선택, LLM 없음 | [`3.smart_client_manual.py`](../../../../8.mcp/2.openai/2.multi_tools/3.smart_client_manual.py) |
-| `3d.routing_llm_gpt.py` | **라우팅 2단계**: GPT function calling이 질의 보고 자동 선택 | [`4.smart_client_gpt.py`](../../../../8.mcp/2.openai/2.multi_tools/4.smart_client_gpt.py) |
+| `3a.math_server.py` / `3b.utility_server.py`(비실습, 지원용) | 도메인이 다른 두 서버(계산 vs 시간·날씨) | [`5.mcp/2.openai/2.multi_tools/`](../../../../5.mcp/2.openai/2.multi_tools/) `math_server.py` + `utility_server.py` |
+| `3c.routing_manual.py` | **라우팅 1단계**: 키워드 규칙(`find_tool`/`extract_params`)으로 수동 선택, LLM 없음 | [`3.smart_client_manual.py`](../../../../5.mcp/2.openai/2.multi_tools/3.smart_client_manual.py) |
+| `3d.routing_llm_gpt.py` | **라우팅 2단계**: GPT function calling이 질의 보고 자동 선택 | [`4.smart_client_gpt.py`](../../../../5.mcp/2.openai/2.multi_tools/4.smart_client_gpt.py) |
 
 `3a`/`3b`는 실습 대상이 아니다(서버는 클라이언트가 stdio로 자동 실행) — 실행에 필요해서 넣었다.
 
@@ -73,15 +73,15 @@ instructor 전용 보너스 파일은 `{자리 알파벳}x` 로 표시한다 —
 > "규칙 기반 → LLM 라우팅"으로 넘어가는 순간 자체가 목적이라 **LLM이 도구 스키마만 보고 뭘 부를지
 > 스스로 정하는 raw 메커니즘**을 한 겹 벗겨서 보여준다. LangChain `create_agent`도 내부적으론 같은 일을
 > 하지만 감싸서 안 보인다. 같은 라우팅을 LangChain으로 다시 보고 싶으면 —
-> [`4.langchain/1.quickstart/4.multi_server.py`](../../../../8.mcp/4.langchain/1.quickstart/4.multi_server.py) (포맷 1의 "시간 남으면" 보너스).
+> [`4.langchain/1.quickstart/4.multi_server.py`](../../../../5.mcp/4.langchain/1.quickstart/4.multi_server.py) (포맷 1의 "시간 남으면" 보너스).
 
 ## 섹션 4 — Human-in-the-loop
 
 | 파일 | 내용 | 원본 |
 |---|---|---|
-| `4a.hitl_approval_server.py`(비실습, 지원용) / `4b.hitl_approval_client.py` | HITL 승인 게이트(CLI) — `checkpointer`+`interrupt_before` 두 인자가 핵심 | [`8.mcp/4.langchain/6.human_in_loop/server.py`](../../../../8.mcp/4.langchain/6.human_in_loop/server.py) + `1.approval_gate.py` |
-| `4cx.hitl_auto_approve.py`(**instructor 전용 보너스**) | "항상 허용"을 한 번 고르면 같은 도구는 다음부턴 안 묻는다(`AUTO_APPROVED` 집합) — 4b를 확장 | 레포에 CLI 형태로는 없음 — `18.mcp_ops_assistant/4.auto_approve`의 아이디어를 이번 세션에서 CLI로 재구성 |
-| [`4dx.hitl_web_demo/`](1.instructor/4dx.hitl_web_demo/)(**instructor 전용 보너스**) | 같은 HITL을 웹 화면(승인 카드)으로 — CLI `input()` 대신 승인 대기 상태를 저장소에 남기고 재개하는 구조 | [`10.project/18.mcp_ops_assistant/2.hitl_approve/`](../../../../10.project/18.mcp_ops_assistant/2.hitl_approve/) |
+| `4a.hitl_approval_server.py`(비실습, 지원용) / `4b.hitl_approval_client.py` | HITL 승인 게이트(CLI) — `checkpointer`+`interrupt_before` 두 인자가 핵심 | [`5.mcp/4.langchain/6.human_in_loop/server.py`](../../../../5.mcp/4.langchain/6.human_in_loop/server.py) + `1.approval_gate.py` |
+| `4cx.hitl_auto_approve.py`(**instructor 전용 보너스**) | "항상 허용"을 한 번 고르면 같은 도구는 다음부턴 안 묻는다(`AUTO_APPROVED` 집합) — 4b를 확장 | 레포에 CLI 형태로는 없음 — `15.mcp_ops_assistant/4.auto_approve`의 아이디어를 이번 세션에서 CLI로 재구성 |
+| [`4dx.hitl_web_demo/`](1.instructor/4dx.hitl_web_demo/)(**instructor 전용 보너스**) | 같은 HITL을 웹 화면(승인 카드)으로 — CLI `input()` 대신 승인 대기 상태를 저장소에 남기고 재개하는 구조 | [`10.project/15.mcp_ops_assistant/2.hitl_approve/`](../../../../10.project/15.mcp_ops_assistant/2.hitl_approve/) |
 
 `4cx`/`4dx` 둘 다 `2.student(todo)`·`3.student(answer)`에는 없다 — 4시간 안에 다 못 다룰 수 있어
 **강사가 시간 남으면 보여주는 용도**로만 instructor 폴더에 넣었다. 둘 다 `4a`/`4b` 다음에

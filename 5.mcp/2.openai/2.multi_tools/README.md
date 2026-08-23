@@ -11,7 +11,7 @@
 
 ## 실행
 ```bash
-cd 8.mcp/2.openai/2.multi_tools
+cd 5.mcp/2.openai/2.multi_tools
 pip install mcp openai python-dotenv
 # .env 에 OPENAI_API_KEY  (gpt 버전만 필요)
 

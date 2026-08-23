@@ -42,7 +42,7 @@ result = await ctx.elicit(message="정말 지울까요?", schema=ConfirmDelete)
 ## 실행
 ```bash
 pip install mcp
-cd 8.mcp/1.basic/4.advanced/3.elicitation
+cd 5.mcp/1.basic/4.advanced/3.elicitation
 python client.py
 ```
 

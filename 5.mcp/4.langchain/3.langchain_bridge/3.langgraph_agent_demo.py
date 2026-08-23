@@ -1,7 +1,7 @@
 # 3.langgraph_agent_demo.py - create_agent (현행)
 # 옛 `from langgraph.prebuilt import create_react_agent` 는 `from langchain.agents import create_agent` 로 이동·대체됨.
 # create_agent 자체가 LangGraph 그래프(START→model→tools→END)이므로 이게 곧 'LangGraph 방식'이다.
-# (옛 문법 비교: 8.mcp/4.langchain/0.legacy(deprecated)/)
+# (옛 문법 비교: 5.mcp/4.langchain/0.legacy(deprecated)/)
 import asyncio
 from dotenv import load_dotenv
 

@@ -1,6 +1,6 @@
 # pip install anthropic python-dotenv
 #
-# 고급 5: Files API (beta) — 파일을 한 번 업로드하고 file_id 로 여러 번 재사용.
+# Files API (beta) — 파일을 한 번 업로드하고 file_id 로 여러 번 재사용.
 # 같은 문서에 질문을 여러 번 할 때 매번 업로드 안 해도 된다.
 # (실행하려면 같은 폴더에 doc.pdf 를 두거나 경로를 바꾸세요)
 

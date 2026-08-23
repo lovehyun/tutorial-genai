@@ -1,6 +1,6 @@
 # pip install anthropic python-dotenv
 #
-# 7단계: 생각하기(thinking) — 모델이 답하기 전에 내부 추론을 한다.
+# 7a단계: 생각하기(thinking) — 모델이 답하기 전에 내부 추론을 한다.
 # ★ 방식이 모델마다 다르다 (확인 안 하면 400 난다):
 #   - Haiku 4.5  : "extended thinking" → thinking={"type":"enabled","budget_tokens":N}
 #                  budget_tokens 는 max_tokens 보다 작아야 하고 최소 1024.

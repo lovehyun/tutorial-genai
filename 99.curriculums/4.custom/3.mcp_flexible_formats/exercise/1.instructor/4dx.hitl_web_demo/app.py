@@ -3,7 +3,7 @@
 # ══ 이 폴더에 대해 ══════════════════════════════════════════════
 #   4b.hitl_approval_client.py(CLI)의 웹 버전. 4시간 안에 다 못 다룰 수 있어
 #   instructor 전용 보너스로만 넣었다(student(todo)/answer 에는 없음).
-#   원본: 10.project/18.mcp_ops_assistant/2.hitl_approve/ (+ 공유 servers/)
+#   원본: 10.project/15.mcp_ops_assistant/2.hitl_approve/ (+ 공유 servers/)
 #   실행: pip install flask langgraph-checkpoint-sqlite (+ 4b와 같은 의존성) 후
 #         이 폴더에 .env(OPENAI_API_KEY) 넣고 python app.py → http://localhost:5082
 #

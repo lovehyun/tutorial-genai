@@ -3,7 +3,7 @@
 # 디버깅용 유틸리티. 이 실습의 교재 내용은 아니다 — 1g.hello_client.py 가 이 파일을 서버 대신
 # 자식 프로세스로 띄워서 사용한다 (원본 그대로, 수정 없이 사용).
 #
-# 원본: 8.mcp/1.basic/2.protocol_deep/debug_proxy.py
+# 원본: 5.mcp/1.basic/2.protocol_deep/debug_proxy.py
 
 import json
 import sys

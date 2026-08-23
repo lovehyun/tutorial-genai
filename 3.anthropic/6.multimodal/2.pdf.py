@@ -1,6 +1,6 @@
 # pip install anthropic python-dotenv
 #
-# 중급 2: PDF/문서 입력 — document 블록으로 PDF 를 통째로 넣어 질문한다.
+# 2단계: PDF/문서 입력 — document 블록으로 PDF 를 통째로 넣어 질문한다.
 # source 는 base64(로컬 파일) / url / text 를 지원.
 # (실행하려면 같은 폴더에 doc.pdf 를 두거나 경로를 바꾸세요)
 

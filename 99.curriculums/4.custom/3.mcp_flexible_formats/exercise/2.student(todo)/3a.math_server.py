@@ -1,7 +1,7 @@
 """
 5b/5c 라우팅 실습이 쓰는 지원 서버 — 이 파일 자체는 실습 대상이 아니다.
 
-원본: 8.mcp/2.openai/2.multi_tools/math_server.py
+원본: 5.mcp/2.openai/2.multi_tools/math_server.py
 """
 
 import sys

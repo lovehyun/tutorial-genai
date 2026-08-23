@@ -18,7 +18,7 @@
 
 ## 실행
 ```bash
-cd 8.mcp/2.openai/1.agent_tool        # 상대경로 server.py 를 쓰므로 반드시 폴더 안에서 실행
+cd 5.mcp/2.openai/1.agent_tool        # 상대경로 server.py 를 쓰므로 반드시 폴더 안에서 실행
 pip install mcp openai python-dotenv
 # .env 에 OPENAI_API_KEY  (gpt 버전만 필요)
 

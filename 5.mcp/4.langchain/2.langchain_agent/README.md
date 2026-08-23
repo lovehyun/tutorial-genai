@@ -14,7 +14,7 @@ MCP 도구를 LangChain `Tool`/`@tool` 로 **직접 감싸** `create_agent` 가 
 
 ## 실행
 ```bash
-cd 8.mcp/4.langchain/2.langchain_agent     # 상대경로 server.py 사용 → 폴더 안에서 실행
+cd 5.mcp/4.langchain/2.langchain_agent     # 상대경로 server.py 사용 → 폴더 안에서 실행
 pip install mcp langchain langchain-openai langchain-core python-dotenv
 # .env 에 OPENAI_API_KEY
 

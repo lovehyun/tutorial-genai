@@ -1,6 +1,6 @@
 # pip install anthropic python-dotenv
 #
-# 중급 7: 에러 처리 — SDK 의 타입별 예외로 상황을 구분한다.
+# 에러 처리 — SDK 의 타입별 예외로 상황을 구분한다.
 # 문자열 매칭("429" in str(e)) 대신 예외 "클래스"로 잡는 게 정석.
 # 참고: SDK 는 429(한도)·5xx(서버오류)를 자동 재시도한다(max_retries 로 조절, 기본 2).
 

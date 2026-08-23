@@ -10,7 +10,7 @@ mcp-math 원격 클라이언트 — 이미 떠 있는 2c.mcp_math_remote_server.
   터미널 1)  python 2c.mcp_math_remote_server.py   ← 먼저 서버를 띄워둔다
   터미널 2)  python 2d.mcp_math_remote_client.py
 
-원본: 8.mcp/4.langchain/5.remote_http/2.client_agent.py
+원본: 5.mcp/4.langchain/5.remote_http/2.client_agent.py
 """
 
 import asyncio

@@ -4,7 +4,7 @@
 # - @tool async → 동기 func + asyncio.run() 중첩(RuntimeError) 회피.
 #
 # (옛 create_react_agent + AgentExecutor + hub.pull → 현행 create_agent.
-#  옛 문법 비교: 8.mcp/4.langchain/0.legacy(deprecated)/2.langchain_agent_react_hub.py)
+#  옛 문법 비교: 5.mcp/4.langchain/0.legacy(deprecated)/2.langchain_agent_react_hub.py)
 
 import asyncio
 from dotenv import load_dotenv

@@ -49,7 +49,7 @@ customers ─1:N─ orders ─1:N─ order_items ─N:1─ products
 ## 실행 (로컬 SQLite, 완성본)
 ```bash
 pip install mcp python-dotenv
-cd 8.mcp/5.vscode/2.sql_helpers
+cd 5.mcp/5.vscode/2.sql_helpers
 python init_db.py        # sample.db 생성 (필수)
 python client.py         # 조인/집계 질의 + 읽기전용 가드 데모
 ```
@@ -58,7 +58,7 @@ python client.py         # 조인/집계 질의 + 읽기전용 가드 데모
 ## Claude Code 에 등록해서 자연어로 쓰기
 ```powershell
 # (mcp 깔린 python 필요 — 레포 루트 venv 권장)
-claude mcp add sql-helper -- "C:\...\tutorial-genai\.venv\Scripts\python.exe" "C:\...\tutorial-genai\8.mcp\5.vscode\2.sql_helpers\server.py"
+claude mcp add sql-helper -- "C:\...\tutorial-genai\.venv\Scripts\python.exe" "C:\...\tutorial-genai\5.mcp\5.vscode\2.sql_helpers\server.py"
 claude mcp list          # ✓ Connected 확인
 ```
 등록 후(재시작 뒤) **자연어로** 물으면 된다 — 도구는 `mcp__sql-helper__run_query` 등으로 노출:

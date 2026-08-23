@@ -1,6 +1,6 @@
 # pip install anthropic python-dotenv
 #
-# 중급 1: 비전(vision) — 이미지를 입력으로 넣어 분석한다.
+# 1단계: 비전(vision) — 이미지를 입력으로 넣어 분석한다.
 # content 리스트에 image 블록 + text 블록을 함께 넣는다.
 # 이미지 주는 법 2가지: 로컬 파일 base64(권장, 안정적) 또는 URL.
 # (실행하려면 같은 폴더에 image.png 를 두거나 경로를 바꾸세요)

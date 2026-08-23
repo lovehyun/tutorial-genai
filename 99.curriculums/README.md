@@ -99,8 +99,8 @@ API 호출과 기본 체이닝에 익숙한 학습자가 RAG, 에이전트, Lang
 |----------|--------|------|
 | `1.openai/` | 49 | OpenAI API, 챗봇, RAG, 스트리밍, 멀티모달 |
 | `2.langchain/` | 90 | LLM 모델, 프롬프트, 체이닝, 메모리, RAG, 에이전트, LangGraph |
-| `3.local/` | 57 | Transformers, HuggingFace, Ollama, GPT4All, 한국어 LLM |
-| `4.anthropic/` | 58 | Claude API, LangChain 통합, MCP 프로토콜 |
-| `7.google/` | 10 | Gemini API, 멀티모달, LangChain 통합 |
-| `12.study/` | 23 | Transformer 내부, BERT, 토크나이저, 임베딩, 어텐션 |
+| `3.anthropic/` | 58 | Claude API, LangChain 통합, MCP 프로토콜 |
+| `4.google/` | 10 | Gemini API, 멀티모달, LangChain 통합 |
+| `31.local/` | 57 | Transformers, HuggingFace, Ollama, GPT4All, 한국어 LLM |
+| `30.study/` | 23 | Transformer 내부, BERT, 토크나이저, 임베딩, 어텐션 |
 | `10.project/` | 82 | Flask 앱 프로젝트 (챗봇, 영어학습, 코드리뷰, 시험채점 등) |

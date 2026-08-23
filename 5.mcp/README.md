@@ -1,4 +1,4 @@
-# 8.mcp — Model Context Protocol
+# 5.mcp — Model Context Protocol
 
 > **MCP (Model Context Protocol)** = Anthropic 이 제안한 LLM ↔ 도구 표준 프로토콜.
 > 도구를 "MCP 서버" 라는 독립 프로세스로 만들면, 어떤 LLM 클라이언트(Claude Desktop,
@@ -7,8 +7,9 @@
 > 비유: USB 가 키보드·마우스·메모리·프린터를 한 포트로 통일했듯이, MCP 는
 > 도구 제공자 ↔ LLM 클라이언트 사이의 USB 가 되려는 것.
 
-이 폴더는 **provider/framework 중립**으로 MCP 를 다룬다. (원래 `4.anthropic/3.mcp` 와
-`2.langchain/8.agents/8.mcp` 에 흩어져 있던 것을 여기로 통합했다.)
+이 폴더는 **provider/framework 중립**으로 MCP 를 다룬다. (원래 `3.anthropic/3.mcp` 와
+`2.langchain/8.agents/8.mcp` 에 흩어져 있던 것을 여기로 통합했다 — 지금은 둘 다 이 폴더로 완전히
+이전됐고, 원래 있던 자리엔 흔적도 남아있지 않다.)
 
 ## 디렉토리 구조
 
@@ -26,7 +27,7 @@
 - **1.basic**
   - `1.intro/` — MCP 첫 접촉: SDK 확인 + hello 서버/클라이언트(첫 왕복). 상세: [`1.intro/README.md`](1.basic/1.intro/README.md)
   - `2.protocol_deep/` — 프로토콜 깊게: 도구·resource·prompt 발견 + `debug_proxy` 로 JSON-RPC 보기 + tool vs resource
-  - `3.transports/` — stdio vs HTTP 전송
+  - `3.transports_http/` — stdio vs HTTP 전송
   - `4.advanced/` — **양방향·Context 심화**: sampling / progress·logging / elicitation / roots. 상세: [`4.advanced/README.md`](1.basic/4.advanced/README.md)
 - **2.openai** — `1.agent_tool/`, `2.multi_tools/` (각 폴더: 공통 서버 + manual 클라이언트 → GPT 클라이언트 빌드업)
 - **3.anthropic** — `1.claude_desktop/` (Hello, 네트워크 서버, 파일 컨버터 등 Claude Desktop 등록용)
@@ -49,7 +50,7 @@
    2.openai/1.agent_tool       GPT function calling 으로 직접 (수동 → 자동 빌드업)
         ▼
 [3단계] 전송 방식 · 멀티 서버                                        난이도 ★★
-   1.basic/3.transports       stdio → HTTP(streamable-http)
+   1.basic/3.transports_http       stdio → HTTP(streamable-http)
    2.openai/2.multi_tools      여러 MCP 서버를 한 클라이언트에서
         ▼
 [4단계] 양방향·Context 심화 (프로토콜의 나머지 절반)                 난이도 ★★★
@@ -80,7 +81,7 @@
 
 ```bash
 pip install mcp
-cd 8.mcp/1.basic/1.intro && python 4.hello_client.py    # 첫 왕복 (LLM 불필요)
+cd 5.mcp/1.basic/1.intro && python 4.hello_client.py    # 첫 왕복 (LLM 불필요)
 ```
 - **폴더별 상세·관전 포인트는 각 폴더 README** 참고. 특히 [`1.basic/README`](1.basic/) 에 **tool / resource / prompt** 개념 정리.
 - 브라우저 클릭 테스트: `pip install "mcp[cli]"` → `mcp dev 1.basic/2.protocol_deep/5.server_tools_resource.py` (Node 18+ Inspector).
@@ -95,7 +96,7 @@ python -m venv .venv
 .venv\Scripts\activate            # Windows (PowerShell/CMD)
 # source .venv/bin/activate       # macOS / Linux
 
-pip install -r 8.mcp/requirements.txt   # mcp·uvicorn·openai·langchain 등 일괄
+pip install -r 5.mcp/requirements.txt   # mcp·uvicorn·openai·langchain 등 일괄
 
 # 공식 MCP 서버(filesystem 등) 실행용 — pip 아님, 별도
 node --version    # Node.js 18+ (npx)

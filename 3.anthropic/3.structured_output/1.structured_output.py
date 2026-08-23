@@ -1,6 +1,6 @@
 # pip install anthropic python-dotenv pydantic
 #
-# 중급 5: 구조화 출력 — 응답을 정해진 스키마(JSON)로 강제해 바로 파싱한다.
+# 구조화 출력 — 응답을 정해진 스키마(JSON)로 강제해 바로 파싱한다.
 # messages.parse() + Pydantic 모델이 가장 간단. parsed_output 으로 검증된 객체를 받는다.
 # (지원: Opus 4.8 / Sonnet 4.6 / Haiku 4.5)
 

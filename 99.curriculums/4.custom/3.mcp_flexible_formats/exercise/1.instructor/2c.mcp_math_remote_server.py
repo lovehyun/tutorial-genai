@@ -4,7 +4,7 @@ mcp-math 원격 서버 — 2a.mcp_math_local_server.py 와 같은 개념을, std
 
 실행:  python 2c.mcp_math_remote_server.py     → http://127.0.0.1:8000/mcp
 
-원본: 8.mcp/4.langchain/5.remote_http/1.server_simple.py
+원본: 5.mcp/4.langchain/5.remote_http/1.server_simple.py
 """
 
 from datetime import datetime

@@ -23,7 +23,7 @@
 ## 실행
 ```bash
 pip install mcp
-cd 8.mcp/1.basic/4.advanced/1.sampling
+cd 5.mcp/1.basic/4.advanced/1.sampling
 python client.py        # server.py 를 자식 프로세스로 띄운다
 ```
 

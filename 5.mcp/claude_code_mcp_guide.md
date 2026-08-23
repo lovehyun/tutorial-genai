@@ -152,7 +152,7 @@ claudeAiMcpEverConnected : [ ... "PlayMCP" ... ]                # "연결된 적
 
 ```powershell
 # (A) 그 폴더에서 자동 인식 — .mcp.json 이용
-cd 8.mcp\5.vscode\2.sql_helpers
+cd 5.mcp\5.vscode\2.sql_helpers
 python init_db.py                 # sql-helper 는 DB 먼저
 claude                            # 이 폴더에서 실행 → .mcp.json 발견 → 첫 사용 시 신뢰 승인
 

@@ -23,7 +23,7 @@
 ## 실행
 ```bash
 pip install mcp
-cd 8.mcp/1.basic/2.protocol_deep
+cd 5.mcp/1.basic/2.protocol_deep
 python 2.simple_client.py              # debug_proxy 경유 → 1.simple_server 호출, 프로토콜 메시지 출력
 python 4.simple_client3_getinfo.py     # tools/resources/prompts 발견
 python 6.client_tools_resource.py      # call_tool(실행) vs read_resource(읽기) 비교

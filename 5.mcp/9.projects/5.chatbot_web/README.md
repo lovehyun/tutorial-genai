@@ -21,7 +21,7 @@
 ## 실행
 ```bash
 pip install flask langchain-openai langchain-mcp-adapters langgraph python-dotenv
-# OPENAI_API_KEY 설정 (.env 또는 8.mcp/.env)
+# OPENAI_API_KEY 설정 (.env 또는 5.mcp/.env)
 python app.py        # → http://localhost:5050
 ```
 채팅창에 *"12 * 7 은?"*, *"지금 몇 시?"*, *"주사위 굴려줘"*, *"서울 날씨"* 입력 → 답변과 **🛠 사용한 도구** 표시.

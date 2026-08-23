@@ -4,7 +4,7 @@
 # 옛 방식의 문제: 동기 Tool(func) 내부에서 asyncio.run() → 이미 실행 중인 루프 안에서 호출되면
 #   RuntimeError: asyncio.run() cannot be called from a running event loop.
 # 현행 해결: @tool async + agent.ainvoke() → 하나의 이벤트 루프에서 await (중첩 없음).
-# (옛 문법 비교: 8.mcp/4.langchain/0.legacy(deprecated)/2.langchain_agent_react_prompttemplate.py)
+# (옛 문법 비교: 5.mcp/4.langchain/0.legacy(deprecated)/2.langchain_agent_react_prompttemplate.py)
 
 import asyncio
 from dotenv import load_dotenv

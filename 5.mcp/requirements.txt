@@ -1,11 +1,11 @@
-# 8.mcp 전체를 돌리기 위한 파이썬 의존성
+# 5.mcp 전체를 돌리기 위한 파이썬 의존성
 # 레포 최상위에 venv 하나 만들어 여기에 설치하는 걸 권장 (하위 폴더별 venv ✗)
 #
 #   # 레포 최상위(tutorial-genai/)에서 1번만
 #   python -m venv .venv
 #   .venv\Scripts\activate           # Windows (PowerShell/CMD)
 #   # source .venv/bin/activate      # macOS / Linux
-#   pip install -r 8.mcp/requirements.txt
+#   pip install -r 5.mcp/requirements.txt
 
 # ── 핵심(1.common / 9.projects): MCP 그 자체 ──────────────────
 mcp<2.0                   # MCP 파이썬 SDK (FastMCP, ClientSession) — 2.0.0 은 mcp.server.fastmcp 가

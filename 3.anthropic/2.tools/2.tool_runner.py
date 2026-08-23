@@ -1,7 +1,7 @@
 # pip install anthropic python-dotenv
 #
-# 중급 4: tool runner (beta) — 도구 호출 루프를 SDK 가 자동으로 돌려준다.
-# 3.tool_use.py 의 수동 루프(요청→실행→결과→재호출)를 @beta_tool + tool_runner 로 간단히.
+# 2단계: tool runner (beta) — 도구 호출 루프를 SDK 가 자동으로 돌려준다.
+# 1.tool_use.py 의 수동 루프(요청→실행→결과→재호출)를 @beta_tool + tool_runner 로 간단히.
 
 import os
 import anthropic

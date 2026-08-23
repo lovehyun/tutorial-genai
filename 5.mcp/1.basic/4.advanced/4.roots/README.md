@@ -19,7 +19,7 @@ filesystem 류 서버가 **허용 범위 밖 접근을 거부**할 때 쓴다(�
 ## 실행
 ```bash
 pip install mcp
-cd 8.mcp/1.basic/4.advanced/4.roots
+cd 5.mcp/1.basic/4.advanced/4.roots
 python client.py
 ```
 

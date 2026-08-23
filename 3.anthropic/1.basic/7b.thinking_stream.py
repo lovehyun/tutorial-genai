@@ -1,7 +1,7 @@
 # pip install anthropic python-dotenv
 #
-# 7-2단계: 생각(thinking)을 "스트리밍"으로 실시간 보기.
-# 7.thinking.py 는 호출이 끝난 뒤 블록을 출력했지만, 여기서는 생성되는 대로 흘려 받는다.
+# 7b단계: 생각(thinking)을 "스트리밍"으로 실시간 보기.
+# 7a.thinking.py 는 호출이 끝난 뒤 블록을 출력했지만, 여기서는 생성되는 대로 흘려 받는다.
 # 스트림 이벤트에서 thinking_delta(생각 조각) / text_delta(답변 조각) 를 구분해 출력한다.
 #
 # ★ Opus 4.7/4.8 은 생각이 기본 "omitted" 라 display:"summarized" 를 줘야 생각이 흐른다.

@@ -25,11 +25,11 @@
 
 ## 단계별 워크스루
 
-1. **이 폴더를 연다** — VSCode `File ▸ Open Folder…` 로 `8.mcp/5.vscode/1.dev_helpers` 를 연다.
+1. **이 폴더를 연다** — VSCode `File ▸ Open Folder…` 로 `5.mcp/5.vscode/1.dev_helpers` 를 연다.
    - `${workspaceFolder}` 가 이 폴더가 되어 `.vscode/mcp.json` 의 `server.py` 경로가 맞는다.
      (이 설정은 레포에 커밋돼 있어 복사 없이 바로 인식된다.)
    - (전체 레포를 열고 싶으면 레포 루트 `.vscode/mcp.json` 으로 옮기고
-     경로를 `${workspaceFolder}/8.mcp/5.vscode/1.dev_helpers/server.py` 로 바꾼다.)
+     경로를 `${workspaceFolder}/5.mcp/5.vscode/1.dev_helpers/server.py` 로 바꾼다.)
 2. **서버 시작** — `.vscode/mcp.json` 을 열면 `"dev-helper"` 항목 위에 **Start** 코드렌즈가 뜬다 → 클릭.
    - 또는 명령 팔레트(`Ctrl+Shift+P`) → **MCP: List Servers** → `dev-helper` → Start.
    - `python` 을 못 찾으면 `mcp.json` 의 `"command"` 를 venv python 절대경로로 바꾼다.
@@ -51,7 +51,7 @@
 
 ### 1) 확장 없이 — Inspector (가장 간단, 항상 가능)
 ```bash
-cd 8.mcp/5.vscode/1.dev_helpers
+cd 5.mcp/5.vscode/1.dev_helpers
 pip install "mcp[cli]"
 mcp dev server.py     # 브라우저 Inspector 에서 도구 클릭 호출 (add / word_count / to_snake_case)
 ```
@@ -65,7 +65,7 @@ Cline 의 **Configure MCP Servers** → `cline_mcp_settings.json` 에 추가(서
   "mcpServers": {
     "dev-helper": {
       "command": "python",
-      "args": ["C:/ABSOLUTE/PATH/TO/tutorial-genai/8.mcp/5.vscode/1.dev_helpers/server.py"]
+      "args": ["C:/ABSOLUTE/PATH/TO/tutorial-genai/5.mcp/5.vscode/1.dev_helpers/server.py"]
     }
   }
 }
@@ -79,7 +79,7 @@ mcpServers:
   - name: dev-helper
     command: python
     args:
-      - C:/ABSOLUTE/PATH/TO/tutorial-genai/8.mcp/5.vscode/1.dev_helpers/server.py
+      - C:/ABSOLUTE/PATH/TO/tutorial-genai/5.mcp/5.vscode/1.dev_helpers/server.py
 ```
 
 > 어느 쪽이든 핵심은 같다 — `command/args` 로 `server.py` 를 stdio 로 띄우는 것.
@@ -97,7 +97,7 @@ Playwright MCP(`npx @playwright/mcp`)를 띄우는 것과 **완전히 같은 구
 #   cd C:\...\tutorial-genai ; python -m venv .venv ; .venv\Scripts\activate ; pip install mcp
 
 # 등록 — 이름 dev-helper, 경로는 절대경로로 (CWD 흔들림 방지)
-claude mcp add dev-helper -- "C:\...\tutorial-genai\.venv\Scripts\python.exe" "C:\...\tutorial-genai\8.mcp\5.vscode\1.dev_helpers\server.py"
+claude mcp add dev-helper -- "C:\...\tutorial-genai\.venv\Scripts\python.exe" "C:\...\tutorial-genai\5.mcp\5.vscode\1.dev_helpers\server.py"
 
 # 확인
 claude mcp list          # ✓ Connected 확인 (대화형 세션에선 /mcp)
@@ -133,7 +133,7 @@ VSCode 에서 **본인 LLM(Cline/Continue + OpenAI·Anthropic 키)** 으로 *"�
   "mcpServers": {
     "codebase-qa": {
       "command": "python",
-      "args": ["C:/ABSOLUTE/PATH/tutorial-genai/8.mcp/9.projects/3.codebase_qa/server_docs.py"],
+      "args": ["C:/ABSOLUTE/PATH/tutorial-genai/5.mcp/9.projects/3.codebase_qa/server_docs.py"],
       "env": { "OPENAI_API_KEY": "sk-..." }
     },
     "repo-files": {
@@ -150,7 +150,7 @@ VSCode 에서 **본인 LLM(Cline/Continue + OpenAI·Anthropic 키)** 으로 *"�
 ### 써보기 (에이전트 채팅에서)
 - *"codebase-qa 로 **RAG 가 할루시네이션을 줄이는 원리** 를 찾아줘."* → `answer` 호출 → 문서 근거 답변
 - *"**코사인 유사도** 가 뭔지 우리 문서에서 검색해줘."* → `search` 호출 → 출처 청크
-- *"repo-files 로 `8.mcp/5.vscode/1.dev_helpers/server.py` 를 읽고 **to_snake_case 함수 본문** 만 보여줘."* → `read_file` → 스니펫
+- *"repo-files 로 `5.mcp/5.vscode/1.dev_helpers/server.py` 를 읽고 **to_snake_case 함수 본문** 만 보여줘."* → `read_file` → 스니펫
 - *"이 레포에서 create_agent 를 쓰는 파일들을 찾아 요약해줘."* → 파일 탐색 + 요약
 
 > 핵심: **에이전트가 "검색이 필요한지/파일을 읽을지" 스스로 판단**해 우리 MCP 도구를 호출한다.

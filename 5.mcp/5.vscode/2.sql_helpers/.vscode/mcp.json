@@ -1,6 +1,6 @@
 {
   // VSCode(1.102+) 워크스페이스 MCP 설정.
-  // 이 폴더(8.mcp/5.vscode/2.sql_helpers)를 VSCode 로 열면 ${workspaceFolder} = 이 폴더가 되어
+  // 이 폴더(5.mcp/5.vscode/2.sql_helpers)를 VSCode 로 열면 ${workspaceFolder} = 이 폴더가 되어
   // 아래 server.py 가 그대로 실행된다.
   //
   // 사전: `python init_db.py` 로 sample.db 생성 + (원격이면) .env 작성.

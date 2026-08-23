@@ -1,4 +1,4 @@
-# 18.mcp_ops_assistant — 사내 IT 비서: 웹 챗봇 × 다중 MCP × HITL × 서브에이전트 × 자동승인
+# 15.mcp_ops_assistant — 사내 IT 비서: 웹 챗봇 × 다중 MCP × HITL × 서브에이전트 × 자동승인
 
 챗봇에게 사내 업무(계정 생성·권한 부여·메일 발송)를 말로 시키면, 에이전트가 세 MCP 서버를 써서 처리한다.
 **되돌릴 수 없는 작업 앞에서는 멈춰 사람에게 물어보고**, 오래 걸리는 업무는 **백그라운드 담당자(서브에이전트)에게 위임**한다.
@@ -24,7 +24,7 @@
 
 이 프로젝트에서 배울 것 하나만 꼽으면 이것이다.
 
-CLI([8.mcp/4.langchain/6.human_in_loop](../../8.mcp/4.langchain/6.human_in_loop/))에서는 `input()` 으로 그 자리에서 멈추면 됐다.
+CLI([5.mcp/4.langchain/6.human_in_loop](../../5.mcp/4.langchain/6.human_in_loop/))에서는 `input()` 으로 그 자리에서 멈추면 됐다.
 프로세스가 통째로 기다린다. **웹은 요청/응답이라 블로킹할 수 없고**, 백그라운드 작업이면 물어볼 요청조차 없다.
 
 ```
@@ -83,10 +83,10 @@ pip install flask langchain langchain-openai langchain-mcp-adapters langgraph \
             langgraph-checkpoint-sqlite python-dotenv mcp
 # .env 에 OPENAI_API_KEY
 
-cd 10.project/18.mcp_ops_assistant/1.web_agent      && python app.py   # → localhost:5081
-cd 10.project/18.mcp_ops_assistant/2.hitl_approve   && python app.py   # → localhost:5082
-cd 10.project/18.mcp_ops_assistant/3.background_tasks && python app.py # → localhost:5083
-cd 10.project/18.mcp_ops_assistant/4.auto_approve    && python app.py # → localhost:5084
+cd 10.project/15.mcp_ops_assistant/1.web_agent      && python app.py   # → localhost:5081
+cd 10.project/15.mcp_ops_assistant/2.hitl_approve   && python app.py   # → localhost:5082
+cd 10.project/15.mcp_ops_assistant/3.background_tasks && python app.py # → localhost:5083
+cd 10.project/15.mcp_ops_assistant/4.auto_approve    && python app.py # → localhost:5084
 ```
 
 - MCP 서버는 **stdio 로 자동 실행**된다. 따로 띄울 필요 없다.
@@ -233,10 +233,10 @@ prod-db 권한도 줘                     ← 거부해 보기. AI 가 대안을
 
 | 주제 | 위치 |
 |---|---|
-| CLI 에서의 HITL (여기의 원형) | [8.mcp/4.langchain/6.human_in_loop](../../8.mcp/4.langchain/6.human_in_loop/) |
-| 서버가 직접 되묻는 방식 (elicitation) | [8.mcp/1.basic/4.advanced/3.elicitation](../../8.mcp/1.basic/4.advanced/3.elicitation/) |
-| 원격 HTTP MCP 서버로 바꾸기 | [8.mcp/4.langchain/5.remote_http](../../8.mcp/4.langchain/5.remote_http/) |
-| 웹 챗봇 + 다중 MCP 의 최소 형태 | [8.mcp/9.projects/6.multi_mcp_concierge](../../8.mcp/9.projects/6.multi_mcp_concierge/) |
+| CLI 에서의 HITL (여기의 원형) | [5.mcp/4.langchain/6.human_in_loop](../../5.mcp/4.langchain/6.human_in_loop/) |
+| 서버가 직접 되묻는 방식 (elicitation) | [5.mcp/1.basic/4.advanced/3.elicitation](../../5.mcp/1.basic/4.advanced/3.elicitation/) |
+| 원격 HTTP MCP 서버로 바꾸기 | [5.mcp/4.langchain/5.remote_http](../../5.mcp/4.langchain/5.remote_http/) |
+| 웹 챗봇 + 다중 MCP 의 최소 형태 | [5.mcp/9.projects/6.multi_mcp_concierge](../../5.mcp/9.projects/6.multi_mcp_concierge/) |
 
 ## 실무로 가져갈 때
 

@@ -9,7 +9,7 @@
 
 ## 실행
 ```bash
-cd 8.mcp/4.langchain/4.tools_safety
+cd 5.mcp/4.langchain/4.tools_safety
 pip install mcp langchain langchain-openai langchain-core python-dotenv
 # .env 에 OPENAI_API_KEY
 

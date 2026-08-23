@@ -144,7 +144,7 @@ tutorial-genai/
 ├── 1.openai/                  ← Day 22: OpenAI 웹서비스
 ├── 2.langchain/               ← Day 27: Agent 서비스 개발
 ├── 3.local/                   ← Day 23~24: HuggingFace, 다양한 모델
-├── 4.anthropic/               ← Day 24, 26: Claude API, MCP Agent
+├── 3.anthropic/               ← Day 24, 26: Claude API, MCP Agent
 ├── 5.stablediffusion/         ← Day 25: 이미지 생성 웹서비스
 ├── 9.nlp/                     ← Day 23: 자연어 처리 실습
 ├── 10.project/                ← Day 28~30: 미니 프로젝트

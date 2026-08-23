@@ -57,7 +57,7 @@ MCP 도구는 **남이 만든 서버**의 도구다. 이 폴더의 [server.py](s
 ## 실행
 
 ```bash
-cd 8.mcp/4.langchain/6.human_in_loop
+cd 5.mcp/4.langchain/6.human_in_loop
 pip install mcp langchain langchain-openai langchain-mcp-adapters langgraph python-dotenv
 # .env 에 OPENAI_API_KEY
 

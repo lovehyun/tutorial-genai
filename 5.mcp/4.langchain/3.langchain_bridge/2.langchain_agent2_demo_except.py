@@ -1,6 +1,6 @@
 # 2.langchain_agent2_demo_except.py - create_agent + 예외 처리 + 스트리밍 (현행)
 # 옛 create_react_agent + AgentExecutor.astream → create_agent + agent.astream(stream_mode=...).
-# (옛 문법 비교: 8.mcp/4.langchain/0.legacy(deprecated)/)
+# (옛 문법 비교: 5.mcp/4.langchain/0.legacy(deprecated)/)
 import asyncio
 from dotenv import load_dotenv
 

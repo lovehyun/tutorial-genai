@@ -2,7 +2,7 @@
 mcp-math 로컬 서버 — llm-math 와 같은 계산 개념을 MCP 서버로 노출한다.
 클라이언트가 stdio 로 이 파일을 자식 프로세스로 띄워 호출한다.
 
-원본: 8.mcp/2.openai/2.multi_tools/math_server.py
+원본: 5.mcp/2.openai/2.multi_tools/math_server.py
 """
 
 import sys

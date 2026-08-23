@@ -3,7 +3,7 @@
 안전한 도구(list_files, read_file)와 위험한 도구(delete_file, send_email)가 섞여 있다.
 이 서버는 아무 것도 막지 않는다 — 안전장치는 클라이언트(4b.hitl_approval_client.py) 쪽 몫이다.
 
-원본: 8.mcp/4.langchain/6.human_in_loop/server.py
+원본: 5.mcp/4.langchain/6.human_in_loop/server.py
 """
 
 from mcp.server.fastmcp import FastMCP

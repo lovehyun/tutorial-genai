@@ -1,6 +1,6 @@
 # pip install anthropic python-dotenv
 #
-# 중급 3: 도구 호출(tool use) — 모델이 직접 못 하는 일을 "도구"에 위임한다.
+# 1단계: 도구 호출(tool use) — 모델이 직접 못 하는 일을 "도구"에 위임한다.
 # 흐름: 도구 정의 → 모델이 tool_use 로 호출 요청 → 우리가 실행 → tool_result 로 돌려줌 → 최종 답.
 
 import os

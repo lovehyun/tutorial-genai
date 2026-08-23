@@ -66,7 +66,7 @@
 ## 실행 (각 폴더 공통)
 ```bash
 pip install mcp
-cd 8.mcp/1.basic/4.advanced/<폴더>
+cd 5.mcp/1.basic/4.advanced/<폴더>
 python client.py        # 각 폴더의 server.py 를 자식 프로세스로 띄운다
 ```
 

@@ -25,7 +25,7 @@
 ## 실행
 ```bash
 pip install flask langchain-openai langchain-mcp-adapters langgraph python-dotenv
-# OPENAI_API_KEY 설정 (.env 또는 8.mcp/.env)
+# OPENAI_API_KEY 설정 (.env 또는 5.mcp/.env)
 python app.py        # → http://localhost:5060
 ```
 - 단순: *"노트북 할인가?"* · *"캐리어 2개 주문"* · *"제주도 여행 예약"*

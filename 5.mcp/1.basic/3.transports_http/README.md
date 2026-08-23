@@ -12,11 +12,11 @@
 pip install mcp
 
 # 터미널 1 — 서버 먼저 (계속 떠 있음)
-cd 8.mcp/1.basic/3.transports_http
+cd 5.mcp/1.basic/3.transports_http
 python server_http.py        # localhost:8000 에서 대기
 
 # 터미널 2 — 클라이언트
-cd 8.mcp/1.basic/3.transports_http
+cd 5.mcp/1.basic/3.transports_http
 python client_http.py      # 실행 중인 서버에 HTTP 로 접속
 ```
 

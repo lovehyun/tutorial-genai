@@ -2,7 +2,7 @@
 mcp-math 로컬 클라이언트 — 2a.mcp_math_local_server.py 를 stdio 로 띄워 도구를 직접 호출한다.
 아직 LLM/에이전트는 없다 — 연결과 call_tool 이 되는지 raw 하게 확인만.
 
-원본: 8.mcp/2.openai/2.multi_tools/1.math_client.py
+원본: 5.mcp/2.openai/2.multi_tools/1.math_client.py
 """
 
 import sys

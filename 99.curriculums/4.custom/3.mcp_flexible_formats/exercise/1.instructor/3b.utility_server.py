@@ -3,7 +3,7 @@
 math_server.py 와 완전히 다른 도메인(시간/날씨)이라 "질의에 따라 다른 서버가 선택되는"
 라우팅이 눈에 보인다.
 
-원본: 8.mcp/2.openai/2.multi_tools/utility_server.py
+원본: 5.mcp/2.openai/2.multi_tools/utility_server.py
 """
 
 import logging

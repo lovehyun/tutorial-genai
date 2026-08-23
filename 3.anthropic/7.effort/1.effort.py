@@ -1,6 +1,6 @@
 # pip install anthropic python-dotenv
 #
-# 고급 1: effort 파라미터 — 생각 깊이/토큰 소비를 조절한다.
+# effort 파라미터 — 생각 깊이/토큰 소비를 조절한다.
 # output_config={"effort": "low"|"medium"|"high"|"max"}  (high 가 기본)
 # ★ Opus / Sonnet 4.6 만 지원. Haiku 4.5 / Sonnet 4.5 에 보내면 에러. "max" 는 Opus 전용.
 

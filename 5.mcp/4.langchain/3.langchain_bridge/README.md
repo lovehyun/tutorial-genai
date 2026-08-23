@@ -20,7 +20,7 @@ LangChain ReAct 에이전트와 LangGraph 에이전트에 각각 연결한다.
 
 ## 실행
 ```bash
-cd 8.mcp/4.langchain/3.langchain_bridge
+cd 5.mcp/4.langchain/3.langchain_bridge
 pip install -r requirements.txt        # langchain · langgraph · mcp · openai 등
 # .env 에 OPENAI_API_KEY
 

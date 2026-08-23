@@ -3,7 +3,7 @@
 5c(GPT 라우팅)의 '이전 단계' — 규칙 기반 선택이 얼마나 번거로운지 체감한다.
 AsyncExitStack 으로 여러 서버 세션을 main 끝까지 동시에 유지.
 
-원본: 8.mcp/2.openai/2.multi_tools/3.smart_client_manual.py
+원본: 5.mcp/2.openai/2.multi_tools/3.smart_client_manual.py
 """
 
 import re

@@ -1,6 +1,6 @@
 # 1.client.py - 제한 없는 기본 에이전트 (현행 create_agent)
 # 등록된 도구(hello/add/now)는 쓰되, 범위 밖 요청은 LLM 이 임의로 답할 수 있음 → 2.client2_restrict 와 대비.
-# (옛 create_react_agent + AgentExecutor + hub → create_agent. 비교: 8.mcp/4.langchain/0.legacy(deprecated)/)
+# (옛 create_react_agent + AgentExecutor + hub → create_agent. 비교: 5.mcp/4.langchain/0.legacy(deprecated)/)
 import asyncio
 import re
 from typing import Type

@@ -19,8 +19,8 @@ pip install anthropic python-dotenv
 | `4.streaming.py` | 스트리밍 출력 | Sonnet |
 | `5.params.py` | max_tokens / temperature + 모델별 주의 | Haiku |
 | `6.models.py` | haiku/sonnet/opus 비교 + 기능표 | 셋 다 |
-| `7.thinking.py` | 생각하기 (adaptive vs budget_tokens) | Opus/Haiku |
-| `7.thinking_stream.py` | 생각 과정을 스트리밍으로 실시간 보기 | Opus |
+| `7a.thinking.py` | 생각하기 (adaptive vs budget_tokens) | Opus/Haiku |
+| `7b.thinking_stream.py` | 생각 과정을 스트리밍으로 실시간 보기 | Opus |
 | `8.response.py` | 응답 객체(블록/stop_reason/usage) + 토큰 세기 | Sonnet |
 
 ## 모델별 규격 차이 (꼭 기억)

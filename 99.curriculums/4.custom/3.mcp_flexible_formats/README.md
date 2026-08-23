@@ -6,7 +6,7 @@
 - **대상**: 강사가 청중·가용 시간에 맞춰 포맷을 고르는 용도. 파일명까지 못박은 정식 3일 심화 과정은 [`3.advanced/1.mcp_protocol_deep_dive`](../../3.advanced/1.mcp_protocol_deep_dive/) 참고
 - **선수 과목**: LLM tool-calling/에이전트 개념을 한 번은 접해본 사람(복습으로 다시 훑는다). 완전 초심자면 [`2.intermediate/2.agent_development`](../../2.intermediate/2.agent_development/) 선행 권장
 
-같은 교재([`8.mcp/`](../../../8.mcp/))로 **수업 길이·일수**에 맞춰 짜는 커리큘럼 모음.
+같은 교재([`5.mcp/`](../../../5.mcp/))로 **수업 길이·일수**에 맞춰 짜는 커리큘럼 모음.
 **모듈(레고 블록)** 을 먼저 정의하고, **시간 포맷**(4H / 8H / 16H×2day)별로 조합한다.
 
 ## 구성 파일

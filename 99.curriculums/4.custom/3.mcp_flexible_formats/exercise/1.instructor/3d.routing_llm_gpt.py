@@ -4,7 +4,7 @@ math_server + utility_server 의 도구를 한데 모아 OpenAI 에 넘기고,
 GPT 가 고른 도구를 '그 도구를 가진 서버 세션' 으로 실행한다.
 (3c.routing_manual = 키워드 규칙 / 여기 = LLM 자동)
 
-원본: 8.mcp/2.openai/2.multi_tools/4.smart_client_gpt.py
+원본: 5.mcp/2.openai/2.multi_tools/4.smart_client_gpt.py
 """
 
 import json

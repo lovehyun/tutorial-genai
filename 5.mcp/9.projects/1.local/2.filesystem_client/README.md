@@ -12,7 +12,7 @@
 ## 실행
 ```bash
 pip install mcp langchain-openai openai python-dotenv
-# 키: 8.mcp/.env 또는 이 폴더 .env 에 OPENAI_API_KEY
+# 키: 5.mcp/.env 또는 이 폴더 .env 에 OPENAI_API_KEY
 python 1.fs_mcp_client.py
 ```
 > 셋 다 `../1.filesystem/server/server.py`(4툴)를 자식 프로세스로 띄운다(`cwd`로 workspace 지정).

@@ -37,7 +37,7 @@
 ## 실행
 
 ```bash
-cd 8.mcp/4.langchain/5.remote_http
+cd 5.mcp/4.langchain/5.remote_http
 pip install mcp yfinance langchain langchain-openai langchain-mcp-adapters langgraph python-dotenv
 # .env 에 OPENAI_API_KEY
 

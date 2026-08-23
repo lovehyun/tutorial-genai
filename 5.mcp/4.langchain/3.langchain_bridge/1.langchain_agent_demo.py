@@ -1,6 +1,6 @@
 # 2.langchain_agent_demo.py - MCPBridge + create_agent (현행 LangChain 1.x)
 # 옛 create_react_agent + AgentExecutor + hub.pull → create_agent 한 줄로 통합.
-# (옛 문법 비교: 8.mcp/4.langchain/0.legacy(deprecated)/)
+# (옛 문법 비교: 5.mcp/4.langchain/0.legacy(deprecated)/)
 import asyncio
 from dotenv import load_dotenv
 

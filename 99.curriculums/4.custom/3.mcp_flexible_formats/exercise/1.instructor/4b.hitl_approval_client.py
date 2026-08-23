@@ -8,7 +8,7 @@
 실행:
   python 4b.hitl_approval_client.py     ← 4a.hitl_approval_server.py 는 stdio 로 자동 실행된다
 
-원본: 8.mcp/4.langchain/6.human_in_loop/1.approval_gate.py
+원본: 5.mcp/4.langchain/6.human_in_loop/1.approval_gate.py
 """
 
 import asyncio

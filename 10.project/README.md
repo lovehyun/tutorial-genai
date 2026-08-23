@@ -45,7 +45,7 @@ OpenAI API · LangChain · LangGraph 를 활용한 실전 프로젝트 모음.
 | `15.todo_chatbot/` | **Todo + 챗봇** (3단계 빌드업) | G | ★★ | Flask, SQLite, `@tool`, `create_react_agent` |
 | `16.airline_chatbot/` | **항공 예약 + 챗봇 + 상담사 연결** (3단계 빌드업) | G | ★★★ | Flask, SQLite, 권한 분리, 폴링 채팅 |
 | `17.mcp_marketplace/` | MCP 마켓플레이스 | E | ★★★ | MCP 게이트웨이, 등록/구독, Docker |
-| `18.mcp_ops_assistant/` | **사내 IT 비서 — 다중 MCP + 사람 승인 + 서브에이전트** (4단계 빌드업) | G | ★★★ | MCP 3개, LangGraph interrupt, 체크포인터, 백그라운드 워커 |
+| `15.mcp_ops_assistant/` | **사내 IT 비서 — 다중 MCP + 사람 승인 + 서브에이전트** (4단계 빌드업) | G | ★★★ | MCP 3개, LangGraph interrupt, 체크포인터, 백그라운드 워커 |
 
 ---
 
@@ -135,7 +135,7 @@ LLM 이 도구를 능동적으로 호출.
 - 챗봇 한계 인지 → 사람 상담사 에스컬레이션 패턴
 - WebSocket 없이 폴링만으로 실시간 채팅 구현
 
-### `18.mcp_ops_assistant/` — 사내 IT 비서: 다중 MCP + 사람 승인 + 서브에이전트 (★★★)
+### `15.mcp_ops_assistant/` — 사내 IT 비서: 다중 MCP + 사람 승인 + 서브에이전트 (★★★)
 
 > 각 단계 폴더의 `CHANGES.md` 에 이전 단계 대비 변경점만 짧게 정리돼 있다 (라이브 업그레이드용).
 
@@ -162,6 +162,6 @@ LLM 이 도구를 능동적으로 호출.
 |---|---|---|---|---|
 | A.1.chatbot_gui | A.1.chatbot_gui | D.13.document_qa | E.10.ai_agent | G.15.todo_chatbot |
 | → B/C 적당히 | → A.1.agents | → D.7.job_match | → E.12.nas_mcp | → G.16.airline_chatbot |
-| | | | → E.17.mcp_marketplace | → G.18.mcp_ops_assistant |
+| | | | → E.17.mcp_marketplace | → G.15.mcp_ops_assistant |
 
 각 프로젝트 폴더에 자체 `README.md` 가 있으니 자세한 내용은 거기에서.

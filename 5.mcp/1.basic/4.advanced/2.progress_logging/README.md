@@ -17,7 +17,7 @@
 ## 실행
 ```bash
 pip install mcp
-cd 8.mcp/1.basic/4.advanced/2.progress_logging
+cd 5.mcp/1.basic/4.advanced/2.progress_logging
 python client.py
 ```
 

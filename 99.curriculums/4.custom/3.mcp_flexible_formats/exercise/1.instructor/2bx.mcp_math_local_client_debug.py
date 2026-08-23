@@ -8,7 +8,7 @@
   debug_proxy 가 클라↔서버 사이에 끼어 모든 메시지를 debug_proxy.log 에 기록한다.
   (프록시 없이 서버에 바로 붙는 원래 방식이 2b — args=[SERVER_FILE] 로만 바뀐 거였다)
 
-원본: 8.mcp/1.basic/2.protocol_deep/2.simple_client.py(프록시 경유 방식) + 이 폴더의 2b
+원본: 5.mcp/1.basic/2.protocol_deep/2.simple_client.py(프록시 경유 방식) + 이 폴더의 2b
 """
 
 import os
