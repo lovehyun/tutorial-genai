@@ -185,6 +185,7 @@ chain = (
 | `10.1_production_fallback_retry.py` | async + 수동 retry + timeout + 다단계 fallback 시나리오 (가장 복잡) |
 | `10.2_with_fallbacks.py` | `.with_fallbacks([backup_chain, last_resort])` — 주 체인 실패 시 백업 체인 자동 호출 |
 | `10.3_llm_cache.py` | `set_llm_cache(InMemoryCache())` — 동일 입력 재호출 시 LLM 호출 자체 생략 (비용 0) |
+| `10.4_semantic_cache.py` | 완전히 같은 문자열이 아니라 "의미가 비슷한 질문"도 캐시로 잡는 semantic cache — 임베딩 유사도 threshold를 보수적/느슨하게 잡았을 때의 실제 트레이드오프(캐시 적중률 vs 오답 사고)를 실측 |
 
 > 단순 재시도/태깅은 `9.config_retry/` 빌트인이 더 깔끔합니다. 10번은 더 세밀한 컨트롤이 필요한 경우용.
 

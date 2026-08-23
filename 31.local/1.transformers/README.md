@@ -28,6 +28,7 @@ HuggingFace `transformers` 로 **트랜스포머 모델이 안에서 무슨 일�
 | `4.1_decoding_strategies.py` | greedy / beam / sampling / top-k / top-p 비교 |
 | `5.1_attention.py` | 토큰이 어디를 주목하는지 attention 가중치 시각화 |
 | `5.2_headwise_attention.py` | 헤드별 entropy / top-k 주목 토큰 (심화) |
+| `7.1_perplexity_eval.py` | 생성 품질을 숫자로 비교 — Perplexity(cross-entropy loss의 exp) |
 
 ### 부록 — 응용(통합 · 서빙)
 

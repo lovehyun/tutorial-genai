@@ -14,6 +14,9 @@ Transformer가 텍스트를 이해하고 생성하는 전 과정을 순서대로
 | [`8.positional_encoding/`](8.positional_encoding/) | 포지셔널 인코딩 | 어텐션은 왜 순서를 모르는가, sin/cos로 어떻게 주입하는가 |
 | [`9.decoding_strategies/`](9.decoding_strategies/) | 디코딩/샘플링 | temperature·top-k·top-p가 확률 분포를 어떻게 바꾸는가 |
 | [`11.training_objectives/`](11.training_objectives/) | 학습 목적함수 | Causal LM(GPT) vs Masked LM(BERT) — loss가 어디서 계산되는가 |
+| [`12.kv_cache/`](12.kv_cache/) | KV 캐시 | 매 스텝 처음부터 재계산 안 하는 이유 — 속도 실측 + 결과 동일성 증명 |
+| [`13.rnn_vs_transformer/`](13.rnn_vs_transformer/) | RNN vs Transformer | 기울기 소실·병렬화를 직접 측정해 Transformer가 RNN을 대체한 이유를 확인 |
+| [`14.instruction_tuning/`](14.instruction_tuning/) | Instruction Tuning | base 모델 vs instruction-tuned 모델 — 같은 질문에 대한 응답 비교 |
 | [`1.transformer/`](1.transformer/) | 사전학습 모델 활용 | `sentence-transformers`로 의미 검색 |
 | [`2.bert/`](2.bert/) | BERT 파인튜닝 | 감성분류·토픽분류 직접 학습 |
 | [`4.korean_nlp/`](4.korean_nlp/) | 한국어 NLP | 형태소 분석, 전처리 |
@@ -26,9 +29,15 @@ Transformer가 텍스트를 이해하고 생성하는 전 과정을 순서대로
 5.tokenizer → 6.embedding → 7.attention → 8.positional_encoding
    (텍스트를 토큰으로, 토큰을 벡터로, 벡터 간 관계를 attention으로, 순서 정보를 추가로)
         ▼
+13.rnn_vs_transformer                (왜 하필 attention 구조인가 — RNN 대비 기울기 소실/병렬화 실측)
+        ▼
 11.training_objectives              ("그래서 이걸로 뭘 배우나" — GPT vs BERT가 다른 문제를 품)
         ▼
 9.decoding_strategies                (학습된 모델이 다음 토큰을 실제로 어떻게 고르는가)
+        ▼
+12.kv_cache                          (생성할 때 매 스텝 처음부터 다시 계산하지 않는 이유)
+        ▼
+14.instruction_tuning                (사전학습만 된 모델과 instruction-tuned 모델은 뭐가 다른가)
         ▼
 1.transformer, 2.bert, 4.korean_nlp  (사전학습 모델을 실전에서 쓰기 — 의미 검색, 파인튜닝, 한국어)
         ▼
