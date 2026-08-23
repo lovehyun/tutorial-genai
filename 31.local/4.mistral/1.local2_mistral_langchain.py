@@ -12,7 +12,7 @@ model_name = "mistralai/Mistral-7B-Instruct-v0.3"
 
 # 모델 및 토크나이저 로드
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto")
+model = AutoModelForCausalLM.from_pretrained(model_name, dtype="auto")
 
 # 파이프라인 설정
 generator = pipeline(

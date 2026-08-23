@@ -1,7 +1,7 @@
 """
 (1) 기본 대화 — EXAONE 3.5 와 단일/멀티 턴 대화
 EXAONE 3.5 = LG AI Research 의 한국어 강한 오픈 LLM (Ollama 로 로컬 실행).
-호출은 ollama 파이썬 SDK 사용 (REST 대비 간단 — 비교는 6.ollama1_restapi vs 6.ollama2_sdk).
+호출은 ollama 파이썬 SDK 사용 (REST 대비 간단 — 비교는 1.restapi vs 2.sdk).
 
 준비: pip install ollama  +  ollama pull exaone3.5   (가벼운 버전: exaone3.5:2.4b)
 """

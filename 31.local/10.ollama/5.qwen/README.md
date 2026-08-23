@@ -1,10 +1,10 @@
-# 8.ollama_qwen — Qwen 으로 한국어 NLP 태스크 (Ollama)
+# 5.qwen — Qwen 으로 한국어 NLP 태스크 (Ollama)
 
 **Qwen**(Alibaba) 한 모델로 한국어 NLP 태스크들을 프롬프트만으로 처리합니다.
 전부 **Ollama** 로 로컬 실행하며, 예제는 따라하기 쉽게 짧게 구성했습니다.
 
 > Qwen 은 **Apache 2.0**(상업 사용 자유) + 다국어(한국어 포함) 균형이 장점입니다.
-> 한국어 자연스러움이 더 필요하면 EXAONE → [`../9.ollama_exaone`](../9.ollama_exaone) 참고.
+> 한국어 자연스러움이 더 필요하면 EXAONE → [`../6.exaone`](../6.exaone) 참고.
 
 ## 준비
 
@@ -32,7 +32,7 @@ pip install ollama          # 파이썬 SDK
 ## 핵심 정리
 - **학습 데이터 없이** 프롬프트만으로 분류/감성/NER 등이 된다 (zero-shot).
 - 정확도 중요한 태스크(감성/분류/번역)는 **temperature 낮게**, 구조화는 **`format="json"`**.
-- 호출은 **ollama 파이썬 SDK**(`ollama.chat`/`ollama.generate`) — REST 보다 간단. (REST vs SDK 비교는 [`../6.ollama1_restapi`](../6.ollama1_restapi) ↔ [`../6.ollama2_sdk`](../6.ollama2_sdk))
+- 호출은 **ollama 파이썬 SDK**(`ollama.chat`/`ollama.generate`) — REST 보다 간단. (REST vs SDK 비교는 [`../1.restapi`](../1.restapi) ↔ [`../2.sdk`](../2.sdk))
 - 더 높은 품질은 큰 모델(`qwen2.5:7b`/`qwen3`)로 교체 — 코드는 그대로.
 
 > 참고: 학습 기반 분류(BERT 파인튜닝)는 [`../2.mymodel`](../2.mymodel), 본격 RAG 는 [`../../2.langchain/7.RAG`](../../2.langchain/7.RAG).

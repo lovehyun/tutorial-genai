@@ -1,4 +1,4 @@
-# 3.local/6.ollama — Ollama 로 로컬 LLM 돌리기
+# 31.local/10.ollama — Ollama 로 로컬 LLM 돌리기
 
 Ollama 관련 예제를 한곳에 모았다. **두 종류**로 나뉜다 — 헷갈리지 않게 구분해서 본다.
 
@@ -11,6 +11,7 @@ Ollama 관련 예제를 한곳에 모았다. **두 종류**로 나뉜다 — 헷
 | [`2.sdk/`](2.sdk/) | 파이썬 `ollama` SDK |
 | [`3.langchain/`](3.langchain/) | LangChain(`ChatOllama`) 로 감싸기 |
 | [`4.modelfile/`](4.modelfile/) | Modelfile 로 커스텀 모델 정의(시스템프롬프트·파라미터 고정) |
+| [`7.openai_compat/`](7.openai_compat/) | **OpenAI 형태로 호출**(`/v1/chat/completions`) — `1.openai/` 코드가 거의 그대로 로컬에 붙는다 |
 
 ## ② 모델별 한국어 활용 (특정 모델로 실제 태스크)
 "이 **모델로 무엇을 만드나**" — 한국어에 강한 모델로 실제 NLP 작업을 수행한다.
@@ -60,4 +61,4 @@ ollama pull qwen2.5:1.5b
 # 저사양이면:  ollama pull qwen2.5:0.5b  또는  ollama pull llama3.2:1b
 pip install ollama langchain-ollama       # 2.sdk / 3.langchain 용
 ```
-- 다른 로컬 런타임: `../7.gpt4all/` · `../1.transformers/` · `../3.huggingface/`
+- 다른 로컬 런타임: `../6.gpt4all/` · `../1.transformers/` · `../3.huggingface/`

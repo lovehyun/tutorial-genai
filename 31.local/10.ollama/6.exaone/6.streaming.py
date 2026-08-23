@@ -24,4 +24,4 @@ chat_stream("인공지능의 장점 3가지를 한국어로 설명해줘.")
 
 # 학습 포인트:
 #   - SDK 는 stream=True 면 그냥 for 루프 — chunk["message"]["content"] 를 이어붙이면 끝
-#   - REST 버전(6.ollama1_restapi/2.streaming.py)은 iter_lines()+json.loads 가 필요했다
+#   - REST 버전(1.restapi/2.streaming.py)은 iter_lines()+json.loads 가 필요했다

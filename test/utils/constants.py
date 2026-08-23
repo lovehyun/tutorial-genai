@@ -10,11 +10,11 @@ PYTHON = REPO_ROOT / ".venv" / "bin" / "python"
 SCAN_DIRS = [
     "1.openai",
     "2.langchain",
-    "3.local",
-    "4.anthropic",
-    "7.google",
-    "9.study",
+    "3.anthropic",
+    "4.google",
     "10.project",
+    "30.study",
+    "31.local",
 ]
 
 # 스캔 제외 패턴

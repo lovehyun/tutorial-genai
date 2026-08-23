@@ -15,5 +15,9 @@ reduced_model/
 pruned_model/
 security_tokenizer/
 
+# 3.lora
+my_lora_adapter/
+results_lora/
+
 # 구버전 학습 산출물 폴더명
 my_model/

@@ -1,6 +1,6 @@
 """
 (1) 기본 채팅 — ollama 파이썬 SDK 방식
-같은 예제의 REST 버전과 비교: ../6.ollama1_restapi/1.chat.py
+같은 예제의 REST 버전과 비교: ../1.restapi/1.chat.py
 준비: pip install ollama  +  ollama pull qwen2.5:1.5b
 """
 import ollama

@@ -1,6 +1,6 @@
 """
 (1) 기본 채팅 — REST API 방식 (requests 로 직접 HTTP 호출)
-같은 예제의 SDK 버전과 비교: ../6.ollama2_sdk/1.chat.py
+같은 예제의 SDK 버전과 비교: ../2.sdk/1.chat.py
 준비: ollama pull qwen2.5:1.5b   (어떤 모델이든 가능)
 """
 import requests

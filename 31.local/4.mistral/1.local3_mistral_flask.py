@@ -8,7 +8,7 @@ model_name = "mistralai/Mistral-7B-Instruct-v0.3"
 
 # 모델 및 토크나이저 로드 (서버 시작 시 1회)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto")
+model = AutoModelForCausalLM.from_pretrained(model_name, dtype="auto")
 
 generator = pipeline(
     "text-generation",

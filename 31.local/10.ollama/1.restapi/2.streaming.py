@@ -1,6 +1,6 @@
 """
 (2) 스트리밍 — REST API 방식 (생성되는 토큰을 줄 단위로 수신)
-같은 예제의 SDK 버전과 비교: ../6.ollama2_sdk/2.streaming.py
+같은 예제의 SDK 버전과 비교: ../2.sdk/2.streaming.py
 준비: ollama pull qwen2.5:1.5b
 """
 import requests

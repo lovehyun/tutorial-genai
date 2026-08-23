@@ -32,7 +32,7 @@ HuggingFace `transformers` 로 **트랜스포머 모델이 안에서 무슨 일�
 ### 부록 — 응용(통합 · 서빙)
 
 트랜스포머 '기본 기능' 은 아니지만, 같은 GPT-2 를 응용하는 예시로 남겨둡니다.
-(본격적인 로컬 LLM 서빙은 `4.mistral` / `6.ollama*` 등 참고)
+(본격적인 로컬 LLM 서빙은 `4.mistral` / `10.ollama*` 등 참고)
 
 | 파일 | 내용 |
 |---|---|
@@ -45,7 +45,7 @@ HuggingFace `transformers` 로 **트랜스포머 모델이 안에서 무슨 일�
 pip install transformers torch
 # 부록: pip install langchain langchain-core langchain-huggingface flask
 
-cd "3.local/1.transformers"
+cd "31.local/1.transformers"
 python 1.1_tokenizer_basics.py
 ```
 

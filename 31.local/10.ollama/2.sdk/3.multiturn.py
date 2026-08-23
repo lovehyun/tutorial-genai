@@ -1,6 +1,6 @@
 """
 (3) 멀티 턴 대화 — ollama 파이썬 SDK 방식 (대화 히스토리 누적)
-같은 예제의 REST 버전과 비교: ../6.ollama1_restapi/3.multiturn.py
+같은 예제의 REST 버전과 비교: ../1.restapi/3.multiturn.py
 준비: pip install ollama  +  ollama pull qwen2.5:1.5b
 """
 import ollama

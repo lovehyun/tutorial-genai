@@ -1,6 +1,6 @@
 """
 (3) 멀티 턴 대화 — REST API 방식 (대화 히스토리 누적)
-같은 예제의 SDK 버전과 비교: ../6.ollama2_sdk/3.multiturn.py
+같은 예제의 SDK 버전과 비교: ../2.sdk/3.multiturn.py
 준비: ollama pull qwen2.5:1.5b
 """
 import requests

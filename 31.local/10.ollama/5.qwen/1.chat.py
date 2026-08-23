@@ -1,6 +1,6 @@
 """
 (1) 대화 — Qwen 으로 단일/멀티 턴 채팅 (한국어 vs 영어 비교)
-호출은 ollama 파이썬 SDK 사용 (REST 대비 간단 — 비교는 6.ollama1_restapi vs 6.ollama2_sdk).
+호출은 ollama 파이썬 SDK 사용 (REST 대비 간단 — 비교는 1.restapi vs 2.sdk).
 준비: pip install ollama  +  ollama pull qwen2.5:1.5b   (더 좋은 품질: qwen2.5:7b / qwen3:4b)
 """
 import ollama

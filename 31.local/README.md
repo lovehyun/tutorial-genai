@@ -1,114 +1,46 @@
-# 🔍 LLM(Local Large Language Model) 로컬 모델 종류 및 비교
+# 31.local — 로컬에서 생성형 AI 모델 실행/커스터마이즈
 
-로컬에서 실행할 수 있는 LLM(대형 언어 모델)은 다양한 오픈소스 프로젝트를 통해 제공되고 있으며, **CPU/GPU 환경에 따라 적합한 모델을 선택하는 것이 중요**합니다.
+API 키 없이 **내 컴퓨터에서** 모델을 돌린다 — 구조 이해(transformers) → 직접 파인튜닝/경량화 →
+HuggingFace 생태계 활용 → 특정 모델 계열(Mistral/Llama) → GPT4All(대안 런타임) →
+Ollama(지금 시대의 사실상 표준 로컬 런타임, 그래서 번호도 맨 뒤) 순으로 쌓는다.
 
----
+## 디렉토리 구조
 
-## **1️⃣ 로컬 LLM 모델 종류**
-로컬에서 실행 가능한 대표적인 LLM 모델들은 아래와 같습니다.
+| 폴더 | 내용 |
+|---|---|
+| [`1.transformers/`](1.transformers/) | 토큰화→hidden state→인코더/디코더→디코딩전략→어텐션까지 내부 구조 단계별 실행 |
+| [`2.mymodel/`](2.mymodel/) | `1.finetune/`(직접 분류기 파인튜닝) · `2.compression/`(양자화·레이어축소·프루닝·어휘축소·증류) · `3.lora/`(LoRA) |
+| [`3.huggingface/`](3.huggingface/) | `1.pipelines/`(태스크별 `pipeline()`) · `2.local_llm/`(GPT-Neo 로컬 서빙) · `3.image_gen/`(Stable Diffusion) |
+| [`4.mistral/`](4.mistral/) | Mistral 7B Instruct 로드·LangChain 연동·Flask 서빙 |
+| [`5.llama/`](5.llama/) | Llama 아키텍처(TinyLlama) 로드·생성 |
+| [`6.gpt4all/`](6.gpt4all/) | GGUF 기반 대안 로컬 런타임 |
+| `7~9` | *(예약)* |
+| [`10.ollama/`](10.ollama/) | **사실상 표준 로컬 런타임** — REST→SDK→LangChain(호출 방식) + Modelfile 커스터마이즈 + Qwen/EXAONE(모델별 한국어 태스크) + OpenAI 호환 엔드포인트 |
 
-### **✅ 1. Meta LLaMA (Large Language Model Meta AI)**
-📌 **특징**
-- Meta(구 Facebook)에서 공개한 모델로, **LLaMA 2**가 최신 버전 (2023년 7월 공개)
-- LLaMA 3도 2024년 출시 예정
-- 기존 GPT-3.5와 비슷한 성능을 제공하며, **7B, 13B, 70B 등 다양한 크기로 제공됨**
-- Hugging Face `transformers` 라이브러리 및 `llama.cpp`를 통해 실행 가능
+## 로컬 모델 선택 가이드 (2026-08 기준)
 
-📌 **추천 사용 환경**
-- **LLaMA 2 7B** → **GPU 8GB 이상 필요** (NVIDIA 4060 8GB 이상 가능)
-- **LLaMA 2 13B** → **GPU 16GB 이상 필요** (4090급 GPU 추천)
-- **LLaMA 2 70B** → **A100/T4 같은 고성능 GPU 필요)
+| 모델 계열 | 크기 | 요구 VRAM(GPU 기준) | 이 저장소에서 |
+|---|---|---|---|
+| **Llama** | 1B~405B(버전별 상이) | 1B급은 CPU도 가능, 8B+는 GPU 8GB+ 권장 | `5.llama/`(TinyLlama, CPU 실습용) |
+| **Mistral 7B** | 7B | GPU 8GB+ 권장, CPU는 매우 느림 | `4.mistral/` |
+| **Qwen 2.5** | 0.5B~72B(버전별) | 1.5B~7B는 CPU도 실용적 | `10.ollama/5.qwen/` |
+| **EXAONE 3.5** | 2.4B~32B(버전별) | 2.4B~7.8B는 CPU도 가능 | `10.ollama/6.exaone/` |
+| **GPT-Neo** | 125M~2.7B | CPU 가능(작은 버전 기준) | `3.huggingface/2.local_llm/` |
 
-📌 **설치 및 실행 (llama.cpp)**
-```bash
-git clone https://github.com/ggerganov/llama.cpp
-cd llama.cpp
-make
-./main -m models/7B/ggml-model-q4_0.bin -p "Hello, what is your name?"
-```
+> **VRAM/속도가 걱정되면 Ollama부터**(`10.ollama/`) — GGUF로 양자화된 모델을 CPU에서도 합리적인
+> 속도로 돌린다. `4.mistral/`·`5.llama/`처럼 `transformers`로 직접 로드하는 예제는 원본 가중치라
+> 용량·속도 부담이 더 크다(단, "내부에서 무슨 일이 일어나는지" 보기엔 이쪽이 낫다).
 
----
-
-### **✅ 2. Mistral AI (Mistral 7B & Mixtral)**
-📌 **특징**
-- **Mistral 7B**: GPT-3.5급 성능을 제공하는 작은 모델 (LLaMA 2 13B보다 강력함)
-- **Mixtral 8x7B**: MoE (Mixture of Experts) 구조를 사용하여 효율적인 계산 수행
-- **오픈소스이며, LLaMA보다 실행 속도가 빠름**
-- GPT-4와 비슷한 성능을 목표로 함
-
-📌 **추천 사용 환경**
-- **Mistral 7B** → GPU 8GB 이상 (NVIDIA 4060 가능)
-- **Mixtral 8x7B** → GPU 24GB 이상 필요 (4090 이상, A100 추천)
-
-📌 **설치 및 실행**
-```bash
-pip install transformers
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
-model_name = "mistralai/Mistral-7B-Instruct"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name)
-```
-
----
-
-### **✅ 3. Falcon (Falcon 7B, 40B)**
-📌 **특징**
-- UAE(아랍에미리트)의 Technology Innovation Institute에서 개발한 모델
-- **Falcon 40B는 GPT-3.5와 유사한 성능**
-- Falcon 7B는 LLaMA 7B보다 조금 더 뛰어난 성능 제공
-
-📌 **추천 사용 환경**
-- **Falcon 7B** → GPU 16GB 이상 (4080 이상)
-- **Falcon 40B** → GPU 48GB 이상 (A100 필요)
-
-📌 **설치 및 실행**
-```bash
-from transformers import AutoModelForCausalLM, AutoTokenizer
-model_name = "tiiuae/falcon-7b-instruct"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name)
-```
-
----
-
-## **2️⃣ 로컬 모델 비교 (성능 & 요구사항)**
-| 모델 | 크기 | GPT 비교 | 성능 | 요구 VRAM | 특징 |
-|------|-----|---------|-----|--------|-----|
-| **LLaMA 2** | 7B/13B/70B | GPT-3.5급 | ⭐⭐⭐⭐ | 8GB ~ 80GB | 메타의 대표 모델 |
-| **Mistral 7B** | 7B | GPT-3.5보다 강함 | ⭐⭐⭐⭐⭐ | 8GB ~ 24GB | 가장 효율적인 모델 |
-| **Mixtral 8x7B** | 45B (활성 12B) | GPT-4에 가까움 | ⭐⭐⭐⭐⭐ | 24GB 이상 | MoE 기반 고성능 모델 |
-| **Falcon** | 7B/40B | GPT-3.5급 | ⭐⭐⭐⭐ | 16GB ~ 48GB | UAE 연구소 개발 |
-
----
-
-## **3️⃣ 로컬 LLM 실행을 위한 환경 세팅**
-**1. 기본 라이브러리 설치**
+## 환경 세팅
 ```bash
 pip install torch transformers accelerate sentencepiece
 ```
+GPU가 없어도(이 저장소 개발 환경도 CPU-only) `1.transformers/`, `5.llama/`(TinyLlama), `10.ollama/`
+전체는 실습 가능하다. `4.mistral/`(7B), `3.huggingface/3.image_gen/`(Stable Diffusion)은 GPU가
+있어야 실용적인 속도가 나온다.
 
-**2. 모델 다운로드**
-```bash
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
-model_name = "mistralai/Mistral-7B-Instruct"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name)
-```
-
----
-
-## **4️⃣ 결론: 어떤 모델을 선택해야 할까?**
-✅ **성능이 중요하다면?**  
-- **Mistral 7B** → 빠르고 효율적  
-- **Mixtral 8x7B** → GPT-4 수준 (최고 성능)  
-
-✅ **VRAM이 적다면?**  
-- **LLaMA 7B / GPT4All** → VRAM 8GB 가능  
-
-✅ **CPU에서 실행하고 싶다면?**  
-- **GPT4All** → 가장 가벼움  
-
-✅ **실제 챗봇 서비스용이라면?**  
-- **LLaMA 2 + 벡터 DB (RAG 방식) 활용**  
+## 결론: 어떤 걸 먼저 볼까
+- **원리부터 이해하고 싶다면** → `1.transformers/`
+- **내 모델을 직접 학습/경량화하고 싶다면** → `2.mymodel/`
+- **일단 뭔가를 로컬에서 빨리 돌려보고 싶다면(CPU도 OK)** → `10.ollama/`
+- **파인튜닝 없이 프롬프트만으로 한국어 태스크를 처리하고 싶다면** → `10.ollama/5.qwen/` 또는 `10.ollama/6.exaone/`

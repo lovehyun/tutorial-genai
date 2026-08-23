@@ -16,7 +16,7 @@ model_name = "mistralai/Mistral-7B-Instruct-v0.3"
 # AutoModelForCausalLM	                GPT류 모델 (텍스트 생성)
 # AutoModelForSeq2SeqLM	                번역/요약 등 (Encoder-Decoder 구조)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto")
+model = AutoModelForCausalLM.from_pretrained(model_name, dtype="auto")
 
 # 파이프라인 생성
 

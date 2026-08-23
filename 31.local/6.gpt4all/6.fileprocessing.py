@@ -1,7 +1,7 @@
 from gpt4all import GPT4All
 
 model = GPT4All("Meta-Llama-3-8B-Instruct.Q4_0.gguf")
-with open("/path/to/file.txt", "r") as file:
+with open("document1.txt", "r", encoding="utf-8") as file:
     content = file.read()
 
 with model.chat_session() as session:

@@ -4,8 +4,9 @@
 두 흐름을 각각 기초부터 단계별로 다룹니다.
 
 ```
-1.finetune/     ← 내 데이터로 '나만의 모델' 학습
+1.finetune/     ← 내 데이터로 '나만의 모델' 학습 (전체 파라미터)
 2.compression/  ← 학습한(혹은 기존) 모델을 작게 만들기
+3.lora/         ← 전체 대신 아주 작은 어댑터만 학습 (큰 모델의 현실적인 대안)
 ```
 
 ## 1.finetune — 파인튜닝 (내 모델 학습)
@@ -39,22 +40,36 @@
 | `2.3_pruning.py` | L1 프루닝 (50%) | 개별 **가중치**(0으로) |
 | `2.4_vocab_reduction.py` | 어휘 재학습 | **어휘(vocab)** = 임베딩 크기 |
 | `2.5_distillation.py` | 지식 증류 (교사→학생) | 큰 모델 → **작은 모델** 로 지식 이전 |
+| `2.6_bnb_4bit_reference.py` | bitsandbytes 4bit(NF4) 로딩 | ⚠️ **GPU 전용** — 코드 참고용, 이 저장소(CPU-only)에서 실행 검증 못함 |
 
 > 각 예제는 경량화 **효과를 직접 측정** 합니다 (크기 MB / 파라미터 수 / 0 비율 / 손실 감소).
 > 2.1~2.4 는 "그냥 줄이면 성능은 떨어질 수 있다" → 보통 재학습이나 2.5 증류로 회복합니다.
 
+## 3.lora — LoRA (전체 학습의 현실적인 대안)
+
+| 파일 | 기법 |
+|---|---|
+| `1.lora_vs_full.py` | `1.finetune/1.1_train.py`와 같은 데이터로 LoRA 학습 — 학습 파라미터 비율(전체의 약 1.2%)과 저장 용량(약 1/80)을 직접 비교 |
+
+> distilbert 정도는 전체 파인튜닝도 CPU로 충분하지만, `4.mistral/`·`5.llama/`급 모델은 전체
+> 파인튜닝에 GPU 메모리가 수십GB 필요하다 — LoRA는 그럴 때 쓰는 실전 기법이다. 자세한 건
+> [`3.lora/README.md`](3.lora/README.md).
+
 ## 설치 & 실행
 
 ```bash
-pip install transformers torch datasets tokenizers
+pip install transformers torch datasets tokenizers peft
 
-cd "3.local/2.mymodel/1.finetune"
+cd "31.local/2.mymodel/1.finetune"
 python 1.1_train.py        # → ./my_local_model 생성
 python 1.2_predict.py      # 저장한 모델로 예측
 
 cd "../2.compression"
 python 2.1_quantization.py
 python 2.5_distillation.py
+
+cd "../3.lora"
+python 1.lora_vs_full.py   # 전체 파인튜닝 대신 LoRA로 같은 작업
 ```
 
 > 첫 실행 시 모델 다운로드: distilbert ~268MB, bert-base ~420MB, KcBERT ~400MB.

@@ -1,6 +1,6 @@
-# 6.ollama4_modelfile — Ollama 모델 커스터마이즈 (Modelfile)
+# 4.modelfile — Ollama 모델 커스터마이즈 (Modelfile)
 
-앞선 `6.ollama1~3` 은 **모델을 그대로 호출**하는 방법이었습니다.
+앞선 `1~3` 은 **모델을 그대로 호출**하는 방법이었습니다.
 여기서는 **모델 자체를 내 입맛대로 바꾸는** 가장 가벼운 튜닝, **Modelfile** 을 다룹니다.
 
 > **이게 파인튜닝인가요?** 아닙니다. 가중치를 다시 학습하는 [`../2.mymodel/1.finetune`](../2.mymodel) 과 달리,
