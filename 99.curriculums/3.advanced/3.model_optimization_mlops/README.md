@@ -20,9 +20,9 @@
 | 09:00-09:30 | 오리엔테이션 | — | 모델 최적화의 필요성, 과정 개요 |
 | 09:30-10:00 | Transformer 모델 로드 | `30.study/1.transformer/1.model_load.py` | Transformer 모델 구조 탐색 |
 | 10:00-10:30 | Transformer 질의 | `30.study/1.transformer/2.model_query.py` | 모델에 질의하며 내부 동작 확인 |
-| 10:45-11:15 | 토큰화 이론 | `31.local/1.transformers/2.1_token.py`, `31.local/1.transformers/2.2_token_dict.py` | 토큰화 과정, 토큰 사전 |
+| 10:45-11:15 | 토큰화 이론 | `31.local/1.transformers/1.1_tokenizer_basics.py`, `31.local/1.transformers/1.2_special_tokens.py` | 토큰화 과정, 특수 토큰/attention_mask |
 | 11:15-12:00 | 토크나이저 비교 | `30.study/5.tokenizer/1.tokenizer_compare.py`, `30.study/5.tokenizer/2.korean_tokenizer.py` | 다양한 토크나이저 성능 비교, 한국어 토크나이저 |
-| 13:00-13:30 | 어텐션 시각화 | `31.local/1.transformers/3.1_attention.py`, `31.local/1.transformers/3.2_headwise_topk.py` | Self-Attention 메커니즘 시각화 |
+| 13:00-13:30 | 어텐션 시각화 | `31.local/1.transformers/5.1_attention.py`, `31.local/1.transformers/5.2_headwise_attention.py` | Self-Attention 메커니즘 시각화 |
 | 13:30-14:00 | 어텐션 심화 시각화 | `30.study/7.attention/1.attention_visualize.py`, `30.study/7.attention/2.qkv_visualize.py` | Q, K, V 벡터 시각화 |
 | 14:00-14:30 | BERT 기초 | `30.study/2.bert/1.intro_bert.py` | BERT 모델 구조 이해 |
 | 14:45-15:15 | BERT 파인튜닝 (감성분석) | `30.study/2.bert/2.finetune_imdb_sentiment.py`, `30.study/2.bert/3.finetune_imdb_load.py` | IMDB 감성분석 파인튜닝 |
@@ -35,15 +35,15 @@
 | 시간 | 주제 | 실습 파일 | 설명 |
 |------|------|-----------|------|
 | 09:00-09:30 | Day 1 복습 | — | Transformer 내부 구조 복습 |
-| 09:30-10:00 | 모델 학습 (기초) | `31.local/2.mymodel/1.mymodel_train.py` | 커스텀 모델 학습 기초 |
-| 10:00-10:30 | 모델 학습 (한국어) | `31.local/2.mymodel/1.mymodel_train1kr.py`, `31.local/2.mymodel/1.mymodel_train2.py` | 한국어 모델 학습, 개선 버전 |
-| 10:45-11:15 | 모델 추론 | `31.local/2.mymodel/2.mymodel_predict.py`, `31.local/2.mymodel/2.mymodel_predict1kr.py` | 학습된 모델로 추론 실행 |
-| 11:15-12:00 | 양자화 | `31.local/2.mymodel/3.quantization_save.py`, `31.local/2.mymodel/3.quantization_load.py` | 모델 양자화 저장/로드, 크기 비교 |
-| 13:00-13:30 | 레이어 축소 | `31.local/2.mymodel/4.layer_reduction.py` | 레이어 수 줄이기로 경량화 |
-| 13:30-14:00 | 가지치기 (Pruning) | `31.local/2.mymodel/5.pruning.py` | 불필요한 가중치 제거 |
-| 14:00-14:30 | 어휘 축소 & 지식증류 | `31.local/2.mymodel/6.vocab_reduction.py`, `31.local/2.mymodel/7.knowledge_distillation.py` | 어휘 크기 줄이기, 큰 모델의 지식을 작은 모델로 |
-| 14:45-15:15 | HuggingFace 배포 | `31.local/3.huggingface/4.1_huggingface_ep.py`, `31.local/3.huggingface/4.2_huggingface2_inst.py` | HuggingFace Hub 배포 |
-| 15:15-15:45 | Flask/FastAPI 서빙 | `31.local/3.huggingface/4.local4_neo27_flask.py`, `31.local/3.huggingface/4.local5_neo27_fastapi.py` | Flask/FastAPI 모델 서빙 |
+| 09:30-10:00 | 모델 학습 (기초) | `31.local/2.mymodel/1.finetune/1.1_train.py` | 커스텀 모델 학습 기초 |
+| 10:00-10:30 | 모델 학습 (한국어 · 실전) | `31.local/2.mymodel/1.finetune/1.3_train_korean.py`, `31.local/2.mymodel/1.finetune/1.4_train_nsmc.py` | 한국어 모델 학습(KcBERT), 실전 데이터셋(NSMC)으로 확장 |
+| 10:45-11:15 | 모델 추론 & LoRA | `31.local/2.mymodel/1.finetune/1.2_predict.py`, `31.local/2.mymodel/3.lora/1.lora_vs_full.py` | 학습된 모델로 추론, 전체 파인튜닝 대신 LoRA로 가볍게 |
+| 11:15-12:00 | 양자화 | `31.local/2.mymodel/2.compression/2.1_quantization.py` | 모델 동적 양자화, 크기 비교 |
+| 13:00-13:30 | 레이어 축소 | `31.local/2.mymodel/2.compression/2.2_layer_reduction.py` | 레이어 수 줄이기로 경량화 |
+| 13:30-14:00 | 가지치기 (Pruning) | `31.local/2.mymodel/2.compression/2.3_pruning.py` | 불필요한 가중치 제거 |
+| 14:00-14:30 | 어휘 축소 & 지식증류 | `31.local/2.mymodel/2.compression/2.4_vocab_reduction.py`, `31.local/2.mymodel/2.compression/2.5_distillation.py` | 어휘 크기 줄이기, 큰 모델의 지식을 작은 모델로 |
+| 14:45-15:15 | HuggingFace Hub 배포 | `31.local/3.huggingface/HF_CLI.md` | CLI 로그인, 모델 업로드, 캐시 관리 |
+| 15:15-15:45 | Flask/FastAPI 서빙 | `31.local/3.huggingface/2.local_llm/2.4_flask.py`, `31.local/3.huggingface/2.local_llm/2.5_fastapi.py` | Flask/FastAPI 모델 서빙 |
 | 15:45-17:00 | 종합 프로젝트 & 발표 | — | 모델 경량화 → 배포 파이프라인 구축, 결과 발표 |
 
 ## 환경 설정
