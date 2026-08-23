@@ -146,7 +146,7 @@ Claude Desktop이 MCP 서버를 **자동 실행/연결**하도록 설정 파일(
 
 같은 폴더의 **[`claude_desktop_config.sample.json`](claude_desktop_config.sample.json)** 은 이 레포의
 세 서버를 한꺼번에 등록하는 예시입니다 — `hello`, `dev-helper`([`5.vscode`](../../5.vscode/)),
-**`codebase-qa`**(문서 QA RAG, [`9.projects/3.codebase_qa`](../../9.projects/3.codebase_qa/)).
+**`codebase-qa`**(문서 QA RAG, [`10.projects/3.codebase_qa`](../../10.projects/3.codebase_qa/)).
 
 이 내용을 `claude_desktop_config.json`(5.1 경로)에 붙여넣고 다음을 바꾸세요:
 

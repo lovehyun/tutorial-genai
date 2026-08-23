@@ -23,11 +23,11 @@ pip install mcp uvicorn python-dotenv     # 또는: pip install -r ../../../requ
 # (선택) cp .env.example .env             # 토큰/URL 바꾸려면
 
 # 터미널 1 — 서버
-cd 5.mcp/9.projects/2.remote/2.oauth
+cd 5.mcp/10.projects/2.remote/2.oauth
 python server.py            # http://127.0.0.1:8000/mcp  (Bearer 필요)
 
 # 터미널 2 — 클라이언트
-cd 5.mcp/9.projects/2.remote/2.oauth
+cd 5.mcp/10.projects/2.remote/2.oauth
 python client.py            # 무토큰=거부, 유토큰=성공 을 순서대로 확인
 ```
 

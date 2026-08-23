@@ -1,12 +1,12 @@
 # 1.basic/4.advanced — MCP 심화: Context 와 양방향
 
-`1.intro ~ 3.transports` 까지는 방향이 **클라이언트 → 서버(도구 호출)** 하나뿐이었다.
+`1.intro ~ 3.transports_http` 까지는 방향이 **클라이언트 → 서버(도구 호출)** 하나뿐이었다.
 여기서는 MCP 의 **양방향** 기능과 **`Context`(ctx) 객체**를 다룬다 —
 서버가 실행 도중 클라이언트에게 되묻거나(모델·사람), 클라이언트가 서버에 컨텍스트를 준다.
 
 > 전부 **provider/framework 중립**(순수 MCP). LLM 없이 흐름만으로 이해할 수 있게 콜백은 '가짜' 로 채웠다.
 
-## 4가지 패턴
+## 5가지 패턴
 
 | 폴더 | 패턴 | 방향 | 서버 API | 클라이언트 등록 |
 |---|---|---|---|---|
@@ -14,6 +14,7 @@
 | [`2.progress_logging/`](2.progress_logging/) | 오래 걸리는 도구의 **진행률·로그** | 서버→클라(알림) | `ctx.report_progress` / `ctx.info` | `progress_callback` / `logging_callback` |
 | [`3.elicitation/`](3.elicitation/) | 서버가 **사용자** 에게 확인·입력 요청 | 서버→클라(사람) | `ctx.elicit` | `elicitation_callback` |
 | [`4.roots/`](4.roots/) | 클라가 서버에 **허용 경로** 통지 | 서버→클라(설정) | `ctx.session.list_roots` | `list_roots_callback` |
+| [`5.cancellation/`](5.cancellation/) | 클라가 **실행 중인 도구를 중단** | 클라→서버(중단 요청) | `asyncio.CancelledError` 처리 | `CancelledNotification` 전송 |
 
 ### 한눈에 보는 공통 구조
 - 서버 도구에 **`ctx: Context`** 인자를 추가 → FastMCP 가 자동 주입(클라 인자엔 안 보임).
@@ -61,6 +62,8 @@
 3.elicitation      사람에게 되묻기(확인/입력)                             ★★
    ▼
 4.roots            클라가 서버에 접근 범위를 통지                         ★★
+   ▼
+5.cancellation     클라가 실행 중인 도구를 중단 — progress_logging 의 반대 방향  ★★
 ```
 
 ## 실행 (각 폴더 공통)
@@ -71,7 +74,7 @@ python client.py        # 각 폴더의 server.py 를 자식 프로세스로 띄
 ```
 
 ## 다음 단계
-- 원격 서버 **인증(OAuth2/Bearer)**: [`../../9.projects/2.remote/2.oauth/`](../../9.projects/2.remote/2.oauth/)
+- 원격 서버 **인증(OAuth2/Bearer)**: [`../../10.projects/2.remote/2.oauth/`](../../10.projects/2.remote/2.oauth/)
 - LLM 자동 호출로 돌아가기: [`../../4.langchain/1.quickstart/`](../../4.langchain/1.quickstart/)
 
 > 참고: 이 콜백들은 MCP Inspector(`mcp dev server.py`)에서도 눌러볼 수 있다(Node 18+).

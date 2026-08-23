@@ -119,7 +119,7 @@ python client.py                  # 같은 도구로 원격 DB 질의
 ### 다중 사용자·원격 공유로 확장하려면 (= "원격 shared" 모델)
 하나의 서버가 **여러 사용자를 HTTP 로** 서빙한다면 이야기가 달라진다:
 1. **클라이언트→서버 인증 필요** — 사용자별 **OAuth/Bearer 토큰** 제시 → 서버가 "이 요청=사용자 A" 식별.
-   (아기 버전 데모: [`../../9.projects/2.remote/2.oauth/`](../../9.projects/2.remote/2.oauth/))
+   (아기 버전 데모: [`../../10.projects/2.remote/2.oauth/`](../../10.projects/2.remote/2.oauth/))
 2. **"내 계정으로 내 자원 접속"** — 서버가 A의 다운스트림 자격증명을 쓰는 두 방식:
    - **OAuth 패스스루/on-behalf-of**: A가 서버 통해 자기 계정을 직접 인가 → 서버는 A용 **단기 토큰**만 사용(비번 미보유). *claude.ai Gmail/Drive 커넥터가 이 방식.*
    - **서버측 per-user 시크릿 스토어**: `user_id → 자격증명(암호화)` 매핑을 KMS/Vault 에 저장, **토큰으로 인증된 신원에만** 묶어 조회.
@@ -165,5 +165,5 @@ dialects.py   ← DB별로 다른 것만: connect() / introspection / 인용   �
 ## 다음 / 관련
 - **인증이 얽히는 실전 3모델** → [`../3.sql_helpers_auth/`](../3.sql_helpers_auth/) (서버관리 / 사용자별 스코프 / 클라이언트 제공)
 - 등록 흐름 익히기 → [`../1.dev_helpers/`](../1.dev_helpers/)
-- 원격 인증 데모 → [`../../9.projects/2.remote/2.oauth/`](../../9.projects/2.remote/2.oauth/)
+- 원격 인증 데모 → [`../../10.projects/2.remote/2.oauth/`](../../10.projects/2.remote/2.oauth/)
 - 읽기 전용 가드는 2차 방어일 뿐 — 운영 DB 는 반드시 최소권한 계정으로.

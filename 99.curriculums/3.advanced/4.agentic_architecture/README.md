@@ -49,10 +49,10 @@
 | 09:00-09:30 | Day 2 복습 | — | Agentic 패턴 복습 |
 | 09:30-10:00 | MCP 서버/클라이언트 복습 | `5.mcp/1.basic/2.protocol_deep/1.simple_server.py`, `5.mcp/1.basic/2.protocol_deep/2.simple_client.py` | MCP 기본 구조 재확인 |
 | 10:00-10:30 | MCP 에이전트 도구 | `5.mcp/2.openai/1.agent_tool/server.py`, `5.mcp/2.openai/1.agent_tool/3.client_gpt.py` | MCP 기반 에이전트 도구 |
-| 10:45-11:15 | MCP 멀티 도구 | `5.mcp/2.openai/2.multi_tools/math_server.py`, `5.mcp/2.openai/2.multi_tools/2.smart_client_gpt.py` | 다중 MCP 서버 통합 |
+| 10:45-11:15 | MCP 멀티 도구 | `5.mcp/2.openai/2.multi_tools/math_server.py`, `5.mcp/2.openai/2.multi_tools/4.smart_client_gpt.py` | 다중 MCP 서버 통합 |
 | 11:15-12:00 | LangChain 브릿지 | `5.mcp/4.langchain/3.langchain_bridge/mcp_bridge.py`, `5.mcp/4.langchain/3.langchain_bridge/3.langgraph_agent_demo.py` | MCP ↔ LangGraph 브릿지 |
 | 13:00-13:30 | 도구 안전성 | `5.mcp/4.langchain/4.tools_safety/server.py`, `5.mcp/4.langchain/4.tools_safety/2.client2_restrict.py` | 도구 접근 제한 설계 |
-| 13:30-14:00 | 파일시스템 에이전트 | `5.mcp/9.projects/1.local/2.filesystem_client/3.fs_mcp_client3_gpt.py` | 파일 시스템 조작 에이전트 |
+| 13:30-14:00 | 파일시스템 에이전트 | `5.mcp/10.projects/1.local/2.filesystem_client/3.fs_mcp_client3_gpt.py` | 파일 시스템 조작 에이전트 |
 | 14:00-14:30 | 웹 스캔 에이전트 | `2.langchain/8.agents/20.mini_apps/2.webscan_app_web/app.py` | 웹 스캔 에이전트 |
 | 14:45-15:30 | 스마트 에이전트 라우터 | `2.langchain/8.agents/0.legacy(initialize_agent)/5.routing/9.2_smartagent_router.py`, `2.langchain/8.agents/0.legacy(initialize_agent)/5.routing/9.3_smartagent_router2_moretools.py` | 지능형 도구 라우팅 시스템 |
 | 15:30-17:00 | 실습: MCP 기반 에이전트 설계 | — | 커스텀 MCP 서버 + LangGraph 에이전트 구축 |

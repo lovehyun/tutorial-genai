@@ -46,4 +46,4 @@ cd 2.per_user_scope && python client.py
 ## 실전화 포인트
 - `TOKENS` 딕셔너리 → **OAuth 2.1 토큰 검증**(서명·만료·스코프) + 사용자/역할 DB.
 - 테이블 문자열 검사(교육용)보다 **DB 자체 권한**(GRANT / Row-Level Security / 역할별 뷰·스키마)이 더 견고.
-- 전송 계층 인증의 토대는 → [`../../../9.projects/2.remote/2.oauth/`](../../../9.projects/2.remote/2.oauth/)
+- 전송 계층 인증의 토대는 → [`../../../10.projects/2.remote/2.oauth/`](../../../10.projects/2.remote/2.oauth/)

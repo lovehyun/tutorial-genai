@@ -124,8 +124,8 @@ VSCode 에서 **본인 LLM(Cline/Continue + OpenAI·Anthropic 키)** 으로 *"�
 
 | 목적 | 붙일 MCP 서버 | 제공 도구 |
 |------|--------------|----------|
-| **코드/문서 의미 검색·QA** | [`9.projects/3.codebase_qa/server_docs.py`](../../9.projects/3.codebase_qa/) | `search`, `answer` (레포 `0.docs` RAG) |
-| **실파일 읽기·스니펫 추출** | 공식 `@modelcontextprotocol/server-filesystem` 또는 [`9.projects/1.local/1.filesystem/server/server.py`](../../9.projects/1.local/1.filesystem/) | `read_file`, `list_dir` 등 |
+| **코드/문서 의미 검색·QA** | [`10.projects/3.codebase_qa/server_docs.py`](../../10.projects/3.codebase_qa/) | `search`, `answer` (레포 `0.docs` RAG) |
+| **실파일 읽기·스니펫 추출** | 공식 `@modelcontextprotocol/server-filesystem` 또는 [`10.projects/1.local/1.filesystem/server/server.py`](../../10.projects/1.local/1.filesystem/) | `read_file`, `list_dir` 등 |
 
 ### Cline 설정 (`cline_mcp_settings.json`)
 ```json
@@ -133,7 +133,7 @@ VSCode 에서 **본인 LLM(Cline/Continue + OpenAI·Anthropic 키)** 으로 *"�
   "mcpServers": {
     "codebase-qa": {
       "command": "python",
-      "args": ["C:/ABSOLUTE/PATH/tutorial-genai/5.mcp/9.projects/3.codebase_qa/server_docs.py"],
+      "args": ["C:/ABSOLUTE/PATH/tutorial-genai/5.mcp/10.projects/3.codebase_qa/server_docs.py"],
       "env": { "OPENAI_API_KEY": "sk-..." }
     },
     "repo-files": {

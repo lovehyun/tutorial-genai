@@ -5,7 +5,7 @@
 #   2) session.initialize() — 핸드셰이크(프로토콜 버전·기능 협상)
 #   3) session.list_tools() 로 도구 발견 → session.call_tool(이름, 인자) 로 실행
 #   ※ 여기선 '어떤 도구를 어떤 인자로' 부를지 내가 손으로 정한다(수동 하드코딩).
-#     다음 단계: 2.client_simple_nlp(키워드 자동) → 3.client_gpt(LLM 자동)
+#     다음 단계: 2.client_manual_nlp(키워드 자동) → 3.client_gpt(LLM 자동)
 
 import asyncio
 from mcp import ClientSession, StdioServerParameters

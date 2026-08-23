@@ -31,4 +31,4 @@
 | `2.langchain_agent_react_hub.py` | `4.langchain/2.langchain_agent/1.2_*` | `create_react_agent` + `AgentExecutor` + `hub.pull` |
 | `2.langchain_agent_react_prompttemplate.py` | `4.langchain/2.langchain_agent/2.2_*` | `create_react_agent` + `AgentExecutor` + 수동 `PromptTemplate` |
 
-→ 현행으로 고친 실제 코드: [`../4.langchain/`](../4.langchain/) (`1.quickstart` 가 기준 템플릿)
+→ 현행으로 고친 실제 코드: [`../`](../) (`1.quickstart` 가 기준 템플릿)

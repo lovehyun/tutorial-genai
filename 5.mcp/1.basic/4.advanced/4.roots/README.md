@@ -27,8 +27,8 @@ python client.py
 - `Root.uri` 는 **`file://` 로 시작해야 한다**(현행 스펙 제약, `FileUrl` 로 검증).
 - roots 는 sampling/elicit 과 **방향은 같지만(서버→클라 요청) 성격이 다르다** — LLM 도 사람도 아닌 **컨텍스트(설정)** 를 받아오는 것.
 - 서버는 이 목록을 접근통제에 활용할 수 있다 → `is_allowed` 가 그 예시(범위 밖 `/etc/passwd` 차단).
-- 실제 filesystem 서버 연동은 [`../../../9.projects/1.local/1.filesystem/`](../../../9.projects/1.local/1.filesystem/) 과 묶어 생각하면 좋다.
+- 실제 filesystem 서버 연동은 [`../../../10.projects/1.local/1.filesystem/`](../../../10.projects/1.local/1.filesystem/) 과 묶어 생각하면 좋다.
 
 ## 다음
 - 상위 [`../README.md`](../README.md) 로 돌아가 4개 심화 패턴 정리 보기
-- 원격 서버 **인증**: [`../../../9.projects/2.remote/2.oauth/`](../../../9.projects/2.remote/2.oauth/)
+- 원격 서버 **인증**: [`../../../10.projects/2.remote/2.oauth/`](../../../10.projects/2.remote/2.oauth/)

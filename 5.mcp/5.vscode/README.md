@@ -63,5 +63,5 @@ Copilot / Cline / Continue / Claude Code ──stdio──▶ server.py ──�
 - 미인증 커넥터: 다른 터미널에서 `claude mcp login "<이름>"` → 원래 창에서 `/mcp reconnect all`.
 
 ## 참고
-- 원격/멀티유저로 확장(인증·OAuth) → [`../9.projects/2.remote/2.oauth/`](../9.projects/2.remote/2.oauth/)
+- 원격/멀티유저로 확장(인증·OAuth) → [`../10.projects/2.remote/2.oauth/`](../10.projects/2.remote/2.oauth/)
 - VSCode(Copilot) MCP 문서: <https://code.visualstudio.com/docs/copilot/chat/mcp-servers>

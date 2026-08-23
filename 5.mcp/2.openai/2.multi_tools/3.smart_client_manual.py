@@ -1,5 +1,5 @@
-# 1.smart_client_manual.py — 여러 MCP 서버 도구를 '키워드 규칙'으로 수동 선택 (LLM 없음)
-# GPT 버전(2.smart_client_gpt) 의 '이전 단계' — 규칙 기반 선택이 얼마나 번거로운지 체감한다.
+# 3.smart_client_manual.py — 여러 MCP 서버 도구를 '키워드 규칙'으로 수동 선택 (LLM 없음)
+# GPT 버전(4.smart_client_gpt) 의 '이전 단계' — 규칙 기반 선택이 얼마나 번거로운지 체감한다.
 # AsyncExitStack 으로 여러 서버 세션을 main 끝까지 동시에 유지.
 
 import re

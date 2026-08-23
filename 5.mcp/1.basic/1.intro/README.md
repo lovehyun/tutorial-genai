@@ -26,5 +26,5 @@ python 4.hello_client.py        # 3.hello_server 를 자동으로 띄워 호출 
 
 - **[`../2.protocol_deep/`](../2.protocol_deep/)** — 프로토콜 더 깊게: 도구 여러 개·resource·prompt 발견,
   **`debug_proxy` 로 오가는 JSON-RPC 들여다보기**, tool vs resource
-- **[`../3.transports/`](../3.transports/)** — stdio → HTTP(streamable-http) 전송 차이
+- **[`../3.transports_http/`](../3.transports_http/)** — stdio → HTTP(streamable-http) 전송 차이
 - LLM 이 MCP 도구를 **자동 호출**하게 하려면 → [`../../4.langchain/1.quickstart/`](../../4.langchain/1.quickstart/)(어댑터) 또는 [`../../2.openai/`](../../2.openai/)

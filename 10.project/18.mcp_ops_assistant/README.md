@@ -236,7 +236,7 @@ prod-db 권한도 줘                     ← 거부해 보기. AI 가 대안을
 | CLI 에서의 HITL (여기의 원형) | [5.mcp/4.langchain/6.human_in_loop](../../5.mcp/4.langchain/6.human_in_loop/) |
 | 서버가 직접 되묻는 방식 (elicitation) | [5.mcp/1.basic/4.advanced/3.elicitation](../../5.mcp/1.basic/4.advanced/3.elicitation/) |
 | 원격 HTTP MCP 서버로 바꾸기 | [5.mcp/4.langchain/5.remote_http](../../5.mcp/4.langchain/5.remote_http/) |
-| 웹 챗봇 + 다중 MCP 의 최소 형태 | [5.mcp/9.projects/6.multi_mcp_concierge](../../5.mcp/9.projects/6.multi_mcp_concierge/) |
+| 웹 챗봇 + 다중 MCP 의 최소 형태 | [5.mcp/10.projects/6.multi_mcp_concierge](../../5.mcp/10.projects/6.multi_mcp_concierge/) |
 
 ## 실무로 가져갈 때
 

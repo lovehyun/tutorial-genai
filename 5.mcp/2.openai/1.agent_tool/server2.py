@@ -318,6 +318,37 @@ def calculate_age(birth_year: int) -> str:
     return f"{birth_year}년생의 현재 나이: 만 {age}세 (또는 만 {age-1}세)"
 
 
+# ===== 지원 티켓 도구 (4.client_gpt3_retry.py 재시도 데모용) =====
+
+_VALID_PRIORITY = {"URG1": "긴급(1시간 내 대응)", "URG2": "높음(당일 대응)", "STD": "보통(2일 내)", "LOW": "낮음"}
+_VALID_CATEGORY = {"FIN-BILL": "결제/청구", "TECH-BUG": "기술 문제", "ACCT-ACCESS": "계정 문제"}
+
+
+@mcp.tool()
+def create_support_ticket(priority: str, category: str, summary: str) -> str:
+    """
+    고객지원 티켓을 생성하는 도구. priority/category는 자유 텍스트가 아니라 사내 전용 코드다.
+
+    매개변수:
+        priority (str): 사내 우선순위 코드 (필수)
+        category (str): 사내 분류 코드 (필수)
+        summary (str): 문제 한 줄 요약 (필수)
+
+    반환값:
+        str: 생성 결과, 또는 코드가 틀렸을 경우 사용 가능한 코드 목록을 포함한 오류 메시지
+    """
+    # [관전 포인트] 여기 valid 코드 목록을 docstring에는 일부러 안 적었다 — 모델이 스키마만 보고
+    #   맞히게 하지 않고, 실패 응답을 읽고 고치는 흐름을 보게 하려는 의도다.
+    errors = []
+    if priority not in _VALID_PRIORITY:
+        errors.append(f"priority='{priority}'는 잘못된 코드입니다. 사용 가능한 코드: {_VALID_PRIORITY}")
+    if category not in _VALID_CATEGORY:
+        errors.append(f"category='{category}'는 잘못된 코드입니다. 사용 가능한 코드: {_VALID_CATEGORY}")
+    if errors:
+        return "티켓 생성 실패:\n" + "\n".join(errors)
+    return f"티켓 생성됨: [{priority}/{category}] {summary}"
+
+
 # ===== 서버 실행 =====
 if __name__ == "__main__":
     import sys

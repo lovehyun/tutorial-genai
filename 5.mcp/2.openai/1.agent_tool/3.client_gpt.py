@@ -6,7 +6,7 @@
 #   3) GPT 에 tools=... , tool_choice="auto" 로 넘기면 GPT 가 '어떤 도구를 어떤 인자로' 결정
 #   4) GPT 가 고른 도구를 session.call_tool() 로 MCP 실행
 #   5) 실행 결과를 tool 메시지로 되돌려주면 GPT 가 자연스러운 문장으로 정리
-#   (1.client_demo=수동 하드코딩, 2.client_simple_nlp=키워드, 여기=LLM 자동)
+#   (1.client_demo=수동 하드코딩, 2.client_manual_nlp=키워드, 여기=LLM 자동)
 
 import asyncio
 import json

@@ -16,11 +16,13 @@
 | 폴더 | 내용 | LLM/Node |
 |------|------|----------|
 | [`1.basic/`](1.basic/) | **공통(중립): MCP 그 자체** — 서버 만들기, 순수 클라이언트, 전송(stdio/HTTP), 양방향 심화 | 없음 |
-| [`2.openai/`](2.openai/) | GPT 로 MCP 도구 호출 (agent_tool, multi_tools) | OpenAI |
-| [`3.anthropic/`](3.anthropic/) | Claude API + **Claude Desktop** 연동 | Claude |
+| [`2.openai/`](2.openai/) | GPT 로 MCP 도구 호출 (agent_tool, multi_tools) · Codex CLI 등록 | OpenAI |
+| [`3.anthropic/`](3.anthropic/) | **Claude Desktop** 등록 + Claude API 직접 호출(`tool_use`) | Claude |
 | [`4.langchain/`](4.langchain/) | `langchain-mcp-adapters` · LangGraph 브릿지 · 도구 안전성 | OpenAI |
 | [`5.vscode/`](5.vscode/) | **실제 클라이언트에 등록** — `1.dev_helpers`(등록법) · `2.sql_helpers`(**DB 자연어 질의**) · `3.sql_helpers_auth`(**인증 3모델**) | VSCode·Claude Code |
-| [`9.projects/`](9.projects/) | 실전 프로젝트 (filesystem, remote, codebase-QA) | 혼합 |
+| [`6.ollama/`](6.ollama/) | 로컬 모델(qwen2.5:7b)로 MCP 도구 호출 — API 키·인터넷 불필요, 완전 무료 | Ollama |
+| `7~9` | *(예약)* — 다른 벤더/클라이언트(Gemini MCP 클라이언트 등)가 추가되면 이 번호대역에 들어간다 | — |
+| [`10.projects/`](10.projects/) | 실전 프로젝트 (filesystem, remote, codebase-QA, 멀티벤더 캡스톤) | 혼합 |
 
 ### 각 폴더 안
 
@@ -29,11 +31,12 @@
   - `2.protocol_deep/` — 프로토콜 깊게: 도구·resource·prompt 발견 + `debug_proxy` 로 JSON-RPC 보기 + tool vs resource
   - `3.transports_http/` — stdio vs HTTP 전송
   - `4.advanced/` — **양방향·Context 심화**: sampling / progress·logging / elicitation / roots. 상세: [`4.advanced/README.md`](1.basic/4.advanced/README.md)
-- **2.openai** — `1.agent_tool/`, `2.multi_tools/` (각 폴더: 공통 서버 + manual 클라이언트 → GPT 클라이언트 빌드업)
-- **3.anthropic** — `1.claude_desktop/` (Hello, 네트워크 서버, 파일 컨버터 등 Claude Desktop 등록용)
+- **2.openai** — `1.agent_tool/`, `2.multi_tools/` (각 폴더: 공통 서버 + manual 클라이언트 → GPT 클라이언트 빌드업) · `3.codex_cli/`(OpenAI Codex CLI 에 등록)
+- **3.anthropic** — `1.claude_desktop/` (Hello, 네트워크 서버, 파일 컨버터 등 Claude Desktop 등록용) · `2.anthropic_api/`(**Claude API가 코드로 MCP 직접 호출** — `2.openai/1.agent_tool`과 대칭)
 - **4.langchain** — `1.quickstart/`(adapters 빠른 시작) · `2.langchain_agent/` · `3.langchain_bridge/` · `4.tools_safety/` · `5.remote_http/`(**원격 HTTP 서버 + 실전 API(yfinance) 서버**) · `6.human_in_loop/`(**MCP 도구 실행 전 사람 승인**) · `7.guardrails/`(**인젝션·rm -rf·PII·악성 서버 차단**)
 - **5.vscode** — 내 서버를 실제 클라이언트에 등록. `1.dev_helpers/`(dev-helper 도구를 Copilot·Cline·Continue·**Claude Code** 에 등록) · `2.sql_helpers/`(**내 DB 를 MCP 로 노출 → 자연어로 SQL 질의**, sqlite/postgres/mysql, 단순·무인증) · `3.sql_helpers_auth/`(**인증 3모델**: 서버관리 / 사용자별 스코프(HTTP+Bearer) / 클라이언트 제공 프록시)
-- **9.projects** — `1.local/`(filesystem 서버·클라이언트) · `2.remote/`(원격: `1.intro` 무인증 → `2.oauth` **Bearer 인증**) · `3.codebase_qa/`(**RAG 를 MCP 서버로 노출**, 멀티 클라이언트)
+- **6.ollama** — `1.agent_tool/`(`2.openai/1.agent_tool`, `3.anthropic/2.anthropic_api`와 대칭 — **로컬 모델**로 도구 자동 선택, API 키·인터넷 불필요)
+- **10.projects** — `1.local/`(filesystem 서버·클라이언트) · `2.remote/`(원격: `1.intro` 무인증 → `2.oauth` **Bearer 인증**) · `3.codebase_qa/`(**RAG 를 MCP 서버로 노출**, 멀티 클라이언트) · `4.mini_context7/`(ID 기반 문서 검색) · `5.chatbot_web/`·`6.multi_mcp_concierge/`(웹 챗봇, 서버 여러 개) · `7.multi_vendor_capstone/`(**서버 하나를 OpenAI·Anthropic·LangChain 이 동시에** 사용). 상세: [`10.projects/README.md`](10.projects/README.md)
 
 ## 학습 단계 (쉬운 기초 → 응용)
 
@@ -48,6 +51,8 @@
 [2단계] LLM 이 MCP 도구를 '자동' 호출                                난이도 ★★
    4.langchain/1.quickstart    langchain-mcp-adapters → 에이전트가 자동 호출 (가장 쉬움)
    2.openai/1.agent_tool       GPT function calling 으로 직접 (수동 → 자동 빌드업)
+   3.anthropic/2.anthropic_api Claude tool_use 로 직접 (2.openai 와 대칭)
+   6.ollama/1.agent_tool       로컬 모델로 직접 — API 키·인터넷 불필요
         ▼
 [3단계] 전송 방식 · 멀티 서버                                        난이도 ★★
    1.basic/3.transports_http       stdio → HTTP(streamable-http)
@@ -71,7 +76,10 @@
    5.vscode/2.sql_helpers        내 DB 를 MCP 로 → 자연어로 SQL 질의(인증·보안 포함)
         ▼
 [7단계] 실전 응용 프로젝트                                           난이도 ★★★
-   9.projects/1.local(filesystem) → 2.remote(1.intro → 2.oauth 인증) → 3.codebase_qa (RAG 를 MCP 로 노출)
+   10.projects/1.local(filesystem) → 2.remote(1.intro → 2.oauth 인증) → 3.codebase_qa (RAG 를 MCP 로 노출)
+   → 4.mini_context7 → 5.chatbot_web → 6.multi_mcp_concierge → 7.multi_vendor_capstone
+   (7.multi_vendor_capstone: 서버 하나에 OpenAI·Anthropic·LangChain 클라이언트가 동시에 붙는다 —
+    "서버 한 번 만들면 어디서든 재사용"이라는 MCP 의 핵심 가치를 마지막에 직접 확인)
 ```
 
 > **빠른 길**: 코드보다 결과를 먼저 보고 싶으면 1단계 → 5단계(Claude Desktop/VSCode 설정) 로 건너뛰어도 된다.
@@ -103,7 +111,7 @@ node --version    # Node.js 18+ (npx)
 ```
 - 개별 폴더만 빠르게 볼 땐 최소로 `pip install mcp` 만 해도 `1.basic` 은 동작한다.
 - `.env` 에 `OPENAI_API_KEY`(2.openai·4.langchain), `ANTHROPIC_API_KEY`(3.anthropic) 가 필요할 수 있다.
-  원격 인증 예제는 [`9.projects/2.remote/2.oauth/.env.example`](9.projects/2.remote/2.oauth/.env.example) 를 `.env` 로 복사해 쓴다.
+  원격 인증 예제는 [`10.projects/2.remote/2.oauth/.env.example`](10.projects/2.remote/2.oauth/.env.example) 를 `.env` 로 복사해 쓴다.
 
 ## 더 보기
 - **[`claude_code_mcp_guide.md`](claude_code_mcp_guide.md)** — Claude Code 에서 MCP 다루기(운영 가이드): 서버 출처(커넥터/project/local)·상태·인증(login/reconnect)·`claude mcp` 명령·**MCP 등록 vs 직접 설치(Bash)**
@@ -113,4 +121,4 @@ node --version    # Node.js 18+ (npx)
 
 ---
 > **둘러보기**: [`5.vscode/`](5.vscode/) — VSCode Copilot Agent Mode 연동 워크스루 ·
-> [`9.projects/3.codebase_qa/`](9.projects/3.codebase_qa/) — RAG 를 MCP 서버로 노출(GPT·Claude·LangChain·VSCode 재사용).
+> [`10.projects/3.codebase_qa/`](10.projects/3.codebase_qa/) — RAG 를 MCP 서버로 노출(GPT·Claude·LangChain·VSCode 재사용).

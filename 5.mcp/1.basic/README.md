@@ -7,7 +7,7 @@ MCP를 **밑바닥부터** 본다. LLM·프레임워크 없이, 서버를 만들
 |---|---|---|
 | [`1.intro/`](1.intro/) | 첫 접촉 — SDK 확인 + hello 서버/클라이언트(첫 왕복) | stdio |
 | [`2.protocol_deep/`](2.protocol_deep/) | 도구 여러 개·**resource·prompt 발견**·`debug_proxy`로 JSON-RPC 보기 | stdio |
-| [`3.transports/`](3.transports/) | stdio ↔ HTTP(streamable-http) 차이 | HTTP |
+| [`3.transports_http/`](3.transports_http/) | stdio ↔ HTTP(streamable-http) 차이 | HTTP |
 | [`4.advanced/`](4.advanced/) | **양방향·Context**: sampling·progress/logging·elicitation·roots | stdio |
 
 ## MCP 서버가 제공하는 3가지 (핵심 개념)

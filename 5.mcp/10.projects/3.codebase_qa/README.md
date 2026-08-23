@@ -43,7 +43,7 @@ pip install mcp langchain-mcp-adapters langchain-openai langchain-text-splitters
 
 ### A. 순수 클라이언트 (수동 호출)
 ```bash
-cd "5.mcp/9.projects/3.codebase_qa"
+cd "5.mcp/10.projects/3.codebase_qa"
 python 1.client_raw.py
 # search('코사인 유사도') 결과 + answer('MCP 서버 vs 클라이언트') RAG 답변
 ```

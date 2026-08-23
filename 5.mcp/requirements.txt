@@ -7,13 +7,13 @@
 #   # source .venv/bin/activate      # macOS / Linux
 #   pip install -r 5.mcp/requirements.txt
 
-# ── 핵심(1.common / 9.projects): MCP 그 자체 ──────────────────
+# ── 핵심(1.common / 10.projects): MCP 그 자체 ──────────────────
 mcp<2.0                   # MCP 파이썬 SDK (FastMCP, ClientSession) — 2.0.0 은 mcp.server.fastmcp 가
                            # mcp.server.mcpserver 로 바뀌어 이 폴더 예제 전체가 깨짐. 1.x 로 고정.
-uvicorn                   # 원격 HTTP 서버 실행 (3.transports, 9.projects/2.remote)
+uvicorn                   # 원격 HTTP 서버 실행 (3.transports_http, 10.projects/2.remote)
 python-dotenv             # .env 로딩 (원격/프로젝트 클라이언트)
 
-# ── 2.openai / 9.projects (GPT 클라이언트) ───────────────────
+# ── 2.openai / 10.projects (GPT 클라이언트) ───────────────────
 openai                    # GPT function calling 로 MCP 도구 자동 호출
 
 # ── 3.anthropic (Claude API 연동) ────────────────────────────
@@ -25,6 +25,9 @@ langchain-openai
 langchain-mcp-adapters    # LangChain ↔ MCP 도구 자동 변환
 langgraph
 yfinance                  # 4.langchain/5.remote_http 의 주가 조회 서버 (키 불필요)
+
+# ── 6.ollama (로컬 모델, API 키 불필요) ───────────────────────
+ollama                    # Ollama 파이썬 클라이언트 — 별도로 https://ollama.com 설치 + 모델 pull 필요
 
 # ── 참고: 공식 MCP 서버(filesystem 등)는 Node.js 18+ 의 npx 로 실행 ──
 #   node --version   # 별도 설치 (pip 아님)

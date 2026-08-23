@@ -1,4 +1,4 @@
-# 1.basic/3.transports — stdio vs HTTP 전송
+# 1.basic/3.transports_http — stdio vs HTTP 전송
 
 지금까지 예제는 모두 **stdio**(클라이언트가 서버를 자식 프로세스로 실행)였다.
 여기선 같은 서버를 **HTTP** 로 띄우고 네트워크로 붙는다 — 상시/원격 서버의 출발점.
@@ -26,4 +26,4 @@ python client_http.py      # 실행 중인 서버에 HTTP 로 접속
   - HTTP = 서버가 독립 실행(수동 선실행) → **여러 클라이언트 / 원격 접속** 가능.
 - 클라이언트 코드 차이는 접속부 한 줄뿐: `stdio_client(...)` → `streamablehttp_client(url)`.
   나머지(`initialize` / `list_tools` / `call_tool`)는 **완전히 동일**.
-- 원격 배포로의 확장은 [`../../9.projects/2.remote/`](../../9.projects/2.remote/) 로 이어진다.
+- 원격 배포로의 확장은 [`../../10.projects/2.remote/`](../../10.projects/2.remote/) 로 이어진다.

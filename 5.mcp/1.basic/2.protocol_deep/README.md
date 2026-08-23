@@ -10,14 +10,18 @@
 | 1 | `1.simple_server.py` | 도구 몇 개를 가진 서버 |
 | 2 | `2.simple_client.py` | 도구 호출 + **`debug_proxy` 경유로 오가는 JSON-RPC 출력** |
 | 2 | `2.simple_client2_tryexcept.py` | 2 + 예외 처리 |
-| 3 | `3.simple_server2.py` | tools + **resources + prompts** 를 가진 서버 |
+| 3 | `3.simple_server3.py` | tools + **resources + prompts** 를 가진 서버 |
 | 4 | `4.simple_client3_getinfo.py` | 서버의 **tools / resources / prompts 전체 발견** (`list_resources`, `get_prompt`) |
 | 4 | `4.simple_client3_getinfo2_tryexcept.py` | 4 + 예외 처리 |
 | 5 | `5.server_tools_resource.py` | tools 여러 개 + resource(`info://server`) 를 가진 서버 |
 | 6 | `6.client_tools_resource.py` | **`call_tool`(실행) vs `read_resource`(읽기)** 를 직접 비교 — tool/resource 차이 |
+| 7 | `7.server_resource_template.py` | **리소스 템플릿** — `greeting://{name}` 처럼 URI에 파라미터를 받는 resource |
+| 8 | `8.client_resource_template.py` | 템플릿 리소스 호출 + **capability negotiation을 직접 눈으로 확인**(`initialize()` 반환값) |
+| 9 | `9.server_tool_error_structured.py` | 도구 실패 시 **`isError`**, 구조화된 성공 응답(**`structuredContent`**) |
+| 10 | `10.client_tool_error_structured.py` | `isError`/`structuredContent`를 클라이언트에서 어떻게 구분해 처리하는지 |
 | — | `debug_proxy.py` | (유틸) 클라↔서버 JSON-RPC 를 로그로 중계하는 디버거 |
 
-> `_tryexcept` = 같은 예제 + 예외 처리 (번호 공유). 서버↔클라 짝: **1↔2, 3↔4, 5↔6**.
+> `_tryexcept` = 같은 예제 + 예외 처리 (번호 공유). 서버↔클라 짝: **1↔2, 3↔4, 5↔6, 7↔8, 9↔10**.
 > (`5.server_tools_resource.py` 는 [`../../4.langchain/1.quickstart/1.agent.py`](../../4.langchain/1.quickstart/) 가 LLM 클라이언트로도 재사용한다 — "서버 하나, 클라 여럿".)
 
 ## 실행
@@ -27,6 +31,8 @@ cd 5.mcp/1.basic/2.protocol_deep
 python 2.simple_client.py              # debug_proxy 경유 → 1.simple_server 호출, 프로토콜 메시지 출력
 python 4.simple_client3_getinfo.py     # tools/resources/prompts 발견
 python 6.client_tools_resource.py      # call_tool(실행) vs read_resource(읽기) 비교
+python 8.client_resource_template.py   # 리소스 템플릿 + capability negotiation 확인
+python 10.client_tool_error_structured.py  # isError / structuredContent 확인
 ```
 
 ### MCP Inspector 로 클릭 테스트 (Node 필요)
@@ -36,5 +42,5 @@ mcp dev 5.server_tools_resource.py     # 브라우저 UI 에서 tool/resource �
 ```
 
 ## 다음 단계
-- **[`../3.transports/`](../3.transports/)** — stdio → HTTP 전송
+- **[`../3.transports_http/`](../3.transports_http/)** — stdio → HTTP 전송
 - LLM 자동 호출 → [`../../4.langchain/1.quickstart/`](../../4.langchain/1.quickstart/) (이 폴더의 `5.server_tools_resource.py` 를 어댑터가 그대로 재사용)

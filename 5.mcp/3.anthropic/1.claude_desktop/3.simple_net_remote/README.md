@@ -13,9 +13,9 @@
 * 서버에 **Docker**, **Docker Compose** 설치
 * 프로젝트에 아래 파일들이 준비되어 있다고 가정
 
-  * `simple_net_server_http.py` (MCP HTTP 서버)
+  * `simple_net_server.py` (MCP HTTP 서버)
   * `Dockerfile`
-  * `docker-compose.yml`
+  * `docker-compose.yaml`
   * `nginx/conf.d/mcp.conf`
   * `nginx/certbot/conf/`, `nginx/certbot/www/` (인증서 디렉터리/웹루트)
 
@@ -29,7 +29,9 @@
 docker compose up -d
 ```
 
-> 이때 Nginx는 80/443 대기, 애플리케이션 컨테이너는 8080에서 MCP 서버(`/mcp`) 대기합니다.
+> 이때 Nginx는 80/443 대기, 애플리케이션 컨테이너는 8000에서 MCP 서버(`/mcp`) 대기합니다.
+> `FastMCP(..., host="0.0.0.0", port=8000)`로 명시하지 않으면 기본값(`127.0.0.1`)에 묶여
+> 같은 Docker 네트워크의 nginx조차 접속하지 못하니 주의(`simple_net_server.py` 참고).
 
 ---
 
@@ -145,8 +147,8 @@ server {
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
     # MCP 엔드포인트
-    location /mcp/ {
-        proxy_pass http://app:8080/mcp/;
+    location /mcp {
+        proxy_pass http://app:8000/mcp;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -161,10 +163,10 @@ server {
 # Dockerfile
 FROM python:3.12-slim
 WORKDIR /app
-COPY simple_net_server_http.py /app/
+COPY simple_net_server.py /app/
 RUN pip install --no-cache-dir "mcp[cli]"
-EXPOSE 8080
-CMD ["python", "simple_net_server_http.py"]
+EXPOSE 8000
+CMD ["python", "simple_net_server.py"]
 ```
 
 ---

@@ -8,7 +8,9 @@ from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("simple-net-remote")  # 커넥터에 표시될 서버 이름
+mcp = FastMCP("simple-net-remote", host="0.0.0.0", port=8000)  # 커넥터에 표시될 서버 이름
+# host="0.0.0.0" 필수: 기본값(127.0.0.1)이면 컨테이너 안에서만 열려서
+# 같은 Docker 네트워크의 nginx 컨테이너조차 접속할 수 없다.
 
 COMMON_PORTS: List[int] = [22, 80, 443, 3000, 5000, 8000]
 

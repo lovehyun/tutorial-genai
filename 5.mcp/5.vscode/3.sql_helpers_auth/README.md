@@ -40,4 +40,4 @@ pip install mcp python-dotenv uvicorn
 
 ## 관련
 - 단순 무인증 버전 → [`../2.sql_helpers/`](../2.sql_helpers/)
-- 전송 계층 인증(OAuth/Bearer)의 토대 → [`../../9.projects/2.remote/2.oauth/`](../../9.projects/2.remote/2.oauth/)
+- 전송 계층 인증(OAuth/Bearer)의 토대 → [`../../10.projects/2.remote/2.oauth/`](../../10.projects/2.remote/2.oauth/)
