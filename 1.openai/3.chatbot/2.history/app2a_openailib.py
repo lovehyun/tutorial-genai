@@ -1,0 +1,55 @@
+# 2a: OpenAI SDK로 전환 (시간 측정 없는 기본형)
+# app_restapi.py 대비 달라진 것: requests 대신 openai SDK 사용.
+# 요청/응답 시간까지 재는 버전은 app2b_openailib_time.py 참고.
+
+import os
+import logging
+
+from flask import Flask, request, send_from_directory, jsonify
+from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv('../.env')
+
+app = Flask(__name__, static_folder='public')
+port = int(os.environ.get("PORT", 5000))
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    user_input = request.json.get('userInput', '')
+    print(f' => [사용자 요청]: {user_input}')
+
+    response = ask_chatgpt(user_input)
+    print(f' <= [ChatGPT 응답]: {response}')
+
+    return jsonify({'chatgpt': response})
+
+@app.route('/')
+def index():
+    return send_from_directory('public', 'index.html')
+
+def ask_chatgpt(user_input):
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                # {"role": "system", "content": "You are a helpful assistant."},
+                # {"role": "system", "content": "You are a first-class hotel chef providing culinary recommendations."},
+                # {"role": "system", "content": "You are a travel guide providing assistance and information for travelers."},
+                {"role": "system", "content": "당신은 도움이 되는 AI 어시스턴트입니다."},
+                # {"role": "system", "content": "당신은 최고급 호텔의 요리사로서 요리와 관련된 추천을 제공합니다."},
+                # {"role": "system", "content": "당신은 여행자들에게 도움과 정보를 제공하는 여행 가이드입니다."},
+                {"role": "user", "content": user_input}
+            ]
+        )
+        return response.choices[0].message.content
+    except Exception as error:
+        print('Error making ChatGPT API request:', str(error))
+        return '챗봇 응답을 가져오는 도중에 오류가 발생했습니다.'
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=port)

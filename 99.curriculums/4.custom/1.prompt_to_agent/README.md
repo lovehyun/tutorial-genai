@@ -32,7 +32,7 @@
 | 09:30-10:30 | 생성형 AI 지형도 | `0.docs/01_genai_intro/01_genai_landscape.md` | AI 역사, LLM의 등장, 한계(환각/편향/컨텍스트) |
 | | | `0.docs/01_genai_intro/02_llm_companies_models.md` | 주요 기업/모델 비교, 선택 기준 |
 | 10:45-12:00 | 프롬프트 엔지니어링 기초~중급 | `0.docs/01_genai_intro/04_prompt_engineering.md` | Zero-Shot → Few-Shot → CoT → Zero-Shot CoT 진화 |
-| | | `1.openai/1.intro/11.sdk_new.py` | [실습] OpenAI SDK로 프롬프트 패턴 직접 실행 |
+| | | `1.openai/2.sdk/2.sdk_new.py` | [실습] OpenAI SDK로 프롬프트 패턴 직접 실행 |
 | | | `2.langchain/2.prompts/1.basic/1.1_template_chat.py` | [실습] PromptTemplate 기본 구조 |
 | | | `2.langchain/2.prompts/2.chat_templates/2.1_template_chat.py` | [실습] Persona 역할 분리 (ChatPromptTemplate) |
 | 13:00-14:30 | 고급 프롬프팅 전략 | `0.docs/05_genai_advanced/04_prompt_engineering_code.md` | Plan-and-Solve, Self-Refine, Self-Consistency, ReAct, ToT |
@@ -54,10 +54,10 @@
 |------|------|------|------|
 | 09:00-09:30 | Day 1 복습 | — | 프롬프트 엔지니어링 핵심 요약 |
 | 09:30-10:30 | RAG 아키텍처 이론 | `0.docs/05_genai_advanced/06_rag_system.md` | Indexing → Search → Generation 파이프라인, 청킹 전략, 임베딩 |
-| | | `12.study/6.embedding/1.tokenize_visualize.py` | [실습] 토큰화 과정 시각화 |
-| | | `12.study/6.embedding/2.embedding_visualize.py` | [실습] 임베딩 벡터 공간 시각화 |
-| 10:45-12:00 | RAG 기본 구현 (Indexing & Search) | `12.study/6.embedding/4.similarity_matrix.py` | [실습] 코사인 유사도 행렬 |
-| | | `1.openai/4.rag/1.rag_basic.py` | [실습] FAISS 인덱스 생성과 검색 |
+| | | `30.study/6.embedding/1.tokenize_visualize.py` | [실습] 토큰화 과정 시각화 |
+| | | `30.study/6.embedding/2.embedding_visualize.py` | [실습] 임베딩 벡터 공간 시각화 |
+| 10:45-12:00 | RAG 기본 구현 (Indexing & Search) | `30.study/6.embedding/4.similarity_matrix.py` | [실습] 코사인 유사도 행렬 |
+| | | `1.openai/8.rag/1.rag_basic.py` | [실습] FAISS 인덱스 생성과 검색 |
 | | | `2.langchain/7.RAG/2.loaders/2.1_text_loader.py` | [실습] 텍스트 로드 |
 | | | `2.langchain/7.RAG/3.vectorstore/3.1_persist.py` | [실습] ChromaDB 저장/로드 |
 | 13:00-14:30 | RAG 기본 구현 (Generation & 웹앱) | `2.langchain/7.RAG/1.basics/1.3_first_rag.py` | [실습] Store & Retrieve 기본 RAG |
@@ -112,7 +112,7 @@
 | 11:15-11:45 | 패턴 4: Orchestrator-Worker | `2.langchain/8.agents/9.agentic_patterns/9.4_orchestrator_worker.py` | [실습] 오케스트레이터의 작업 분배 패턴 |
 | 11:45-12:00 | 패턴 5: Evaluator-Optimizer | `2.langchain/8.agents/9.agentic_patterns/9.5_evaluator_optimizer.py` | [실습] 평가 → 최적화 반복 패턴 |
 | 13:00-13:45 | Tool Calling | `0.docs/05_genai_advanced/01_openai_advanced.md` | Function Calling, tool_calls, JSON Schema |
-| | | `1.openai/6.structured_output_func_calling/5.func_calling_basic.py` | [실습] OpenAI Function Calling |
+| | | `1.openai/7.function_calling/1.func_calling_basic.py` | [실습] OpenAI Function Calling |
 | | | `2.langchain/8.agents/0.legacy(initialize_agent)/3.custom_tools/4.4_customtools2_getinfo.py` | [실습] 정보 조회 도구 |
 | 13:45-14:30 | MCP 프로토콜 연동 | `0.docs/05_genai_advanced/12_mcp_model_context_protocol.md` | MCP 아키텍처, 서버/클라이언트, 전송 계층 |
 | | | `8.mcp/1.basic/2.protocol_deep/1.simple_server.py` | [실습] MCP 서버 구현 |
@@ -204,5 +204,5 @@ pip install openai anthropic google-generativeai langchain langchain-openai lang
 - `2.langchain/9.langgraph/` — LangGraph
 - `2.langchain/8.agents/9.agentic_patterns/` — 5대 Agentic 패턴
 - `8.mcp/` — MCP 프로토콜
-- `12.study/6.embedding/` — 임베딩 시각화
+- `30.study/6.embedding/` — 임베딩 시각화
 - `10.project/10.ai_agent/` — 멀티에이전트 프로젝트

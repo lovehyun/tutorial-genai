@@ -40,19 +40,19 @@
 |------|------|-----------|------|
 | 09:00-09:40 | 강사 소개 & OT | — | 과정 소개, 산출물 미리보기, 개발 환경(.env, API 키) 설정 |
 | 09:40-10:30 | 생성형 AI 이론 기초 | `0.docs/00_OT/05_generative_ai_intro.md` | AI/ML/DL/GenAI/LLM, "다음 단어 예측", Transformer, 토큰·컨텍스트 윈도우 |
-| 10:45-11:15 | REST API 첫 호출 | `1.openai/1.intro/1.restapi_hello.py`, `1.openai/1.intro/2.restapi_content.py` | Chat Completions 엔드포인트, JSON 응답 구조, role(system/user/assistant) |
-| 11:15-12:00 | 파라미터 & 함수화 | `1.openai/1.intro/3.restapi_params.py`, `1.openai/1.intro/4.restapi_chat.py` | temperature·max_tokens, 예외 처리, 대화 루프 |
+| 10:45-11:15 | REST API 첫 호출 | `1.openai/1.restapi/1.restapi_hello.py`, `1.openai/1.restapi/2.restapi_content.py` | Chat Completions 엔드포인트, JSON 응답 구조, role(system/user/assistant) |
+| 11:15-12:00 | 파라미터 & 함수화 | `1.openai/1.restapi/3.restapi_params.py`, `1.openai/1.restapi/4.restapi_chat.py` | temperature·max_tokens, 예외 처리, 대화 루프 |
 
 **오후 (13:00–17:00) — SDK 챗봇과 프롬프트/컨텍스트 엔지니어링**
 
 | 시간 | 주제 | 실습/교안 | 설명 |
 |------|------|-----------|------|
-| 13:00-13:30 | OpenAI SDK | `1.openai/1.intro/11.sdk_new.py` | REST vs SDK 비교, `client.chat.completions.create()` |
-| 13:30-14:10 | 멀티턴 & 대화 히스토리 | `1.openai/1.intro/13.chat_multiturn.py`, `1.openai/2.chatbot/2.history/app3_history.py` | messages 누적으로 맥락 유지, system prompt 적용 |
-| 14:10-14:30 | 히스토리 길이 제한 | `1.openai/2.chatbot/2.history/app4_historylimit.py` | 토큰 절약을 위한 최근 N개 유지 |
+| 13:00-13:30 | OpenAI SDK | `1.openai/2.sdk/2.sdk_new.py` | REST vs SDK 비교, `client.chat.completions.create()` |
+| 13:30-14:10 | 멀티턴 & 대화 히스토리 | `1.openai/2.sdk/4.chat_multiturn.py`, `1.openai/3.chatbot/2.history/app3a_history.py` | messages 누적으로 맥락 유지, system prompt 적용 |
+| 14:10-14:30 | 히스토리 길이 제한 | `1.openai/3.chatbot/2.history/app4_historylimit.py` | 토큰 절약을 위한 최근 N개 유지 |
 | 14:45-15:30 | 프롬프트 엔지니어링 개요 | `0.docs/01_genai_intro/04_prompt_engineering.md` | Zero/Few-shot, CoT, ReAct, CRAFT 공식 |
 | 15:30-16:15 | 컨텍스트 엔지니어링 | `0.docs/01_genai_intro/05_so_what_now.md`, `0.docs/05_genai_advanced/05_context_engineering.md` | 컨텍스트 윈도우 6요소, 토큰 관리, "AI는 천재 인턴" |
-| 16:15-17:00 | Day 1 실습 & 정리 | `1.openai/1.intro/4.restapi_chat.py` | 나만의 system prompt CLI 챗봇 완성, Q&A |
+| 16:15-17:00 | Day 1 실습 & 정리 | `1.openai/1.restapi/4.restapi_chat.py` | 나만의 system prompt CLI 챗봇 완성, Q&A |
 
 ### Day 2: LangChain으로 구조화하기
 
@@ -84,7 +84,7 @@
 |------|------|-----------|------|
 | 09:00-09:30 | Day 2 복습 & RAG 개요 | `0.docs/04_database/11_vector_databases.md` | 왜 RAG인가, 할루시네이션, "오픈북 시험" 비유 |
 | 09:30-10:10 | 임베딩 이해 | `2.langchain/7.RAG/1.basics/1.1_embeddings_intro.py` | 텍스트→벡터, 코사인 유사도로 의미 거리 |
-| 10:10-10:30 | FAISS 기본 RAG | `1.openai/4.rag/1.rag_basic.py` | 문서→임베딩→FAISS 검색→GPT 응답 파이프라인 |
+| 10:10-10:30 | FAISS 기본 RAG | `1.openai/8.rag/1.rag_basic.py` | 문서→임베딩→FAISS 검색→GPT 응답 파이프라인 |
 | 10:45-11:15 | 텍스트 전처리 · 청킹 | `2.langchain/7.RAG/2.loaders/2.3_chunking.py` | chunk_size·overlap, splitter 3종 비교 |
 | 11:15-12:00 | 첫 RAG 체인 | `2.langchain/7.RAG/1.basics/1.3_first_rag.py`, `2.langchain/7.RAG/1.basics/1.4_rag_lcel_chain.py` | InMemoryVectorStore + LCEL 검색 체인 |
 
@@ -134,9 +134,9 @@ OPENAI_API_KEY=sk-...
 | `0.docs/05_genai_advanced/06_rag_system.md` | RAG 시스템 전체 파이프라인 | Day 3 |
 
 ## 참고 자료 (예제 디렉토리)
-- `1.openai/1.intro/` — REST API → SDK 진행 단계
-- `1.openai/2.chatbot/2.history/` — 대화 히스토리 관리
-- `1.openai/4.rag/` — FAISS 기반 RAG 기초
+- `1.openai/1.restapi/`, `1.openai/2.sdk/` — REST API → SDK 진행 단계
+- `1.openai/3.chatbot/2.history/` — 대화 히스토리 관리
+- `1.openai/8.rag/` — FAISS 기반 RAG 기초
 - `2.langchain/` — LangChain 전체 (모델·프롬프트·파서·체인·메모리·RAG)
 - `2.langchain/7.RAG/8.web_app/` — RAG 웹앱 단계별 빌드업
 
@@ -231,13 +231,13 @@ AI(인공지능) ⊃ ML(머신러닝) ⊃ DL(딥러닝) ⊃ 생성형 AI ⊃ LLM
 ---
 
 ## 2. REST API 요청과 응답
-> 예제: `1.openai/1.intro/` · 교안: `0.docs/02_web_basics/05_http_protocol.md`, `0.docs/03_python_webdev/13_external_api_and_gpt.md`
+> 예제: `1.openai/1.restapi/` · 교안: `0.docs/02_web_basics/05_http_protocol.md`, `0.docs/03_python_webdev/13_external_api_and_gpt.md`
 
 핵심: 우리 프로그램이 OpenAI의 `POST /v1/chat/completions` 엔드포인트에
 **messages 배열**을 보내면, **JSON 응답**이 돌아옵니다.
 
 ### 2.1 가장 단순한 호출 — 응답 구조 직접 보기
-> `1.openai/1.intro/1.restapi_hello.py`
+> `1.openai/1.restapi/1.restapi_hello.py`
 ```python
 import os, requests
 from dotenv import load_dotenv
@@ -262,7 +262,7 @@ print(response.json())   # 답변은 choices[0].message.content 안에 있다
 ```
 
 ### 2.2 답변만 추출 + 역할(role)
-> `1.openai/1.intro/2.restapi_content.py`
+> `1.openai/1.restapi/2.restapi_content.py`
 
 메시지의 3가지 역할:
 - `system`: 챗봇의 정체성·말투·규칙 (대화 시작 전 1회)
@@ -288,7 +288,7 @@ print('챗봇:', answer)
 ```
 
 ### 2.3 응답을 조절하는 파라미터
-> `1.openai/1.intro/3.restapi_params.py`
+> `1.openai/1.restapi/3.restapi_params.py`
 ```python
 json={
     'model': 'gpt-4o-mini',
@@ -302,7 +302,7 @@ json={
 ```
 
 ### 2.4 함수화 + 예외 처리 + 대화 루프 (REST 완성형)
-> `1.openai/1.intro/4.restapi_chat.py`
+> `1.openai/1.restapi/4.restapi_chat.py`
 ```python
 system_prompt = '당신은 친절한 AI 도우미입니다.'
 
@@ -340,10 +340,10 @@ if __name__ == '__main__':
 ---
 
 ## 3. OpenAI SDK & 멀티턴 대화
-> 예제: `1.openai/1.intro/`, `1.openai/2.chatbot/2.history/`
+> 예제: `1.openai/2.sdk/`, `1.openai/3.chatbot/2.history/`
 
 ### 3.1 신버전 SDK (v1.x) — 현재 표준
-> `1.openai/1.intro/11.sdk_new.py`
+> `1.openai/2.sdk/2.sdk_new.py`
 
 REST와 결과는 같지만 코드가 훨씬 간결합니다.
 ```python
@@ -366,7 +366,7 @@ print('챗봇:', response.choices[0].message.content)
 ```
 
 ### 3.2 멀티턴 — messages 리스트에 대화를 누적
-> `1.openai/1.intro/13.chat_multiturn.py`
+> `1.openai/2.sdk/4.chat_multiturn.py`
 
 멀티턴의 핵심: 이전 대화를 함께 보내면 맥락이 이어집니다.
 모델의 지난 답변은 `assistant` 역할로 다시 넣습니다.
@@ -390,8 +390,8 @@ for q in ['대한민국의 수도는 어디야?', '그 도시의 인구는 얼�
 ```
 
 ### 3.3 웹 챗봇으로 — 히스토리 관리
-> `1.openai/2.chatbot/2.history/app3_history.py` (인메모리 히스토리)
-> `1.openai/2.chatbot/2.history/app4_historylimit.py` (최근 N개만 유지 → 토큰 절약)
+> `1.openai/3.chatbot/2.history/app3a_history.py` (인메모리 히스토리)
+> `1.openai/3.chatbot/2.history/app4_historylimit.py` (최근 N개만 유지 → 토큰 절약)
 
 핵심 아이디어는 3.2와 동일합니다. 서버가 사용자별 `messages` 리스트를 들고
 계속 누적하며, 너무 길어지면 **최근 N개만 유지**해 토큰 비용을 아낍니다.
@@ -793,7 +793,7 @@ for i in range(len(sentences)):
 ---
 
 ## 12. FAISS 기본 RAG
-> 예제: `1.openai/4.rag/1.rag_basic.py`
+> 예제: `1.openai/8.rag/1.rag_basic.py`
 
 전체 파이프라인을 순수 OpenAI + FAISS로 한눈에:
 **문서 → 임베딩 → FAISS 저장 → 질문 임베딩 → 유사 문서 검색 → GPT 응답**
@@ -1122,12 +1122,12 @@ pip install faiss-cpu numpy chromadb langchain-chroma langchain-text-splitters p
 | Day | 주제 | 이론(0.docs) | 코드 예제 |
 |-----|------|-------------|-----------|
 | 1 | 생성형 AI 기초 | `00_OT/05_generative_ai_intro.md` | — |
-| 1 | REST API | `02_web_basics/05_http_protocol.md`, `03_python_webdev/13_external_api_and_gpt.md` | `1.openai/1.intro/1~4` |
-| 1 | SDK·멀티턴 | — | `1.openai/1.intro/11,13`, `1.openai/2.chatbot/2.history/` |
+| 1 | REST API | `02_web_basics/05_http_protocol.md`, `03_python_webdev/13_external_api_and_gpt.md` | `1.openai/1.restapi/1~4` |
+| 1 | SDK·멀티턴 | — | `1.openai/2.sdk/2,4`, `1.openai/3.chatbot/2.history/` |
 | 1 | 프롬프트 엔지니어링 | `01_genai_intro/04_prompt_engineering.md` | — |
 | 1 | 컨텍스트 엔지니어링 | `01_genai_intro/05_so_what_now.md`, `05_genai_advanced/05_context_engineering.md` | — |
 | 2 | LangChain | `05_genai_advanced/07_langchain_lcel.md` | `2.langchain/1~6` |
-| 3 | 임베딩·벡터DB | `04_database/11_vector_databases.md` | `2.langchain/7.RAG/1.basics/`, `1.openai/4.rag/` |
+| 3 | 임베딩·벡터DB | `04_database/11_vector_databases.md` | `2.langchain/7.RAG/1.basics/`, `1.openai/8.rag/` |
 | 3 | RAG 시스템 | `05_genai_advanced/06_rag_system.md` | `2.langchain/7.RAG/2~5` |
 | 3 | RAG 웹앱 | — | `2.langchain/7.RAG/8.web_app/` |
 
