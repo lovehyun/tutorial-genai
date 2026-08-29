@@ -23,13 +23,15 @@ Ollama(지금 시대의 사실상 표준 로컬 런타임, 그래서 번호도 �
 |---|---|---|---|
 | **Llama** | 1B~405B(버전별 상이) | 1B급은 CPU도 가능, 8B+는 GPU 8GB+ 권장 | `5.llama/`(TinyLlama, CPU 실습용) |
 | **Mistral 7B** | 7B | GPU 8GB+ 권장, CPU는 매우 느림 | `4.mistral/` |
-| **Qwen 2.5** | 0.5B~72B(버전별) | 1.5B~7B는 CPU도 실용적 | `10.ollama/5.qwen/` |
-| **EXAONE 3.5** | 2.4B~32B(버전별) | 2.4B~7.8B는 CPU도 가능 | `10.ollama/6.exaone/` |
+| **Qwen 2.5 / 3.5** | 0.5B~397B(버전별) | 0.8B~7B는 CPU도 실용적 | `10.ollama/5.qwen25/`, `10.ollama/6.qwen35/` |
+| **EXAONE 3.5 / 4.0** | 1.2B~32B(버전별) | 1.2B~7.8B는 CPU도 가능 | `10.ollama/7.exaone35/`, `10.ollama/8.exaone40/` |
 | **GPT-Neo** | 125M~2.7B | CPU 가능(작은 버전 기준) | `3.huggingface/2.local_llm/` |
 
 > **VRAM/속도가 걱정되면 Ollama부터**(`10.ollama/`) — GGUF로 양자화된 모델을 CPU에서도 합리적인
 > 속도로 돌린다. `4.mistral/`·`5.llama/`처럼 `transformers`로 직접 로드하는 예제는 원본 가중치라
 > 용량·속도 부담이 더 크다(단, "내부에서 무슨 일이 일어나는지" 보기엔 이쪽이 낫다).
+> GGUF·오픈 웨이트가 정확히 뭔지, 원본 가중치가 GGUF로 어떻게 변환되는지는
+> [`10.ollama/0.gguf_and_open_weights.md`](10.ollama/0.gguf_and_open_weights.md) 참고.
 
 ## 환경 세팅
 ```bash
@@ -43,4 +45,4 @@ GPU가 없어도(이 저장소 개발 환경도 CPU-only) `1.transformers/`, `5.
 - **원리부터 이해하고 싶다면** → `1.transformers/`
 - **내 모델을 직접 학습/경량화하고 싶다면** → `2.mymodel/`
 - **일단 뭔가를 로컬에서 빨리 돌려보고 싶다면(CPU도 OK)** → `10.ollama/`
-- **파인튜닝 없이 프롬프트만으로 한국어 태스크를 처리하고 싶다면** → `10.ollama/5.qwen/` 또는 `10.ollama/6.exaone/`
+- **파인튜닝 없이 프롬프트만으로 한국어 태스크를 처리하고 싶다면** → `10.ollama/5.qwen25/` 또는 `10.ollama/7.exaone35/`

@@ -1,5 +1,9 @@
 # 31.local/10.ollama — Ollama 로 로컬 LLM 돌리기
 
+> **처음이라면 먼저** → [`0.gguf_and_open_weights.md`](0.gguf_and_open_weights.md) — GGUF가 뭔지,
+> 오픈 웨이트가 뭔지, Ollama가 내부적으로 뭘 하는지, 그리고 왜 어떤 모델(EXAONE)은 공식
+> 버전이 없는지까지 기초 개념을 먼저 정리해뒀다.
+
 Ollama 관련 예제를 한곳에 모았다. **두 종류**로 나뉜다 — 헷갈리지 않게 구분해서 본다.
 
 ## ① 호출 방법 (같은 걸 다른 방식으로)
@@ -11,18 +15,30 @@ Ollama 관련 예제를 한곳에 모았다. **두 종류**로 나뉜다 — 헷
 | [`2.sdk/`](2.sdk/) | 파이썬 `ollama` SDK |
 | [`3.langchain/`](3.langchain/) | LangChain(`ChatOllama`) 로 감싸기 |
 | [`4.modelfile/`](4.modelfile/) | Modelfile 로 커스텀 모델 정의(시스템프롬프트·파라미터 고정) |
-| [`7.openai_compat/`](7.openai_compat/) | **OpenAI 형태로 호출**(`/v1/chat/completions`) — `1.openai/` 코드가 거의 그대로 로컬에 붙는다 |
+| [`9.openai_compat/`](9.openai_compat/) | **OpenAI 형태로 호출**(`/v1/chat/completions`) — `1.openai/` 코드가 거의 그대로 로컬에 붙는다 |
 
 ## ② 모델별 한국어 활용 (특정 모델로 실제 태스크)
 "이 **모델로 무엇을 만드나**" — 한국어에 강한 모델로 실제 NLP 작업을 수행한다.
 
 | 폴더 | 모델 | 태스크 |
 |------|------|--------|
-| [`5.qwen/`](5.qwen/) | Qwen 2.5 (Alibaba) | chat · 감성분석 · 분류 · NER · 요약 · 번역 |
-| [`6.exaone/`](6.exaone/) | EXAONE 3.5 (LG AI) | chat · 추론 · 요약 · structured JSON · 코드어시스트 · streaming · RAG |
+| [`5.qwen25/`](5.qwen25/) | Qwen 2.5 (Alibaba) | chat · 감성분석 · 분류 · NER · 요약 · 번역 — 생각 모드 없는 표준 모델 |
+| [`6.qwen35/`](6.qwen35/) | Qwen 3.5 (Alibaba) | 생각 모드(thinking) on/off 비교 · tool calling(2.5와 신뢰도 비교) |
+| [`7.exaone35/`](7.exaone35/) | EXAONE 3.5 (LG AI) | chat · 추론 · 요약 · structured JSON · 코드어시스트 · streaming · RAG |
+| [`8.exaone40/`](8.exaone40/) | EXAONE 4.0 (LG AI) | 생각 모드 · tool calling(3.5엔 없던 기능) — 단, 공식 라이브러리 없어 커뮤니티 GGUF별 동작 차이 실측 |
 
-> **한 줄 요약**: `1~4` = *어떻게 호출하나*(방법), `5~6` = *특정 모델로 무엇을 하나*(활용).
-> 그래서 `1~4` 도 예시로 qwen 을 쓸 수 있지만, `5.qwen` 은 "Qwen 으로 한국어 태스크 모음" 이라 목적이 다르다.
+> **한 줄 요약**: `1~4` = *어떻게 호출하나*(방법), `5~8` = *특정 모델로 무엇을 하나*(활용).
+> 그래서 `1~4` 도 예시로 qwen 을 쓸 수 있지만, `5~8` 은 "모델로 한국어 태스크·생각모드·tool calling" 이라 목적이 다르다.
+>
+> **`5.qwen25` vs `6.qwen35`** — 같은 계열의 세대 차이: **2.5 는 생각 모드가 아예 없는 표준 모델**,
+> **3.5 는 같은 모델 안에서 생각 모드를 켜고 끌 수 있는 하이브리드**다. tool calling 은 **둘 다 된다** — "생각 모드가
+> 있어야 도구 호출이 된다"는 오해가 있는데 사실이 아니다(2.5도 이미 native tool calling 지원). 다만 인자를
+> 헛짚는 빈도는 3.5 쪽이 더 낮다 — `6.qwen35`에서 이 차이를 직접 실측해서 비교한다.
+>
+> **`7.exaone35` vs `8.exaone40`** — 같은 구조의 대비다: **3.5 는 tool calling 자체를 지원 안 함**,
+> **4.0 은 생각 모드 + tool calling 을 새로 지원**한다. 다만 Qwen 과 달리 EXAONE 4.0 은 **Ollama 공식
+> 라이브러리에 아직 없어서** 커뮤니티 GGUF 품질에 따라 실제 동작이 갈린다(어떤 업로드는 tool calling
+> 성공률이 0/3, 어떤 건 3/3) — `8.exaone40`에서 그 차이를 그대로 실측해서 보여준다.
 
 ## 🔧 모델 바꾸기 (저사양·재현용)
 각 파일 상단의 **`MODEL = "..."` 한 줄만 바꾸면** 다른 모델로 돌아간다. 저사양 PC 에서도 재현되게 **가벼운 것 위주** 권장:

@@ -1,4 +1,4 @@
-# 7.openai_compat — Ollama를 OpenAI 형태로 호출하기(드롭인 호환)
+# 8.openai_compat — Ollama를 OpenAI 형태로 호출하기(드롭인 호환)
 
 Ollama는 자체 REST(`1.restapi`)·SDK(`2.sdk`) 말고도 **OpenAI와 똑같은 형태의 엔드포인트**
 (`/v1/chat/completions`)를 함께 제공한다. `base_url`만 로컬로 바꾸면 `openai` 파이썬 패키지를

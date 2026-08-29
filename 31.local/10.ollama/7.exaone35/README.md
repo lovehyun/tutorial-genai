@@ -1,9 +1,9 @@
-# 6.exaone — EXAONE 3.5 로 할 수 있는 다양한 것들 (Ollama)
+# 7.exaone — EXAONE 3.5 로 할 수 있는 다양한 것들 (Ollama)
 
 **EXAONE 3.5** = LG AI Research 가 만든 한국어 강한 오픈 LLM.
 여기서는 Ollama 로 로컬 실행하며, 대화부터 추론·구조화출력·RAG 까지 **여러 활용**을 단계별로 봅니다.
 
-> 순수 '한국어 NLP 태스크(감정/NER/번역 등)' 위주 예제는 [`../5.qwen`](../5.qwen)(Qwen 버전,
+> 순수 '한국어 NLP 태스크(감정/NER/번역 등)' 위주 예제는 [`../5.qwen25`](../5.qwen25)(Qwen 버전,
 > 구조 동일) 참고 — 이 폴더는 '**EXAONE 으로 할 수 있는 다양한 응용**'(추론·요약·구조화출력·RAG)에 집중합니다.
 
 ## 준비
@@ -36,4 +36,4 @@ pip install ollama
 - ⚠️ **EXAONE 3.5 는 네이티브 tool calling(함수호출)을 지원하지 않습니다** (Ollama capability = `completion` 만).
   그래서 이 폴더엔 agent/도구사용 예제가 없습니다. **agent 가 필요하면 `tools` 지원 모델**
   (Qwen2.5 / Mistral)을 쓰세요 — 예: [`../3.langchain/7.tool_agent.py`](../3.langchain/7.tool_agent.py).
-- 본격 벡터검색 RAG·LangChain 연동은 [`../../2.langchain/7.RAG`](../../2.langchain/7.RAG) 참고.
+- 본격 벡터검색 RAG·LangChain 연동은 [`../../../2.langchain/7.RAG`](../../../2.langchain/7.RAG) 참고.

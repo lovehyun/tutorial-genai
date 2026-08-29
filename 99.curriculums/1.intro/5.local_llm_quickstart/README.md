@@ -26,8 +26,8 @@
 | 13:30-14:00 | GPT4All 대화 & 시스템 프롬프트 | `31.local/6.gpt4all/3.conversation.py`, `31.local/6.gpt4all/4.system_prompt.py` | 대화 모드, 시스템 프롬프트 설정 |
 | 14:00-14:30 | GPT4All 파일 처리 | `31.local/6.gpt4all/6.fileprocessing.py`, `31.local/6.gpt4all/8.local_docs.py` | 로컬 문서 처리 및 QA |
 | 14:45-15:15 | HuggingFace 파이프라인 | `31.local/3.huggingface/1.pipelines/1.1_cla_sentiment.py`, `31.local/3.huggingface/1.pipelines/1.5_ext_qa.py` | 감성분석, QA 파이프라인 |
-| 15:15-15:45 | 한국어 NLP (감성분석/분류) | `31.local/10.ollama/5.qwen/1.chat.py`, `31.local/10.ollama/5.qwen/2.sentiment.py`, `31.local/10.ollama/5.qwen/3.classification.py` | 한국어 챗, 감성분석, 텍스트 분류 |
-| 15:45-16:15 | 한국어 NLP (NER/요약/번역) | `31.local/10.ollama/5.qwen/4.ner.py`, `31.local/10.ollama/5.qwen/5.summarization.py`, `31.local/10.ollama/5.qwen/6.translation.py` | 개체명 인식, 요약, 번역 |
+| 15:15-15:45 | 한국어 NLP (감성분석/분류) | `31.local/10.ollama/5.qwen25/1.chat.py`, `31.local/10.ollama/5.qwen25/2.sentiment.py`, `31.local/10.ollama/5.qwen25/3.classification.py` | 한국어 챗, 감성분석, 텍스트 분류 |
+| 15:45-16:15 | 한국어 NLP (NER/요약/번역) | `31.local/10.ollama/5.qwen25/4.ner.py`, `31.local/10.ollama/5.qwen25/5.summarization.py`, `31.local/10.ollama/5.qwen25/6.translation.py` | 개체명 인식, 요약, 번역 |
 | 16:15-17:00 | 종합 비교 & Q&A | — | Ollama vs GPT4All vs HuggingFace 비교 정리, 종합 Q&A |
 
 ## 환경 설정
@@ -48,4 +48,4 @@ pip install transformers torch flask gradio gpt4all
 - `31.local/3.huggingface/` — HuggingFace 파이프라인
 - `31.local/10.ollama/1.restapi/` · `10.ollama/2.sdk/` · `10.ollama/3.langchain/` — Ollama (REST → SDK → LangChain)
 - `31.local/6.gpt4all/` — GPT4All
-- `31.local/10.ollama/5.qwen/` — 한국어 NLP
+- `31.local/10.ollama/5.qwen25/` — 한국어 NLP
