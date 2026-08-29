@@ -109,7 +109,7 @@ instructor 전용 보너스 파일은 `{자리 알파벳}x` 로 표시한다 —
 ## 실행
 
 ```bash
-cd exercise/2.student(todo)          # 또는 1.instructor, 3.student(answer)
+cd exercise_4hr/2.student(todo)      # 또는 1.instructor, 3.student(answer)
 pip install mcp langchain langchain-openai langchain-community langchain-mcp-adapters langgraph openai python-dotenv numexpr
 # .env 에 OPENAI_API_KEY 필요 (이 폴더에 직접 두거나, 레포 루트 .env 를 상속받게 실행 위치 조정)
 

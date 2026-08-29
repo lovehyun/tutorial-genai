@@ -1,6 +1,6 @@
 """
 4b 확장 — "항상 허용"이라고 한 번 답하면, 그 도구는 이후로 다시 안 묻는다(허용 리스트에 추가).
-15.mcp_ops_assistant/4.auto_approve 의 AUTO_APPROVED 집합 아이디어를 CLI로 단순화한 것.
+18.mcp_ops_assistant/4.auto_approve 의 AUTO_APPROVED 집합 아이디어를 CLI로 단순화한 것.
 
 레포에 CLI 형태의 자동승인 예제는 없다 — 4b(interrupt_before 승인 루프)를 그대로 확장해서
 이번 세션에서 직접 구성. 4a.hitl_approval_server.py 를 그대로 재사용한다.
@@ -112,11 +112,11 @@ if __name__ == "__main__":
 
 
 # 관전 포인트: AUTO_APPROVED 는 "도구 이름" 단위다. delete_file 을 한 번 항상 허용하면
-# 인자(어떤 파일인지)와 무관하게 delete_file 호출이면 뭐든 통과된다 — 15.mcp_ops_assistant의
+# 인자(어떤 파일인지)와 무관하게 delete_file 호출이면 뭐든 통과된다 — 18.mcp_ops_assistant의
 # README가 짚었던 바로 그 한계("자동승인 범위가 너무 넓다")를 CLI로도 그대로 재현한 것.
 #
 # ⚠️ 별개의 관찰: 실행해보면 두 번째 삭제 후에도 "남은 파일 2개"로 찍힌다(1개가 맞을 것 같은데).
 #   MultiServerMCPClient 로 얻은 도구는 호출마다(또는 턴마다) 서버를 새로 붙이는 식이라,
 #   server.py 의 메모리 속 DOCS 상태가 턴 사이에 안 이어지는 것으로 보인다 — 자동승인 로직과는
 #   무관한 별개의 현상이다(4b 원본도 같은 구조라 같은 한계를 갖는다). 실제 운영에선 DB처럼
-#   프로세스 밖에 상태를 두면 해결된다(15.mcp_ops_assistant가 ops.db 파일을 쓰는 이유이기도 하다).
+#   프로세스 밖에 상태를 두면 해결된다(18.mcp_ops_assistant가 ops.db 파일을 쓰는 이유이기도 하다).
