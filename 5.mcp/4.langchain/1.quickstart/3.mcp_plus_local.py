@@ -19,8 +19,8 @@ from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
-from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain.agents import create_agent
+from langchain_mcp_adapters.client import MultiServerMCPClient
 
 load_dotenv()
 

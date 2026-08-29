@@ -24,6 +24,10 @@ async def main():
             # - 버전 교환
             await session.initialize()
 
+            # 도구 목록 요청
+            # tools = (await session.list_tools()).tools
+            # print("도구:", [t.name for t in tools])
+
             # 서버에서 제공하는 "hello" 도구를 호출
             # - 첫 번째 파라미터: 도구 이름
             # - 두 번째 파라미터: 도구 실행에 필요한 인자(딕셔너리)
@@ -45,3 +49,8 @@ if __name__ == "__main__":
 # 4. 도구 호출: hello("John") 원격 실행
 # 5. 결과 반환: "Hello, John!" 문자열 반환
 # 6. 리소스 정리: 서버 프로세스 종료 및 스트림 닫기
+
+# {"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"mcp","version":"0.1.0"}},"jsonrpc":"2.0","id":0}
+# {"method":"notifications/initialized","jsonrpc":"2.0"}
+# {"method":"tools/list","jsonrpc":"2.0","id":1}
+# {"method":"tools/call","params":{"name":"hello","arguments":{"name":"홍길동"}},"jsonrpc":"2.0","id":1}
