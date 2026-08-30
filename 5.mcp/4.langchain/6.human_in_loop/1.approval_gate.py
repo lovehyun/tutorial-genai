@@ -84,6 +84,8 @@ async def main():
     #   이 질문은 list_files → delete_file 로 두 번 멈춘다.
     #   마지막 메시지에 tool_calls 가 없으면 = 최종 답변 도달 → 루프 종료.
     while result["messages"][-1].tool_calls:
+        # [-1]인 이유: messages는 append-only라 방금 멈춘 시점의 도구 호출 요청이
+        # 항상 맨 끝에 있다 — 그래서 "지금 승인 대기 중인 게 뭔지"는 항상 -1로 본다.
         print("\n[정지 — 실행 예정]")
         for call in result["messages"][-1].tool_calls:
             print(f"  → {call['name']}({call['args']})")
