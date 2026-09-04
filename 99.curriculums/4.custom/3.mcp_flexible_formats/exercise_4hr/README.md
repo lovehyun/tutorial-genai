@@ -80,8 +80,8 @@ instructor 전용 보너스 파일은 `{자리 알파벳}x` 로 표시한다 —
 | 파일 | 내용 | 원본 |
 |---|---|---|
 | `4a.hitl_approval_server.py`(비실습, 지원용) / `4b.hitl_approval_client.py` | HITL 승인 게이트(CLI) — `checkpointer`+`interrupt_before` 두 인자가 핵심 | [`5.mcp/4.langchain/6.human_in_loop/server.py`](../../../../5.mcp/4.langchain/6.human_in_loop/server.py) + `1.approval_gate.py` |
-| `4cx.hitl_auto_approve.py`(**instructor 전용 보너스**) | "항상 허용"을 한 번 고르면 같은 도구는 다음부턴 안 묻는다(`AUTO_APPROVED` 집합) — 4b를 확장 | 레포에 CLI 형태로는 없음 — `18.mcp_ops_assistant/4.auto_approve`의 아이디어를 이번 세션에서 CLI로 재구성 |
-| [`4dx.hitl_web_demo/`](1.instructor/4dx.hitl_web_demo/)(**instructor 전용 보너스**) | 같은 HITL을 웹 화면(승인 카드)으로 — CLI `input()` 대신 승인 대기 상태를 저장소에 남기고 재개하는 구조 | [`10.project/18.mcp_ops_assistant/2.hitl_approve/`](../../../../10.project/18.mcp_ops_assistant/2.hitl_approve/) |
+| `4cx.hitl_auto_approve.py`(**instructor 전용 보너스**) | "항상 허용"을 한 번 고르면 같은 도구는 다음부턴 안 묻는다(`AUTO_APPROVED` 집합) — 4b를 확장 | 레포에 CLI 형태로는 없음 — `18.mcp_ops_hitl/4.auto_approve`의 아이디어를 이번 세션에서 CLI로 재구성 |
+| [`4dx.hitl_web_demo/`](1.instructor/4dx.hitl_web_demo/)(**instructor 전용 보너스**) | 같은 HITL을 웹 화면(승인 카드)으로 — CLI `input()` 대신 승인 대기 상태를 저장소에 남기고 재개하는 구조 | [`10.project/18.mcp_ops_hitl/2.hitl_approve/`](../../../../10.project/18.mcp_ops_hitl/2.hitl_approve/) |
 
 `4cx`/`4dx` 둘 다 `2.student(todo)`·`3.student(answer)`에는 없다 — 4시간 안에 다 못 다룰 수 있어
 **강사가 시간 남으면 보여주는 용도**로만 instructor 폴더에 넣었다. 둘 다 `4a`/`4b` 다음에

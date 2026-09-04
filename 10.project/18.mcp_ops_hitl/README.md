@@ -1,4 +1,4 @@
-# 18.mcp_ops_assistant — 사내 IT 비서: 웹 챗봇 × 다중 MCP × HITL × 서브에이전트 × 자동승인
+# 18.mcp_ops_hitl — 사내 IT 비서: 웹 챗봇 × 다중 MCP × HITL × 서브에이전트 × 자동승인
 
 챗봇에게 사내 업무(계정 생성·권한 부여·메일 발송)를 말로 시키면, 에이전트가 세 MCP 서버를 써서 처리한다.
 **되돌릴 수 없는 작업 앞에서는 멈춰 사람에게 물어보고**, 오래 걸리는 업무는 **백그라운드 담당자(서브에이전트)에게 위임**한다.
@@ -83,10 +83,10 @@ pip install flask langchain langchain-openai langchain-mcp-adapters langgraph \
             langgraph-checkpoint-sqlite python-dotenv mcp
 # .env 에 OPENAI_API_KEY
 
-cd 10.project/18.mcp_ops_assistant/1.web_agent      && python app.py   # → localhost:5081
-cd 10.project/18.mcp_ops_assistant/2.hitl_approve   && python app.py   # → localhost:5082
-cd 10.project/18.mcp_ops_assistant/3.background_tasks && python app.py # → localhost:5083
-cd 10.project/18.mcp_ops_assistant/4.auto_approve    && python app.py # → localhost:5084
+cd 10.project/18.mcp_ops_hitl/1.web_agent      && python app.py   # → localhost:5081
+cd 10.project/18.mcp_ops_hitl/2.hitl_approve   && python app.py   # → localhost:5082
+cd 10.project/18.mcp_ops_hitl/3.background_tasks && python app.py # → localhost:5083
+cd 10.project/18.mcp_ops_hitl/4.auto_approve    && python app.py # → localhost:5084
 ```
 
 - MCP 서버는 **stdio 로 자동 실행**된다. 따로 띄울 필요 없다.

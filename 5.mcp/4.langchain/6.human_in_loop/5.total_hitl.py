@@ -180,7 +180,7 @@ if __name__ == "__main__":
 #     ALLOWED_TOOLS 는 초기화된다(영구 저장하려면 파일/DB에 남겨야 한다).
 #   - **a(always)는 '도구 이름' 단위다** — get_stock_price 를 한 번 always 허용하면, 그 뒤로는
 #     어떤 종목을 조회하든(테슬라든 애플이든) 다시 안 묻는다. 인자별로 세밀하게 막고 싶다면
-#     ALLOWED_TOOLS 를 (도구명, 인자) 조합으로 바꿔야 한다 — 8.exaone40, 18.mcp_ops_assistant
+#     ALLOWED_TOOLS 를 (도구명, 인자) 조합으로 바꿔야 한다 — 8.exaone40, 18.mcp_ops_hitl
 #     의 "자동승인이 너무 넓다"는 한계와 같은 이야기다.
 #   - **도구 이름 충돌**: docs 서버와 fs 서버 둘 다 read_file 을 갖고 있다. 이 파일의 실측으로도
 #     확인됐다 — 여러 MCP 서버를 한 에이전트에 동시에 붙일 때는 이름이 겹치는 도구가 없는지

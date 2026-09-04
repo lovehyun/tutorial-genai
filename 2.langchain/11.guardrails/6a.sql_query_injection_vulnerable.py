@@ -13,6 +13,7 @@
 """
 
 import os
+import re
 import sqlite3
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
@@ -71,7 +72,10 @@ sql_gen_chain = sql_gen_prompt | llm | StrOutputParser()
 
 
 def run_unvalidated(question: str):
-    generated_sql = sql_gen_chain.invoke({"question": question}).strip().strip("```sql").strip("```")
+    raw = sql_gen_chain.invoke({"question": question}).strip()
+    # 코드펜스만 벗겨낸다 — .strip("```sql")는 문자 '집합'을 지우는 함수라 SQL이
+    # 우연히 s/q/l로 끝나면(예: "...FROM employees") 실제 텍스트가 잘려나가는 버그가 있었다.
+    generated_sql = re.sub(r"^```(?:sql)?\s*|\s*```$", "", raw)
     print(f"[생성된 SQL]\n{generated_sql}\n")
 
     conn = setup_db()

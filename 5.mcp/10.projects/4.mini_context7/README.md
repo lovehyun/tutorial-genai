@@ -111,7 +111,7 @@ claude mcp add mini-context7 -- "C:\...\tutorial-genai\.venv\Scripts\python.exe"
    반환한다.
 2. `get_library_docs`는 **그 정확한 ID만 신뢰**한다 — 등록되지 않은 ID가 오면 문서 대신 "먼저
    resolve하라"는 에러 문자열을 돌려준다. 이건 프로토콜이 강제하는 게 아니라 **서버 코드가
-   스스로 검증**하는 것이다. [`10.project/18.mcp_ops_assistant`](../../../10.project/18.mcp_ops_assistant/README.md)에서
+   스스로 검증**하는 것이다. [`10.project/18.mcp_ops_hitl`](../../../10.project/18.mcp_ops_hitl/README.md)에서
    "도구 설명(프롬프트)만으론 100% 강제가 안 된다"고 배운 것과 같은 이유로, 여기서는
    *서버가 직접 최후 방어선* 역할을 한다.
 3. `topic` 파라미터는 문서 전체가 아니라 관련 파일만 필터링한다 — 실제 context7이 토큰 예산을
