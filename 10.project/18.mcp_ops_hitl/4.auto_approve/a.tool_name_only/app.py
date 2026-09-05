@@ -1,4 +1,9 @@
-# app.py — [4단계] 한 번 승인한 기능은 다시 묻지 않는다 (자동승인) + 결과를 눈으로 확인
+# app.py — [4a] 한 번 승인한 기능은 다시 묻지 않는다 (자동승인) + 결과를 눈으로 확인
+#
+# ══ 이 폴더는 4단계의 두 변형(a/b) 중 하나다 — ../README.md 참고 ═══════
+#   여기(a)는 자동승인을 '도구 이름' 단위로만 건다 — grant_access 를 한 번
+#   자동승인하면 email 이든 prod-db 든 그냥 나간다. `b.scoped_guard/`가
+#   여기에 인자 수준 예외(고위험 group 이면 자동승인이어도 재확인)를 더한 버전이다.
 #
 # ══ 3단계의 한계 ═══════════════════════════════════════════════
 #   온보딩을 열 명 하면 create_account 승인을 열 번 누른다. 매번 같은 판단인데도.
@@ -45,7 +50,7 @@ import jobs
 load_dotenv()
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SERVERS = os.path.join(HERE, "..", "servers")
+SERVERS = os.path.join(HERE, "..", "..", "servers")
 
 # [4단계] DB 현황 패널을 위해 사내 시스템 DB 를 직접 읽는다.
 #   ※ 일부러 MCP 를 거치지 않는다 — 에이전트가 '정말로' 바꿨는지를

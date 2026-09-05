@@ -3,18 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>사내 IT 헬프데스크 AI — 4단계 (자동승인)</title>
+  <title>사내 IT 헬프데스크 AI — 4b (인자 수준 guardrail)</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <header>
     <h1>사내 IT 헬프데스크 AI</h1>
-    <span class="stage stage-ok">4단계 · 자동승인 + 결과 확인</span>
+    <span class="stage stage-ok">4b · 자동승인 + 고위험 인자는 항상 재확인</span>
   </header>
 
   <p class="tools">
     조회는 자동 통과({{ safe|join(', ') }}) · 나머지는 승인 대상 ·
-    <b>[항상 승인]</b> 을 누르면 그 기능은 다음부터 안 묻는다
+    <b>[항상 승인]</b> 을 누르면 그 기능은 다음부터 안 묻는다 —
+    단 <b>grant_access 의 group 이 고위험(prod-db·payroll)이면 예외 없이 매번 재확인</b>
   </p>
 
   <div class="layout4">
@@ -23,7 +24,7 @@
       <div class="panel">
         <h2>⚡ 자동승인 목록</h2>
         <div id="autolist"><p class="empty">아직 없음 — 전부 물어본다</p></div>
-        <p class="note">여기 올라간 기능은 승인 없이 실행된다. 해제하면 다시 물어본다.</p>
+        <p class="note">여기 올라간 기능은 승인 없이 실행된다. 단, 고위험 인자는 예외.</p>
       </div>
 
       <div class="panel">
@@ -39,7 +40,7 @@
     <div>
       <div id="chat"></div>
       <form id="form">
-        <input id="msg" autocomplete="off" placeholder="예) 김철수 온보딩 해줘. 계정 chulsoo, email·vpn 권한">
+        <input id="msg" autocomplete="off" placeholder="예) 오지훈 온보딩 해줘. 계정 jihoon, email·vpn 권한">
         <button id="send">보내기</button>
       </form>
 
@@ -48,22 +49,22 @@
       <details class="hint">
         <summary>예제 프롬프트</summary>
         <ol>
-          <li><code class="p">김철수 온보딩 해줘. 계정 chulsoo, email·vpn 권한</code>
-            <ul><li>승인 카드에서 <b>[항상 승인]</b> 을 눌러 보기</li>
-                <li>왼쪽 <b>자동승인 목록</b>에 그 기능이 올라간다</li></ul></li>
+          <li><code class="p">오지훈 온보딩 해줘. 계정 jihoon, email·vpn 권한</code>
+            <ul><li>create_account 승인 카드에서 <b>[항상 승인]</b> 을 눌러 보기</li>
+                <li>이어지는 grant_access 카드에서도 <b>[항상 승인]</b> (email 만 있을 수도, vpn 까지 같이 있을 수도 있다) — grant_access 도 목록에 오른다</li></ul></li>
 
-          <li><code class="p">이영희한테 github 권한 줘</code>
-            <ul><li>같은 기능이라 <b>이번엔 안 묻는다</b></li>
-                <li>작업 로그에 <code>⚡ 자동승인</code> 으로 남는다</li>
-                <li>왼쪽 <b>DB 현황</b>에서 권한이 실제로 늘어난 것을 확인</li></ul></li>
-
-          <li><code class="p">박민수한테 payroll 권한 줘</code>
-            <ul><li>먼저 왼쪽에서 <code>grant_access</code> 자동승인을 <b>[해제]</b> 할 것</li>
-                <li>해제했으니 다시 물어본다</li></ul></li>
+          <li><code class="p">박민수한테 vpn 권한 줘</code>
+            <ul><li>vpn 은 고위험이 아니라서 <b>안 묻는다</b> (a 와 동일하게 동작)</li>
+                <li>작업 로그에 <code>⚡ 자동승인</code> 으로 남는다</li></ul></li>
 
           <li><code class="p">박민수한테 prod-db 권한 줘</code>
-            <ul><li><code>grant_access</code> 를 자동승인해 뒀다면 <b>고위험 권한도 안 묻고 나간다</b></li>
-                <li>도구 이름으로만 자동승인하면 범위가 너무 넓다는 뜻</li></ul></li>
+            <ul><li><b>grant_access 는 자동승인 상태인데도 승인 카드가 뜬다</b> — prod-db 가 고위험이라서</li>
+                <li>이 카드에는 <b>[항상 승인] 버튼이 없다</b> — "이번만 봐줘"는 있어도
+                    "고위험은 앞으로도 자동으로"는 이 단계에서 아예 선택지에서 뺐다</li>
+                <li>a 였다면 이 요청은 그냥 아무 표시 없이 나갔다 — 비교해서 확인해 볼 것</li></ul></li>
+
+          <li><code class="p">박민수한테 payroll 권한 줘</code>
+            <ul><li>payroll 도 고위험이라 마찬가지로 매번 재확인 — 어떤 사번·어떤 그룹이든 예외 없음</li></ul></li>
         </ol>
       </details>
 
@@ -117,7 +118,7 @@ function renderTrace(trace) {
   chat.scrollTop = chat.scrollHeight;
 }
 
-/* ── 폴링 — 3단계의 /jobs 가 /state 로 넓어졌다 (작업 + 자동승인 + DB) ── */
+/* ── 폴링 — 작업 + 자동승인 + DB 를 한 번에 받는다 ── */
 async function poll() {
   try {
     const r = await fetch('/state');
@@ -213,7 +214,7 @@ function renderJobs(jobs) {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
           approved: btn.dataset.decision !== 'no',
-          always:   btn.dataset.decision === 'always',   // ← 4단계에서 추가된 필드
+          always:   btn.dataset.decision === 'always',
         }),
       });
       poll();
@@ -260,13 +261,23 @@ function approvalHtml(j) {
     Object.entries(c.args).map(([k, v]) => `  ${escapeHtml(k)} = ${escapeHtml(v)}`).join('\n')
   ).join('\n');
 
+  // [4b] 고위험 인자가 섞인 배치는 '항상 승인' 버튼 자체를 숨긴다 —
+  //   도구 이름 단위 자동승인으로 고위험까지 같이 넘어가는 걸 막기 위해서다.
+  const alwaysBtn = j.locked
+    ? ''
+    : `<button class="btn-always" data-job="${j.id}" data-decision="always">항상 승인</button>`;
+  const lockedNote = j.locked
+    ? `<p class="note" style="color:#b45309">⚠️ 고위험 인자 포함 — 자동승인 여부와 무관하게 매번 재확인합니다.</p>`
+    : '';
+
   return `
     <div class="approval" style="margin-top:8px">
       <h3>⚠️ 승인 필요</h3>
       <div class="args">${args}</div>
+      ${lockedNote}
       <div class="btns">
         <button class="btn-yes"    data-job="${j.id}" data-decision="yes">승인</button>
-        <button class="btn-always" data-job="${j.id}" data-decision="always">항상 승인</button>
+        ${alwaysBtn}
         <button class="btn-no"     data-job="${j.id}" data-decision="no">거부</button>
       </div>
     </div>`;
@@ -279,7 +290,7 @@ document.getElementById('dbreset').onclick = async (e) => {
   const ok = confirm(
     '데모를 처음 상태로 되돌립니다.\n\n' +
     '지워지는 것\n' +
-    '• 생성된 계정과 부여된 권한, 발송 기록 (김철수는 다시 "계정 없음")\n' +
+    '• 생성된 계정과 부여된 권한, 발송 기록 (오지훈은 다시 "계정 없음")\n' +
     '• 작업 목록\n' +
     '• 채팅 대화 내용\n\n' +
     '남는 것\n' +

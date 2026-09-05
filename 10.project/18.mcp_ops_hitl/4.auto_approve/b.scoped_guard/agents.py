@@ -1,6 +1,6 @@
 # agents.py — MCP 연결과 에이전트 조립
 #
-# 1~3단계에서 이미 만든 것들이다. 4단계에서 바뀐 것이 없어서 통째로 빼뒀다.
+# 1~4단계에서 이미 만든 것들이다. 4b(여기)에서 바뀐 것이 없어서 통째로 빼뒀다.
 #   · mcp_config()      : 서버 3개를 stdio 로 띄우는 설정 (1단계 그대로)
 #   · make_checkpointer(): 승인 대기를 저장할 곳 (2단계 그대로)
 #   · build()           : 메인/워커 두 에이전트로 분리 (3단계 그대로)
@@ -15,7 +15,7 @@ from langgraph.checkpoint.memory import MemorySaver
 import jobs
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SERVERS = os.path.join(HERE, "..", "servers")
+SERVERS = os.path.join(HERE, "..", "..", "servers")
 CHECKPOINT_DB = os.path.join(HERE, "checkpoints.sqlite")
 
 MAIN_SYSTEM = """너는 사내 IT 헬프데스크 접수 담당이다.

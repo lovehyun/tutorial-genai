@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>사내 IT 헬프데스크 AI — 4a (자동승인 — 도구 이름 단위)</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>사내 IT 헬프데스크 AI</h1>
+    <span class="stage stage-warn">4a · 자동승인 — 도구 이름 단위라 고위험도 그냥 나간다</span>
+  </header>
+
+  <p class="tools">
+    조회는 자동 통과({{ safe|join(', ') }}) · 나머지는 승인 대상 ·
+    <b>[항상 승인]</b> 을 누르면 그 기능은 다음부터 안 묻는다
+  </p>
+
+  <div class="layout4">
+    <!-- ── 왼쪽 패널: 자동승인 목록 + DB 현황 ────────────── -->
+    <div class="side">
+      <div class="panel">
+        <h2>⚡ 자동승인 목록</h2>
+        <div id="autolist"><p class="empty">아직 없음 — 전부 물어본다</p></div>
+        <p class="note">여기 올라간 기능은 승인 없이 실행된다. 해제하면 다시 물어본다.</p>
+      </div>
+
+      <div class="panel">
+        <h2>🗄 DB 현황
+          <button id="dbreset" class="reset">초기화</button>
+        </h2>
+        <div id="dbview"></div>
+        <p class="note">MCP 를 거치지 않고 DB 를 직접 읽는다 — 에이전트가 정말 바꿨는지 확인용.</p>
+      </div>
+    </div>
+
+    <!-- ── 가운데: 채팅 ──────────────────────────────────── -->
+    <div>
+      <div id="chat"></div>
+      <form id="form">
+        <input id="msg" autocomplete="off" placeholder="예) 강태호 온보딩 해줘. 계정 taeho, email·vpn 권한">
+        <button id="send">보내기</button>
+      </form>
+
+      <!-- 예제 프롬프트 — 입력창 바로 아래.
+           그리드 바깥에 두면 왼쪽 패널이 길 때 그 아래로 밀려 보인다 -->
+      <details class="hint">
+        <summary>예제 프롬프트</summary>
+        <ol>
+          <li><code class="p">강태호 온보딩 해줘. 계정 taeho, email·vpn 권한</code>
+            <ul><li>create_account 승인 카드에서 <b>[항상 승인]</b> 을 눌러 보기 — 왼쪽 자동승인 목록에 오른다</li>
+                <li>이어지는 grant_access 카드에서도 <b>[항상 승인]</b> (email 만 있을 수도, vpn 까지 같이 있을 수도 있다) — grant_access 도 목록에 오른다</li></ul></li>
+
+          <li><code class="p">이영희한테 github 권한 줘</code>
+            <ul><li>같은 기능(grant_access)이라 <b>이번엔 안 묻는다</b></li>
+                <li>작업 로그에 <code>⚡ 자동승인</code> 으로 남는다</li>
+                <li>왼쪽 <b>DB 현황</b>에서 권한이 실제로 늘어난 것을 확인</li></ul></li>
+
+          <li><code class="p">박민수한테 payroll 권한 줘</code>
+            <ul><li>먼저 왼쪽에서 <code>grant_access</code> 자동승인을 <b>[해제]</b> 할 것</li>
+                <li>해제했으니 다시 물어본다 (박민수는 payroll 이 이미 있어 결과는 no-op —
+                    여기서 볼 건 "다시 묻는지" 그 자체다). 이번엔 그냥 <b>[승인]</b>만 누르기</li></ul></li>
+
+          <li><code class="p">이영희한테 prod-db 권한 줘</code>
+            <ul><li>방금 해제했으니 또 물어본다 — 여기서 별 고민 없이 <b>[항상 승인]</b> 을 눌러 보기</li>
+                <li>고위험 권한 하나가 그렇게(클릭 한 번으로) 나간다</li></ul></li>
+
+          <li><code class="p">박민수한테 github 권한 줘</code>
+            <ul><li>방금 그 클릭 한 번 때문에 이것도 <b>안 묻고 그냥 나간다</b></li>
+                <li>도구 이름으로만 자동승인하면 범위가 너무 넓다는 뜻</li></ul></li>
+        </ol>
+      </details>
+
+      <!-- 워커가 실제로 무슨 도구를 불렀는지 — 접어두고 필요할 때만 편다 -->
+      <details id="worklog" class="worklog">
+        <summary>작업 로그 <span class="count">0</span></summary>
+        <div id="worklogbody"><p class="empty">아직 없습니다.</p></div>
+      </details>
+    </div>
+
+    <!-- ── 오른쪽: 작업 패널 ─────────────────────────────── -->
+    <div id="jobs">
+      <h2>작업 패널</h2>
+      <div id="joblist"><p class="empty">위임된 작업이 없습니다.</p></div>
+    </div>
+  </div>
+
+<script>
+const chat = document.getElementById('chat');
+const form = document.getElementById('form');
+const msg  = document.getElementById('msg');
+const send = document.getElementById('send');
+const joblist = document.getElementById('joblist');
+const autolist = document.getElementById('autolist');
+const dbview = document.getElementById('dbview');
+
+const LABEL = {queued:'대기', running:'진행 중', waiting:'승인 대기',
+               done:'완료', rejected:'거부됨', error:'오류'};
+const CLS   = {queued:'st-queued', running:'st-running', waiting:'st-waiting',
+               done:'st-done', rejected:'st-rejected', error:'st-error'};
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+
+function bubble(who, text, cls) {
+  const el = document.createElement('div');
+  el.className = 'bubble ' + cls;
+  el.innerHTML = `<b>${who}</b><div>${text}</div>`;
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+  return el;
+}
+
+function renderTrace(trace) {
+  if (!trace || !trace.length) return;
+  const el = document.createElement('div');
+  el.className = 'trace';
+  el.innerHTML = trace.map(t => `<div class="call">${escapeHtml(t)}</div>`).join('');
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+/* ── 폴링 — 3단계의 /jobs 가 /state 로 넓어졌다 (작업 + 자동승인 + DB) ── */
+async function poll() {
+  try {
+    const r = await fetch('/state');
+    const s = await r.json();
+    renderJobs(s.jobs);
+    renderWorklog(s.jobs);
+    renderAuto(s.auto);
+    renderDb(s.db);
+  } catch (e) { /* 서버 재시작 중일 수 있다 — 다음 폴링에서 복구된다 */ }
+}
+
+/* ── 자동승인 목록 ─────────────────────────────────────── */
+function renderAuto(auto) {
+  if (!auto.length) {
+    autolist.innerHTML = '<p class="empty">아직 없음 — 전부 물어본다</p>';
+    return;
+  }
+  autolist.innerHTML = auto.map(name => `
+    <div class="autoitem">
+      <code>${escapeHtml(name)}</code>
+      <button class="revoke" data-auto="${escapeHtml(name)}">해제</button>
+    </div>`).join('');
+
+  autolist.querySelectorAll('button[data-auto]').forEach(btn => {
+    btn.onclick = async () => {
+      btn.disabled = true;
+      await fetch(`/auto/${encodeURIComponent(btn.dataset.auto)}/revoke`, {method: 'POST'});
+      poll();
+    };
+  });
+}
+
+/* ── DB 현황 (접기/펼치기) ─────────────────────────────────
+   1초마다 다시 그리므로 두 가지를 챙겨야 한다:
+     ① 펼침 상태를 JS 쪽(dbOpen)에 들고 있어야 다시 그려도 안 접힌다
+     ② 내용이 그대로면 아예 다시 그리지 않는다 (깜빡임·스크롤 튐 방지)          */
+const dbOpen = {accounts: true, access: true, sent: false};
+let dbCache = '';
+
+function dbGroup(key, label, rows, renderRow) {
+  return `
+    <details class="dbgroup" data-g="${key}" ${dbOpen[key] ? 'open' : ''}>
+      <summary>${label} <span class="count">${rows.length}</span></summary>
+      ${rows.length ? rows.map(renderRow).join('') : '<div class="empty">없음</div>'}
+    </details>`;
+}
+
+function renderDb(db) {
+  const key = JSON.stringify(db);
+  if (key === dbCache) return;          // 바뀐 게 없으면 그대로 둔다
+  dbCache = key;
+
+  dbview.innerHTML = [
+    dbGroup('accounts', '계정', db.accounts, a =>
+      `<div>${escapeHtml(a.name || a.employee_id)} · <code>${escapeHtml(a.username)}</code></div>`),
+
+    // 권한 줄도 사번이 아니라 이름으로 — E1001 만 보고는 누군지 알 수 없다
+    dbGroup('access', '권한', db.access, a =>
+      `<div>${escapeHtml(a.name || a.employee_id)} → <code>${escapeHtml(a.group_name)}</code>` +
+      (a.risk === 'high' ? ' <span class="risk">high</span>' : '') + '</div>'),
+
+    dbGroup('sent', '발송', db.sent, s =>
+      `<div>${escapeHtml(s.target)}<br><span class="dim">${escapeHtml(s.subject || s.kind)}</span></div>`),
+  ].join('');
+
+  // 사용자가 접거나 펼치면 기억해 둔다 (다음 렌더에 반영)
+  dbview.querySelectorAll('details[data-g]').forEach(d => {
+    d.addEventListener('toggle', () => { dbOpen[d.dataset.g] = d.open; });
+  });
+}
+
+/* ── 작업 패널 ─────────────────────────────────────────── */
+function renderJobs(jobs) {
+  if (!jobs.length) {
+    joblist.innerHTML = '<p class="empty">위임된 작업이 없습니다.</p>';
+    return;
+  }
+
+  // 카드는 상태·승인·결과만. 자세한 도구 호출 내역은 아래 '작업 로그' 로 옮겼다.
+  joblist.innerHTML = jobs.map(j => `
+    <div class="job">
+      <div class="title">${escapeHtml(j.id)} · ${escapeHtml(j.title)}</div>
+      <span class="status ${CLS[j.status] || ''}">${LABEL[j.status] || j.status}</span>
+      ${j.pending ? approvalHtml(j) : ''}
+      ${j.result ? `<div class="log">${escapeHtml(j.result)}</div>` : ''}
+    </div>`).join('');
+
+  joblist.querySelectorAll('button[data-job]').forEach(btn => {
+    btn.onclick = async () => {
+      joblist.querySelectorAll('button[data-job]').forEach(b => b.disabled = true);
+      await fetch(`/jobs/${btn.dataset.job}/decide`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          approved: btn.dataset.decision !== 'no',
+          always:   btn.dataset.decision === 'always',   // ← 4단계에서 추가된 필드
+        }),
+      });
+      poll();
+    };
+  });
+}
+
+/* ── 작업 로그 (채팅 아래, 접기/펼치기) ─────────────────────
+   워커가 실제로 무슨 도구를 어떤 인자로 불렀는지가 여기 쌓인다.
+   DB 패널과 같은 이유로 ① 내용이 같으면 안 그리고 ② 펼침 상태는 브라우저가 알아서 유지한다
+   (여기선 details 를 다시 만들지 않고 안쪽 내용만 갈아끼우므로 open 속성이 안 날아간다). */
+let worklogCache = '';
+
+function renderWorklog(jobs) {
+  const body = document.getElementById('worklogbody');
+  const count = document.querySelector('#worklog .count');
+  const lines = jobs.reduce((n, j) => n + (j.log ? j.log.length : 0), 0);
+
+  const key = JSON.stringify(jobs.map(j => [j.id, j.log]));
+  if (key === worklogCache) return;
+  worklogCache = key;
+
+  count.textContent = lines;
+
+  if (!jobs.length) {
+    body.innerHTML = '<p class="empty">아직 없습니다.</p>';
+    return;
+  }
+
+  body.innerHTML = jobs.map(j => `
+    <div class="wl-job">
+      <div class="wl-title">${escapeHtml(j.id)} · ${escapeHtml(j.title)}</div>
+      <div class="wl-lines">${
+        (j.log && j.log.length)
+          ? j.log.map(escapeHtml).join('<br>')
+          : '<span class="empty">기록 없음</span>'
+      }</div>
+    </div>`).join('');
+}
+
+function approvalHtml(j) {
+  const args = j.pending.map(c =>
+    `${escapeHtml(c.name)}\n` +
+    Object.entries(c.args).map(([k, v]) => `  ${escapeHtml(k)} = ${escapeHtml(v)}`).join('\n')
+  ).join('\n');
+
+  return `
+    <div class="approval" style="margin-top:8px">
+      <h3>⚠️ 승인 필요</h3>
+      <div class="args">${args}</div>
+      <div class="btns">
+        <button class="btn-yes"    data-job="${j.id}" data-decision="yes">승인</button>
+        <button class="btn-always" data-job="${j.id}" data-decision="always">항상 승인</button>
+        <button class="btn-no"     data-job="${j.id}" data-decision="no">거부</button>
+      </div>
+    </div>`;
+}
+
+/* ── DB 초기화 — 되돌릴 수 없으니 확인을 한 번 받는다 ────────
+   (에이전트에게 승인을 받는 것과 같은 이유다. 사람이 누르는 버튼도 마찬가지) */
+document.getElementById('dbreset').onclick = async (e) => {
+  const btn = e.currentTarget;
+  const ok = confirm(
+    '데모를 처음 상태로 되돌립니다.\n\n' +
+    '지워지는 것\n' +
+    '• 생성된 계정과 부여된 권한, 발송 기록 (강태호는 다시 "계정 없음")\n' +
+    '• 작업 목록\n' +
+    '• 채팅 대화 내용\n\n' +
+    '남는 것\n' +
+    '• 자동승인 목록 (데이터가 아니라 정책이라서)\n\n' +
+    '계속할까요?'
+  );
+  if (!ok) return;
+
+  btn.disabled = true;
+  try {
+    await fetch('/db/reset', {method: 'POST'});
+    dbCache = '';                 // 캐시를 비워야 다시 그린다
+    worklogCache = '';
+    chat.innerHTML = '';          // 화면의 대화도 지운다 (서버 대화는 새로 시작됐다)
+    await poll();
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+setInterval(poll, 1000);
+poll();
+
+form.onsubmit = async (e) => {
+  e.preventDefault();
+  const text = msg.value.trim();
+  if (!text) return;
+
+  bubble('나', escapeHtml(text), 'me');
+  msg.value = '';
+  send.disabled = true;
+  const waiting = bubble('AI', '<i>처리 중…</i>', 'bot');
+
+  try {
+    const r = await fetch('/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: text}),
+    });
+    const data = await r.json();
+    waiting.remove();
+    renderTrace(data.trace);
+    bubble('AI', escapeHtml(data.reply || ''), 'bot');
+  } catch (err) {
+    waiting.remove();
+    bubble('오류', escapeHtml(String(err)), 'err');
+  } finally {
+    send.disabled = false;
+    msg.focus();
+    poll();
+  }
+};
+</script>
+</body>
+</html>

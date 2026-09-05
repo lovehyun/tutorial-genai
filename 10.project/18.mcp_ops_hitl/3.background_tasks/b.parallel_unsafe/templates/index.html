@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>사내 IT 헬프데스크 AI — 3b (병렬 승인 — 위험)</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>사내 IT 헬프데스크 AI</h1>
+    <span class="stage stage-warn">3b · 서브에이전트 위임 — 승인 카드가 통째로 몰려서 뜬다</span>
+  </header>
+
+  <p class="tools">
+    메인은 조회만({{ safe|join(', ') }}) 하고, 나머지는 담당자(워커)에게 위임한다 ·
+    MCP 도구 {{ tools|length }}개
+  </p>
+
+  <div class="layout">
+    <div>
+      <div id="chat"></div>
+      <form id="form">
+        <input id="msg" autocomplete="off" placeholder="예) 한소연 온보딩 해줘. 계정 soyeon, email·vpn 권한, 환영메일까지">
+        <button id="send">보내기</button>
+      </form>
+    </div>
+
+    <div id="jobs">
+      <h2>작업 패널</h2>
+      <div id="joblist"><p class="empty">위임된 작업이 없습니다.</p></div>
+    </div>
+  </div>
+
+  <details class="hint">
+    <summary>예제 프롬프트</summary>
+    <ol>
+      <li><code class="p">한소연 온보딩 해줘. 계정 soyeon, email·vpn 권한, 환영 메일까지</code>
+        <ul><li>작업 번호(J001)가 나오고 <b>채팅이 바로 풀린다</b></li>
+            <li>오른쪽 패널에 J001 이 "승인 대기"로 뜬다 — <b>카드 안을 자세히 볼 것</b>:
+                <code>create_account</code>·<code>grant_access(email)</code>·<code>grant_access(vpn)</code>·
+                <code>send_email</code> 이 <b>한 카드에 전부 몰려 있다</b>. 모델이 이 온보딩을
+                네 단계로 나눠 하나씩 묻는 대신, 한 턴에 계획을 다 세워 한꺼번에 요청한 것 —
+                <b>승인/거부 버튼은 딱 하나뿐</b>이라 넷을 따로 판단할 수 없다</li></ul></li>
+
+      <li><code class="p">박민수한테 prod-db 권한 줘</code>
+        <ul><li>작업 번호(J002)가 하나 더 배정된다</li>
+            <li>이제 패널에 승인 대기 카드가 <b>동시에 2개</b> 떠 있다 — thread_id 가 달라 완전히 분리된 대화라서</li></ul></li>
+
+      <li><code class="p">한소연 계정 상태 알려줘</code>
+        <ul><li>두 작업이 대기 중인 동안에도 대화는 안 막힌다</li>
+            <li>2단계였다면 이 메시지조차 못 보냈다</li></ul></li>
+
+      <li><code class="p">진행 상황 알려줘</code>
+        <ul><li>메인 에이전트가 list_jobs 로 "J001 대기중 · J002 대기중" 을 답한다</li></ul></li>
+
+      <li>이제 패널에서 처리해 보자
+        <ul><li>J002(박민수 prod-db) <b>거부</b> — 즉시 종료, 워커가 거부 사실을 보고하고 마무리</li>
+            <li>J001 <b>승인</b> — 버튼 하나로 계정 생성·email·vpn·메일 발송이 <b>한 번에 전부</b> 실행된다.
+                넷 중 하나만 이상해도(예: 엉뚱한 그룹이 섞여 있어도) 카드를 대충 읽었다면 몰랐을 것이다</li></ul></li>
+    </ol>
+    <p class="after">
+      "한 카드에 네 개"가 이 변형의 핵심 문제다 — <code>a.sequential/</code>(하나씩 승인, 대신 피로 누적)과
+      <code>c.parallel_guarded/</code>(병렬은 유지하되 위험한 것만 따로 승인)와 비교해 볼 것.
+    </p>
+  </details>
+
+<script>
+const chat = document.getElementById('chat');
+const form = document.getElementById('form');
+const msg  = document.getElementById('msg');
+const send = document.getElementById('send');
+const joblist = document.getElementById('joblist');
+
+const LABEL = {queued:'대기', running:'진행 중', waiting:'승인 대기',
+               done:'완료', rejected:'거부됨', error:'오류'};
+const CLS   = {queued:'st-queued', running:'st-running', waiting:'st-waiting',
+               done:'st-done', rejected:'st-rejected', error:'st-error'};
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+
+function bubble(who, text, cls) {
+  const el = document.createElement('div');
+  el.className = 'bubble ' + cls;
+  el.innerHTML = `<b>${who}</b><div>${text}</div>`;
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+  return el;
+}
+
+function renderTrace(trace) {
+  if (!trace || !trace.length) return;
+  const el = document.createElement('div');
+  el.className = 'trace';
+  el.innerHTML = trace.map(t => `<div class="call">${escapeHtml(t)}</div>`).join('');
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+/* ── 작업 패널 폴링 ────────────────────────────────────────
+   워커는 백그라운드 루프에서 잠들어 있다. 승인이 필요해지면 status 가 waiting 이 되고,
+   이 폴링이 그걸 발견해 승인 카드를 그린다. */
+async function pollJobs() {
+  try {
+    const r = await fetch('/jobs');
+    const {jobs} = await r.json();
+    render(jobs);
+  } catch (e) { /* 서버 재시작 중일 수 있다 — 다음 폴링에서 복구된다 */ }
+}
+
+function render(jobs) {
+  if (!jobs.length) {
+    joblist.innerHTML = '<p class="empty">위임된 작업이 없습니다.</p>';
+    return;
+  }
+
+  joblist.innerHTML = jobs.map(j => `
+    <div class="job">
+      <div class="title">${escapeHtml(j.id)} · ${escapeHtml(j.title)}</div>
+      <span class="status ${CLS[j.status] || ''}">${LABEL[j.status] || j.status}</span>
+      ${j.pending ? approvalHtml(j) : ''}
+      ${j.result ? `<div class="log">${escapeHtml(j.result)}</div>` : ''}
+      ${j.log && j.log.length ? `<div class="log">${j.log.map(escapeHtml).join('<br>')}</div>` : ''}
+    </div>`).join('');
+
+  // 승인 버튼 연결
+  joblist.querySelectorAll('button[data-job]').forEach(btn => {
+    btn.onclick = async () => {
+      joblist.querySelectorAll('button[data-job]').forEach(b => b.disabled = true);
+      await fetch(`/jobs/${btn.dataset.job}/decide`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({approved: btn.dataset.decision === 'yes'}),
+      });
+      pollJobs();
+    };
+  });
+}
+
+function approvalHtml(j) {
+  const args = j.pending.map(c =>
+    `${escapeHtml(c.name)}\n` +
+    Object.entries(c.args).map(([k, v]) => `  ${escapeHtml(k)} = ${escapeHtml(v)}`).join('\n')
+  ).join('\n');
+
+  return `
+    <div class="approval" style="margin-top:8px">
+      <h3>⚠️ 승인 필요</h3>
+      <div class="args">${args}</div>
+      <div class="btns">
+        <button class="btn-yes" data-job="${j.id}" data-decision="yes">승인</button>
+        <button class="btn-no"  data-job="${j.id}" data-decision="no">거부</button>
+      </div>
+    </div>`;
+}
+
+setInterval(pollJobs, 1000);
+pollJobs();
+
+form.onsubmit = async (e) => {
+  e.preventDefault();
+  const text = msg.value.trim();
+  if (!text) return;
+
+  bubble('나', escapeHtml(text), 'me');
+  msg.value = '';
+  send.disabled = true;
+  const waiting = bubble('AI', '<i>처리 중…</i>', 'bot');
+
+  try {
+    const r = await fetch('/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: text}),
+    });
+    const data = await r.json();
+    waiting.remove();
+    renderTrace(data.trace);
+    bubble('AI', escapeHtml(data.reply || ''), 'bot');
+  } catch (err) {
+    waiting.remove();
+    bubble('오류', escapeHtml(String(err)), 'err');
+  } finally {
+    send.disabled = false;
+    msg.focus();
+    pollJobs();
+  }
+};
+</script>
+</body>
+</html>

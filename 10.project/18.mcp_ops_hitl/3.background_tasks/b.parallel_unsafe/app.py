@@ -1,14 +1,20 @@
-# app.py — [3단계] 오래 걸리는 업무는 서브에이전트에게 맡기고, 대화는 계속한다.
+# app.py — [3b] 오래 걸리는 업무는 서브에이전트에게 맡기고, 대화는 계속한다.
+#
+# ══ 이 폴더는 3단계의 세 변형(a/b/c) 중 하나다 — ../README.md 참고 ═══════
+#   여기(b)는 원래 3단계 파일 그대로다. 모델이 한 턴에 여러 도구 호출을
+#   병렬로 계획하면(예: create_account + grant_access + send_email 를 한꺼번에),
+#   승인 카드도 그걸 통째로 한 장에 몰아서 보여준다 — 사람이 4개를 구분 못 하고
+#   그냥 한 번에 승인/거부해 버릴 수 있다는 위험이 여기서 드러난다.
 #
 # ══ 2단계의 한계 ═══════════════════════════════════════════════
 #   2단계는 승인 카드가 뜨면 대화가 그 자리에서 멈춘다. 승인할 때까지 아무것도 못 한다.
-#   실제 업무는 그렇지 않다 — "김철수 온보딩 해줘" 를 시켜놓고 다른 일을 하다가,
+#   실제 업무는 그렇지 않다 — "한소연 온보딩 해줘" 를 시켜놓고 다른 일을 하다가,
 #   승인이 필요한 순간에만 결정해 주면 된다.
 #
 # ══ 구조: 메인 에이전트 + 워커(서브에이전트) ════════════════════
 #
 #     사용자 ──대화──▶ 메인 에이전트   (조회 도구 + delegate_task/list_jobs)
-#                          │ delegate_task("김철수 온보딩")
+#                          │ delegate_task("한소연 온보딩")
 #                          ▼
 #                      작업 큐 ──▶ 워커 에이전트 (MCP 도구 전부)  ← 백그라운드 루프에서 실행
 #                          │           │ 위험한 도구를 만나면 정지
@@ -29,11 +35,12 @@
 #   pip install flask langchain langchain-openai langchain-mcp-adapters langgraph \
 #               langgraph-checkpoint-sqlite python-dotenv mcp
 #   .env 에 OPENAI_API_KEY
-#   python app.py     → http://localhost:5083
+#   python app.py     → http://localhost:5086
 
 import asyncio
 import os
 import threading
+import uuid
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
@@ -47,7 +54,7 @@ from langgraph.checkpoint.memory import MemorySaver
 load_dotenv()
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SERVERS = os.path.join(HERE, "..", "servers")
+SERVERS = os.path.join(HERE, "..", "..", "servers")
 CHECKPOINT_DB = os.path.join(HERE, "checkpoints.sqlite")
 
 SAFE_TOOLS = {"find_employee", "get_account_status", "list_groups", "list_sent"}
@@ -105,6 +112,12 @@ def spawn(coro):
 JOBS = {}            # job_id -> dict
 JOB_SEQ = 0
 JOB_LOCK = threading.Lock()
+
+# 이 실행에만 해당하는 식별자. 작업 스레드 id 앞에 붙인다.
+#   체크포인터는 파일(checkpoints.sqlite)에 남으므로, 앱을 재시작하면 JOB_SEQ 는 0 으로
+#   돌아가는데 'job-J001' 체크포인트는 그대로 남아 있다. 그대로 쓰면 새 작업이
+#   옛날 대화를 이어받아 "이미 처리했다" 며 도구를 안 부른다. RUN_ID 로 그걸 막는다.
+RUN_ID = uuid.uuid4().hex[:8]
 
 
 def new_job(title: str, instruction: str) -> str:
@@ -174,7 +187,7 @@ def delegate_task(title: str, instruction: str) -> str:
     즉시 작업 번호를 돌려주고, 실제 처리는 백그라운드에서 진행된다.
 
     Args:
-        title: 작업 제목 (예: '김철수 온보딩')
+        title: 작업 제목 (예: '한소연 온보딩')
         instruction: 담당자가 혼자 읽고 처리할 수 있는 구체적 지시.
                      대상(사번 또는 이름), 해야 할 일, 조건을 모두 포함한다.
 
@@ -215,7 +228,7 @@ def collect(messages, start: int) -> list:
 
 async def run_job(job_id: str) -> None:
     job = JOBS[job_id]
-    config = {"configurable": {"thread_id": f"job-{job_id}"}}   # 작업마다 독립된 대화
+    config = {"configurable": {"thread_id": f"job-{RUN_ID}-{job_id}"}}   # 작업마다 독립된 대화
     job["status"] = "running"
 
     try:
@@ -359,5 +372,5 @@ if __name__ == "__main__":
     print("MCP 도구:", TOOL_NAMES)
     print("메인 에이전트: 조회 도구 + delegate_task / list_jobs")
     print("워커 에이전트: MCP 도구 전부 (위험한 도구는 승인 대기)")
-    print("→ http://localhost:5083")
-    app.run(port=5083, debug=False, threaded=True)
+    print("→ http://localhost:5086")
+    app.run(port=5086, debug=False, threaded=True)

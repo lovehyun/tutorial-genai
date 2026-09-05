@@ -26,6 +26,17 @@ EMPLOYEES = [
     ("E1001", "김철수", "chulsoo@example.com", "개발팀",   "사원",  "2026-08-01"),
     ("E1002", "이영희", "younghee@example.com", "마케팅팀", "대리",  "2024-03-02"),
     ("E1003", "박민수", "minsoo@example.com",  "재무팀",   "과장",  "2021-07-15"),
+    # E1004~E1009 는 각각 2단계·3a·3b·3c·4a·4b 데모 전용 온보딩 대상이다. 같은 신입을
+    # 두 변형이 같이 쓰면, 먼저 실습한 변형에서 이미 만든 계정이 나중 변형에서
+    # "이미 있습니다"로 no-op 될 뿐 아니라, 모델이 get_account_status 로 먼저 확인하고
+    # "이미 다 되어 있다"며 온보딩 도구를 아예 안 부를 수도 있다 — 그러면 승인 카드 자체가
+    # 안 뜨는, 데모가 완전히 안 서는 상황이 된다. 그래서 변형마다 계정 없는 신입을 따로 둔다.
+    ("E1004", "최유진", "yujin@example.com",   "인사팀",   "사원",  "2026-08-01"),
+    ("E1005", "정다은", "daeun@example.com",   "영업팀",   "사원",  "2026-08-01"),
+    ("E1008", "한소연", "soyeon@example.com",  "IT팀",     "사원",  "2026-08-01"),
+    ("E1009", "윤도현", "dohyun@example.com",  "물류팀",   "사원",  "2026-08-01"),
+    ("E1006", "강태호", "taeho@example.com",   "디자인팀", "사원",  "2026-08-01"),
+    ("E1007", "오지훈", "jihoon@example.com",  "총무팀",   "사원",  "2026-08-01"),
 ]
 
 
@@ -64,7 +75,8 @@ def init() -> None:
     if not conn.execute("SELECT 1 FROM employees LIMIT 1").fetchone():
         conn.executemany("INSERT INTO employees VALUES (?,?,?,?,?,?)", EMPLOYEES)
         conn.executemany("INSERT INTO groups VALUES (?,?,?)", GROUPS)
-        # 기존 직원 2명은 이미 계정이 있다 — 신입(E1001)만 없는 상태에서 시작한다
+        # 이영희·박민수만 이미 계정이 있다 — 신입 7명(E1001, E1004~E1009)은 계정 없는
+        # 상태에서 시작한다 (변형마다 다른 신입을 온보딩 대상으로 쓴다)
         now = datetime.now().isoformat(timespec="seconds")
         conn.executemany(
             "INSERT INTO accounts VALUES (?,?,?,?)",
@@ -84,7 +96,7 @@ def reset() -> None:
     """
     모든 테이블을 비우고 시드 데이터를 다시 넣는다 (데모 초기화용).
 
-    4단계의 [초기화] 버튼이 이걸 부른다. 실습을 여러 번 돌릴 때
+    4a·4b 의 [초기화] 버튼이 이걸 부른다. 실습을 여러 번 돌릴 때
     ops.db 파일을 직접 지우지 않고도 처음 상태로 되돌리기 위한 것이다.
     """
     conn = connect()

@@ -132,7 +132,7 @@ async def build():
 agent, TOOL_NAMES = run(build())
 
 app = Flask(__name__)
-CONFIG = {"configurable": {"thread_id": "web"}}     # 데모라 대화 하나. 실제로는 사용자별로 발급
+CHAT_CONFIG = {"configurable": {"thread_id": "web"}}     # 데모라 대화 하나. 실제로는 사용자별로 발급
 
 
 # ══════════════════════════════════════════════════════════════
@@ -175,21 +175,21 @@ async def drive(state, trace: list) -> dict:
 
         # 조회 도구뿐이면 묻지 않고 그대로 진행한다 (승인 피로를 막는 핵심)
         before = len(state["messages"])
-        state = await agent.ainvoke(None, config=CONFIG)
+        state = await agent.ainvoke(None, config=CHAT_CONFIG)
         trace.extend(collect(state["messages"], before))
 
 
 async def start_turn(message: str) -> dict:
     # 비동기 체크포인터를 쓰므로 상태 조회도 비동기 API 를 써야 한다 (get_state ✗ / aget_state ○)
-    snapshot = await agent.aget_state(CONFIG)
+    snapshot = await agent.aget_state(CHAT_CONFIG)
     before = len(snapshot.values.get("messages", []))
-    state = await agent.ainvoke({"messages": [("user", message)]}, config=CONFIG)
+    state = await agent.ainvoke({"messages": [("user", message)]}, config=CHAT_CONFIG)
     return await drive(state, collect(state["messages"], before))
 
 
 async def resume(approved: bool) -> dict:
     """승인/거부 결정을 반영하고 멈춰 있던 에이전트를 이어서 돌린다."""
-    snapshot = await agent.aget_state(CONFIG)
+    snapshot = await agent.aget_state(CHAT_CONFIG)
     calls = snapshot.values["messages"][-1].tool_calls
     before = len(snapshot.values["messages"])
     trace = []
@@ -200,7 +200,7 @@ async def resume(approved: bool) -> dict:
         #   도구는 그대로 실행돼 버린다. 이걸 줘야 tools 노드를 '이미 실행한 것' 으로
         #   치고 건너뛴다. tool_call 하나당 결과 하나를 맞춰야 다음 LLM 호출이 깨지지 않는다.
         await agent.aupdate_state(
-            CONFIG,
+            CHAT_CONFIG,
             {"messages": [
                 ToolMessage(content="관리자가 이 작업을 거부했습니다. 실행하지 않았습니다.",
                             tool_call_id=c["id"], name=c["name"])
@@ -210,7 +210,7 @@ async def resume(approved: bool) -> dict:
         )
         trace.append(f"✗ 거부됨: {', '.join(c['name'] for c in calls)}")
 
-    state = await agent.ainvoke(None, config=CONFIG)
+    state = await agent.ainvoke(None, config=CHAT_CONFIG)
     trace.extend(collect(state["messages"], before))
     return await drive(state, trace)
 

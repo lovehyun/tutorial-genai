@@ -199,7 +199,7 @@ def delegate_task(title: str, instruction: str) -> str:
     즉시 작업 번호를 돌려주고, 실제 처리는 백그라운드에서 진행된다.
 
     Args:
-        title: 작업 제목 (예: '김철수 온보딩')
+        title: 작업 제목 (예: '강태호 온보딩')
         instruction: 담당자가 혼자 읽고 처리할 수 있는 구체적 지시.
                      대상(사번 또는 이름), 해야 할 일, 조건을 모두 포함한다.
 

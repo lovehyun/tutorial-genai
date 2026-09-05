@@ -3,17 +3,19 @@
 챗봇에게 사내 업무(계정 생성·권한 부여·메일 발송)를 말로 시키면, 에이전트가 세 MCP 서버를 써서 처리한다.
 **되돌릴 수 없는 작업 앞에서는 멈춰 사람에게 물어보고**, 오래 걸리는 업무는 **백그라운드 담당자(서브에이전트)에게 위임**한다.
 
-4단계 빌드업이며, 각 단계는 딱 하나씩만 더한다.
+4단계 빌드업이며, 각 단계는 딱 하나씩만 더한다. 3·4단계는 그 안에서 또 "설계를 어떻게
+자르느냐"의 변형이 갈려서 각자 하위 폴더(`a`/`b`/`c`)로 나뉜다 — 순서상 다음 단계가
+아니라 **같은 문제를 푸는 서로 다른 방식**이라서다.
 
 | 단계 | 더해지는 것 | 포트 | 변경점 |
 |---|---|---|---|
 | `1.web_agent/` | 웹 챗봇 + MCP 서버 3개 (승인 없음) | 5081 | [CHANGES](1.web_agent/CHANGES.md) |
 | `2.hitl_approve/` | **승인 게이트** — 위험한 작업 전 정지 → 승인 카드 | 5082 | [CHANGES](2.hitl_approve/CHANGES.md) |
-| `3.background_tasks/` | **서브에이전트 위임** — 백그라운드 실행 + 작업 패널 | 5083 | [CHANGES](3.background_tasks/CHANGES.md) |
-| `4.auto_approve/` | **자동승인** — 한 번 승인한 기능은 안 묻기 + 자동승인 목록·DB 현황 패널 | 5084 | [CHANGES](4.auto_approve/CHANGES.md) |
+| `3.background_tasks/` | **서브에이전트 위임** — 백그라운드 실행 + 작업 패널 (세 변형 `a`/`b`/`c`) | 5083·5086·5087 | [README](3.background_tasks/README.md) |
+| `4.auto_approve/` | **자동승인** — 한 번 승인한 기능은 안 묻기 (두 변형 `a`도구이름/`b`인자수준) | 5084·5085 | [README](4.auto_approve/README.md) |
 
-4단계만 파일이 셋이다(`jobs.py` · `agents.py` · `app.py`). `app.py` 가 400줄을 넘어서 나눴는데,
-**코드를 바꾼 게 아니라 자리만 옮겼다** — 각 파일이 '몇 단계에서 배운 것' 에 대응한다.
+4단계는 파일이 셋이다(`jobs.py` · `agents.py` · `app.py`, `a`/`b` 둘 다). `app.py` 가 400줄을
+넘어서 나눴는데, **코드를 바꾼 게 아니라 자리만 옮겼다** — 각 파일이 '몇 단계에서 배운 것' 에 대응한다.
 
 > 각 폴더의 `CHANGES.md` 에 **이전 단계에서 무엇이 바뀌는지**만 짧게 정리해 뒀다.
 > 라이브로 업그레이드하며 진행할 때 이것만 따라가면 된다.
@@ -61,7 +63,7 @@ CLI 예제에서 `MemorySaver` 를 쓰며 "실무에선 SqliteSaver" 라고 적�
 
 ### MCP 서버는 4단계 내내 그대로다
 
-`servers/` 폴더 하나를 네 단계가 공유한다. 승인 로직이 붙든 백그라운드가 붙든
+`servers/` 폴더 하나를 네 단계(하위 변형 포함 일곱 개 앱)가 공유한다. 승인 로직이 붙든 백그라운드가 붙든
 **서버 코드는 한 줄도 바뀌지 않는다.** 이게 MCP 를 쓰는 이유다 —
 안전장치는 서버가 아니라 **서버를 쓰는 쪽**이 건다. 서버를 고칠 수 없는 상황(다른 팀 소유, 외부 벤더)이 실제로 흔하다.
 
@@ -85,13 +87,20 @@ pip install flask langchain langchain-openai langchain-mcp-adapters langgraph \
 
 cd 10.project/18.mcp_ops_hitl/1.web_agent      && python app.py   # → localhost:5081
 cd 10.project/18.mcp_ops_hitl/2.hitl_approve   && python app.py   # → localhost:5082
-cd 10.project/18.mcp_ops_hitl/3.background_tasks && python app.py # → localhost:5083
-cd 10.project/18.mcp_ops_hitl/4.auto_approve    && python app.py # → localhost:5084
+
+# 3단계는 세 변형 중 하나를 골라 실행 (세 개를 동시에 띄워서 비교해도 된다 — 포트가 다르다)
+cd 10.project/18.mcp_ops_hitl/3.background_tasks/a.sequential       && python app.py # → localhost:5083
+cd 10.project/18.mcp_ops_hitl/3.background_tasks/b.parallel_unsafe  && python app.py # → localhost:5086
+cd 10.project/18.mcp_ops_hitl/3.background_tasks/c.parallel_guarded && python app.py # → localhost:5087
+
+# 4단계도 두 변형 중 하나를 골라 실행 (포트가 달라 동시에 띄워도 된다)
+cd 10.project/18.mcp_ops_hitl/4.auto_approve/a.tool_name_only && python app.py # → localhost:5084
+cd 10.project/18.mcp_ops_hitl/4.auto_approve/b.scoped_guard   && python app.py # → localhost:5085
 ```
 
 - MCP 서버는 **stdio 로 자동 실행**된다. 따로 띄울 필요 없다.
 - 데모 데이터를 초기화하려면 `servers/ops.db` 를 지운다 (다음 실행 때 다시 시드된다).
-  4단계는 **DB 현황 패널의 [초기화] 버튼**으로 앱을 끄지 않고도 되돌릴 수 있다 (확인 창을 거친다).
+  4단계(`a`·`b` 둘 다)는 **DB 현황 패널의 [초기화] 버튼**으로 앱을 끄지 않고도 되돌릴 수 있다 (확인 창을 거친다).
 - 승인 대기까지 초기화하려면 각 단계 폴더의 `checkpoints.sqlite` 도 지운다.
 - `langgraph-checkpoint-sqlite` 가 없으면 **메모리 체크포인터로 자동 폴백**한다(앱은 정상 동작,
   대신 서버를 재시작하면 대기 중인 승인이 사라진다). 시작 로그에 어느 쪽인지 찍힌다.
@@ -100,9 +109,19 @@ cd 10.project/18.mcp_ops_hitl/4.auto_approve    && python app.py # → localhost
 
 | 사번 | 이름 | 부서 | 계정 |
 |---|---|---|---|
-| E1001 | 김철수 | 개발팀 사원 | **없음** ← 온보딩 대상 |
+| E1001 | 김철수 | 개발팀 사원 | **없음** ← 1단계 온보딩 대상 |
 | E1002 | 이영희 | 마케팅팀 대리 | 있음 (email, vpn) |
 | E1003 | 박민수 | 재무팀 과장 | 있음 (email, payroll) |
+| E1004 | 최유진 | 인사팀 사원 | **없음** ← 2단계 온보딩 대상 |
+| E1005 | 정다은 | 영업팀 사원 | **없음** ← 3a 온보딩 대상 |
+| E1008 | 한소연 | IT팀 사원 | **없음** ← 3b 온보딩 대상 |
+| E1009 | 윤도현 | 물류팀 사원 | **없음** ← 3c 온보딩 대상 |
+| E1006 | 강태호 | 디자인팀 사원 | **없음** ← 4a 온보딩 대상 |
+| E1007 | 오지훈 | 총무팀 사원 | **없음** ← 4b 온보딩 대상 |
+
+> 단계마다 **다른 온보딩 대상**을 쓴다 — 1~4단계가 전부 같은 `ops.db` 를 공유하는데(아래 "실행" 절),
+> 김철수 한 명을 모든 단계가 재사용하면 앞 단계에서 이미 만든 계정이 뒷단계에서
+> "이미 있습니다" 로 no-op 돼 버려서 데모가 안 산다.
 
 접근 그룹: `email`(low) · `vpn`(medium) · `github`(medium) · **`prod-db`(high)** · **`payroll`(high)**
 — high 인 것들은 "승인해도 되나?" 를 실제로 고민하게 만드는 장치다.
@@ -113,7 +132,9 @@ cd 10.project/18.mcp_ops_hitl/4.auto_approve    && python app.py # → localhost
 
 ### 1단계 — 문제를 먼저 겪는다
 
-*"김철수한테 prod-db 권한 줘"* 라고 하면 **그냥 준다.** 아무도 안 묻는다.
+(계정·email·vpn 을 먼저 만든 뒤) *"김철수한테 prod-db 권한 줘"* 라고 하면 **그냥 준다.** 아무도 안 묻는다.
+(계정이 없는 상태에서 곧바로 시도하면 "계정이 없다"는 안내만 돌아온다 — 1단계 화면의 예제 프롬프트 순서대로
+계정 생성 → email·vpn 부여를 먼저 거쳐야 한다.)
 운영 DB 접근 권한이 대화 한 줄로 나가는 걸 직접 보는 게 이 단계의 목적이다.
 
 ### 2단계 — 승인 게이트
@@ -148,9 +169,15 @@ cd 10.project/18.mcp_ops_hitl/4.auto_approve    && python app.py # → localhost
 
 ### 3단계 — 서브에이전트 위임
 
+> 이 폴더는 실제로 `a.sequential`/`b.parallel_unsafe`/`c.parallel_guarded` 세 변형으로
+> 나뉜다 — 모델이 한 턴에 도구를 여러 개 계획했을 때 승인 요청을 어떻게 자르느냐가
+> 또 하나의 설계 문제라서다. 자세한 내용과 실습 스크립트는
+> [`3.background_tasks/README.md`](3.background_tasks/README.md) 참고. 아래는 세 변형
+> 모두에 공통인 뼈대(메인/워커 분리, 백그라운드 위임)만 설명한다.
+
 ```
 사용자 ──대화──▶ 메인 에이전트   (조회 도구 + delegate_task / list_jobs)
-                     │ delegate_task("김철수 온보딩")  ← 기다리지 않고 작업번호만 반환
+                     │ delegate_task("정다은 온보딩")  ← 기다리지 않고 작업번호만 반환
                      ▼
                  작업 큐 ──▶ 워커 에이전트 (MCP 도구 전부)  ← 백그라운드 루프에서 실행
                      │           │ 위험한 도구를 만나면 정지
@@ -167,8 +194,14 @@ cd 10.project/18.mcp_ops_hitl/4.auto_approve    && python app.py # → localhost
 - 작업 패널은 **1초 폴링**([16.airline_chatbot](../16.airline_chatbot/) 과 같은 방식)으로 상태를 가져온다.
 
 **한계**: 온보딩을 열 명 하면 `create_account` 승인을 열 번 누른다. 매번 같은 판단인데도.
+그리고 그 승인 요청을 사람에게 어떻게 보여줄 것인가도 그 자체로 문제다 — 병렬로 계획된
+호출을 한 카드에 몰아서 보여주면 위험도를 구분 못 하게 된다(`b.parallel_unsafe`가 이걸 보여준다).
 
 ### 4단계 — 자동승인, 그리고 통제를 유지하는 법
+
+> 이 폴더도 두 변형(`a.tool_name_only`/`b.scoped_guard`)으로 나뉜다 — 자동승인을
+> "도구 이름" 단위로 걸지, "인자" 수준까지 볼지가 또 하나의 설계 문제라서다. 자세한
+> 내용은 [`4.auto_approve/README.md`](4.auto_approve/README.md) 참고.
 
 `[항상 승인]` 을 누르면 그 도구가 `AUTO_APPROVED` 에 올라가 다음부터 안 묻는다.
 승인 조건에 한 줄이 붙는 게 전부다.
@@ -190,41 +223,98 @@ def needs_approval(call):
 `high` 배지는 접근 그룹의 위험도(`servers/store.py` 의 `GROUPS`)다 — `prod-db` · `payroll` 이 high.
 권한이 늘어났을 때 눈에 띄게 하려는 표시일 뿐, **승인 로직에는 영향이 없다.**
 
-**자동승인이 '도구 이름' 단위라 범위가 너무 넓다.** `grant_access` 를 한 번 자동승인하면
-어떤 그룹을 주든 전부 통과한다 — `prod-db` 도 안 묻고 나간다.
-실습에서 직접 확인해 보라 — 이게 이 단계의 진짜 교훈이다.
-정교하게 가는 법(인자 조건·유효기간·횟수 제한·감사 로그)은 [4.auto_approve/CHANGES.md](4.auto_approve/CHANGES.md) 참고.
+**`a.tool_name_only`: 자동승인이 '도구 이름' 단위라 범위가 너무 넓다.** `grant_access` 를
+한 번 자동승인하면 어떤 그룹을 주든 전부 통과한다 — `prod-db` 도 안 묻고 나간다.
+실습에서 직접 확인해 보라 — 이게 이 변형의 진짜 교훈이고, `b.scoped_guard`가 이 구멍을 메운다.
+
+**`b.scoped_guard`: 판단을 인자 수준까지 내린다.**
+
+```python
+# a.tool_name_only
+def needs_approval(call):
+    return call["name"] not in SAFE_TOOLS and call["name"] not in AUTO_APPROVED
+
+# b.scoped_guard
+def needs_approval(call):
+    if call["name"] in SAFE_TOOLS:
+        return False
+    if _is_high_risk(call):        # grant_access 이고 group 이 risk=high 면
+        return True                #   자동승인 여부와 무관하게 항상 재확인
+    return call["name"] not in AUTO_APPROVED
+```
+
+- **등록은 그대로 관대하게, 실행 직전 판단만 엄격하게** — `[항상 승인]`을 누르면 여전히
+  "도구 이름"을 자동승인 목록에 올린다(`a`와 동일). 다만 `needs_approval()`이 실행 직전에
+  인자를 한 번 더 확인해서, `grant_access`의 `group`이 `prod-db`·`payroll`(고위험)이면
+  자동승인 목록에 있어도 예외 없이 다시 물어본다.
+- **고위험 카드에는 `[항상 승인]` 버튼 자체가 없다** — "이번만 승인"은 있어도 "고위험도 앞으로
+  자동으로"는 화면에서 아예 뺐다. 그 버튼이 있으면 guardrail을 다시 끌 수 있는 셈이라 의미가 없다.
+- **3단계 문제와 같은 뿌리다** — 3단계(`b.parallel_unsafe`)는 "승인 요청 단위"가 너무 굵어서
+  (여러 호출이 한 카드에 뭉쳐 나옴), 여기(`a.tool_name_only`)는 "자동승인 등록 단위"가 너무 굵어서
+  (도구 이름 하나로 모든 인자가 통과) 문제였다. **굵은 단위의 자동화는 위험도를 못 본다**는
+  같은 교훈이 두 층에서 반복되는 것이다.
+
+**한계**: 지금은 규칙이 `grant_access` + `risk=high` 하나뿐이다. 유효기간·횟수 제한·감사 로그까지
+가는 법은 [4.auto_approve/a.tool_name_only/CHANGES.md](4.auto_approve/a.tool_name_only/CHANGES.md) 참고.
 
 ---
 
 ## 시나리오
 
+> ⚠️ **1~4단계는 전부 같은 `servers/ops.db` 를 공유한다** (위 "실행" 절 참고). 리셋 버튼은 4단계(`a`·`b` 둘 다)에만 있다.
+> 단계마다 온보딩 대상을 다르게 배정해 뒀으니(위 "시드 데이터" 참고) 보통은 순서대로 밟아도 서로
+> 안 겹치지만, **같은 변형을 두 번째로 실습**할 때는 그 온보딩 대상이 이미 완료돼 있어서
+> `create_account`/`grant_access` 가 "이미 있습니다" 로 no-op 응답한다 — 처음 상태로 다시 보고 싶다면
+> `servers/ops.db` 를 지우고(또는 4단계의 [초기화] 버튼으로) 시작할 것.
+
 **2단계** (localhost:5082)
 ```
-김철수 찾아서 계정 상태 알려줘        ← 조회라 안 물어본다
-계정 만들어줘. 아이디는 chulsoo 로     ← 승인 카드
+최유진 찾아서 계정 상태 알려줘        ← 조회라 안 물어본다
+계정 만들어줘. 아이디는 yujin 으로     ← 승인 카드
 email 이랑 vpn 권한 줘                ← 승인
 prod-db 권한도 줘                     ← 거부해 보기. AI 가 대안을 낸다
 ```
 
-**3단계** (localhost:5083)
-```
-김철수 온보딩 해줘. 계정 chulsoo, email·vpn 권한, 환영 메일까지
-    → 작업번호가 나오고 채팅이 바로 풀린다
-이영희 계정 상태 알려줘               ← 작업이 도는 동안에도 대화가 된다
-                                      (2단계였다면 승인할 때까지 막혀 있었다)
-박민수 prod-db 권한 줘                ← 두 작업이 동시에 진행되고 각자 승인을 기다린다
-진행 상황 알려줘                      ← 메인이 list_jobs 로 조회해 답한다
-```
+**3단계** — 세 변형(`a` 5083 / `b` 5086 / `c` 5087)에 각자 예제 프롬프트가 있다. 셋 다
+온보딩 대상은 다르지만(3a=정다은, 3b=한소연, 3c=윤도현 — 변형끼리도 no-op 안 겹치게)
+공통 얼개는 같다: "OO 온보딩 해줘. 계정 ..., email·vpn 권한, 환영 메일까지"로 J001을 배정하고,
+"박민수한테 prod-db 권한 줘"로 J002를 동시에 띄워 작업 패널에 승인 대기 카드가 **2개** 뜨는 걸
+보는 것 — 단, **승인 카드 안이 도구 하나뿐인지 여러 개가 몰려 있는지**는 변형마다 다르다.
+직접 비교해 보려면 [`3.background_tasks/README.md`](3.background_tasks/README.md)의 표와
+각 폴더의 "예제 프롬프트" 참고.
 
-**4단계** (localhost:5084) — 승인 카드의 `[항상 승인]` 을 눌러 보기
+**4a** (localhost:5084) — 승인 카드의 `[항상 승인]` 을 눌러 보기
 ```
-김철수 온보딩 해줘. 계정 chulsoo, email·vpn 권한
-    → [항상 승인] → 왼쪽 자동승인 목록에 그 기능이 올라간다
+강태호 온보딩 해줘. 계정 taeho, email·vpn 권한
+    → create_account 승인 카드에서 [항상 승인] → 왼쪽 자동승인 목록에 그 기능이 올라간다
+    → 이어지는 grant_access 승인 카드에서도 (email 만 있을 수도, vpn 까지 같이 있을 수도 있다) [항상 승인] → grant_access 도 목록에 오른다
 이영희한테 github 권한 줘   ← 같은 기능이라 안 묻는다 (작업 로그에 ⚡ 자동승인)
                               왼쪽 DB 현황에서 권한이 실제로 늘어난 것을 확인
-자동승인 해제 후 다시 시키기 ← 또 물어본다
-박민수한테 prod-db 권한 줘  ← 고위험인데도 안 묻는다. grant_access 를 통째로 열어준 결과
+자동승인 목록에서 grant_access [해제]
+박민수한테 payroll 권한 줘  ← 해제했으니 다시 물어본다 (박민수는 payroll 이 이미 있어 결과는
+                              no-op 지만, "다시 묻는지" 를 확인하는 게 목적 — 이번엔 그냥 [승인]만)
+
+이영희한테 prod-db 권한 줘  ← grant_access 가 다시 자동승인 상태가 아니라 또 물어본다.
+                              여기서 별 고민 없이 [항상 승인] 을 눌러 보라 — 고위험 권한 하나가
+                              그렇게(별생각 없는 클릭 한 번으로) 나간다
+
+박민수한테 github 권한 줘   ← 방금 그 클릭 한 번 때문에, 이것도 안 묻고 그냥 나간다.
+                              "도구 이름" 단위 자동승인이 위험한 이유가 이거다
+```
+
+**4b** (localhost:5085) — 4a 마지막 두 줄과 똑같은 요청을 다시 해 보기 (온보딩 대상만 다르다)
+```
+오지훈 온보딩 해줘. 계정 jihoon, email·vpn 권한
+    → create_account, grant_access(email) 카드에서 각각 [항상 승인]
+      (자동승인 목록: create_account, grant_access)
+
+박민수한테 vpn 권한 줘      ← vpn 은 고위험이 아니라서 4a 처럼 안 묻는다
+
+박민수한테 prod-db 권한 줘  ← grant_access 는 자동승인 상태인데도 승인 카드가 뜬다!
+                              게다가 이 카드엔 [항상 승인] 버튼이 아예 없다 —
+                              4a 에서는 이 줄이 아무 표시 없이 그냥 나갔던 것과 비교해 볼 것
+
+박민수한테 payroll 권한 줘  ← payroll 도 고위험이라 마찬가지로 매번 재확인된다
 ```
 
 ---

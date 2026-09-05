@@ -5,7 +5,7 @@
 #   에이전트가 세 MCP 서버의 도구를 알아서 골라 처리한다.
 #
 # ── 이 단계의 문제 (2단계로 넘어가는 이유) ──────────────────────
-#   "김철수한테 prod-db 권한 줘" 라고 하면 그냥 준다. 아무도 안 물어본다.
+#   (계정·email·vpn 을 먼저 만든 뒤) "김철수한테 prod-db 권한 줘" 라고 하면 그냥 준다. 아무도 안 물어본다.
 #   운영 DB 접근 권한이 대화 한 줄로 나가는 것이다.
 #   → 되돌릴 수 없는 작업 앞에 사람을 세워야 한다. 그게 2.hitl_approve.
 #
@@ -60,7 +60,7 @@ def mcp_config() -> dict:
     }
 
 
-async def build_agent():
+async def build():
     """세 서버의 도구를 한 묶음으로 받아 에이전트를 만든다."""
     tools = await MultiServerMCPClient(mcp_config()).get_tools()
     agent = create_agent(
@@ -72,12 +72,12 @@ async def build_agent():
     return agent, [t.name for t in tools]
 
 
-agent, TOOL_NAMES = asyncio.run(build_agent())
+agent, TOOL_NAMES = asyncio.run(build())
 
 app = Flask(__name__)
 
 # 데모라 대화는 하나만 쓴다. 실제 서비스라면 로그인 사용자별로 발급한다.
-CONFIG = {"configurable": {"thread_id": "web"}}
+CHAT_CONFIG = {"configurable": {"thread_id": "web"}}
 
 
 @app.route("/")
@@ -91,8 +91,8 @@ def chat():
     if not message:
         return jsonify({"reply": "메시지를 입력하세요.", "trace": []})
 
-    before = len(agent.get_state(CONFIG).values.get("messages", []))
-    result = asyncio.run(agent.ainvoke({"messages": [("user", message)]}, config=CONFIG))
+    before = len(agent.get_state(CHAT_CONFIG).values.get("messages", []))
+    result = asyncio.run(agent.ainvoke({"messages": [("user", message)]}, config=CHAT_CONFIG))
 
     # 이번 턴에 새로 생긴 메시지만 훑어 도구 호출/결과를 뽑는다
     # (messages 는 append-only 라서 인덱스 하나로 '이번 것' 을 가려낼 수 있다)
